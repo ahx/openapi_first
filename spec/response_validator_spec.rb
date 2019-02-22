@@ -2,16 +2,28 @@ require_relative 'spec_helper'
 require 'rack'
 
 RSpec.describe OpenapiFirst::ResponseValidator do
+  let(:spec) do
+    spec_path = './spec/openapi/petstore.yaml'
+    OasParser::Definition.resolve(spec_path)
+  end
+
   let(:subject) do
-    described_class.new('')
+    described_class.new(spec)
   end
 
   let(:request) do
-    Rack::MockRequest.env_for('/pets')
+    env = Rack::MockRequest.env_for('/pets')
+    Rack::Request.new(env)
+  end
+
+  let(:response_body) do
+    JSON.dump({})
   end
 
   let(:response) do
-    Rack::Response.new
+    headers = { Rack::CONTENT_TYPE => 'application/json' }
+    status = 200
+    Rack::MockResponse.new(status, headers, response_body)
   end
 
   it 'returns true' do
