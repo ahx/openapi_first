@@ -25,7 +25,9 @@ Response validation is to make sure your app responds as described in your OpenA
 ```ruby
 # In your test:
 require 'openapi_first'
-OpenapiFirst::ResponseValidator.validate(last_request, last_response)
+spec = OpenapiFirst.load('petstore.yaml')
+validator = OpenapiFirst::ResponseValidator.new(spec)
+validator.validate(last_request, last_response) # => true or false
 ```
 
 ### Request validation (TODO)
