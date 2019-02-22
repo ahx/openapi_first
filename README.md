@@ -19,8 +19,17 @@ And then execute:
 
 Start with writing an OpenAPI specification that describes the API, which you are about to write. Use a [validator](http://speccy.io/) to make sure the file is valid.
 
-### Response validation (TODO)
+### Response validation
 Response validation is to make sure your app responds as described in your OpenAPI spec. You usually to this in your tests using [rack-test](https://github.com/rack-test/rack-test).
+
+```ruby
+# In your test:
+require 'openapi_first'
+OpenapiFirst::ResponseValidator.validate(last_request, last_response)
+```
+
+or (TODO)
+
 ```ruby
   # In your test:
   require 'openapi_first/test'
