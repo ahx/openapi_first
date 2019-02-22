@@ -4,7 +4,7 @@ require 'rack'
 RSpec.describe OpenapiFirst::ResponseValidator do
   let(:spec) do
     spec_path = './spec/openapi/petstore.yaml'
-    OasParser::Definition.resolve(spec_path)
+    OpenapiFirst.load(spec_path)
   end
 
   let(:subject) do
