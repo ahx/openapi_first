@@ -28,20 +28,6 @@ require 'openapi_first'
 OpenapiFirst::ResponseValidator.validate(last_request, last_response)
 ```
 
-or (TODO)
-
-```ruby
-  # In your test:
-  require 'openapi_first/test'
-  include OpenapiFirst::Test
-
-  def test_response_is_ok
-    get '/'
-    assert_equal last_response.status, 200
-    assert_schema_response
-  end
-```
-
 ### Request validation (TODO)
 ```ruby
 # In your app:
