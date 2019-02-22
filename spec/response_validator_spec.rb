@@ -35,7 +35,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
   end
 
   describe 'invalid response' do
-    it 'returns false on unknown http method' do
+    it 'fails on unknown http method' do
       request = begin
         env = Rack::MockRequest.env_for('/pets', method: 'PATCH')
         Rack::Request.new(env)
@@ -48,7 +48,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       )
     end
 
-    it 'returns false on unknown status' do
+    it 'fails on unknown status' do
       response_body = JSON.dump([{ id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(201, headers, response_body)
       expect { subject.validate(request, response) }.to raise_error(
@@ -57,14 +57,22 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       )
     end
 
-    it 'returns false on missing property' do
+    it 'fails on wrong content type' do
+      response_body = JSON.dump([{ id: 2, name: 'Voldemort' }])
+      headers = { Rack::CONTENT_TYPE => 'application/xml' }
+      response = Rack::MockResponse.new(200, headers, response_body)
+      result = subject.validate(request, response)
+      expect(result).to eq(false)
+    end
+
+    it 'fails on missing property' do
       response_body = JSON.dump([{ id: 42 }, { id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
       expect(result).to eq(false)
     end
 
-    it 'returns false on wrong property type' do
+    it 'fails on wrong property type' do
       response_body = JSON.dump([{ id: 'string', name: 'hans' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)

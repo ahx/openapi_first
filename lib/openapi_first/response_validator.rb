@@ -11,7 +11,8 @@ module OpenapiFirst
         .path_by_path(request.path)
         .endpoint_by_method(request.request_method.downcase)
         .response_by_code(response.status.to_s)
-        .content[response.content_type]['schema']
+        .content[response.content_type]&.[]('schema')
+      return false unless response_schema
 
       response_data = JSON.parse(response.body)
       JSONSchemer.schema(response_schema).valid?(response_data)
