@@ -16,23 +16,59 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     Rack::Request.new(env)
   end
 
-  let(:response_body) do
-    JSON.dump({})
+  let(:headers) { { Rack::CONTENT_TYPE => 'application/json' } }
+
+  describe 'valid response' do
+    it 'returns true' do
+      response_body = JSON.dump([{ id: 42, name: 'hans' }, { id: 2, name: 'Voldemort' }])
+      response = Rack::MockResponse.new(200, headers, response_body)
+      result = subject.validate(request, response)
+      expect(result).to eq(true)
+    end
+
+    it 'returns true on additional, not required properties' do
+      response_body = JSON.dump([{ id: 42, name: 'hans', something: 'else' }])
+      response = Rack::MockResponse.new(200, headers, response_body)
+      result = subject.validate(request, response)
+      expect(result).to eq(true)
+    end
   end
 
-  let(:response) do
-    headers = { Rack::CONTENT_TYPE => 'application/json' }
-    status = 200
-    Rack::MockResponse.new(status, headers, response_body)
-  end
+  describe 'invalid response' do
+    it 'returns false on unknown http method' do
+      request = begin
+        env = Rack::MockRequest.env_for('/pets', method: 'PATCH')
+        Rack::Request.new(env)
+      end
+      response_body = JSON.dump([{ id: 'string', name: 'hans' }])
+      response = Rack::MockResponse.new(200, headers, response_body)
+      expect { subject.validate(request, response) }.to raise_error(
+        StandardError,
+        'So such endpoint exists' # TODO: PR on https://github.com/Nexmo/oas_parser/issues/17
+      )
+    end
 
-  it 'returns true' do
-    result = subject.validate(request, response)
-    expect(result).to eq(true)
-  end
+    it 'returns false on unknown status' do
+      response_body = JSON.dump([{ id: 2, name: 'Voldemort' }])
+      response = Rack::MockResponse.new(201, headers, response_body)
+      expect { subject.validate(request, response) }.to raise_error(
+        StandardError,
+        'So such response exists' # TODO: PR on https://github.com/Nexmo/oas_parser/issues/17
+      )
+    end
 
-  it 'returns false' do
-    result = subject.validate(request, response)
-    expect(result).to eq(false)
+    it 'returns false on missing property' do
+      response_body = JSON.dump([{ id: 42 }, { id: 2, name: 'Voldemort' }])
+      response = Rack::MockResponse.new(200, headers, response_body)
+      result = subject.validate(request, response)
+      expect(result).to eq(false)
+    end
+
+    it 'returns false on wrong property type' do
+      response_body = JSON.dump([{ id: 'string', name: 'hans' }])
+      response = Rack::MockResponse.new(200, headers, response_body)
+      result = subject.validate(request, response)
+      expect(result).to eq(false)
+    end
   end
 end

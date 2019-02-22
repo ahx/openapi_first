@@ -18,4 +18,3 @@ module OpenapiFirst
     end
   end
 end
-
