@@ -2,6 +2,8 @@ PATH
   remote: .
   specs:
     openapi_first (0.1.1)
+      json_schemer (~> 0.1)
+      oas_parser (~> 0.16)
 
 GEM
   remote: https://rubygems.org/
@@ -77,8 +79,6 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 2.0)
-  json_schemer (~> 0.1)
-  oas_parser (~> 0.16)
   openapi_first!
   pry
   rack-test (~> 1)

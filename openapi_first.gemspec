@@ -31,9 +31,10 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
   spec.require_paths = ['lib']
 
+  spec.add_dependency 'json_schemer', '~> 0.1'
+  spec.add_dependency 'oas_parser', '~> 0.16'
+
   spec.add_development_dependency 'bundler', '~> 2.0'
-  spec.add_development_dependency 'json_schemer', '~> 0.1'
-  spec.add_development_dependency 'oas_parser', '~> 0.16'
   spec.add_development_dependency 'rack-test', '~> 1'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
