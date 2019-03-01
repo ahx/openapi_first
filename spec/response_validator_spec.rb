@@ -23,14 +23,14 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       response_body = JSON.dump([{ id: 42, name: 'hans' }, { id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
-      expect(result).to eq(true)
+      expect(result.errors).to be_empty
     end
 
     it 'returns true on additional, not required properties' do
       response_body = JSON.dump([{ id: 42, name: 'hans', something: 'else' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
-      expect(result).to eq(true)
+      expect(result.errors).to be_empty
     end
   end
 
@@ -69,14 +69,41 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       response_body = JSON.dump([{ id: 42 }, { id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
-      expect(result).to eq(false)
+      expect(result.errors).to eq(
+        [
+          {
+            'data' => { 'id' => 42 },
+            'data_pointer' => '/0',
+            'schema' => {
+              'properties' => {
+                'id' => { 'format' => 'int64', 'type' => 'integer' },
+                'name' => { 'type' => 'string' },
+                'tag' => { 'type' => 'string' }
+              },
+              'required' => %w[id name]
+            },
+            'schema_pointer' => '/items',
+            'type' => 'required'
+          }
+        ]
+      )
     end
 
     it 'fails on wrong property type' do
       response_body = JSON.dump([{ id: 'string', name: 'hans' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
-      expect(result).to eq(false)
+      expect(result.errors).to eq(
+        [
+          {
+            'data' => 'string',
+            'data_pointer' => '/0/id',
+            'schema' => { 'format' => 'int64', 'type' => 'integer' },
+            'schema_pointer' => '/items/properties/id',
+            'type' => 'integer'
+          }
+        ]
+      )
     end
   end
 end
