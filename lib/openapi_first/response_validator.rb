@@ -15,7 +15,15 @@ module OpenapiFirst
       return false unless response_schema
 
       response_data = JSON.parse(response.body)
-      JSONSchemer.schema(response_schema).valid?(response_data)
+      Validation.new(JSONSchemer.schema(response_schema).validate(response_data))
+    end
+
+    class Validation
+      attr_reader :errors
+
+      def initialize(errors)
+        @errors = errors.to_a.each { |error| error.delete('root_schema') }
+      end
     end
   end
 end

@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
     `git ls-files -z`
       .split("\x0")
       .reject { |f| f.match(%r{^(test|spec|features)/}) }
-      .reject { |f| %w(Dockerfile Jenkinsfile).include?(f) }
+      .reject { |f| %w[Dockerfile Jenkinsfile].include?(f) }
   end
   spec.bindir        = 'exe'
   spec.require_paths = ['lib']
