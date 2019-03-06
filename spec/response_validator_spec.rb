@@ -43,8 +43,8 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       response_body = JSON.dump([{ id: 'string', name: 'hans' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       expect { subject.validate(request, response) }.to raise_error(
-        StandardError,
-        'So such endpoint exists' # TODO: PR on https://github.com/Nexmo/oas_parser/issues/17
+        OasParser::MethodNotFound,
+        "HTTP method not found: 'patch'"
       )
     end
 
@@ -52,8 +52,8 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       response_body = JSON.dump([{ id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(201, headers, response_body)
       expect { subject.validate(request, response) }.to raise_error(
-        StandardError,
-        'So such response exists' # TODO: PR on https://github.com/Nexmo/oas_parser/issues/17
+        OasParser::ResponseCodeNotFound,
+        "Response code not found: '201'"
       )
     end
 
