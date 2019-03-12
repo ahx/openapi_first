@@ -14,12 +14,12 @@ And then execute:
 
     $ bundle
 
-
 ## Usage
 
 Start with writing an OpenAPI specification that describes the API, which you are about to write. Use a [validator](http://speccy.io/) to make sure the file is valid.
 
 ### Response validation
+
 Response validation is to make sure your app responds as described in your OpenAPI spec. You usually to this in your tests using [rack-test](https://github.com/rack-test/rack-test).
 
 ```ruby
@@ -27,10 +27,11 @@ Response validation is to make sure your app responds as described in your OpenA
 require 'openapi_first'
 spec = OpenapiFirst.load('petstore.yaml')
 validator = OpenapiFirst::ResponseValidator.new(spec)
-validator.validate(last_request, last_response) # => true or false
+validator.validate(last_request, last_response).errors? # => true or false
 ```
 
 ### Request validation (TODO)
+
 ```ruby
 # In your app:
 use OpenapiFirst::RequestValidator, spec: myspec
@@ -41,6 +42,7 @@ use OpenapiFirst::RequestValidator, spec: myspec
 ### Mocked server (TODO)
 
 ## Alternatives
+
 This gem is inspired by [committee](https://github.com/interagent/committee), which has much more features like response stubs or support for Hyper-Schema or OpenAPI 2.
 
 ## Development

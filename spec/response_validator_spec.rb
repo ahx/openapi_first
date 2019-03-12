@@ -19,14 +19,15 @@ RSpec.describe OpenapiFirst::ResponseValidator do
   let(:headers) { { Rack::CONTENT_TYPE => 'application/json' } }
 
   describe 'valid response' do
-    it 'returns true' do
+    it 'returns no errors' do
       response_body = JSON.dump([{ id: 42, name: 'hans' }, { id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
+      expect(result.errors?).to be false
       expect(result.errors).to be_empty
     end
 
-    it 'returns true on additional, not required properties' do
+    it 'returns no errors on additional, not required properties' do
       response_body = JSON.dump([{ id: 42, name: 'hans', something: 'else' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
@@ -65,10 +66,11 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       expect(result).to eq(false)
     end
 
-    it 'fails on missing property' do
+    it 'returns errors on missing property' do
       response_body = JSON.dump([{ id: 42 }, { id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
+      expect(result.errors?).to be true
       expect(result.errors).to eq(
         [
           {
@@ -90,7 +92,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       )
     end
 
-    it 'fails on wrong property type' do
+    it 'returns errors on wrong property type' do
       response_body = JSON.dump([{ id: 'string', name: 'hans' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
