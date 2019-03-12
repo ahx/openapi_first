@@ -74,6 +74,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
           {
             'data' => { 'id' => 42 },
             'data_pointer' => '/0',
+            'details' => { 'missing_keys' => ['name'] },
             'schema' => {
               'properties' => {
                 'id' => { 'format' => 'int64', 'type' => 'integer' },
