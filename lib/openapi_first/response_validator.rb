@@ -1,4 +1,5 @@
 require 'json_schemer'
+require_relative 'validation'
 
 module OpenapiFirst
   class ResponseValidator
@@ -16,18 +17,6 @@ module OpenapiFirst
 
       response_data = JSON.parse(response.body)
       Validation.new(JSONSchemer.schema(response_schema).validate(response_data))
-    end
-
-    class Validation
-      attr_reader :errors
-
-      def initialize(errors)
-        @errors = errors.to_a.each { |error| error.delete('root_schema') }
-      end
-
-      def errors?
-        !errors.empty?
-      end
     end
   end
 end
