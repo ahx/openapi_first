@@ -24,7 +24,6 @@ Response validation is to make sure your app responds as described in your OpenA
 
 ```ruby
 # In your test:
-require 'openapi_first'
 spec = OpenapiFirst.load('petstore.yaml')
 validator = OpenapiFirst::ResponseValidator.new(spec)
 validator.validate(last_request, last_response).errors? # => true or false
@@ -37,7 +36,38 @@ validator.validate(last_request, last_response).errors? # => true or false
 use OpenapiFirst::RequestValidator, spec: myspec
 ```
 
-### Completeness / Spec Test Coverage (TODO)
+### Completeness / Test Coverage
+
+`OpenapiFirst::TestCoverage` can help you make sure, that you have called all endpoints of your OAS file when running tests via `rack-test`:
+
+```ruby
+# In your test (rspec example):
+require 'openapi_first'
+
+describe MyApp do
+  include Rack::Test::Methods
+
+  before(:all) do
+    spec = OpenapiFirst.load('petstore.yaml')
+    @app_wrapper = OpenapiFirst::TestCoverage.new(MyApp, spec)
+  end
+
+  after(:all) do
+    message = "The following paths have not been called yet: #{@app_wrapper.to_be_called}"
+    expect(@app_wrapper.to_be_called).to be_empty
+  end
+
+  # Overwrite `#app` to make rack-test call the wrapped app
+  def app
+    @app_wrapper
+  end
+
+  it 'does things' do
+    get '/i/my/stuff'
+    # …
+  end
+end
+```
 
 ### Mocked server (TODO)
 
