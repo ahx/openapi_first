@@ -36,7 +36,7 @@ validator.validate(last_request, last_response).errors? # => true or false
 use OpenapiFirst::RequestValidator, spec: myspec
 ```
 
-### Completeness / Test Coverage (TODO)
+### Completeness / Test Coverage
 
 `OpenapiFirst::TestCoverage` can help you make sure, that you have called all endpoints of your OAS file when running tests via `rack-test`:
 
