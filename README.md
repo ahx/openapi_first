@@ -29,12 +29,16 @@ validator = OpenapiFirst::ResponseValidator.new(spec)
 validator.validate(last_request, last_response).errors? # => true or false
 ```
 
-### Request validation (TODO)
+### Request parameter validation
 
 ```ruby
-# In your app:
-use OpenapiFirst::RequestValidator, spec: myspec
+# Add the RequestParameters middleware:
+use OpenapiFirst::RequestParameters, spec: myspec
 ```
+
+Using the `RequestParameters` middleware will parse the request with ((`Rack::Parser`)[https://rubygems.org/gems/rack-parser]) and will respond with a 400 status if the request is not valid according to the specification.
+
+The error response (400) conforms with [JSON:API](https://jsonapi.org).
 
 ### Completeness / Test Coverage
 
