@@ -20,7 +20,7 @@ Start with writing an OpenAPI specification that describes the API, which you ar
 
 ### Response validation
 
-Response validation is to make sure your app responds as described in your OpenAPI spec. You usually to this in your tests using [rack-test](https://github.com/rack-test/rack-test).
+Response validation is to make sure your app responds as described in your OpenAPI spec. You usually do this in your tests using [rack-test](https://github.com/rack-test/rack-test).
 
 ```ruby
 # In your test:
