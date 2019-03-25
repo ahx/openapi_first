@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    openapi_first (0.1.4)
+    openapi_first (0.1.5)
       json_schemer (~> 0.2)
       oas_parser (~> 0.18)
 
