@@ -58,6 +58,8 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     end
 
     it 'fails on unknown status' do
+      env = Rack::MockRequest.env_for('/pets/1')
+      request = Rack::Request.new(env)
       response_body = JSON.dump([{ id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(201, headers, response_body)
       expect { subject.validate(request, response) }.to raise_error(
