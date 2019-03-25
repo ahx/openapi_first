@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     openapi_first (0.1.4)
-      json_schemer (~> 0.1)
-      oas_parser (~> 0.16)
+      json_schemer (~> 0.2)
+      oas_parser (~> 0.18)
 
 GEM
   remote: https://rubygems.org/
@@ -38,9 +38,9 @@ GEM
     mustermann-contrib (1.0.3)
       hansi (~> 0.2.0)
       mustermann (= 1.0.3)
-    nokogiri (1.10.1)
+    nokogiri (1.10.2)
       mini_portile2 (~> 2.4.0)
-    oas_parser (0.17.0)
+    oas_parser (0.18.0)
       activesupport (>= 4.0.0)
       addressable (~> 2.3)
       builder (~> 3.2.3)
