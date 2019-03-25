@@ -19,8 +19,8 @@ RSpec.describe OpenapiFirst::TestCoverage do
     end
 
     it 'removes an endpoint after it was called' do
-      expected_endpoints = %w[/pets#post /pets/{petId}#get]
-      response = Rack::MockRequest.new(subject).get('/pets')
+      expected_endpoints = %w[/pets#get /pets#post]
+      response = Rack::MockRequest.new(subject).get('/pets/1')
       expect(subject.to_be_called).to eq expected_endpoints
       expect(response.body).to eq 'hello' # make we called the original app
     end
