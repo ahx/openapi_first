@@ -27,6 +27,14 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       expect(result.errors).to be_empty
     end
 
+    it 'falls back to the default' do
+      response_body = JSON.dump(code: 422, message: 'Not good!' )
+      response = Rack::MockResponse.new(422, headers, response_body)
+      result = subject.validate(request, response)
+      expect(result.errors).to be_empty
+      expect(result.errors?).to be false
+    end
+
     it 'returns no errors on additional, not required properties' do
       response_body = JSON.dump([{ id: 42, name: 'hans', something: 'else' }])
       response = Rack::MockResponse.new(200, headers, response_body)
@@ -50,6 +58,8 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     end
 
     it 'fails on unknown status' do
+      env = Rack::MockRequest.env_for('/pets/1')
+      request = Rack::Request.new(env)
       response_body = JSON.dump([{ id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(201, headers, response_body)
       expect { subject.validate(request, response) }.to raise_error(

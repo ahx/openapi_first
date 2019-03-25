@@ -11,7 +11,7 @@ module OpenapiFirst
       response_schema = @schema
         .path_by_path(request.path)
         .endpoint_by_method(request.request_method.downcase)
-        .response_by_code(response.status.to_s)
+        .response_by_code(response.status.to_s, use_default: true)
         .content[response.content_type]&.[]('schema')
       return false unless response_schema
 
