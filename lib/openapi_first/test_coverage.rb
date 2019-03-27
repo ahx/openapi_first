@@ -26,8 +26,8 @@ module OpenapiFirst
       @spec
         .path_by_path(request.path)
         .endpoint_by_method(request.request_method.downcase)
-      rescue OasParser::PathNotFound
-        nil
+    rescue OasParser::PathNotFound
+      nil
     end
   end
 end
