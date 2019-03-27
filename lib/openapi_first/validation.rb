@@ -3,7 +3,7 @@ module OpenapiFirst
     attr_reader :errors
 
     def initialize(errors)
-      @errors = errors.to_a.each { |error| error.delete('root_schema') }
+      @errors = errors
     end
 
     def errors?
