@@ -1,7 +1,8 @@
 require_relative 'spec_helper'
 require 'rack'
+require 'openapi_first/coverage'
 
-RSpec.describe OpenapiFirst::TestCoverage do
+RSpec.describe OpenapiFirst::Coverage do
   let(:spec) do
     spec_path = './spec/data/openapi/petstore.yaml'
     OpenapiFirst.load(spec_path)
@@ -11,7 +12,7 @@ RSpec.describe OpenapiFirst::TestCoverage do
     app = ->(_env) { Rack::Response.new('hello') }
     described_class.new(app, spec)
   end
-  
+
   describe '#to_be_called' do
     it 'starts with all endpoints' do
       expected_endpoints = %w[/pets#get /pets#post /pets/{petId}#get]

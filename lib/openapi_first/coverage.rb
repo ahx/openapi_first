@@ -1,5 +1,5 @@
 module OpenapiFirst
-  class TestCoverage
+  class Coverage
     attr_reader :to_be_called
 
     def initialize(app, spec)
@@ -24,8 +24,8 @@ module OpenapiFirst
 
     def endpoint_id_for_request(request)
       endpoint = @spec
-        .path_by_path(request.path)
-        .endpoint_by_method(request.request_method.downcase)
+                 .path_by_path(request.path)
+                 .endpoint_by_method(request.request_method.downcase)
       endpoint_id(endpoint)
     end
   end
