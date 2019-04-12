@@ -1,5 +1,6 @@
 require_relative 'spec_helper'
 require 'rack'
+require 'openapi_first/response_validator'
 
 RSpec.describe OpenapiFirst::ResponseValidator do
   let(:spec) do
@@ -20,7 +21,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
 
   describe 'valid response' do
     it 'returns no errors' do
-      response_body = JSON.dump([{ id: 42, name: 'hans' }, { id: 2, name: 'Voldemort' }])
+      response_body = json_dump([{ id: 42, name: 'hans' }, { id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
       expect(result.errors?).to be false
@@ -28,7 +29,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     end
 
     it 'returns no errors on additional, not required properties' do
-      response_body = JSON.dump([{ id: 42, name: 'hans', something: 'else' }])
+      response_body = json_dump([{ id: 42, name: 'hans', something: 'else' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
       expect(result.errors).to be_empty
@@ -41,7 +42,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
         env = Rack::MockRequest.env_for('/pets', method: 'PATCH')
         Rack::Request.new(env)
       end
-      response_body = JSON.dump([{ id: 'string', name: 'hans' }])
+      response_body = json_dump([{ id: 'string', name: 'hans' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       expect { subject.validate(request, response) }.to raise_error(
         OasParser::MethodNotFound,
@@ -50,7 +51,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     end
 
     it 'fails on unknown status' do
-      response_body = JSON.dump([{ id: 2, name: 'Voldemort' }])
+      response_body = json_dump([{ id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(201, headers, response_body)
       expect { subject.validate(request, response) }.to raise_error(
         OasParser::ResponseCodeNotFound,
@@ -59,7 +60,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     end
 
     it 'fails on wrong content type' do
-      response_body = JSON.dump([{ id: 2, name: 'Voldemort' }])
+      response_body = json_dump([{ id: 2, name: 'Voldemort' }])
       headers = { Rack::CONTENT_TYPE => 'application/xml' }
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
@@ -67,7 +68,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     end
 
     it 'returns errors on missing property' do
-      response_body = JSON.dump([{ id: 42 }, { id: 2, name: 'Voldemort' }])
+      response_body = json_dump([{ id: 42 }, { id: 2, name: 'Voldemort' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
       expect(result.errors?).to be true
@@ -93,7 +94,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     end
 
     it 'returns errors on wrong property type' do
-      response_body = JSON.dump([{ id: 'string', name: 'hans' }])
+      response_body = json_dump([{ id: 'string', name: 'hans' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
       expect(result.errors).to eq(
