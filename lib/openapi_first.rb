@@ -6,8 +6,6 @@ module OpenapiFirst
     OasParser::Definition.resolve(spec_path)
   end
 
-  QUERY_PARAMS = 'openapi_first.params'.freeze
-
   class Error < StandardError; end
   # Your code goes here...
 end

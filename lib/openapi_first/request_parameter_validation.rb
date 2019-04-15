@@ -5,6 +5,8 @@ require 'json_schemer'
 require 'multi_json'
 
 module OpenapiFirst
+  QUERY_PARAMS = 'openapi_first.params'.freeze
+
   class RequestParameterValidation
     JSON_API_CONTENT_TYPE = 'application/vnd.api+json'
 
@@ -17,8 +19,11 @@ module OpenapiFirst
     def call(env)
       req = Rack::Request.new(env)
       schema = parameter_schema(req)
-      errors = schema && JSONSchemer.schema(schema).validate(req.params)
-      return error_response(errors) if errors&.any?
+      if schema
+        errors = schema && JSONSchemer.schema(schema).validate(req.params)
+        return error_response(errors) if errors&.any?
+        req.env[QUERY_PARAMS] = allowed_query_parameters(schema, req.params)
+      end
 
       @app.call(env)
     end
@@ -29,6 +34,13 @@ module OpenapiFirst
         400,
         Rack::CONTENT_TYPE => JSON_API_CONTENT_TYPE
       )
+    end
+
+    def allowed_query_parameters(params_schema, query_params)
+      params_schema['properties'].keys.each_with_object({}) do |parameter_name, filtered|
+        value = query_params[parameter_name]
+        filtered[parameter_name] = value if value
+      end
     end
 
     def parameter_schema(req)
@@ -75,11 +87,14 @@ module OpenapiFirst
       end
     end
 
-    def spec_parameters(req)
+    def spec_endpoint(req)
       @spec
         .path_by_path(req.path)
         .endpoint_by_method(req.request_method.downcase)
-        .query_parameters
+    end
+
+    def spec_parameters(req)
+        spec_endpoint(req).query_parameters
     end
   end
 end

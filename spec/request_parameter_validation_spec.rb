@@ -73,7 +73,7 @@ RSpec.describe OpenapiFirst::RequestParameterValidation do
     end
 
     it 'adds filtered query parameters to env ' do
-      env = Rack::MockRequest.env_for(path, params: query_params.merge(foo: 'bar'))
+      env = Rack::MockRequest.env_for(path, params: query_params)
       app.call(env)
 
       expect(env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
@@ -115,6 +115,14 @@ RSpec.describe OpenapiFirst::RequestParameterValidation do
 
         expect(last_response.status).to be 200
       end
+
+      it 'still adds filtered query parameters to env ' do
+        env = Rack::MockRequest.env_for(path, params: query_params.merge(foo: 'bar'))
+        app.call(env)
+
+        expect(env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
+      end
+    end
   end
 
   describe '#query_parameter_schema' do

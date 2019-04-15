@@ -115,6 +115,10 @@ use OpenapiFirst::RequestParameterValidation,
     spec: myspec,
     allow_additional_parameters: true
 ```
+
+The middleware filteres all top-level query parameters and ads these to the Rack env: `env[OpenapiFirst::QUERY_PARAMS]`.
+If you want to dis-allow nested query parameters you will need to use `additionalProperties: false` in your query parameter json schema.
+
 OpenapiFirst does not support parameters set to `explode: false` and treats nested query parameters (`filter[foo]=bar`) like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values).
 
 ### TODO: Request Body validation
