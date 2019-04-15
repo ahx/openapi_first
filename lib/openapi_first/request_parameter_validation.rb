@@ -8,9 +8,10 @@ module OpenapiFirst
   class RequestParameterValidation
     JSON_API_CONTENT_TYPE = 'application/vnd.api+json'
 
-    def initialize(app, spec:)
+    def initialize(app, spec:, allow_additional_parameters: false)
       @app = app
       @spec = spec
+      @additional_properties = allow_additional_parameters
     end
 
     def call(env)
@@ -34,7 +35,7 @@ module OpenapiFirst
       spec_parameters(req).each_with_object(
         'type' => 'object',
         'required' => [],
-        'additionalProperties' => false,
+        'additionalProperties' => @additional_properties,
         'properties' => {}
       ) do |parameter, schema|
         schema['required'] << parameter.name if parameter.required

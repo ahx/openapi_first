@@ -2,8 +2,15 @@ openapi: "3.0.2"
 info:
   version: 1.0.0
   title: Search example
+  contact:
+    name: Contact Name
+    email: contact@example.com
+    url: https://example.com/
 servers:
   - url: http://example.com
+tags:
+  - name: search
+    description: Search
 paths:
   /search:
     get:
@@ -12,12 +19,24 @@ paths:
       tags:
         - pets
       parameters:
-        - name: q
+        - name: term
           in: query
           description: The term you want to search for
           required: true
           schema:
             type: string
+        - name: filter
+          in: query
+          description: Filter results
+          example: "filter[tag]"
+          schema:
+            type: object
+            required: [tag]
+            properties:
+              tag:
+                type: string
+              other:
+                type: object
         - name: limit
           in: query
           description: How many items to return at one time (max 100)

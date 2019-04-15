@@ -108,6 +108,15 @@ require 'openapi_first/request_parameter_validation'
 use OpenapiFirst::RequestParameterValidation, spec: myspec
 ```
 
+By default OpenapiFirst does not allow additional query parameters and will respond with 400 if additional parameters are sent. You can allow additional parameters with `additional_properties: true`:
+
+```ruby
+use OpenapiFirst::RequestParameterValidation,
+    spec: myspec,
+    allow_additional_parameters: true
+```
+OpenapiFirst does not support parameters set to `explode: false` and treats nested query parameters (`filter[foo]=bar`) like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values).
+
 ### TODO: Request Body validation
 
 ```ruby

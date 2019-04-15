@@ -8,23 +8,21 @@ require 'openapi_first/request_parameter_validation'
 RSpec.describe OpenapiFirst::RequestParameterValidation do
   API_SPEC = OpenapiFirst.load('./spec/data/openapi/search.yaml')
 
-  App = Rack::Builder.new do
-    use OpenapiFirst::RequestParameterValidation, spec: API_SPEC
-    run lambda { |_env|
-      Rack::Response.new('hello', 200)
-    }
-  end
-
   describe '#call' do
     include Rack::Test::Methods
 
-    def app
-      App
+    let(:app) do
+      Rack::Builder.new do
+        use OpenapiFirst::RequestParameterValidation, spec: API_SPEC
+        run lambda { |_env|
+          Rack::Response.new('hello', 200)
+        }
+      end
     end
 
     let(:query_params) do
       {
-        q: 'Oscar'
+        'term' => 'Oscar'
       }
     end
 
@@ -37,13 +35,13 @@ RSpec.describe OpenapiFirst::RequestParameterValidation do
     end
 
     it 'returns 400 if query parameter is missing' do
-      query_params.delete(:q)
+      query_params.delete('term')
       get path, query_params
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
       expect(error[:title]).to eq 'is missing'
-      expect(error[:source][:parameter]).to eq 'q'
+      expect(error[:source][:parameter]).to eq 'term'
     end
 
     it 'returns 400 if query parameter is not valid' do
@@ -67,20 +65,19 @@ RSpec.describe OpenapiFirst::RequestParameterValidation do
       expect(error[:source][:parameter]).to eq 'include'
     end
 
-    it 'does not allow additional query parameters in strict mode' do
+    it 'does not allow additional query parameters by default' do
       query_params[:foo] = 'bar'
       get path, query_params
 
       expect(last_response.status).to be 400
     end
 
-    it 'adds whitelisted query parameters to env in non strict mode' # do
-    # query_params[:foo] = 'bar'
-    # env = Rack::MockRequest.env_for(path, params: query_params)
-    # app.call(env)
+    it 'adds filtered query parameters to env ' do
+      env = Rack::MockRequest.env_for(path, params: query_params.merge(foo: 'bar'))
+      app.call(env)
 
-    # expect(env[OpenapiFirst::QUERY_PARAMS]).to be query_params
-    # end
+      expect(env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
+    end
 
     it 'skips parameter validation if path was not found' do
       get '/foo'
@@ -99,6 +96,25 @@ RSpec.describe OpenapiFirst::RequestParameterValidation do
 
       expect(last_response.status).to be 200
     end
+
+    describe('allow_additional_parameters: true') do
+      let(:app) do
+        Rack::Builder.new do
+          use OpenapiFirst::RequestParameterValidation,
+              spec: API_SPEC,
+              allow_additional_parameters: true
+          run lambda { |_env|
+            Rack::Response.new('hello', 200)
+          }
+        end
+      end
+
+      it 'does allow additional query parameters by default' do
+        query_params[:foo] = 'bar'
+        get path, query_params
+
+        expect(last_response.status).to be 200
+      end
   end
 
   describe '#query_parameter_schema' do
@@ -107,12 +123,29 @@ RSpec.describe OpenapiFirst::RequestParameterValidation do
       described_class.new(app, spec: API_SPEC)
     end
 
-    it 'returns the JSON Schema for the request' do
-      expected_schema = {
+    let(:expected_schema) do
+      {
+        'type' => 'object',
+        'required' => %w[
+          term
+        ],
+        'additionalProperties' => false,
         'properties' => {
           'birthdate' => {
             'format' => 'date',
             'type' => 'string'
+          },
+          'filter' => {
+            'type' => 'object',
+            'required' => ['tag'],
+            'properties' => {
+              'tag' => {
+                'type' => 'string'
+              },
+              'other' => {
+                'type' => 'object'
+              }
+            }
           },
           'include' => {
             'type' => 'string',
@@ -122,19 +155,18 @@ RSpec.describe OpenapiFirst::RequestParameterValidation do
             'type' => 'integer',
             'format' => 'int32'
           },
-          'q' => {
+          'term' => {
             'type' => 'string'
           }
-        },
-        'required' => [
-          'q'
-        ],
-        'type' => 'object'
+        }
       }
+    end
 
+    it 'returns the JSON Schema for the request' do
       env = Rack::MockRequest.env_for('/search')
       request = Rack::Request.new(env)
-      expect(subject.parameter_schema(request)).to eq expected_schema
+      parameter_schema = subject.parameter_schema(request)
+      expect(parameter_schema).to eq expected_schema
     end
   end
 end
