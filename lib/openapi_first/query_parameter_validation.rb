@@ -7,7 +7,7 @@ require 'multi_json'
 module OpenapiFirst
   QUERY_PARAMS = 'openapi_first.params'.freeze
 
-  class RequestParameterValidation
+  class QueryParameterValidation
     JSON_API_CONTENT_TYPE = 'application/vnd.api+json'
 
     def initialize(app, spec:, allow_additional_parameters: false)

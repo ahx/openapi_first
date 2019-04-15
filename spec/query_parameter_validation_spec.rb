@@ -3,9 +3,9 @@
 require_relative 'spec_helper'
 require 'rack'
 require 'rack/test'
-require 'openapi_first/request_parameter_validation'
+require 'openapi_first/query_parameter_validation'
 
-RSpec.describe OpenapiFirst::RequestParameterValidation do
+RSpec.describe OpenapiFirst::QueryParameterValidation do
   API_SPEC = OpenapiFirst.load('./spec/data/openapi/search.yaml')
 
   describe '#call' do
@@ -13,7 +13,7 @@ RSpec.describe OpenapiFirst::RequestParameterValidation do
 
     let(:app) do
       Rack::Builder.new do
-        use OpenapiFirst::RequestParameterValidation, spec: API_SPEC
+        use OpenapiFirst::QueryParameterValidation, spec: API_SPEC
         run lambda { |_env|
           Rack::Response.new('hello', 200)
         }
@@ -100,7 +100,7 @@ RSpec.describe OpenapiFirst::RequestParameterValidation do
     describe('allow_additional_parameters: true') do
       let(:app) do
         Rack::Builder.new do
-          use OpenapiFirst::RequestParameterValidation,
+          use OpenapiFirst::QueryParameterValidation,
               spec: API_SPEC,
               allow_additional_parameters: true
           run lambda { |_env|

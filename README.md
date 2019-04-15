@@ -100,18 +100,18 @@ content-type: "application/vnd.api+json"
 }
 ```
 
-### Request parameter validation
+### Query parameter validation
 
 ```ruby
 # Add the middleware:
-require 'openapi_first/request_parameter_validation'
-use OpenapiFirst::RequestParameterValidation, spec: myspec
+require 'openapi_first/query_parameter_validation'
+use OpenapiFirst::QueryParameterValidation, spec: myspec
 ```
 
 By default OpenapiFirst does not allow additional query parameters and will respond with 400 if additional parameters are sent. You can allow additional parameters with `additional_properties: true`:
 
 ```ruby
-use OpenapiFirst::RequestParameterValidation,
+use OpenapiFirst::QueryParameterValidation,
     spec: myspec,
     allow_additional_parameters: true
 ```
