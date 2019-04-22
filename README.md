@@ -78,6 +78,13 @@ OpenapiFirst offers Rack middlewares to auto-implement different aspects of requ
 
 If the request is not valid, these middlewares return a 400 status code with a body that describes the error.
 
+To make request parameter validation work, make sure you add the endpoint Rack middleware first. This will add the current endpoint to the Rack env:
+
+```ruby
+require 'openapi_first/request_endpoint'
+use OpenapiFirst::RequestEndpoint, spec: myspec
+```
+
 The error responses conform with [JSON:API](https://jsonapi.org).
 
 Here's and example response body for a missing query parameter "search":
@@ -123,15 +130,11 @@ OpenapiFirst does not support parameters set to `explode: false` and treats nest
 
 Request body validation is build of these middlewares:
 
-1. `RequestEndpoint` - Finds the endpoint of the current request
-2. `RequestBody` - Parses the request body
-3. `RequestBodyValidation` - Validates the parsed request body
+1. `RequestBody` - Parses the request body
+2. `RequestBodyValidation` - Validates the parsed request body
 
 ```ruby
 # Add these middlewares:
-require 'openapi_first/request_endpoint'
-use OpenapiFirst::RequestEndpoint, spec: myspec
-
 require 'openapi_first/request_body_parser'
 use OpenapiFirst::RequestBody, spec: myspec
 
