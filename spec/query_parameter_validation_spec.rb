@@ -125,7 +125,7 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
     end
   end
 
-  describe '#query_parameter_schema' do
+  describe '#parameter_schema' do
     let(:subject) do
       app = ->(_env) { Rack::Response(['hello'], 200) }
       described_class.new(app, spec: SEARCH_SPEC)
