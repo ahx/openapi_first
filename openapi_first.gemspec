@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'json_schemer', '~> 0.2'
+  spec.add_dependency 'multi_json', '~> 1.13'
   spec.add_dependency 'oas_parser', '~> 0.18'
 
   spec.add_development_dependency 'bundler', '~> 2.0'

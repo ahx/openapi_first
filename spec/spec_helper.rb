@@ -1,7 +1,20 @@
 require 'bundler/setup'
 require 'openapi_first'
+require 'multi_json'
+
+module OpenapiFirstSpecHelpers
+  def json_dump(data)
+    MultiJson.dump(data)
+  end
+
+  def json_load(string, options = {})
+    MultiJson.load(string, options)
+  end
+end
 
 RSpec.configure do |config|
+  config.include(OpenapiFirstSpecHelpers)
+
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = '.rspec_status'
 

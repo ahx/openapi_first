@@ -1,4 +1,5 @@
 require 'json_schemer'
+require 'multi_json'
 require_relative 'validation'
 
 module OpenapiFirst
@@ -28,7 +29,7 @@ module OpenapiFirst
       response_schema = content_type['schema']
       return unless response_schema
 
-      response_data = JSON.parse(response.body)
+      response_data = MultiJson.load(response.body)
       validate_json_schema(response_schema, response_data)
     end
 

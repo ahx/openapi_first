@@ -1,7 +1,8 @@
 require_relative 'spec_helper'
 require 'rack'
+require 'openapi_first/coverage'
 
-RSpec.describe OpenapiFirst::TestCoverage do
+RSpec.describe OpenapiFirst::Coverage do
   let(:spec) do
     spec_path = './spec/data/openapi/petstore.yaml'
     OpenapiFirst.load(spec_path)

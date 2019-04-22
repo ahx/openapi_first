@@ -1,5 +1,5 @@
 module OpenapiFirst
-  class TestCoverage
+  class Coverage
     attr_reader :to_be_called
 
     def initialize(app, spec)
