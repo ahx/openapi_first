@@ -11,8 +11,8 @@ module OpenapiFirst
     end
 
     def call(env)
-      id = endpoint_id_for_request(Rack::Request.new(env))
-      @to_be_called.delete(id)
+      endpoint = endpoint_for_request(Rack::Request.new(env))
+      @to_be_called.delete(endpoint_id(endpoint)) if endpoint
       @app.call(env)
     end
 
@@ -22,11 +22,12 @@ module OpenapiFirst
       "#{endpoint.path.path}##{endpoint.method}"
     end
 
-    def endpoint_id_for_request(request)
-      endpoint = @spec
-                 .path_by_path(request.path)
-                 .endpoint_by_method(request.request_method.downcase)
-      endpoint_id(endpoint)
+    def endpoint_for_request(request)
+      @spec
+        .path_by_path(request.path)
+        .endpoint_by_method(request.request_method.downcase)
+    rescue OasParser::PathNotFound
+      nil
     end
   end
 end
