@@ -71,11 +71,9 @@ end
 
 OpenapiFirst offers tools to help implementing your app.
 
-### Request Validation
-
 OpenapiFirst offers Rack middlewares to auto-implement different aspects of request validation:
 
-- Request parameter validation
+- Query parameter validation
 - Request body validation
 
 If the request is not valid, these middlewares return a 400 status code with a body that describes the error.
@@ -116,12 +114,30 @@ use OpenapiFirst::QueryParameterValidation,
     allow_additional_parameters: true
 ```
 
-The middleware filteres all top-level query parameters and ads these to the Rack env: `env[OpenapiFirst::QUERY_PARAMS]`.
-If you want to dis-allow nested query parameters you will need to use `additionalProperties: false` in your query parameter json schema.
+The middleware filteres all top-level query parameters and adds these to the Rack env: `env[OpenapiFirst::QUERY_PARAMS]`.
+If you want to forbit nested query parameters you will need to use `additionalProperties: false` in your query parameter json schema.
 
 OpenapiFirst does not support parameters set to `explode: false` and treats nested query parameters (`filter[foo]=bar`) like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values).
 
-### TODO: Request Body validation
+### Request Body validation
+
+Request body validation is build of these middlewares:
+
+1. `RequestEndpoint` - Finds the endpoint of the current request
+2. `RequestBody` - Parses the request body
+3. `RequestBodyValidation` - Validates the parsed request body
+
+```ruby
+# Add these middlewares:
+require 'openapi_first/request_endpoint'
+use OpenapiFirst::RequestEndpoint, spec: myspec
+
+require 'openapi_first/request_body_parser'
+use OpenapiFirst::RequestBody, spec: myspec
+
+require 'openapi_first/request_body_validation'
+use OpenapiFirst::RequestBodyValidation, spec: myspec
+```
 
 ```ruby
 # Add the middleware:
