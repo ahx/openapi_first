@@ -5,15 +5,15 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first/request_endpoint'
 
-RSpec.describe OpenapiFirst::RequestEndpoint do
-  API_SPEC = OpenapiFirst.load('./spec/data/openapi/petstore.yaml')
+PETSTORE_SPEC = OpenapiFirst.load('./spec/data/openapi/petstore.yaml')
 
+RSpec.describe OpenapiFirst::RequestEndpoint do
   describe '#call' do
     include Rack::Test::Methods
 
     let(:app) do
       Rack::Builder.new do
-        use OpenapiFirst::RequestEndpoint, spec: API_SPEC
+        use OpenapiFirst::RequestEndpoint, spec: PETSTORE_SPEC
         run lambda { |_env|
           Rack::Response.new('hello', 200)
         }
@@ -57,7 +57,7 @@ RSpec.describe OpenapiFirst::RequestEndpoint do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::RequestEndpoint,
-              spec: API_SPEC,
+              spec: PETSTORE_SPEC,
               allow_unknown_endpoint: true
           run lambda { |_env|
             Rack::Response.new('hello', 200)
