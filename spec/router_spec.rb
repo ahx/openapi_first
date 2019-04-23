@@ -3,17 +3,17 @@
 require_relative 'spec_helper'
 require 'rack'
 require 'rack/test'
-require 'openapi_first/request_endpoint'
+require 'openapi_first/router'
 
 PETSTORE_SPEC = OpenapiFirst.load('./spec/data/openapi/petstore.yaml')
 
-RSpec.describe OpenapiFirst::RequestEndpoint do
+RSpec.describe OpenapiFirst::Router do
   describe '#call' do
     include Rack::Test::Methods
 
     let(:app) do
       Rack::Builder.new do
-        use OpenapiFirst::RequestEndpoint, spec: PETSTORE_SPEC
+        use OpenapiFirst::Router, spec: PETSTORE_SPEC
         run lambda { |_env|
           Rack::Response.new('hello', 200)
         }
@@ -44,21 +44,21 @@ RSpec.describe OpenapiFirst::RequestEndpoint do
       expect(last_response.body).to eq ''
     end
 
-    it 'adds the endpoint to env ' do
+    it 'adds the operation to env ' do
       env = Rack::MockRequest.env_for(path, params: query_params)
       app.call(env)
 
-      endpoint = env[OpenapiFirst::ENDPOINT]
-      expect(endpoint.path.path).to eq path
-      expect(endpoint.method).to eq 'get'
+      operation = env[OpenapiFirst::OPERATION]
+      expect(operation.path.path).to eq path
+      expect(operation.method).to eq 'get'
     end
 
-    describe('allow_unknown_endpoint: true') do
+    describe('allow_unknown_operation: true') do
       let(:app) do
         Rack::Builder.new do
-          use OpenapiFirst::RequestEndpoint,
+          use OpenapiFirst::Router,
               spec: PETSTORE_SPEC,
-              allow_unknown_endpoint: true
+              allow_unknown_operation: true
           run lambda { |_env|
             Rack::Response.new('hello', 200)
           }
