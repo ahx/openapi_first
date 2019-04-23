@@ -36,6 +36,8 @@ validator.validate(last_request, last_response).errors? # => true or false
 
 ### Coverage
 
+(This is a bit experimental. Please try it out and give feedback.)
+
 `OpenapiFirst::Coverage` helps you make sure, that you have called all endpoints of your OAS file when running tests via `rack-test`.
 
 ```ruby
