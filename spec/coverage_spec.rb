@@ -4,7 +4,7 @@ require 'openapi_first/coverage'
 
 RSpec.describe OpenapiFirst::Coverage do
   let(:spec) do
-    spec_path = './spec/data/openapi/petstore.yaml'
+    spec_path = './spec/data/petstore.yaml'
     OpenapiFirst.load(spec_path)
   end
 

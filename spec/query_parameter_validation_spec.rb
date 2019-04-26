@@ -3,17 +3,24 @@
 require_relative 'spec_helper'
 require 'rack'
 require 'rack/test'
+require 'openapi_first/router'
 require 'openapi_first/query_parameter_validation'
 
+SEARCH_SPEC = OpenapiFirst.load('./spec/data/search.yaml')
+
 RSpec.describe OpenapiFirst::QueryParameterValidation do
-  API_SPEC = OpenapiFirst.load('./spec/data/openapi/search.yaml')
+  let(:path) do
+    '/search'
+  end
 
   describe '#call' do
     include Rack::Test::Methods
 
     let(:app) do
       Rack::Builder.new do
-        use OpenapiFirst::QueryParameterValidation, spec: API_SPEC
+        use OpenapiFirst::Router, spec: SEARCH_SPEC,
+                                  allow_unknown_operation: true
+        use OpenapiFirst::QueryParameterValidation
         run lambda { |_env|
           Rack::Response.new('hello', 200)
         }
@@ -28,10 +35,6 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
 
     let(:response_body) do
       json_load(last_response.body, symbolize_keys: true)
-    end
-
-    let(:path) do
-      '/search'
     end
 
     it 'returns 400 if query parameter is missing' do
@@ -79,15 +82,16 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
       expect(env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
     end
 
-    it 'skips parameter validation if path was not found' do
-      get '/foo'
+    it 'skips parameter validation if operation was not found' do
+      post path, query_params
 
       expect(last_response.status).to be 200
     end
 
-    it 'skips parameter validation if method was not found' do
-      post path, query_params
+    it 'skips parameter validation if no parameters are defined' do
+      get '/info', query_params
 
+      puts last_response.body
       expect(last_response.status).to be 200
     end
 
@@ -100,8 +104,8 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
     describe('allow_additional_parameters: true') do
       let(:app) do
         Rack::Builder.new do
+          use OpenapiFirst::Router, spec: SEARCH_SPEC
           use OpenapiFirst::QueryParameterValidation,
-              spec: API_SPEC,
               allow_additional_parameters: true
           run lambda { |_env|
             Rack::Response.new('hello', 200)
@@ -125,10 +129,9 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
     end
   end
 
-  describe '#query_parameter_schema' do
+  describe '#parameter_schema' do
     let(:subject) do
-      app = ->(_env) { Rack::Response(['hello'], 200) }
-      described_class.new(app, spec: API_SPEC)
+      described_class.new(nil)
     end
 
     let(:expected_schema) do
@@ -171,9 +174,8 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
     end
 
     it 'returns the JSON Schema for the request' do
-      env = Rack::MockRequest.env_for('/search')
-      request = Rack::Request.new(env)
-      parameter_schema = subject.parameter_schema(request)
+      operation = find_operation(SEARCH_SPEC, path, :get)
+      parameter_schema = subject.parameter_schema(operation)
       expect(parameter_schema).to eq expected_schema
     end
   end

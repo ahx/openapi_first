@@ -78,7 +78,9 @@ components:
     Pets:
       type: array
       items:
-        $ref: "./pet.yaml#/Pet"
+        $ref: "#/components/schemas/Pet"
+    Pet:
+      $ref: "./components/schemas/pet.yaml#/Pet"
     Error:
       required:
         - code

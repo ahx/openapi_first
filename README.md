@@ -2,6 +2,31 @@
 
 OpenapiFirst offers tools to help test and implement Rack apps based on an [OpenApi](https://www.openapis.org/) API description.
 
+## TL;DR
+
+This is all in flux.
+It is usable, but the syntax might have changed next time you come here.
+
+```ruby
+require 'rack'
+require 'openapi_first'
+require 'openapi_first/router'
+require 'openapi_first/query_parameter_validation'
+
+SPEC = OpenapiFirst.load('./openapi/openapi.yaml')
+
+App = Rack::Builder.new do
+  use OpenapiFirst::Router, spec: SPEC
+  use OpenapiFirst::QueryParameterValidation
+
+  run (lambda do |_env|
+    Rack::Response.new('Hello', 200)
+  end)
+end
+```
+
+See [`examples/`](examples/) for more.
+
 ## Start
 
 Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](http://speccy.io/) to make sure the file is valid.
@@ -36,6 +61,8 @@ validator.validate(last_request, last_response).errors? # => true or false
 
 ### Coverage
 
+(This is a bit experimental. Please try it out and give feedback.)
+
 `OpenapiFirst::Coverage` helps you make sure, that you have called all endpoints of your OAS file when running tests via `rack-test`.
 
 ```ruby
@@ -69,20 +96,25 @@ end
 
 ## Implementing
 
-OpenapiFirst offers tools to help implementing your app.
-
-### Request Validation
-
 OpenapiFirst offers Rack middlewares to auto-implement different aspects of request validation:
 
-- Request parameter validation
+- Query parameter validation
 - Request body validation
+
+To make it all work you have to add the router middleware first:
+
+```ruby
+spec = OpenapiFirst.load('petstore.yaml')
+
+require 'openapi_first/router'
+use OpenapiFirst::Router, spec: myspec
+```
 
 If the request is not valid, these middlewares return a 400 status code with a body that describes the error.
 
 The error responses conform with [JSON:API](https://jsonapi.org).
 
-Here's and example response body for a missing query parameter "search":
+Here's an example response body for a missing query parameter "search":
 
 ```json
 http-status: 400
@@ -103,33 +135,44 @@ content-type: "application/vnd.api+json"
 ### Query parameter validation
 
 ```ruby
-# Add the middleware:
+# Add the middleware (after the Router):
 require 'openapi_first/query_parameter_validation'
-use OpenapiFirst::QueryParameterValidation, spec: myspec
+use OpenapiFirst::QueryParameterValidation
 ```
 
 By default OpenapiFirst does not allow additional query parameters and will respond with 400 if additional parameters are sent. You can allow additional parameters with `additional_properties: true`:
 
 ```ruby
 use OpenapiFirst::QueryParameterValidation,
-    spec: myspec,
     allow_additional_parameters: true
 ```
 
-The middleware filteres all top-level query parameters and ads these to the Rack env: `env[OpenapiFirst::QUERY_PARAMS]`.
-If you want to dis-allow nested query parameters you will need to use `additionalProperties: false` in your query parameter json schema.
+The middleware filteres all top-level query parameters and adds these to the Rack env: `env[OpenapiFirst::QUERY_PARAMS]`.
+If you want to forbid nested query parameters you will need to use `additionalProperties: false` in your query parameter json schema.
 
 OpenapiFirst does not support parameters set to `explode: false` and treats nested query parameters (`filter[foo]=bar`) like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values).
 
+### TODO: Header, Cookie, Path parameter validation
+
+tbd.
+
 ### TODO: Request Body validation
 
+Request body validation is build of these middlewares:
+
+1. `RequestBody` - Parses the request body via [`Rack::Parser`](https://rubygems.org/gems/rack-parser)
+2. `RequestBodyValidation` - Validates the parsed request body
+
 ```ruby
-# Add the middleware:
+# Add these middlewares:
+require 'openapi_first/request_body_parser'
+use OpenapiFirst::RequestBodyParser
+
 require 'openapi_first/request_body_validation'
-use OpenapiFirst::RequestBodyValidation, spec: myspec
+use OpenapiFirst::RequestBodyValidation
 ```
 
-This middleware will parse the request body with [`Rack::Parser`](https://rubygems.org/gems/rack-parser]).
+OpenAPI request (and response) body validation is based on [JSON Schema](http://json-schema.org/).
 
 ## TODO: Mocking
 

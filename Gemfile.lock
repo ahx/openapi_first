@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    openapi_first (0.1.6)
+    openapi_first (0.2.0.beta)
       json_schemer (~> 0.2)
       multi_json (~> 1.13)
       oas_parser (~> 0.18)
@@ -40,7 +40,7 @@ GEM
     mustermann-contrib (1.0.3)
       hansi (~> 0.2.0)
       mustermann (= 1.0.3)
-    nokogiri (1.10.2)
+    nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
     oas_parser (0.18.1)
       activesupport (>= 4.0.0)
