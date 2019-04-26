@@ -2,6 +2,31 @@
 
 OpenapiFirst offers tools to help test and implement Rack apps based on an [OpenApi](https://www.openapis.org/) API description.
 
+## TL;DR
+
+This is all in flux.
+It is usable, but the syntax might have changed next time you come here.
+
+```ruby
+require 'rack'
+require 'openapi_first'
+require 'openapi_first/router'
+require 'openapi_first/query_parameter_validation'
+
+SPEC = OpenapiFirst.load('./openapi/openapi.yaml')
+
+App = Rack::Builder.new do
+  use OpenapiFirst::Router, spec: SPEC
+  use OpenapiFirst::QueryParameterValidation
+
+  run (lambda do |_env|
+    Rack::Response.new('Hello', 200)
+  end)
+end
+```
+
+See [`examples/`](examples/) for more.
+
 ## Start
 
 Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](http://speccy.io/) to make sure the file is valid.
@@ -127,7 +152,11 @@ If you want to forbid nested query parameters you will need to use `additionalPr
 
 OpenapiFirst does not support parameters set to `explode: false` and treats nested query parameters (`filter[foo]=bar`) like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values).
 
-### Request Body validation
+### TODO: Header, Cookie, Path parameter validation
+
+tbd.
+
+### TODO: Request Body validation
 
 Request body validation is build of these middlewares:
 
