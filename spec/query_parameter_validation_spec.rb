@@ -6,7 +6,7 @@ require 'rack/test'
 require 'openapi_first/router'
 require 'openapi_first/query_parameter_validation'
 
-SEARCH_SPEC = OpenapiFirst.load('./spec/data/openapi/search.yaml')
+SEARCH_SPEC = OpenapiFirst.load('./spec/data/search.yaml')
 
 RSpec.describe OpenapiFirst::QueryParameterValidation do
   let(:path) do

@@ -5,7 +5,7 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first/router'
 
-PETSTORE_SPEC = OpenapiFirst.load('./spec/data/openapi/petstore.yaml')
+PETSTORE_SPEC = OpenapiFirst.load('./spec/data/petstore.yaml')
 
 RSpec.describe OpenapiFirst::Router do
   describe '#call' do
