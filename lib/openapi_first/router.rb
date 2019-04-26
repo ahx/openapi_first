@@ -16,16 +16,18 @@ module OpenapiFirst
 
     def call(env)
       req = Rack::Request.new(env)
-      env[OPERATION] = spec_endpoint(req)
-      @app.call(env)
-    rescue OasParser::PathNotFound, OasParser::MethodNotFound
+      operation = env[OPERATION] = find_operation(req)
+      return @app.call(env) if operation || @allow_unknown_operation
+
       Rack::Response.new('', 404)
     end
 
-    def spec_endpoint(req)
+    def find_operation(req)
       @spec
         .path_by_path(req.path)
         .endpoint_by_method(req.request_method.downcase)
+    rescue OasParser::PathNotFound, OasParser::MethodNotFound
+      nil
     end
   end
 end

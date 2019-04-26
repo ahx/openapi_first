@@ -65,8 +65,8 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      it 'calls the app' do
-        get path, query_params
+      it 'allow unkown operation' do
+        get '/unknown', query_params
 
         expect(last_response.status).to be 200
         expect(last_response.body).to eq 'hello'
