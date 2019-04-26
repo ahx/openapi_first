@@ -10,19 +10,19 @@ module OpenapiFirst
   class QueryParameterValidation
     JSON_API_CONTENT_TYPE = 'application/vnd.api+json'
 
-    def initialize(app, spec:, allow_additional_parameters: false)
+    def initialize(app, allow_additional_parameters: false)
       @app = app
-      @spec = spec
       @additional_properties = allow_additional_parameters
     end
 
     def call(env)
       req = Rack::Request.new(env)
-      schema = parameter_schema(req)
+      schema = parameter_schema(env[OpenapiFirst::OPERATION])
+      params = req.params
       if schema
-        errors = schema && JSONSchemer.schema(schema).validate(req.params)
+        errors = schema && JSONSchemer.schema(schema).validate(params)
         return error_response(errors) if errors&.any?
-        req.env[QUERY_PARAMS] = allowed_query_parameters(schema, req.params)
+        req.env[QUERY_PARAMS] = allowed_query_parameters(schema, params)
       end
 
       @app.call(env)
@@ -43,8 +43,9 @@ module OpenapiFirst
       end
     end
 
-    def parameter_schema(req)
-      spec_parameters(req).each_with_object(
+    def parameter_schema(operation)
+      return unless operation&.query_parameters&.any?
+      operation.query_parameters.each_with_object(
         'type' => 'object',
         'required' => [],
         'additionalProperties' => @additional_properties,
@@ -53,8 +54,6 @@ module OpenapiFirst
         schema['required'] << parameter.name if parameter.required
         schema['properties'][parameter.name] = parameter.schema
       end
-    rescue OasParser::PathNotFound, OasParser::MethodNotFound
-      nil
     end
 
     def serialize_errors(validation_errors)
@@ -85,16 +84,6 @@ module OpenapiFirst
           }
         end
       end
-    end
-
-    def spec_endpoint(req)
-      @spec
-        .path_by_path(req.path)
-        .endpoint_by_method(req.request_method.downcase)
-    end
-
-    def spec_parameters(req)
-        spec_endpoint(req).query_parameters
     end
   end
 end
