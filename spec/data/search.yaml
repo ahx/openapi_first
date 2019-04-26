@@ -17,7 +17,7 @@ paths:
       summary: Search for pets
       operationId: search
       tags:
-        - pets
+        - search
       parameters:
         - name: term
           in: query
@@ -71,13 +71,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /info:
+    get:
+      summary: Get some info
+      operationId: info
+      tags:
+        - search
+      responses:
+        "200":
+          description: ok
 
 components:
   schemas:
     Pets:
       type: array
       items:
-        $ref: "./pet.yaml#/Pet"
+        $ref: "#/components/schemas/Pet"
+    Pet:
+      $ref: "./components/schemas/pet.yaml#/Pet"
     Error:
       required:
         - code
