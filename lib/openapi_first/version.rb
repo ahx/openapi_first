@@ -1,3 +1,3 @@
 module OpenapiFirst
-  VERSION = '0.2.0.beta'.freeze
+  VERSION = '0.2.0'.freeze
 end
