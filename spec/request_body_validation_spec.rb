@@ -91,6 +91,15 @@ RSpec.describe OpenapiFirst::RequestBodyValidation do
       end
     end
 
+    describe 'when operation does not specify request body' do
+      it 'skips request body validation' do
+        get '/pets'
+
+        expect(last_response.status).to be 200
+        expect(last_response.body).to eq 'hello'
+      end
+    end
+
     describe 'when request body is empty and not required' do
       it 'skips request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'

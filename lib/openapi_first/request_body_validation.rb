@@ -17,7 +17,7 @@ module OpenapiFirst
     def call(env)
       req = Rack::Request.new(env)
       endpoint = env[OpenapiFirst::OPERATION]
-      return @app.call(env) unless endpoint
+      return @app.call(env) unless endpoint&.request_body
 
       content_type = req.content_type
       return error_response(415) unless content_type_valid?(content_type, endpoint)
