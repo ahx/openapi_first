@@ -21,7 +21,8 @@ App = Rack::Builder.new do
   use OpenapiFirst::QueryParameterValidation
   use OpenapiFirst::RequestBodyValidation
 
-  run (lambda do |_env|
+  run (lambda do |env|
+    # The parsed request body is avilable at env[OpenapiFirst::REQUEST_BODY]
     Rack::Response.new('Hello', 200)
   end)
 end
@@ -160,21 +161,16 @@ OpenapiFirst does not support parameters set to `explode: false` and treats nest
 
 tbd.
 
-### TODO: Request Body validation
-
-Request body validation is build of these middlewares:
-
-1. `RequestBody` - Parses the request body via [`Rack::Parser`](https://rubygems.org/gems/rack-parser)
-2. `RequestBodyValidation` - Validates the parsed request body
+### Request Body validation
 
 ```ruby
-# Add these middlewares:
-require 'openapi_first/request_body_parser'
-use OpenapiFirst::RequestBodyParser
-
+# Add the middleware:
 require 'openapi_first/request_body_validation'
 use OpenapiFirst::RequestBodyValidation
 ```
+
+This will return a `415` if the requests content type does not match or `400` if the request body is invalid.
+This will add the parsed request body to `env[OpenapiFirst::REQUEST_BODY]`.
 
 OpenAPI request (and response) body validation is based on [JSON Schema](http://json-schema.org/).
 
