@@ -12,12 +12,14 @@ require 'rack'
 require 'openapi_first'
 require 'openapi_first/router'
 require 'openapi_first/query_parameter_validation'
+require 'openapi_first/request_body_validation'
 
 SPEC = OpenapiFirst.load('./openapi/openapi.yaml')
 
 App = Rack::Builder.new do
   use OpenapiFirst::Router, spec: SPEC
   use OpenapiFirst::QueryParameterValidation
+    use OpenapiFirst::RequestBodyValidation
 
   run (lambda do |_env|
     Rack::Response.new('Hello', 200)
