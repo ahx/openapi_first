@@ -80,15 +80,25 @@ RSpec.describe OpenapiFirst::RequestBodyValidation do
       expect(error[:title]).to eq 'Unsupported Media Type'
     end
 
-    it 'skips request body validation if operation was not found' do
-      request_body[:name] = 43
-      header Rack::CONTENT_TYPE, 'application/json'
-      put path, json_dump(request_body)
+    describe 'when operation was not found' do
+      it 'skips request body validation' do
+        request_body[:name] = 43
+        header Rack::CONTENT_TYPE, 'application/json'
+        put path, json_dump(request_body)
 
-      expect(last_response.status).to be 200
-      expect(last_response.body).to eq 'hello'
+        expect(last_response.status).to be 200
+        expect(last_response.body).to eq 'hello'
+      end
     end
 
-    it 'skips request body validation if request body is missing and not required'
+    describe 'when request body is empty and not required' do
+      it 'skips request body validation' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        patch '/pets/1'
+
+        expect(last_response.status).to be 200
+        expect(last_response.body).to eq 'hello'
+      end
+    end
   end
 end

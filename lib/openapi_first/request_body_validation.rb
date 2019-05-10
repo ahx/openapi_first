@@ -22,7 +22,10 @@ module OpenapiFirst
       content_type = req.content_type
       return error_response(415) unless content_type_valid?(content_type, endpoint)
 
-      return error_response(415, 'Request body is required') if req.body.size.zero?
+      if req.body.size.zero?
+        return error_response(415, 'Request body is required') if endpoint.request_body.required
+        return @app.call(env)
+      end
 
       schema = request_body_schema(content_type, endpoint)
       if schema
