@@ -22,6 +22,7 @@ App = Rack::Builder.new do
   use OpenapiFirst::RequestBodyValidation
 
   run (lambda do |env|
+    # Information about the current operation is avilable at env[OpenapiFirst::OPERATION]
     # The parsed request body is avilable at env[OpenapiFirst::REQUEST_BODY]
     Rack::Response.new('Hello', 200)
   end)
