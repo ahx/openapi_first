@@ -88,5 +88,7 @@ RSpec.describe OpenapiFirst::RequestBodyValidation do
       expect(last_response.status).to be 200
       expect(last_response.body).to eq 'hello'
     end
+
+    it 'skips request body validation if request body is missing and not required'
   end
 end
