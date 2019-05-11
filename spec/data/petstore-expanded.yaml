@@ -160,12 +160,17 @@ components:
 
     NewPet:
       required:
-        - name
+        - type
+        - attributes
       properties:
-        name:
+        type:
           type: string
-        tag:
-          type: string
+        attributes:
+          type: object
+          required: [name]
+          properties:
+            name:
+              type: string
 
     Error:
       required:

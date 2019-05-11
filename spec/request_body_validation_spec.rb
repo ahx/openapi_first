@@ -29,7 +29,10 @@ RSpec.describe OpenapiFirst::RequestBodyValidation do
 
     let(:request_body) do
       {
-        'name' => 'Oscar'
+        'type' => 'people',
+        'attributes' => {
+          'name' => 'Oscar'
+        }
       }
     end
 
@@ -53,14 +56,25 @@ RSpec.describe OpenapiFirst::RequestBodyValidation do
     end
 
     it 'returns 400 if request body is not valid' do
-      request_body[:name] = 43
+      request_body['attributes']['name'] = 43
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
       expect(error[:title]).to eq 'is not valid'
-      expect(error[:source][:parameter]).to eq 'name'
+      expect(error[:source][:pointer]).to eq '/attributes/name'
+    end
+
+    it 'returns 400 if required field is missing' do
+      request_body['attributes'].delete('name')
+      header Rack::CONTENT_TYPE, 'application/json'
+      post path, json_dump(request_body)
+
+      expect(last_response.status).to be 400
+      error = response_body[:errors][0]
+      expect(error[:title]).to eq 'is missing required property "name"'
+      expect(error[:source][:pointer]).to eq '/attributes'
     end
 
     it 'returns 415 if required request body is missing' do

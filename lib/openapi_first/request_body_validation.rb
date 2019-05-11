@@ -77,31 +77,28 @@ module OpenapiFirst
 
     def serialize_errors(validation_errors)
       validation_errors.each_with_object([]) do |error, errors|
+        error_object = {
+          source: {
+            pointer: error['data_pointer']
+          }
+        }
         if error['type'] == 'pattern'
-          errors << {
+          error_object.update(
             title: 'is not valid',
             detail: "does not match pattern '#{error['schema']['pattern']}'",
-            source: {
-              parameter: File.basename(error['data_pointer'])
-            }
-          }
+          )
         elsif error['type'] == 'required'
           error['details']['missing_keys'].each do |parameter|
-            errors << {
-              title: 'is missing',
-              source: {
-                parameter: parameter
-              }
-            }
+            error_object.update(
+              title: 'is missing required property "name"'
+            )
           end
         else
-          errors << {
-            title: 'is not valid',
-            source: {
-              parameter: File.basename(error['data_pointer'])
-            }
-          }
+          error_object.update(
+            title: 'is not valid'
+          )
         end
+        errors << error_object
       end
     end
   end
