@@ -5,8 +5,6 @@ require 'json_schemer'
 require 'multi_json'
 
 module OpenapiFirst
-  OPERATION = 'openapi_first.operation'.freeze
-
   class Router
     def initialize(app, spec:, allow_unknown_operation: false)
       @app = app
