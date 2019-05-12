@@ -16,16 +16,20 @@ require 'openapi_first/request_body_validation'
 
 SPEC = OpenapiFirst.load('./openapi/openapi.yaml')
 
+module Pets
+  def find_pet(params, _res)
+    {
+      id: params['id'],
+      name: 'Oscar'
+    }
+  end
+end
+
 App = Rack::Builder.new do
   use OpenapiFirst::Router, spec: SPEC
   use OpenapiFirst::QueryParameterValidation
   use OpenapiFirst::RequestBodyValidation
-
-  run (lambda do |env|
-    # Information about the current operation is avilable at env[OpenapiFirst::OPERATION]
-    # The parsed request body is avilable at env[OpenapiFirst::REQUEST_BODY]
-    Rack::Response.new('Hello', 200)
-  end)
+  use OpenapiFirst::OperationResolver, namespace: Pets
 end
 ```
 

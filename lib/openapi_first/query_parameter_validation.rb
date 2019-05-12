@@ -20,6 +20,7 @@ module OpenapiFirst
       if schema
         errors = schema && JSONSchemer.schema(schema).validate(params)
         return error_response(errors) if errors&.any?
+
         req.env[QUERY_PARAMS] = allowed_query_parameters(schema, params)
       end
 
@@ -43,6 +44,7 @@ module OpenapiFirst
 
     def parameter_schema(operation)
       return unless operation&.query_parameters&.any?
+
       operation.query_parameters.each_with_object(
         'type' => 'object',
         'required' => [],
@@ -76,7 +78,7 @@ module OpenapiFirst
         elsif error['schema_pointer'] == '/additionalProperties'
           unwanted = File.basename(error['data_pointer'])
           errors << {
-            title: "additional properties, which are not allowed: #{unwanted}",
+            title: "additional properties, which are not allowed: #{unwanted}"
           }
         else
           errors << {
