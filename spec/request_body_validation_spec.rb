@@ -73,7 +73,7 @@ RSpec.describe OpenapiFirst::RequestBodyValidation do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'is missing required property "name"'
+      expect(error[:title]).to eq 'is missing required properties: name'
       expect(error[:source][:pointer]).to eq '/attributes'
     end
 

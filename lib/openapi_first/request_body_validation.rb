@@ -86,11 +86,10 @@ module OpenapiFirst
             detail: "does not match pattern '#{error['schema']['pattern']}'",
           )
         elsif error['type'] == 'required'
-          error['details']['missing_keys'].each do |parameter|
-            error_object.update(
-              title: 'is missing required property "name"'
-            )
-          end
+          missing_keys = error['details']['missing_keys']
+          error_object.update(
+            title: "is missing required properties: #{missing_keys.join(', ')}"
+          )
         else
           error_object.update(
             title: 'is not valid'
