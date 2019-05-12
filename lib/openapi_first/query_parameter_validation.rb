@@ -5,8 +5,6 @@ require 'json_schemer'
 require 'multi_json'
 
 module OpenapiFirst
-  QUERY_PARAMS = 'openapi_first.params'.freeze
-
   class QueryParameterValidation
     JSON_API_CONTENT_TYPE = 'application/vnd.api+json'
 
