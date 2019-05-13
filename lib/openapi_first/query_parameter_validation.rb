@@ -73,6 +73,11 @@ module OpenapiFirst
               }
             }
           end
+        elsif error['schema_pointer'] == '/additionalProperties'
+          unwanted = File.basename(error['data_pointer'])
+          errors << {
+            title: "additional properties, which are not allowed: #{unwanted}",
+          }
         else
           errors << {
             title: 'is not valid',

@@ -74,6 +74,8 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
       get path, query_params
 
       expect(last_response.status).to be 400
+      error = response_body[:errors][0]
+      expect(error[:title]).to eq 'additional properties, which are not allowed: foo'
     end
 
     it 'adds filtered query parameters to env ' do
