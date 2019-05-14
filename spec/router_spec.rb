@@ -53,6 +53,25 @@ RSpec.describe OpenapiFirst::Router do
       expect(operation.method).to eq 'get'
     end
 
+    describe 'path parameters' do
+      it 'adds path parameters to env ' do
+        env = Rack::MockRequest.env_for('/pets/1')
+        app.call(env)
+
+        params = env[OpenapiFirst::PATH_PARAMS]
+        expect(params).to eq('petId' => '1')
+      end
+
+      it 'does not add path parameters if not defined for operation' do
+        expect(Mustermann::Template).to_not receive(:new)
+        env = Rack::MockRequest.env_for('/pets')
+        app.call(env)
+
+        params = env[OpenapiFirst::PATH_PARAMS]
+        expect(params).to be_nil
+      end
+    end
+
     describe('allow_unknown_operation: true') do
       let(:app) do
         Rack::Builder.new do

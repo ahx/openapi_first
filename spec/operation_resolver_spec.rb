@@ -113,12 +113,12 @@ RSpec.describe OpenapiFirst::OperationResolver do
 
       it 'has path parameters and request body' do
         pet = {
-          type: 'pet',
-          attributes: { name: 'Frido' }
+          'type' => 'pet',
+          'attributes' => { 'name' => 'Frido' }
         }
 
         expected_params = {
-          id: 1
+          'id' => '1'
         }.merge(pet)
 
         expect(MyApi).to receive(:update_pet) do |params, _res|
@@ -126,7 +126,7 @@ RSpec.describe OpenapiFirst::OperationResolver do
         end
 
         header Rack::CONTENT_TYPE, 'application/json'
-        patch '/pets/1', json_dump(pet.merge(foo: 'bar'))
+        patch '/pets/1', json_dump(pet)
       end
     end
 

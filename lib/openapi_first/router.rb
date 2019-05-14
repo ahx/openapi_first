@@ -3,6 +3,7 @@
 require 'rack'
 require 'json_schemer'
 require 'multi_json'
+require 'mustermann/template'
 
 module OpenapiFirst
   class Router
@@ -15,17 +16,25 @@ module OpenapiFirst
     def call(env)
       req = Rack::Request.new(env)
       operation = env[OPERATION] = find_operation(req)
+      path_params = find_path_params(operation, req)
+      env[PATH_PARAMS] = path_params if path_params
       return @app.call(env) if operation || @allow_unknown_operation
 
       Rack::Response.new('', 404)
     end
 
     def find_operation(req)
-      @spec
-        .path_by_path(req.path)
-        .endpoint_by_method(req.request_method.downcase)
+      path = @spec.path_by_path(req.path)
+      path.endpoint_by_method(req.request_method.downcase)
     rescue OasParser::PathNotFound, OasParser::MethodNotFound
       nil
+    end
+
+    def find_path_params(operation, req)
+      return unless operation&.path_parameters&.any?
+
+      pattern = Mustermann::Template.new(operation.path.path)
+      pattern.params(req.path)
     end
   end
 end
