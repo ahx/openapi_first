@@ -16,16 +16,20 @@ require 'openapi_first/request_body_validation'
 
 SPEC = OpenapiFirst.load('./openapi/openapi.yaml')
 
+module Pets
+  def find_pet(params, _res)
+    {
+      id: params['id'],
+      name: 'Oscar'
+    }
+  end
+end
+
 App = Rack::Builder.new do
   use OpenapiFirst::Router, spec: SPEC
   use OpenapiFirst::QueryParameterValidation
   use OpenapiFirst::RequestBodyValidation
-
-  run (lambda do |env|
-    # Information about the current operation is avilable at env[OpenapiFirst::OPERATION]
-    # The parsed request body is avilable at env[OpenapiFirst::REQUEST_BODY]
-    Rack::Response.new('Hello', 200)
-  end)
+  use OpenapiFirst::OperationResolver, namespace: Pets
 end
 ```
 
@@ -47,65 +51,13 @@ gem 'openapi_first'
 
 OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
-## Testing
-
-OpenapiFirst offers tools to help testing your app.
-
-### Response validation
-
-Response validation is to make sure your app responds as described in your OpenAPI spec. You usually do this in your tests using [rack-test](https://github.com/rack-test/rack-test).
-
-```ruby
-# In your test:
-require 'openapi_first/response_validator'
-spec = OpenapiFirst.load('petstore.yaml')
-validator = OpenapiFirst::ResponseValidator.new(spec)
-validator.validate(last_request, last_response).errors? # => true or false
-```
-
-TODO: Add RSpec matcher (via extra rubygem)
-
-### Coverage
-
-(This is a bit experimental. Please try it out and give feedback.)
-
-`OpenapiFirst::Coverage` helps you make sure, that you have called all endpoints of your OAS file when running tests via `rack-test`.
-
-```ruby
-# In your test (rspec example):
-require 'openapi_first/coverage'
-
-describe MyApp do
-  include Rack::Test::Methods
-
-  before(:all) do
-    spec = OpenapiFirst.load('petstore.yaml')
-    @app_wrapper = OpenapiFirst::TestCoverage.new(MyApp, spec)
-  end
-
-  after(:all) do
-    message = "The following paths have not been called yet: #{@app_wrapper.to_be_called}"
-    expect(@app_wrapper.to_be_called).to be_empty
-  end
-
-  # Overwrite `#app` to make rack-test call the wrapped app
-  def app
-    @app_wrapper
-  end
-
-  it 'does things' do
-    get '/i/my/stuff'
-    # …
-  end
-end
-```
-
 ## Implementing
 
 OpenapiFirst offers Rack middlewares to auto-implement different aspects of request validation:
 
 - Query parameter validation
 - Request body validation
+- Mapping request to a function call
 
 To make it all work you have to add the router middleware first:
 
@@ -174,6 +126,95 @@ This will return a `415` if the requests content type does not match or `400` if
 This will add the parsed request body to `env[OpenapiFirst::REQUEST_BODY]`.
 
 OpenAPI request (and response) body validation is based on [JSON Schema](http://json-schema.org/).
+
+### Mapping request to a function call
+
+OpenapiFirst has a `OperationResolver` middleware to map the HTTP request to a function (method) call
+
+```ruby
+# Define some methods
+module MyApi
+  def create_pet(params, res)
+    res.status = 201
+    {
+      id: '1',
+      name: params['name']
+    }
+  end
+end
+
+# Add the middleware:
+require 'openapi_first/operation_resolver'
+use OpenapiFirst::OperationResolver, namespace: MyApi
+
+# Now make a request like
+# POST /pets, { name: 'Oscar' }
+```
+
+These resolver functions are called with two arguments:
+
+- `params` - Holds the parsed request body, filtered query params and path parameters
+- `res` - Holds a Rack::Response that you can modify if needed
+
+You can call `params.env` to access the Rack env (just like in [Hanami actions](https://guides.hanamirb.org/actions/parameters/))
+
+There are two ways to set the response body:
+
+- Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
+- Returning a value from the function (see example above) (this will always converted to JSON)
+
+## Testing
+
+OpenapiFirst offers tools to help testing your app.
+
+### Response validation
+
+Response validation is to make sure your app responds as described in your OpenAPI spec. You usually do this in your tests using [rack-test](https://github.com/rack-test/rack-test).
+
+```ruby
+# In your test:
+require 'openapi_first/response_validator'
+spec = OpenapiFirst.load('petstore.yaml')
+validator = OpenapiFirst::ResponseValidator.new(spec)
+validator.validate(last_request, last_response).errors? # => true or false
+```
+
+TODO: Add RSpec matcher (via extra rubygem)
+
+### Coverage
+
+(This is a bit experimental. Please try it out and give feedback.)
+
+`OpenapiFirst::Coverage` helps you make sure, that you have called all endpoints of your OAS file when running tests via `rack-test`.
+
+```ruby
+# In your test (rspec example):
+require 'openapi_first/coverage'
+
+describe MyApp do
+  include Rack::Test::Methods
+
+  before(:all) do
+    spec = OpenapiFirst.load('petstore.yaml')
+    @app_wrapper = OpenapiFirst::TestCoverage.new(MyApp, spec)
+  end
+
+  after(:all) do
+    message = "The following paths have not been called yet: #{@app_wrapper.to_be_called}"
+    expect(@app_wrapper.to_be_called).to be_empty
+  end
+
+  # Overwrite `#app` to make rack-test call the wrapped app
+  def app
+    @app_wrapper
+  end
+
+  it 'does things' do
+    get '/i/my/stuff'
+    # …
+  end
+end
+```
 
 ## TODO: Mocking
 
