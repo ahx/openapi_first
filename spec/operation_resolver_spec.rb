@@ -130,7 +130,17 @@ RSpec.describe OpenapiFirst::OperationResolver do
       end
     end
 
-    describe 'params.env'
+    describe 'params.env' do
+      it 'holds the Rack env' do
+        expect(MyApi).to receive(:find_pets) do |params, _res|
+          expect(params.env['PATH_INFO']).to eq '/pets'
+          operation = params.env[OpenapiFirst::OPERATION]
+          expect(operation.operation_id).to eq 'find_pets'
+        end
+
+        get '/pets'
+      end
+    end
 
     context 'when operation was not found' do
       it 'calls the next app' do

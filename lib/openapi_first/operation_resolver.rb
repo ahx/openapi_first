@@ -31,7 +31,9 @@ module OpenapiFirst
 
     def build_params(env)
       sources = [env[QUERY_PARAMS], env[REQUEST_BODY]].tap(&:compact!)
-      {}.merge!(*sources)
+      hash = {}.merge!(*sources)
+      hash.define_singleton_method(:env) { env }
+      hash
     end
   end
 end
