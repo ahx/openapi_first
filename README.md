@@ -9,12 +9,7 @@ It is usable, but the syntax might have changed next time you come here.
 
 ```ruby
 require 'rack'
-require 'rack/contrib/not_found'
 require 'openapi_first'
-require 'openapi_first/router'
-require 'openapi_first/query_parameter_validation'
-require 'openapi_first/request_body_validation'
-
 SPEC = OpenapiFirst.load('./openapi/openapi.yaml')
 
 module Pets
@@ -30,8 +25,7 @@ App = Rack::Builder.new do
   use OpenapiFirst::Router, spec: SPEC
   use OpenapiFirst::QueryParameterValidation
   use OpenapiFirst::RequestBodyValidation
-  use OpenapiFirst::OperationResolver, namespace: Pets
-  run Rack::NotFound
+  run OpenapiFirst::OperationResolver, namespace: Pets
 end
 ```
 
@@ -64,9 +58,9 @@ OpenapiFirst offers Rack middlewares to auto-implement different aspects of requ
 To make it all work you have to add the router middleware first:
 
 ```ruby
+require 'openapi_first'
 spec = OpenapiFirst.load('petstore.yaml')
 
-require 'openapi_first/router'
 use OpenapiFirst::Router, spec: myspec
 ```
 
@@ -96,7 +90,6 @@ content-type: "application/vnd.api+json"
 
 ```ruby
 # Add the middleware (after the Router):
-require 'openapi_first/query_parameter_validation'
 use OpenapiFirst::QueryParameterValidation
 ```
 
@@ -120,7 +113,6 @@ tbd.
 
 ```ruby
 # Add the middleware:
-require 'openapi_first/request_body_validation'
 use OpenapiFirst::RequestBodyValidation
 ```
 
@@ -146,8 +138,12 @@ module MyApi
 end
 
 # Add the middleware:
-require 'openapi_first/operation_resolver'
 use OpenapiFirst::OperationResolver, namespace: MyApi
+# If the operation was not found in the OAS file, the next app will be called
+
+# OR use it as a rack app via `run`:
+run OpenapiFirst::OperationResolver, namespace: Pets
+# If the operation was not found, this will return 404
 
 # Now make a request like
 # POST /pets, { name: 'Oscar' }
