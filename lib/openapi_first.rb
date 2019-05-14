@@ -2,6 +2,10 @@
 
 require 'oas_parser'
 require 'openapi_first/version'
+require 'openapi_first/router'
+require 'openapi_first/query_parameter_validation'
+require 'openapi_first/request_body_validation'
+require 'openapi_first/operation_resolver'
 
 module OpenapiFirst
   OPERATION = 'openapi_first.operation'

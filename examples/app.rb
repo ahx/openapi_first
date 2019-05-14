@@ -1,9 +1,6 @@
-require 'rack/contrib/not_found'
+# frozen_string_literal: true
+
 require 'openapi_first'
-require 'openapi_first/router'
-require 'openapi_first/query_parameter_validation'
-require 'openapi_first/request_body_validation'
-require 'openapi_first/operation_resolver'
 
 module Example
   def self.get_metadata(_params, _res)
@@ -25,6 +22,5 @@ App = Rack::Builder.new do
   use OpenapiFirst::RequestBodyValidation
 
   # use OpenapiFirst::ResponseValidation # TODO (only in development, test)
-  use OpenapiFirst::OperationResolver, namespace: Example
-  run Rack::NotFound
+  run OpenapiFirst::OperationResolver.new(namespace: Example)
 end

@@ -4,7 +4,9 @@ require 'rack'
 
 module OpenapiFirst
   class OperationResolver
-    def initialize(app, namespace:)
+    DEFAULT_APP = ->(_env) { Rack::Response.new('', 404) }
+
+    def initialize(app = DEFAULT_APP, namespace:)
       @app = app
       @namespace = namespace
     end
