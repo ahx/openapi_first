@@ -153,6 +153,8 @@ use OpenapiFirst::OperationResolver, namespace: MyApi
 # POST /pets, { name: 'Oscar' }
 ```
 
+The resolver function is found via the [`operationId`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) attribute in your API description. If your operationId has dots like `pets.find`, the resolver above would call `MyApi.pets.find(params, req)`.
+
 These resolver functions are called with two arguments:
 
 - `params` - Holds the parsed request body, filtered query params and path parameters
