@@ -15,4 +15,9 @@ RSpec.describe 'Example App' do
     get '/'
     expect(json_load(last_response.body)).to eq('hello' => 'world')
   end
+
+  it 'returns 404' do
+    get '/unknown'
+    expect(last_response.status).to eq 404
+  end
 end

@@ -150,5 +150,16 @@ RSpec.describe OpenapiFirst::OperationResolver do
         expect(last_response.body).to eq 'not found'
       end
     end
+
+    context 'when run as rack app' do
+      let(:app) do
+        OpenapiFirst::OperationResolver.new(namespace: MyApi)
+      end
+
+      it 'works' do
+        get '/pets'
+        expect(last_response.status).to be 404
+      end
+    end
   end
 end
