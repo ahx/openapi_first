@@ -57,6 +57,7 @@ OpenapiFirst offers Rack middlewares to auto-implement different aspects of requ
 
 - Query parameter validation
 - Request body validation
+- Mapping request to a function call
 
 To make it all work you have to add the router middleware first:
 
@@ -125,6 +126,42 @@ This will return a `415` if the requests content type does not match or `400` if
 This will add the parsed request body to `env[OpenapiFirst::REQUEST_BODY]`.
 
 OpenAPI request (and response) body validation is based on [JSON Schema](http://json-schema.org/).
+
+### Mapping request to a function call
+
+OpenapiFirst has a `OperationResolver` middleware to map the HTTP request to a function (method) call
+
+```ruby
+# Define some methods
+module MyApi
+  def create_pet(params, res)
+    res.status = 201
+    {
+      id: '1',
+      name: params['name']
+    }
+  end
+end
+
+# Add the middleware:
+require 'openapi_first/operation_resolver'
+use OpenapiFirst::OperationResolver, namespace: MyApi
+
+# Now make a request like
+# POST /pets, { name: 'Oscar' }
+```
+
+These resolver functions are called with two arguments:
+
+- `params` - Holds the parsed request body, filtered query params and path parameters
+- `res` - Holds a Rack::Response that you can modify if needed
+
+You can call `params.env` to access the Rack env (just like in [Hanami actions](https://guides.hanamirb.org/actions/parameters/))
+
+There are two ways to set the response body:
+
+- Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
+- Returning a value from the function (see example above) (this will always converted to JSON)
 
 ## Testing
 
