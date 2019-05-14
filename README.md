@@ -9,6 +9,7 @@ It is usable, but the syntax might have changed next time you come here.
 
 ```ruby
 require 'rack'
+require 'rack/contrib/not_found'
 require 'openapi_first'
 require 'openapi_first/router'
 require 'openapi_first/query_parameter_validation'
@@ -30,6 +31,7 @@ App = Rack::Builder.new do
   use OpenapiFirst::QueryParameterValidation
   use OpenapiFirst::RequestBodyValidation
   use OpenapiFirst::OperationResolver, namespace: Pets
+  run Rack::NotFound
 end
 ```
 
