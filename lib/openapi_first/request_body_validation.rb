@@ -3,6 +3,7 @@
 require 'rack'
 require 'json_schemer'
 require 'multi_json'
+require_relative 'validation_format'
 
 module OpenapiFirst
   class RequestBodyValidation
@@ -12,29 +13,48 @@ module OpenapiFirst
       @app = app
     end
 
-    def call(env)
+    def call(env) # rubocop:disable Metrics/MethodLength
+      operation = env[OpenapiFirst::OPERATION]
+      return @app.call(env) unless operation&.request_body
+
       req = Rack::Request.new(env)
-      endpoint = env[OpenapiFirst::OPERATION]
-      return @app.call(env) unless endpoint&.request_body
-
       content_type = req.content_type
-      return error_response(415) unless content_type_valid?(content_type, endpoint)
-
-      if req.body.size.zero?
-        return error_response(415, 'Request body is required') if endpoint.request_body.required
-        return @app.call(env)
+      body = req.body
+      catch(:halt) do
+        validate_request_content_type!(content_type, operation)
+        validate_request_body_presence!(env, body, operation)
+        parse_and_validate_request_body!(env, content_type, body, operation)
+        @app.call(env)
       end
+    end
 
-      schema = request_body_schema(content_type, endpoint)
-      if schema
-        parsed_request_body = MultiJson.load(req.body)
-        errors = validate_json_schema(schema, parsed_request_body)
-        return error_response(400, serialize_errors(errors)) if errors&.any?
+    def halt(response)
+      throw :halt, response
+    end
 
-        env[OpenapiFirst::REQUEST_BODY] = parsed_request_body
+    def validate_request_content_type!(content_type, operation)
+      return if content_type_valid?(content_type, operation)
+
+      halt(error_response(415))
+    end
+
+    def validate_request_body_presence!(env, body, operation)
+      return unless body.size.zero?
+
+      if operation.request_body.required
+        halt(error_response(415, 'Request body is required'))
       end
+      halt(@app.call(env))
+    end
 
-      @app.call(env)
+    def parse_and_validate_request_body!(env, content_type, body, operation)
+      schema = request_body_schema(content_type, operation)
+      return unless schema
+
+      parsed_request_body = MultiJson.load(body)
+      errors = validate_json_schema(schema, parsed_request_body)
+      halt(error_response(400, serialize_errors(errors))) if errors&.any?
+      env[OpenapiFirst::REQUEST_BODY] = parsed_request_body
     end
 
     def validate_json_schema(schema, object)
@@ -66,36 +86,13 @@ module OpenapiFirst
       endpoint.request_body.content[content_type]&.fetch('schema')
     end
 
-
-    def request_body_schema(content_type, endpoint)
-      return unless endpoint
-
-      endpoint.request_body.content[content_type]&.fetch('schema')
-    end
-
     def serialize_errors(validation_errors)
-      validation_errors.each_with_object([]) do |error, errors|
-        error_object = {
+      validation_errors.map do |error|
+        {
           source: {
             pointer: error['data_pointer']
           }
-        }
-        if error['type'] == 'pattern'
-          error_object.update(
-            title: 'is not valid',
-            detail: "does not match pattern '#{error['schema']['pattern']}'",
-          )
-        elsif error['type'] == 'required'
-          missing_keys = error['details']['missing_keys']
-          error_object.update(
-            title: "is missing required properties: #{missing_keys.join(', ')}"
-          )
-        else
-          error_object.update(
-            title: 'is not valid'
-          )
-        end
-        errors << error_object
+        }.update(ValidationFormat.error_details(error))
       end
     end
   end

@@ -3,6 +3,7 @@
 require 'rack'
 require 'json_schemer'
 require 'multi_json'
+require_relative 'validation_format'
 
 module OpenapiFirst
   class QueryParameterValidation
@@ -36,10 +37,12 @@ module OpenapiFirst
     end
 
     def allowed_query_parameters(params_schema, query_params)
-      params_schema['properties'].keys.each_with_object({}) do |parameter_name, filtered|
-        value = query_params[parameter_name]
-        filtered[parameter_name] = value if value
-      end
+      params_schema['properties']
+        .keys
+        .each_with_object({}) do |parameter_name, filtered|
+          value = query_params[parameter_name]
+          filtered[parameter_name] = value if value
+        end
     end
 
     def parameter_schema(operation)
@@ -57,37 +60,12 @@ module OpenapiFirst
     end
 
     def serialize_errors(validation_errors)
-      validation_errors.each_with_object([]) do |error, errors|
-        if error['type'] == 'pattern'
-          errors << {
-            title: 'is not valid',
-            detail: "does not match pattern '#{error['schema']['pattern']}'",
-            source: {
-              parameter: File.basename(error['data_pointer'])
-            }
+      validation_errors.map do |error|
+        {
+          source: {
+            parameter: File.basename(error['data_pointer'])
           }
-        elsif error['type'] == 'required'
-          error['details']['missing_keys'].each do |parameter|
-            errors << {
-              title: 'is missing',
-              source: {
-                parameter: parameter
-              }
-            }
-          end
-        elsif error['schema_pointer'] == '/additionalProperties'
-          unwanted = File.basename(error['data_pointer'])
-          errors << {
-            title: "additional properties, which are not allowed: #{unwanted}"
-          }
-        else
-          errors << {
-            title: 'is not valid',
-            source: {
-              parameter: File.basename(error['data_pointer'])
-            }
-          }
-        end
+        }.update(ValidationFormat.error_details(error))
       end
     end
   end

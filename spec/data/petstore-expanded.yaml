@@ -166,6 +166,7 @@ components:
         type:
           type: string
         attributes:
+          additionalProperties: false
           type: object
           required: [name]
           properties:

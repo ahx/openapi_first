@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module OpenapiFirst
   class Coverage
     attr_reader :to_be_called

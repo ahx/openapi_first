@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'spec_helper'
 require 'rack'
 require 'openapi_first/response_validator'
@@ -21,7 +23,10 @@ RSpec.describe OpenapiFirst::ResponseValidator do
 
   describe 'valid response' do
     it 'returns no errors' do
-      response_body = json_dump([{ id: 42, name: 'hans' }, { id: 2, name: 'Voldemort' }])
+      response_body = json_dump([
+                                  { id: 42, name: 'hans' },
+                                  { id: 2, name: 'Voldemort' }
+                                ])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
       expect(result.errors?).to be false
@@ -53,7 +58,8 @@ RSpec.describe OpenapiFirst::ResponseValidator do
 
     it 'returns no errors if OAS file has no content schema specified' do
       empty_content = { 'application/json' => {} }
-      expect_any_instance_of(OasParser::Response).to receive(:content) { empty_content }
+      expect_any_instance_of(OasParser::Response)
+        .to receive(:content) { empty_content }
       response = Rack::MockResponse.new(200, headers, 'body')
       result = subject.validate(request, response)
       expect(result.errors?).to be false
@@ -90,7 +96,9 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
       expect(result.errors?).to be true
-      expect(result.errors.first).to eq "Content type not found: 'application/xml'"
+      expect(result.errors.first).to eq(
+        "Content type not found: 'application/xml'"
+      )
     end
 
     it 'returns errors on missing property' do
