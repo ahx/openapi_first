@@ -24,7 +24,7 @@ require 'openapi_first'
 run OpenapiFirst.app('./openapi/openapi.yaml', namespace: Pets)
 ```
 
-`OpenapiFirst::App` is a combination of several Rack middlewares. Read on to learn more.
+`OpenapiFirst.app` returns an instance of `OpenapiFirst::App`, which is a combination of several Rack middlewares. Read on to learn more.
 
 You can also use it as a Rack middleware. In that case the next app will only get called if the request was not specified in the API description.
 
@@ -57,12 +57,10 @@ OpenapiFirst offers Rack middlewares to auto-implement different aspects of requ
 - Request body validation
 - Mapping request to a function call
 
-To make it all work you have to add the router middleware first:
+It starts with a router middleware:
 
 ```ruby
-require 'openapi_first'
 spec = OpenapiFirst.load('petstore.yaml')
-
 use OpenapiFirst::Router, spec: myspec
 ```
 
@@ -91,7 +89,6 @@ content-type: "application/vnd.api+json"
 ### Query parameter validation
 
 ```ruby
-# Add the middleware (after the Router):
 use OpenapiFirst::QueryParameterValidation
 ```
 
