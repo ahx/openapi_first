@@ -2,6 +2,8 @@
 
 OpenapiFirst offers tools to help test and implement Rack apps based on an [OpenApi](https://www.openapis.org/) API description.
 
+TODO: Find a better name!
+
 ## TL;DR
 
 This is all in flux.
