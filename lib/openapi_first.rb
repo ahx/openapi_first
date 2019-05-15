@@ -6,6 +6,7 @@ require 'openapi_first/router'
 require 'openapi_first/query_parameter_validation'
 require 'openapi_first/request_body_validation'
 require 'openapi_first/operation_resolver'
+require 'openapi_first/app'
 
 module OpenapiFirst
   OPERATION = 'openapi_first.operation'

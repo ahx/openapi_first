@@ -8,9 +8,7 @@ This is all in flux.
 It is usable, but the syntax might have changed next time you come here.
 
 ```ruby
-require 'rack'
 require 'openapi_first'
-SPEC = OpenapiFirst.load('./openapi/openapi.yaml')
 
 module Pets
   def find_pet(params, _res)
@@ -21,15 +19,18 @@ module Pets
   end
 end
 
-App = Rack::Builder.new do
-  use OpenapiFirst::Router, spec: SPEC
-  use OpenapiFirst::QueryParameterValidation
-  use OpenapiFirst::RequestBodyValidation
-  run OpenapiFirst::OperationResolver, namespace: Pets
-end
+# In config.ru:
+run OpenapiFirst.app('./openapi/openapi.yaml', namespace: Pets)
 ```
 
-See [`examples/`](examples/) for more.
+`OpenapiFirst::App` is a combination of several Rack apps. Read on to learn more.
+
+You can also use it as a rack middleware. In that case the next app will only get called if the request was not specified in the API description.
+
+```ruby
+parsed_spec = OpenapiFirst.load('./openapi/openapi.yaml')
+use OpenapiFirst::App, parsed_spec, namespace: Pets
+```
 
 ## Start
 
