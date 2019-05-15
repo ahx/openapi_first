@@ -8,8 +8,6 @@ This is all in flux.
 It is usable, but the syntax might have changed next time you come here.
 
 ```ruby
-require 'openapi_first'
-
 module Pets
   def find_pet(params, _res)
     {
@@ -20,6 +18,7 @@ module Pets
 end
 
 # In config.ru:
+require 'openapi_first'
 run OpenapiFirst.app('./openapi/openapi.yaml', namespace: Pets)
 ```
 
