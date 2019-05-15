@@ -11,7 +11,7 @@ It is usable, but the syntax might have changed next time you come here.
 
 ```ruby
 module Pets
-  def find_pet(params, _res)
+  def find_pet(params, _res) # "find_pet" is an operationId from your OpenApi file
     {
       id: params['id'],
       name: 'Oscar'
