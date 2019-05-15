@@ -3,13 +3,18 @@
 require 'rack'
 
 module OpenapiFirst
+  def self.app(spec, namespace:)
+    spec = OpenapiFirst.load(spec) if spec.is_a?(String)
+    App.new(spec, namespace: namespace)
+  end
+
   class App
     def initialize(
-      app = nil,
-      spec, namespace:,
+      app = nil, # rubocop:disable Style/OptionalArguments
+      spec,
+      namespace:,
       allow_unknown_operation: !app.nil?
     )
-      spec = OpenapiFirst.load(spec) if spec.is_a?(String)
       @stack = Rack::Builder.new do
         use OpenapiFirst::Router, spec: spec, allow_unknown_operation: allow_unknown_operation
         use OpenapiFirst::QueryParameterValidation

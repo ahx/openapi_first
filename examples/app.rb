@@ -9,4 +9,4 @@ module Example
 end
 
 oas_path = File.absolute_path('./openapi.yaml', __dir__)
-App = OpenapiFirst::App.new(oas_path, namespace: Example)
+App = OpenapiFirst.app(oas_path, namespace: Example)

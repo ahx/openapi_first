@@ -20,7 +20,7 @@ module Pets
 end
 
 # In config.ru:
-run OpenapiFirst::App.new('./openapi/openapi.yaml', namespace: Pets)
+run OpenapiFirst.app('./openapi/openapi.yaml', namespace: Pets)
 ```
 
 `OpenapiFirst::App` is a combination of several Rack apps. Read on to learn more.
@@ -28,7 +28,8 @@ run OpenapiFirst::App.new('./openapi/openapi.yaml', namespace: Pets)
 You can also use it as a rack middleware. In that case the next app will only get called if the request was not specified in the API description.
 
 ```ruby
-use OpenapiFirst::App, './openapi/openapi.yaml', namespace: Pets
+parsed_spec = OpenapiFirst.load('./openapi/openapi.yaml')
+use OpenapiFirst::App, parsed_spec, namespace: Pets
 ```
 
 ## Start

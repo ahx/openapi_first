@@ -27,7 +27,7 @@ RSpec.describe OpenapiFirst::App do
 
   describe 'when used as a rack app' do
     let(:app) do
-      OpenapiFirst::App.new(SPEC_PATH, namespace: MyApi)
+      OpenapiFirst.app(SPEC_PATH, namespace: MyApi)
     end
 
     it 'runs the app' do
@@ -46,7 +46,8 @@ RSpec.describe OpenapiFirst::App do
   describe 'when used as a rack middleware' do
     let(:app) do
       Rack::Builder.new do
-        use OpenapiFirst::App, SPEC_PATH, namespace: MyApi
+        spec = OpenapiFirst.load(SPEC_PATH)
+        use OpenapiFirst::App, spec, namespace: MyApi
         run lambda { |_env|
           Rack::Response.new('hello', 200)
         }
