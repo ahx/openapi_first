@@ -23,9 +23,9 @@ end
 run OpenapiFirst.app('./openapi/openapi.yaml', namespace: Pets)
 ```
 
-`OpenapiFirst::App` is a combination of several Rack apps. Read on to learn more.
+`OpenapiFirst::App` is a combination of several Rack middlewares. Read on to learn more.
 
-You can also use it as a rack middleware. In that case the next app will only get called if the request was not specified in the API description.
+You can also use it as a Rack middleware. In that case the next app will only get called if the request was not specified in the API description.
 
 ```ruby
 parsed_spec = OpenapiFirst.load('./openapi/openapi.yaml')
@@ -142,7 +142,7 @@ end
 use OpenapiFirst::OperationResolver, namespace: MyApi
 # If the operation was not found in the OAS file, the next app will be called
 
-# OR use it as a rack app via `run`:
+# OR use it as a Rack app via `run`:
 run OpenapiFirst::OperationResolver, namespace: Pets
 # If the operation was not found, this will return 404
 
