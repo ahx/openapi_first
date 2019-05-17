@@ -44,8 +44,7 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'is missing'
-      expect(error[:source][:parameter]).to eq 'term'
+      expect(error[:title]).to eq 'is missing required properties: term'
     end
 
     it 'returns 400 if query parameter is not valid' do
@@ -65,17 +64,20 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
       expect(error[:title]).to eq 'is not valid'
-      expect(error[:detail]).to eq "does not match pattern '(parents|children)+(,(parents|children))*'"
+      expect(error[:detail]).to eq(
+        "does not match pattern '(parents|children)+(,(parents|children))*'"
+      )
       expect(error[:source][:parameter]).to eq 'include'
     end
 
     it 'does not allow additional query parameters by default' do
-      query_params[:foo] = 'bar'
+      query_params.update(foo: 'bar')
       get path, query_params
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'additional properties, which are not allowed: foo'
+      expect(error[:title]).to eq('unknown fields are not allowed')
+      expect(error[:source][:parameter]).to eq 'foo'
     end
 
     it 'adds filtered query parameters to env ' do
@@ -124,7 +126,10 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
       end
 
       it 'still adds filtered query parameters to env ' do
-        env = Rack::MockRequest.env_for(path, params: query_params.merge(foo: 'bar'))
+        env = Rack::MockRequest.env_for(
+          path,
+          params: query_params.merge(foo: 'bar')
+        )
         app.call(env)
 
         expect(env[OpenapiFirst::QUERY_PARAMS]).to eq query_params

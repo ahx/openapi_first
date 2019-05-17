@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module OpenapiFirst
   class Validation
     attr_reader :errors
