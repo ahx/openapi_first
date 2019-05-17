@@ -81,10 +81,9 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
     end
 
     it 'adds filtered query parameters to env ' do
-      env = Rack::MockRequest.env_for(path, params: query_params)
-      app.call(env)
+      get path, query_params
 
-      expect(env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
+      expect(last_request.env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
     end
 
     it 'skips parameter validation if operation was not found' do
@@ -126,13 +125,9 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
       end
 
       it 'still adds filtered query parameters to env ' do
-        env = Rack::MockRequest.env_for(
-          path,
-          params: query_params.merge(foo: 'bar')
-        )
-        app.call(env)
+        get path, query_params.merge(foo: 'bar')
 
-        expect(env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
+        expect(last_request.env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
       end
     end
   end
