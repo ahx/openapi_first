@@ -195,7 +195,7 @@ describe MyApp do
 
   before(:all) do
     spec = OpenapiFirst.load('petstore.yaml')
-    @app_wrapper = OpenapiFirst::TestCoverage.new(MyApp, spec)
+    @app_wrapper = OpenapiFirst::Coverage.new(MyApp, spec)
   end
 
   after(:all) do
