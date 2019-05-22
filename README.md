@@ -61,10 +61,10 @@ It starts with a router middleware:
 
 ```ruby
 spec = OpenapiFirst.load('petstore.yaml')
-use OpenapiFirst::Router, spec: myspec
+use OpenapiFirst::Router, spec: spec
 ```
 
-If the request is not valid, these middlewares return a 400 status code with a body that describes the error.
+If the request is not valid, these middlewares return a 400 status code with a body that describes the error. If unkwon routes in your application exist, which are not specified in the openapi spec file, set `:allow_unknown_operation` to `true`.
 
 The error responses conform with [JSON:API](https://jsonapi.org).
 
@@ -148,7 +148,7 @@ run OpenapiFirst::OperationResolver, namespace: Pets
 # POST /pets, { name: 'Oscar' }
 ```
 
-The resolver function is found via the [`operationId`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) attribute in your API description. If your operationId has dots like `pets.find`, the resolver above would call `MyApi.pets.find(params, req)`.
+The resolver function is found via the [`operationId`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) attribute in your API description. If your operationId has dots like `Pets.find`, the resolver above would call `MyApi::Pets.find(params, req)`.
 
 These resolver functions are called with two arguments:
 
@@ -195,7 +195,7 @@ describe MyApp do
 
   before(:all) do
     spec = OpenapiFirst.load('petstore.yaml')
-    @app_wrapper = OpenapiFirst::TestCoverage.new(MyApp, spec)
+    @app_wrapper = OpenapiFirst::Coverage.new(MyApp, spec)
   end
 
   after(:all) do
