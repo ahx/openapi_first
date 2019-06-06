@@ -215,7 +215,8 @@ describe MyApp do
 end
 ```
 
-## TODO: Mocking
+## Mocking
+Currently out of scope. Use https://github.com/JustinFeng/fakeit or something else.
 
 ## Alternatives
 
