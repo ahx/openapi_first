@@ -2,8 +2,6 @@
 
 OpenapiFirst offers tools to help test and implement Rack apps based on an [OpenApi](https://www.openapis.org/) API description.
 
-TODO: Find a better name!
-
 ## TL;DR
 
 This is all in flux.
@@ -11,7 +9,7 @@ It is usable, but the syntax might have changed next time you come here.
 
 ```ruby
 module Pets
-  def find_pet(params, _res) # "find_pet" is an operationId from your OpenApi file
+  def self.find_pet(params, _res) # "find_pet" is an operationId from your OpenApi file
     {
       id: params['id'],
       name: 'Oscar'
@@ -24,14 +22,11 @@ require 'openapi_first'
 run OpenapiFirst.app('./openapi/openapi.yaml', namespace: Pets)
 ```
 
-`OpenapiFirst.app` returns an instance of `OpenapiFirst::App`, which is a combination of several Rack middlewares. Read on to learn more.
+The above will:
 
-You can also use it as a Rack middleware. In that case the next app will only get called if the request was not specified in the API description.
-
-```ruby
-parsed_spec = OpenapiFirst.load('./openapi/openapi.yaml')
-use OpenapiFirst::App, parsed_spec, namespace: Pets
-```
+- Validate the request and respond with 400 if the request does not match against your spec
+- Map the request (for example `GET /pet/1`) to the method call `Pets.find_pet`
+- Set the content type according to your spec (here with the default status code `200`)
 
 ## Start
 
@@ -216,6 +211,7 @@ end
 ```
 
 ## Mocking
+
 Currently out of scope. Use https://github.com/JustinFeng/fakeit or something else.
 
 ## Alternatives
