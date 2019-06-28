@@ -26,7 +26,7 @@ The above will:
 
 - Validate the request and respond with 400 if the request does not match against your spec
 - Map the request (for example `GET /pet/1`) to the method call `Pets.find_pet`
-- Set the content type according to your spec (here with the default status code `200`)
+- Set the response content type according to your spec (here with the default status code `200`)
 
 ## Start
 
