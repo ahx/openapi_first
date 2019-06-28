@@ -4,9 +4,6 @@ OpenapiFirst offers tools to help test and implement Rack apps based on an [Open
 
 ## TL;DR
 
-This is all in flux.
-It is usable, but the syntax might have changed next time you come here.
-
 ```ruby
 module Pets
   def self.find_pet(params, _res) # "find_pet" is an operationId from your OpenApi file
