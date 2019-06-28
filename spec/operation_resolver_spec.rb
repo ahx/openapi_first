@@ -20,6 +20,10 @@ RSpec.describe OpenapiFirst::OperationResolver do
       def self.create_pet(_params, _res); end
 
       def self.update_pet(_params, _res); end
+
+      def self.delete_pet(_params, res)
+        res.status = 204
+      end
     end
 
     let(:app) do
@@ -97,6 +101,30 @@ RSpec.describe OpenapiFirst::OperationResolver do
       post '/pets', json_dump(pet)
       expect(last_response.status).to eq(201)
       expect(response_body).to eq(pet)
+    end
+
+    describe 'response content-type' do
+      it 'is automatically set as specified for the status code' do
+        get '/pets'
+        expect(last_response.status).to eq(200)
+        expect(last_response[Rack::CONTENT_TYPE]).to eq 'application/json'
+      end
+
+      it 'can be set by the app' do
+        expect(MyApi).to receive(:find_pets) do |_req, res|
+          res.headers[Rack::CONTENT_TYPE] = 'application/xml'
+          '<xml>'
+        end
+        get '/pets'
+        expect(last_response.status).to eq(200)
+        expect(last_response[Rack::CONTENT_TYPE]).to eq 'application/xml'
+      end
+
+      it 'defaults to nothing' do
+        delete '/pets/1'
+        expect(last_response.status).to eq(204)
+        expect(last_response[Rack::CONTENT_TYPE]).to eq nil
+      end
     end
 
     describe 'params' do

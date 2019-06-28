@@ -104,7 +104,7 @@ paths:
                 $ref: '#/components/schemas/Error'
     delete:
       description: deletes a single pet based on the ID supplied
-      operationId: deletePet
+      operationId: delete_pet
       parameters:
         - name: id
           in: path
