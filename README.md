@@ -25,6 +25,14 @@ The above will:
 - Map the request (for example `GET /pet/1`) to the method call `Pets.find_pet`
 - Set the response content type according to your spec (here with the default status code `200`)
 
+### Usage as Rack middlware
+
+```ruby
+# Just like the above, except the last line
+# ...
+run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
+```
+
 ## Start
 
 Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](http://speccy.io/) to make sure the file is valid.
