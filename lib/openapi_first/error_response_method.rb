@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  module MiddlewareHelpers
-    def validate_json_schema(schema, object)
-      JSONSchemer.schema(schema).validate(object)
-    end
-
+  module ErrorResponseMethod
     def default_error(status, title = Rack::Utils::HTTP_STATUS_CODES[status])
       {
         status: status.to_s,
@@ -17,7 +13,7 @@ module OpenapiFirst
       Rack::Response.new(
         MultiJson.dump(errors: errors),
         status,
-        Rack::CONTENT_TYPE => JSON_API_CONTENT_TYPE
+        Rack::CONTENT_TYPE => 'application/vnd.api+json'
       )
     end
   end

@@ -4,10 +4,11 @@ require 'rack'
 require 'json_schemer'
 require 'multi_json'
 require_relative 'validation_format'
+require_relative 'error_response_method'
 
 module OpenapiFirst
   class QueryParameterValidation
-    JSON_API_CONTENT_TYPE = 'application/vnd.api+json'
+    include ErrorResponseMethod
 
     def initialize(app, allow_additional_parameters: false)
       @app = app
@@ -20,20 +21,12 @@ module OpenapiFirst
       params = req.params
       if schema
         errors = schema && JSONSchemer.schema(schema).validate(params)
-        return error_response(errors) if errors&.any?
+        return error_response(400, serialize_errors(errors)) if errors&.any?
 
         req.env[QUERY_PARAMS] = allowed_query_parameters(schema, params)
       end
 
       @app.call(env)
-    end
-
-    def error_response(validation_errors)
-      Rack::Response.new(
-        MultiJson.dump(errors: serialize_errors(validation_errors.to_a)),
-        400,
-        Rack::CONTENT_TYPE => JSON_API_CONTENT_TYPE
-      )
     end
 
     def allowed_query_parameters(params_schema, query_params)

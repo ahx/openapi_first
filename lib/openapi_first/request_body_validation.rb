@@ -3,11 +3,12 @@
 require 'rack'
 require 'json_schemer'
 require 'multi_json'
+require_relative 'error_response_method'
 require_relative 'validation_format'
 
 module OpenapiFirst
   class RequestBodyValidation
-    JSON_API_CONTENT_TYPE = 'application/vnd.api+json'
+    include ErrorResponseMethod
 
     def initialize(app)
       @app = app
@@ -66,14 +67,6 @@ module OpenapiFirst
         status: status.to_s,
         title: title
       }
-    end
-
-    def error_response(status, errors = [default_error(status)])
-      Rack::Response.new(
-        MultiJson.dump(errors: errors),
-        status,
-        Rack::CONTENT_TYPE => JSON_API_CONTENT_TYPE
-      )
     end
 
     def content_type_valid?(content_type, endpoint)
