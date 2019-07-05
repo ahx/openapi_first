@@ -10,24 +10,24 @@ require 'openapi_first/query_parameter_validation'
 SEARCH_SPEC = OpenapiFirst.load('./spec/data/search.yaml')
 
 RSpec.describe OpenapiFirst::QueryParameterValidation do
+  include Rack::Test::Methods
+
   let(:path) do
     '/search'
   end
 
-  describe '#call' do
-    include Rack::Test::Methods
-
-    let(:app) do
-      Rack::Builder.new do
-        use OpenapiFirst::Router, spec: SEARCH_SPEC,
-                                  allow_unknown_operation: true
-        use OpenapiFirst::QueryParameterValidation
-        run lambda { |_env|
-          Rack::Response.new('hello', 200)
-        }
-      end
+  let(:app) do
+    Rack::Builder.new do
+      use OpenapiFirst::Router, spec: SEARCH_SPEC,
+                                allow_unknown_operation: true
+      use OpenapiFirst::QueryParameterValidation
+      run lambda { |_env|
+        Rack::Response.new('hello', 200)
+      }
     end
+  end
 
+  describe '#call' do
     let(:query_params) do
       {
         'term' => 'Oscar'
@@ -177,7 +177,9 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
     end
 
     it 'returns the JSON Schema for the request' do
-      operation = find_operation(SEARCH_SPEC, path, :get)
+      get path
+
+      operation = SEARCH_SPEC.find_operation(last_request)
       parameter_schema = subject.parameter_schema(operation)
       expect(parameter_schema).to eq expected_schema
     end

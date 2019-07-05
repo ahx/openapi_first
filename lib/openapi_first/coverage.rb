@@ -7,29 +7,21 @@ module OpenapiFirst
     def initialize(app, spec)
       @app = app
       @spec = spec
-      @to_be_called = spec.endpoints.map do |endpoint|
-        endpoint_id(endpoint)
+      @to_be_called = spec.operations.map do |operation|
+        endpoint_id(operation)
       end
     end
 
     def call(env)
-      endpoint = endpoint_for_request(Rack::Request.new(env))
-      @to_be_called.delete(endpoint_id(endpoint)) if endpoint
+      operation = @spec.find_operation(Rack::Request.new(env))
+      @to_be_called.delete(endpoint_id(operation)) if operation
       @app.call(env)
     end
 
     private
 
-    def endpoint_id(endpoint)
-      "#{endpoint.path.path}##{endpoint.method}"
-    end
-
-    def endpoint_for_request(request)
-      @spec
-        .path_by_path(request.path)
-        .endpoint_by_method(request.request_method.downcase)
-    rescue OasParser::PathNotFound
-      nil
+    def endpoint_id(operation)
+      "#{operation.path.path}##{operation.method}"
     end
   end
 end

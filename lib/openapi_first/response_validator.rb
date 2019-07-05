@@ -6,8 +6,8 @@ require_relative 'validation'
 
 module OpenapiFirst
   class ResponseValidator
-    def initialize(schema)
-      @schema = schema
+    def initialize(spec)
+      @spec = spec
     end
 
     def validate(request, response)
@@ -20,7 +20,7 @@ module OpenapiFirst
     private
 
     def validation_errors(request, response)
-      content = response_for(request, response).content
+      content = response_for(request, response)&.content
       return unless content
 
       content_type = content[response.content_type]
@@ -43,10 +43,9 @@ module OpenapiFirst
     end
 
     def response_for(request, response)
-      @schema
-        .path_by_path(request.path)
-        .endpoint_by_method(request.request_method.downcase)
-        .response_by_code(response.status.to_s, use_default: true)
+      @spec
+        .find_operation!(request)
+        &.response_by_code(response.status.to_s, use_default: true)
     end
   end
 end

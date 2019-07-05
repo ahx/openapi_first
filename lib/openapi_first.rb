@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'oas_parser'
+require 'openapi_first/definition'
 require 'openapi_first/version'
 require 'openapi_first/router'
 require 'openapi_first/query_parameter_validation'
@@ -15,7 +16,7 @@ module OpenapiFirst
   QUERY_PARAMS = 'openapi_first.query_params'
 
   def self.load(spec_path)
-    OasParser::Definition.resolve(spec_path)
+    Definition.new(OasParser::Definition.resolve(spec_path))
   end
 
   def self.app(spec, namespace:)

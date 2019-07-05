@@ -49,8 +49,7 @@ RSpec.describe OpenapiFirst::Router do
       app.call(env)
 
       operation = env[OpenapiFirst::OPERATION]
-      expect(operation.path.path).to eq path
-      expect(operation.method).to eq 'get'
+      expect(operation.operation_id).to eq 'listPets'
     end
 
     describe 'path parameters' do
