@@ -8,13 +8,13 @@ Gem::Specification.new do |spec|
   spec.name          = 'openapi_first'
   spec.version       = OpenapiFirst::VERSION
   spec.authors       = ['Andreas Haller']
-  spec.email         = ['andreas.haller@invision.de']
+  spec.email         = ['andreas.haller@posteo.de']
 
   spec.summary       = 'Tools to help developing APIs, OpenAPI spec first.'
-  spec.homepage      = 'https://github.com/ivx/openapi_first'
+  spec.homepage      = 'https://github.com/ahx/openapi_first'
 
   if spec.respond_to?(:metadata)
-    spec.metadata['https://github.com/ivx/openapi_first'] = spec.homepage
+    spec.metadata['https://github.com/ahx/openapi_first'] = spec.homepage
   else
     raise 'RubyGems 2.0 or newer is required to protect against ' \
       'public gem pushes.'
