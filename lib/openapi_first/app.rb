@@ -3,30 +3,6 @@
 require 'rack'
 
 module OpenapiFirst
-  # Use .app when using Rack's `run` instead of `App.new`.
-  # This will allow us to run a "compile" step before generating the app.
-  def self.app(spec, namespace:)
-    spec = OpenapiFirst.load(spec) if spec.is_a?(String)
-    App.new(spec, namespace: namespace)
-  end
-
-  # Use .middleware when using Rack's `use` instead of `App, options`.
-  # This will allow us to run a "compile" step before generating the app.
-  def self.middleware(spec, namespace:)
-    spec = OpenapiFirst.load(spec) if spec.is_a?(String)
-    AppWithOptions.new(spec, namespace: namespace)
-  end
-
-  class AppWithOptions
-    def initialize(*options)
-      @options = options
-    end
-
-    def new(app)
-      App.new(app, *@options)
-    end
-  end
-
   class App
     def initialize(
       app = nil, # rubocop:disable Style/OptionalArguments

@@ -18,6 +18,26 @@ module OpenapiFirst
     OasParser::Definition.resolve(spec_path)
   end
 
+  def self.app(spec, namespace:)
+    spec = OpenapiFirst.load(spec) if spec.is_a?(String)
+    App.new(spec, namespace: namespace)
+  end
+
+  def self.middleware(spec, namespace:)
+    spec = OpenapiFirst.load(spec) if spec.is_a?(String)
+    AppWithOptions.new(spec, namespace: namespace)
+  end
+
+  class AppWithOptions
+    def initialize(*options)
+      @options = options
+    end
+
+    def new(app)
+      App.new(app, *@options)
+    end
+  end
+
   class Error < StandardError; end
   # Your code goes here...
 end
