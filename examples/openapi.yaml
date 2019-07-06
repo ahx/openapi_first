@@ -18,3 +18,12 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [hello]
+                properties:
+                  hello:
+                    type: string
+
