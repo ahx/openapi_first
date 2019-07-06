@@ -9,6 +9,7 @@ Gem::Specification.new do |spec|
   spec.version       = OpenapiFirst::VERSION
   spec.authors       = ['Andreas Haller']
   spec.email         = ['andreas.haller@posteo.de']
+  spec.licenses      = ['MIT']
 
   spec.summary       = 'Tools to help developing APIs, OpenAPI spec first.'
   spec.homepage      = 'https://github.com/ahx/openapi_first'
