@@ -35,6 +35,9 @@ run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
 
 When using the middleware, all requests that are not part of the API description will be passed to the next app.
 
+### Missing features
+See [issues](https://github.com/ahx/openapi_first/issues).
+
 ## Start
 
 Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](http://speccy.io/) to make sure the file is valid.
