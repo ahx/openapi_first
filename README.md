@@ -1,6 +1,6 @@
 # OpenapiFirst
 
-OpenapiFirst offers tools to help test and implement Rack apps based on an [OpenApi](https://www.openapis.org/) API description. The idea is that you create an API description first, then add minimal code about your business logic (some call this "Resolver") and be done.
+OpenapiFirst helps to implement Rack based HTTP APIs based on an [OpenApi](https://www.openapis.org/) API description. The idea is that you create an API description first, then add minimal code about your business logic (some call this "Resolver") and be done.
 
 ## TL;DR
 
@@ -35,7 +35,11 @@ run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
 
 When using the middleware, all requests that are not part of the API description will be passed to the next app.
 
-### Missing features
+## Try it out
+
+See [example](examples)
+
+## Missing features
 See [issues](https://github.com/ahx/openapi_first/issues).
 
 ## Start
@@ -54,7 +58,7 @@ gem 'openapi_first'
 
 OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
-## Implementing
+## How it works
 
 OpenapiFirst offers Rack middlewares to auto-implement different aspects of request validation:
 
