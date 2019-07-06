@@ -1,6 +1,6 @@
 # OpenapiFirst
 
-OpenapiFirst offers tools to help test and implement Rack apps based on an [OpenApi](https://www.openapis.org/) API description.
+OpenapiFirst offers tools to help test and implement Rack apps based on an [OpenApi](https://www.openapis.org/) API description. The idea is that you create an API description first, then add minimal code about your business logic (some call this "Resolver") and be done.
 
 ## TL;DR
 
