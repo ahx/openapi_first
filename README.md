@@ -25,7 +25,7 @@ The above will:
 - Map the request (for example `GET /pet/1`) to the method call `Pets.find_pet`
 - Set the response content type according to your spec (here with the default status code `200`)
 
-### Usage as Rack middlware
+### Usage as Rack middleware
 
 ```ruby
 # Just like the above, except the last line
