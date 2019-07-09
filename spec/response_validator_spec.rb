@@ -106,34 +106,15 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
       expect(result.errors?).to be true
-      expect(result.errors.first).to eq(
-        'data' => { 'id' => 42 },
-        'data_pointer' => '/0',
-        'details' => { 'missing_keys' => ['name'] },
-        'schema' => {
-          'properties' => {
-            'id' => { 'format' => 'int64', 'type' => 'integer' },
-            'name' => { 'type' => 'string' },
-            'tag' => { 'type' => 'string' }
-          },
-          'required' => %w[id name]
-        },
-        'schema_pointer' => '/items',
-        'type' => 'required'
-      )
+      error = result.errors.first
+      expect(error[:title]).to eq('is missing required properties: name')
     end
 
     it 'returns errors on wrong property type' do
       response_body = json_dump([{ id: 'string', name: 'hans' }])
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
-      expect(result.errors.first).to eq(
-        'data' => 'string',
-        'data_pointer' => '/0/id',
-        'schema' => { 'format' => 'int64', 'type' => 'integer' },
-        'schema_pointer' => '/items/properties/id',
-        'type' => 'integer'
-      )
+      expect(result.errors.first[:title]).to eq('should be a integer')
     end
   end
 end

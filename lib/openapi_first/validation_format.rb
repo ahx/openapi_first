@@ -2,6 +2,8 @@
 
 module OpenapiFirst
   module ValidationFormat
+    SIMPLE_TYPES = %w[string integer].freeze
+
     # rubocop:disable Metrics/MethodLength
     def self.error_details(error)
       if error['type'] == 'pattern'
@@ -13,6 +15,10 @@ module OpenapiFirst
         missing_keys = error['details']['missing_keys']
         {
           title: "is missing required properties: #{missing_keys.join(', ')}"
+        }
+      elsif SIMPLE_TYPES.include?(error['type'])
+        {
+          title: "should be a #{error['type']}"
         }
       elsif error['schema'] == false
         { title: 'unknown fields are not allowed' }

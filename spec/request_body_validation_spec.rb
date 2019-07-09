@@ -62,7 +62,7 @@ RSpec.describe OpenapiFirst::RequestBodyValidation do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'is not valid'
+      expect(error[:title]).to eq 'should be a string'
       expect(error[:source][:pointer]).to eq '/attributes/name'
     end
 

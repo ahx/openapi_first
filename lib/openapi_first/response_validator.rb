@@ -37,8 +37,16 @@ module OpenapiFirst
 
     def validate_json_schema(schema, data)
       JSONSchemer.schema(schema).validate(data).to_a.map do |error|
-        error.delete('root_schema')
-        error
+        format_error(error)
+      end
+    end
+
+    def format_error(error)
+      ValidationFormat.error_details(error)
+                      .merge!(
+                        data_pointer: error['data_pointer'],
+                        schema_pointer: error['schema_pointer']
+                      ).tap do |formatted|
       end
     end
 
