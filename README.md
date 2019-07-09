@@ -6,7 +6,7 @@ OpenapiFirst helps to implement Rack based HTTP APIs based on an [OpenApi](https
 
 ```ruby
 module Pets
-  def self.find_pet(params, res) # "find_pet" is an operationId from your OpenApi file
+  def self.find_pet(params, res)
     {
       id: params['id'],
       name: 'Oscar'
