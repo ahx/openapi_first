@@ -28,7 +28,11 @@ RSpec.describe OpenapiFirst do
   end
 
   describe '.app' do
-    let(:app) { OpenapiFirst.app(SPEC_PATH, namespace: MyApi) }
+    let(:app) do
+      Rack::Builder.app do
+        run OpenapiFirst.app(SPEC_PATH, namespace: MyApi)
+      end
+    end
 
     before do
       header Rack::CONTENT_TYPE, 'application/json'
