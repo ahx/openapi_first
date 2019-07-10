@@ -20,7 +20,7 @@ module OpenapiFirst
       result = call_operation_method(operation_id, env, res)
       res.write MultiJson.dump(result) if result && res.body.empty?
       res[Rack::CONTENT_TYPE] ||= find_content_type(operation, res.status)
-      res
+      res.finish
     end
 
     private
