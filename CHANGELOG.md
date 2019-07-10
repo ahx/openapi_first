@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.6.1
+
 - Make ResponseValidator errors easier to read
 
 # 0.6.0
