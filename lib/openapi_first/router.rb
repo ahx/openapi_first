@@ -7,6 +7,8 @@ require 'mustermann/template'
 
 module OpenapiFirst
   class Router
+    NOT_FOUND = Rack::Response.new('', 404).finish.freeze
+
     def initialize(app, spec:, allow_unknown_operation: false)
       @app = app
       @spec = spec
@@ -20,7 +22,7 @@ module OpenapiFirst
       env[PATH_PARAMS] = path_params if path_params
       return @app.call(env) if operation || @allow_unknown_operation
 
-      Rack::Response.new('', 404)
+      NOT_FOUND
     end
 
     def find_path_params(operation, req)

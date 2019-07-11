@@ -14,7 +14,7 @@ module OpenapiFirst
         MultiJson.dump(errors: errors),
         status,
         Rack::CONTENT_TYPE => 'application/vnd.api+json'
-      )
+      ).finish
     end
   end
 end

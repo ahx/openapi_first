@@ -4,7 +4,8 @@ require 'rack'
 
 module OpenapiFirst
   class OperationResolver
-    DEFAULT_APP = ->(_env) { Rack::Response.new('', 404) }
+    NOT_FOUND = Rack::Response.new('', 404).finish.freeze
+    DEFAULT_APP = ->(_env) { NOT_FOUND }
 
     def initialize(app = DEFAULT_APP, namespace:)
       @app = app
