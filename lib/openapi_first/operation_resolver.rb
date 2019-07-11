@@ -11,13 +11,15 @@ module OpenapiFirst
       @namespace = namespace
     end
 
-    def call(env)
+    def call(env) # rubocop:disable Metrics/AbcSize
       operation = env[OpenapiFirst::OPERATION]
       return @app.call(env) unless operation
 
       operation_id = operation.operation_id
       res = Rack::Response.new
-      result = call_operation_method(operation_id, env, res)
+      params = build_params(env)
+      handler = find_handler(operation_id)
+      result = handler.call(params, res)
       res.write MultiJson.dump(result) if result && res.body.empty?
       res[Rack::CONTENT_TYPE] ||= find_content_type(operation, res.status)
       res.finish
@@ -25,20 +27,15 @@ module OpenapiFirst
 
     private
 
+    def find_handler(operation_id)
+      @namespace.method(operation_id)
+    end
+
     def find_content_type(operation, status)
       content = operation
                 .response_by_code(status.to_s, use_default: true)
                 .content
       content.keys[0] if content
-    end
-
-    def call_operation_method(operation_id, env, res)
-      target = @namespace
-      methods = operation_id.split('.')
-      final = methods.pop
-      methods.each { |m| target = target.send(m) }
-      params = build_params(env)
-      target.send(final, params, res)
     end
 
     def build_params(env)

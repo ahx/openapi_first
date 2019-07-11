@@ -57,11 +57,6 @@ RSpec.describe OpenapiFirst::OperationResolver do
       get '/pets'
     end
 
-    it 'calls chain of methods on the namespace module' do
-      expect(MyApi).to receive_message_chain(:pets, :find)
-      get '/pets/42'
-    end
-
     it 'allows to set the response body as JSON via return value' do
       pets = [
         { name: 'Frido' }
