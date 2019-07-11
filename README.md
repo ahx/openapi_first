@@ -74,14 +74,13 @@ OpenapiFirst offers tools to help testing your app against your API description.
 Response validation is to make sure your app responds as described in your API description. You usually do this in your tests using [rack-test](https://github.com/rack-test/rack-test).
 
 ```ruby
-# In your test:
-require 'openapi_first/response_validator'
+# In your test (rspec example):
+require 'openapi_first'
 spec = OpenapiFirst.load('petstore.yaml')
 validator = OpenapiFirst::ResponseValidator.new(spec)
-validator.validate(last_request, last_response).errors? # => true or false
-```
 
-TODO: Add RSpec matcher (via extra rubygem)
+expect(validator.validate(last_request, last_response).errors).to be_empty
+```
 
 ### Coverage
 
