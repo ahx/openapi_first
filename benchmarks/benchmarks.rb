@@ -2,17 +2,23 @@
 
 require 'benchmark/ips'
 require 'rack'
+ENV['RACK_ENV'] = 'production'
 
 configs = Dir['./apps/*.ru']
 
 Benchmark.ips do |x|
-  env = Rack::MockRequest.env_for('/hello')
+  requests = [
+    Rack::MockRequest.env_for('/hello'),
+    Rack::MockRequest.env_for('/unknown'),
+    Rack::MockRequest.env_for('/hello', method: 'POST'),
+    Rack::MockRequest.env_for('/hello/1'),
+    Rack::MockRequest.env_for('/hello/123')
+  ]
 
   configs.each do |config|
     app = Rack::Builder.parse_file(config).first
     x.report(config) do
-      res = app.call(env)
-      raise unless res[0] == 200
+      requests.each { |env| app.call(env) }
     end
   end
 

@@ -10,10 +10,37 @@ tags:
   - name: Metadata
     description: Metadata related requests
 paths:
-  /hello:
+  /hello/{id}:
+    parameters:
+    - name: id
+      description: ID of the thing to get
+      in: path
+      required: true
+      schema:
+        type: string
     get:
       operationId: find_thing
-      summary: Get metadata from the root of the API
+      description: Get one thing
+      tags: ["Metadata"]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [hello, id]
+                  properties:
+                    hello:
+                      type: string
+                    id:
+                      type: string
+  /hello:
+    get:
+      operationId: find_things
+      description: Get multiple things
       tags: ["Metadata"]
       responses:
         "200":
@@ -27,3 +54,18 @@ paths:
                   hello:
                     type: string
 
+    post:
+      operationId: create_thing
+      description: Create a thing
+      tags: ["Metadata"]
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [hello]
+                properties:
+                  hello:
+                    type: string
