@@ -42,6 +42,19 @@ paths:
       operationId: find_things
       description: Get multiple things
       tags: ["Metadata"]
+      parameters:
+      - name: filter
+        description: filter things
+        in: query
+        required: false
+        schema:
+          type: object
+          required: [id]
+          properties:
+            id:
+              type: string
+              description: Comma separated list of thing-IDs
+
       responses:
         "200":
           description: OK
@@ -53,6 +66,8 @@ paths:
                 properties:
                   hello:
                     type: string
+        default:
+          description: Error response
 
     post:
       operationId: create_thing
