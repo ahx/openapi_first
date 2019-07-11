@@ -21,7 +21,7 @@ run OpenapiFirst.app('./openapi/openapi.yaml', namespace: Pets)
 
 The above will:
 
-- Validate the request and respond with 400 if the request does not match with your API description 
+- Validate the request and respond with 400 if the request does not match with your API description
 - Map the request to a method call `Pets.find_pet` based on the `operationId` in the API description
 - Set the response content type according to your spec (here with the default status code `200`)
 
@@ -307,6 +307,16 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+### Run benchmarks
+
+```sh
+cd benchmarks
+bundle
+bundle exec ruby benchmarks.rb
+```
+
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/ahx/openapi_first.
+If you have a question or an idea or found a bug don't hesitate to [create an issue on GitHub](https://github.com/ahx/openapi_first/issues).
+
+Pull requests are very welcome as well, of course. Feel free to create a "draft" pull request early on, even if your change is still work in progress. 🤗
