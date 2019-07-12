@@ -1,6 +1,6 @@
 # OpenapiFirst
 
-OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.openapis.org/) API description. The idea is that you create an API description first, then add minimal code about your business logic (some call this "Resolver") and be done.
+OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.openapis.org/) API description. The idea is that you create an API description first, then add minimal code about your business logic (some call this "handler") and be done.
 
 ## TL;DR
 
