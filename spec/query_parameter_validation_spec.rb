@@ -17,7 +17,7 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
   end
 
   let(:app) do
-    Rack::Builder.new do
+    Rack::Builder.app do
       use OpenapiFirst::Router, spec: SEARCH_SPEC,
                                 allow_unknown_operation: true
       use OpenapiFirst::QueryParameterValidation
@@ -129,59 +129,6 @@ RSpec.describe OpenapiFirst::QueryParameterValidation do
 
         expect(last_request.env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
       end
-    end
-  end
-
-  describe '#parameter_schema' do
-    let(:subject) do
-      described_class.new(nil)
-    end
-
-    let(:expected_schema) do
-      {
-        'type' => 'object',
-        'required' => %w[
-          term
-        ],
-        'additionalProperties' => false,
-        'properties' => {
-          'birthdate' => {
-            'format' => 'date',
-            'type' => 'string'
-          },
-          'filter' => {
-            'type' => 'object',
-            'required' => ['tag'],
-            'properties' => {
-              'tag' => {
-                'type' => 'string'
-              },
-              'other' => {
-                'type' => 'object'
-              }
-            }
-          },
-          'include' => {
-            'type' => 'string',
-            'pattern' => '(parents|children)+(,(parents|children))*'
-          },
-          'limit' => {
-            'type' => 'integer',
-            'format' => 'int32'
-          },
-          'term' => {
-            'type' => 'string'
-          }
-        }
-      }
-    end
-
-    it 'returns the JSON Schema for the request' do
-      get path
-
-      operation = SEARCH_SPEC.find_operation(last_request)
-      parameter_schema = subject.parameter_schema(operation)
-      expect(parameter_schema).to eq expected_schema
     end
   end
 end

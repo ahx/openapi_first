@@ -5,6 +5,7 @@ require 'json_schemer'
 require 'multi_json'
 require_relative 'validation_format'
 require_relative 'error_response_method'
+require_relative 'query_parameter_schemas'
 
 module OpenapiFirst
   class QueryParameterValidation
@@ -12,14 +13,18 @@ module OpenapiFirst
 
     def initialize(app, allow_additional_parameters: false)
       @app = app
+      @schemas = QueryParameterSchemas.new(
+        allow_additional_parameters: allow_additional_parameters
+      )
       @additional_properties = allow_additional_parameters
     end
 
     def call(env)
       req = Rack::Request.new(env)
-      schema = parameter_schema(env[OpenapiFirst::OPERATION])
-      params = req.params
+      operation = env[OpenapiFirst::OPERATION]
+      schema = operation && @schemas.find(operation)
       if schema
+        params = req.params
         errors = schema && JSONSchemer.schema(schema).validate(params)
         return error_response(400, serialize_errors(errors)) if errors&.any?
 
@@ -36,20 +41,6 @@ module OpenapiFirst
           value = query_params[parameter_name]
           filtered[parameter_name] = value if value
         end
-    end
-
-    def parameter_schema(operation)
-      return unless operation&.query_parameters&.any?
-
-      operation.query_parameters.each_with_object(
-        'type' => 'object',
-        'required' => [],
-        'additionalProperties' => @additional_properties,
-        'properties' => {}
-      ) do |parameter, schema|
-        schema['required'] << parameter.name if parameter.required
-        schema['properties'][parameter.name] = parameter.schema
-      end
     end
 
     def serialize_errors(validation_errors)
