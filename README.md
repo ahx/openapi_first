@@ -31,6 +31,8 @@ Resolver functions (`find_pet`) are called with two arguments:
 - `res` - Holds a Rack::Response that you can modify if needed
   If you want to access to plain Rack env you can call `params.env`.
 
+You can also use the provided Rack middlewares to auto-implement only certain aspects of the request-response flow like query parameter or request body parameter validation based on your OpenAPI file. Read on to learn how.
+
 ### Usage as Rack middleware
 
 ```ruby
