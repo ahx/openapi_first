@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.6.2
+
 - OperationResolver was simplified. Removed support to use "." in operationIds.
 - RequestBodyValidation ignores mime type media parameters
 
