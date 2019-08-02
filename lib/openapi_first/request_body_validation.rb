@@ -9,6 +9,7 @@ require_relative 'validation_format'
 module OpenapiFirst
   class RequestBodyValidation
     include ErrorResponseMethod
+    STRIP_MIME_PARMA_REGXP = /([^;]*)/.freeze
 
     def initialize(app)
       @app = app
@@ -19,7 +20,7 @@ module OpenapiFirst
       return @app.call(env) unless operation&.request_body
 
       req = Rack::Request.new(env)
-      content_type = req.content_type
+      content_type = strip_mime_param(req.content_type)
       body = req.body
       catch(:halt) do
         validate_request_content_type!(content_type, operation)
@@ -71,6 +72,10 @@ module OpenapiFirst
 
     def content_type_valid?(content_type, endpoint)
       endpoint.request_body.content[content_type]
+    end
+
+    def strip_mime_param(content_type)
+      content_type.match(STRIP_MIME_PARMA_REGXP)[1]
     end
 
     def request_body_schema(content_type, endpoint)

@@ -47,6 +47,13 @@ RSpec.describe OpenapiFirst::RequestBodyValidation do
       expect(last_response.status).to be 200
     end
 
+    it 'succeeds with media type parameter' do
+      header Rack::CONTENT_TYPE, 'application/json; profile=something'
+      post path, json_dump(request_body)
+
+      expect(last_response.status).to be 200
+    end
+
     it 'adds parsed request body to env' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
