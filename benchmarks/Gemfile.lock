@@ -61,7 +61,7 @@ GEM
       mustermann (= 1.0.3)
     mustermann-grape (1.0.0)
       mustermann (~> 1.0.0)
-    nokogiri (1.10.3)
+    nokogiri (1.10.4)
       mini_portile2 (~> 2.4.0)
     oas_parser (0.19.0)
       activesupport (>= 4.0.0)
