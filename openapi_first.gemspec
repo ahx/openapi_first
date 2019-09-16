@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['andreas.haller@posteo.de']
   spec.licenses      = ['MIT']
 
-  spec.summary       = 'Implement REST APIs based on an OpenApi API description'
+  spec.summary       = 'Implement REST APIs based on OpenApi.'
   spec.homepage      = 'https://github.com/ahx/openapi_first'
 
   if spec.respond_to?(:metadata)
