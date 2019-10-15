@@ -26,11 +26,21 @@ module OpenapiFirst
       res.finish
     end
 
-    private
-
     def find_handler(operation_id)
+      if operation_id.include?('.')
+        module_name, method_name = operation_id.split('.')
+        return @namespace.const_get(module_name.camelize).method(method_name)
+      end
+
+      if operation_id.include?('#')
+        module_name, class_name = operation_id.split('#')
+        return @namespace.const_get(module_name.camelize)
+                         .const_get(class_name.camelize).new
+      end
       @namespace.method(operation_id)
     end
+
+    private
 
     def find_content_type(operation, status)
       content = operation
