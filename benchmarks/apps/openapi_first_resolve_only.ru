@@ -18,8 +18,6 @@ namespace = Module.new do
   end
 end
 
-oas_path = File.absolute_path('./openapi.yaml', __dir__)
-
 spec = OpenapiFirst.load(File.absolute_path('./openapi.yaml', __dir__))
 use OpenapiFirst::Router, spec: spec
 run OpenapiFirst::OperationResolver.new(namespace: namespace)
