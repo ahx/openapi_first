@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'committee'
 require 'syro'
 require 'multi_json'
@@ -21,6 +23,8 @@ app = Syro.new do
   end
 end
 
-use Committee::Middleware::RequestValidation, schema_path: './apps/openapi.yaml', coerce_date_times: false
+use Committee::Middleware::RequestValidation,
+    schema_path: './apps/openapi.yaml',
+    coerce_date_times: false
 
 run app

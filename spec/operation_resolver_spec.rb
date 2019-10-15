@@ -176,13 +176,44 @@ RSpec.describe OpenapiFirst::OperationResolver do
 
     context 'when run as rack app' do
       let(:app) do
-        OpenapiFirst::OperationResolver.new(namespace: MyApi)
+        described_class.new(namespace: MyApi)
       end
 
       it 'works' do
         get '/pets'
         expect(last_response.status).to be 404
       end
+    end
+  end
+
+  describe '#find_handler' do
+    module MyApi
+      module Things
+        def self.some_class_method; end
+
+        class Index
+          def call; end
+        end
+      end
+    end
+
+    it 'finds some_method' do
+      namespace = double(:some_method)
+      resolver = described_class.new(namespace: namespace)
+      expect(namespace).to receive(:some_method)
+      resolver.find_handler('some_method').call
+    end
+
+    it 'finds things.some_method' do
+      resolver = described_class.new(namespace: MyApi)
+      expect(MyApi::Things).to receive(:some_class_method)
+      resolver.find_handler('things.some_class_method').call
+    end
+
+    it 'finds things#index' do
+      resolver = described_class.new(namespace: MyApi)
+      expect_any_instance_of(MyApi::Things::Index).to receive(:call)
+      resolver.find_handler('things#index').call
     end
   end
 end

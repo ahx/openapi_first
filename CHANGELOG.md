@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- OperationResolver was simplified. Removed support to use "." in operationIds.
+
+## 0.6.2
+
+- Add support to map operationIds like `things#index` or `web.things_index`
 
 ## 0.6.1
 

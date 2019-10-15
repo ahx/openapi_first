@@ -194,14 +194,34 @@ This will add the parsed request body to `env[OpenapiFirst::REQUEST_BODY]`.
 
 OpenAPI request (and response) body validation is based on [JSON Schema](http://json-schema.org/).
 
-### Mapping request to a function call
+### Mapping the request to a function call
 
-OpenapiFirst has a `OperationResolver` middleware to map the HTTP request to a function (method) call
+OpenapiFirst uses a `OperationResolver` middleware to map the HTTP request to a function (method) call.
+
+The resolver function is found via the [`operationId`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) attribute in your API description like this:
+
+- `create_pet` will map to `MyApi.create_pet(params, response)`
+- `some_things.create` will map to `MyApi::SomeThings.create(params, response)`
+- `pets#create` will map to `MyApi::Pets::Create.new.call(params, response)` (like [Hanami::Router](https://github.com/hanami/router#controllers))
+
+These handler methods are called with two arguments:
+
+- `params` - Holds the parsed request body, filtered query params and path parameters
+- `res` - Holds a Rack::Response that you can modify if needed
+
+You can call `params.env` to access the Rack env (just like in [Hanami actions](https://guides.hanamirb.org/actions/parameters/))
+
+There are two ways to set the response body:
+
+- Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
+- Returning a value from the function (see example above) (this will always converted to JSON)
+
+### Adding the middleware
 
 ```ruby
 # Define some methods
 module MyApi
-  def create_pet(params, res)
+  def self.create_pet(params, res)
     res.status = 201
     {
       id: '1',
@@ -221,20 +241,6 @@ run OpenapiFirst::OperationResolver, namespace: Pets
 # Now make a request like
 # POST /pets, { name: 'Oscar' }
 ```
-
-The resolver function is found via the [`operationId`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) attribute in your API description.
-
-These resolver functions are called with two arguments:
-
-- `params` - Holds the parsed request body, filtered query params and path parameters
-- `res` - Holds a Rack::Response that you can modify if needed
-
-You can call `params.env` to access the Rack env (just like in [Hanami actions](https://guides.hanamirb.org/actions/parameters/))
-
-There are two ways to set the response body:
-
-- Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
-- Returning a value from the function (see example above) (this will always converted to JSON)
 
 ## Mocking
 

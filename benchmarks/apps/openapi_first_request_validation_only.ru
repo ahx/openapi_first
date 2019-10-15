@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'openapi_first'
 require 'syro'
 require 'multi_json'
