@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'yaml'
 require 'oas_parser'
 require 'openapi_first/definition'
 require 'openapi_first/version'
@@ -16,8 +17,12 @@ module OpenapiFirst
   REQUEST_BODY = 'openapi_first.parsed_request_body'
   QUERY_PARAMS = 'openapi_first.query_params'
 
-  def self.load(spec_path)
-    Definition.new(OasParser::Definition.resolve(spec_path))
+  def self.load(spec_path, only: nil)
+    content = YAML.load_file(spec_path)
+    raw = OasParser::Parser.new(spec_path, content).resolve
+    raw['paths'].filter!(&->(key, _) { only.call(key) }) if only
+    parsed = OasParser::Definition.new(raw, spec_path)
+    Definition.new(parsed)
   end
 
   def self.app(spec, namespace:)
