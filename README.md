@@ -39,6 +39,15 @@ Resolver functions (`find_pet`) are called with two arguments:
 
 You can also use the provided Rack middlewares to auto-implement only certain aspects of the request-response flow like query parameter or request body parameter validation based on your OpenAPI file. Read on to learn how.
 
+### Handling only certain paths
+
+You can filter the URIs that should be handled by pass ing `only` to `OpenapiFirst.load`:
+
+```ruby
+spec = OpenapiFirst.load './openapi/openapi.yaml', only: '/pets'.method(:==)
+run OpenapiFirst.app(spec, namespace: Pets)
+```
+
 ### Usage as Rack middleware
 
 ```ruby

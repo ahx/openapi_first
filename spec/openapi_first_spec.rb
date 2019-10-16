@@ -79,4 +79,24 @@ RSpec.describe OpenapiFirst do
       expect(last_response.body).to eq 'hello'
     end
   end
+
+  describe '.load' do
+    it 'returns a Definition' do
+      expect(OpenapiFirst.load(SPEC_PATH)).to be_a OpenapiFirst::Definition
+    end
+
+    describe 'only option' do
+      specify 'with empty filter' do
+        definition = OpenapiFirst.load(SPEC_PATH, only: nil)
+        expected = %w[find_pets create_pet find_pet delete_pet update_pet]
+        expect(definition.operations.map(&:operation_id)).to eq expected
+      end
+
+      specify 'filtering paths' do
+        definition = OpenapiFirst.load SPEC_PATH, only: '/pets'.method(:==)
+        expected = %w[find_pets create_pet]
+        expect(definition.operations.map(&:operation_id)).to eq expected
+      end
+    end
+  end
 end
