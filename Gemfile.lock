@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    openapi_first (0.6.2)
+    openapi_first (0.6.3)
       json_schemer (~> 0.2)
       multi_json (~> 1.13)
       oas_parser (~> 0.19)
@@ -40,7 +40,7 @@ GEM
     method_source (0.9.2)
     mini_portile2 (2.4.0)
     minitest (5.12.2)
-    multi_json (1.13.1)
+    multi_json (1.14.1)
     mustermann (1.0.3)
     mustermann-contrib (1.0.3)
       hansi (~> 0.2.0)
@@ -94,7 +94,7 @@ GEM
       thread_safe (~> 0.1)
     unicode-display_width (1.6.0)
     uri_template (0.7.0)
-    zeitwerk (2.1.10)
+    zeitwerk (2.2.0)
 
 PLATFORMS
   ruby

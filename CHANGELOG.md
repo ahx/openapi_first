@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 0.6.3
+
 - Add option to parse only certain paths from OAS file
 
 ## 0.6.2
