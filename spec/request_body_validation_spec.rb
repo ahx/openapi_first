@@ -40,6 +40,14 @@ RSpec.describe OpenapiFirst::RequestBodyValidation do
       json_load(last_response.body, symbolize_keys: true)
     end
 
+    it 'works with stringio' do
+      header Rack::CONTENT_TYPE, 'application/json'
+      io = StringIO.new(json_dump(request_body))
+      post path, io
+
+      expect(last_response.status).to be 200
+    end
+
     it 'succeeds if request body is valid' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)

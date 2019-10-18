@@ -19,8 +19,9 @@ module OpenapiFirst
       return @app.call(env) unless operation&.request_body
 
       req = Rack::Request.new(env)
+      body = req.body.read
+      req.body.rewind
       content_type = req.content_type
-      body = req.body
       catch(:halt) do
         validate_request_content_type!(content_type, operation)
         validate_request_body_presence!(env, body, operation)
