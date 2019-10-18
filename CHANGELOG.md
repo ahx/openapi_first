@@ -3,6 +3,10 @@
 ## Unreleased
 
 
+## 0.6.4
+
+- Fix: Rewind request body after reading
+
 ## 0.6.3
 
 - Add option to parse only certain paths from OAS file
