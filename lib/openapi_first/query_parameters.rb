@@ -1,21 +1,16 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  class QueryParameterSchemas
-    def initialize(allow_additional_parameters:)
+  class QueryParameters
+    def initialize(operation:, allow_additional_parameters:)
+      @operation = operation
       @additional_properties = allow_additional_parameters
     end
 
-    def find(operation)
-      build_parameter_schema(operation)
-    end
+    def to_json_schema
+      return unless @operation&.query_parameters&.any?
 
-    private
-
-    def build_parameter_schema(operation)
-      return unless operation&.query_parameters&.any?
-
-      operation.query_parameters.each_with_object(
+      @operation.query_parameters.each_with_object(
         'type' => 'object',
         'required' => [],
         'additionalProperties' => @additional_properties,
