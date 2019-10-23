@@ -17,29 +17,39 @@ module OpenapiFirst
     end
 
     def call(env)
-      req = Rack::Request.new(env)
-      operation = env[OpenapiFirst::OPERATION]
-      schemas = QueryParameters.new(
-        allow_additional_parameters: allow_additional_parameters
-      )
-      schema = operation && schemas.find(operation)
-      if schema
-        params = req.params
-        errors = schema && JSONSchemer.schema(schema).validate(params)
-        return error_response(400, serialize_errors(errors)) if errors&.any?
+      params = Rack::Request.new(env).params
+      json_schema = QueryParameters.new(
+        operation: env[OpenapiFirst::OPERATION],
+        allow_additional_parameters: @additional_properties
+      ).to_json_schema
 
-        req.env[QUERY_PARAMS] = allowed_query_parameters(schema, params)
+      catch(:halt) do
+        validate_query_parameters!(json_schema, params)
+        env[QUERY_PARAMS] = allowed_params(json_schema, params) if json_schema
+        @app.call(env)
       end
-
-      @app.call(env)
     end
 
-    def allowed_query_parameters(params_schema, query_params)
-      params_schema['properties']
+    private
+
+    def validate_query_parameters!(json_schema, params)
+      return unless json_schema
+
+      errors = JSONSchemer.schema(json_schema).validate(params)
+      halt error_response(400, serialize_errors(errors)) if errors&.any?
+    end
+
+    def halt(response)
+      throw :halt, response
+    end
+
+    def allowed_params(json_schema, params)
+      json_schema['properties']
         .keys
         .each_with_object({}) do |parameter_name, filtered|
-          value = query_params[parameter_name]
-          filtered[parameter_name] = value if value
+          next unless params.key?(parameter_name)
+
+          filtered[parameter_name] = params[parameter_name]
         end
     end
 
