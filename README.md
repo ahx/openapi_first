@@ -77,8 +77,7 @@ OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
 OpenapiFirst offers Rack middlewares to auto-implement different aspects for request handling:
 
-- Query parameter validation
-- Request body validation
+- Request validation
 - Mapping request to a function call
 
 It starts by adding a router middleware:
@@ -109,40 +108,30 @@ content-type: "application/vnd.api+json"
   ]
 }
 ```
-
-## Query parameter validation
-
-```ruby
-use OpenapiFirst::QueryParameterValidation
-```
-
-By default OpenapiFirst does not allow additional query parameters and will respond with 400 if additional parameters are sent. You can allow additional parameters with `additional_properties: true`:
-
-```ruby
-use OpenapiFirst::QueryParameterValidation,
-    allow_additional_parameters: true
-```
-
-The middleware filteres all top-level query parameters and adds these to the Rack env: `env[OpenapiFirst::QUERY_PARAMS]`.
-If you want to forbid nested query parameters you will need to use `additionalProperties: false` in your query parameter json schema.
-
-OpenapiFirst does not support parameters set to `explode: false` and treats nested query parameters (`filter[foo]=bar`) like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values).
-
-## Header, Cookie, Path parameter validation
-
-tbd.
-
-## Request Body validation
+## Request validation
 
 ```ruby
 # Add the middleware:
-use OpenapiFirst::RequestBodyValidation
+use OpenapiFirst::RequestValidation
 ```
 
-This will return a `415` if the requests content type does not match or `400` if the request body is invalid.
+## Query parameter validation
+
+By default OpenapiFirst does not allow additional query parameters and will respond with 400 if additional parameters are sent. You can allow additional parameters with `allow_additional_parameters: true`:
+
+The middleware filteres all top-level query parameters and adds these to the Rack env: `env[OpenapiFirst::QUERY_PARAMS]`.
+If you want to forbid nested query parameters you will need to use `allow_additional_parameters: false` in your query parameter JSON schema.
+
+OpenapiFirst does not support parameters set to `explode: false` and treats nested query parameters (`filter[foo]=bar`) like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values).
+
+### Request body validation
+
+The middleware will return a `415` if the requests content type does not match or `400` if the request body is invalid.
 This will add the parsed request body to `env[OpenapiFirst::REQUEST_BODY]`.
 
-OpenAPI request (and response) body validation is based on [JSON Schema](http://json-schema.org/).
+### Header, Cookie, Path parameter validation
+
+tbd.
 
 ## Mapping the request to a method call
 

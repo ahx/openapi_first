@@ -25,7 +25,6 @@ end
 
 spec = OpenapiFirst.load(File.absolute_path('./openapi.yaml', __dir__))
 use OpenapiFirst::Router, spec: spec
-use OpenapiFirst::QueryParameterValidation
-use OpenapiFirst::RequestBodyValidation
+use OpenapiFirst::RequestValidation
 
 run app

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Merge QueryParameterValidation and ReqestBodyValidation middlewares into RequestValidation
 
 ## 0.6.4
 

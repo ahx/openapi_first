@@ -3,10 +3,7 @@
 require_relative 'spec_helper'
 require 'rack'
 require 'rack/test'
-require 'openapi_first/router'
-require 'openapi_first/query_parameter_validation'
-require 'openapi_first/request_body_validation'
-require 'openapi_first/operation_resolver'
+require 'openapi_first'
 
 PET_EXPANDED_SPEC = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
 
@@ -31,9 +28,7 @@ RSpec.describe OpenapiFirst::OperationResolver do
         use OpenapiFirst::Router,
             spec: PET_EXPANDED_SPEC,
             allow_unknown_operation: true
-        use OpenapiFirst::QueryParameterValidation,
-            allow_additional_parameters: true
-        use OpenapiFirst::RequestBodyValidation
+        use OpenapiFirst::RequestValidation, allow_additional_parameters: true
         use OpenapiFirst::OperationResolver, namespace: MyApi
         run ->(_env) { Rack::Response.new('not found') }
       end

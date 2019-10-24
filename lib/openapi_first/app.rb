@@ -14,8 +14,7 @@ module OpenapiFirst
         use OpenapiFirst::Router,
             spec: spec,
             allow_unknown_operation: allow_unknown_operation
-        use OpenapiFirst::QueryParameterValidation
-        use OpenapiFirst::RequestBodyValidation
+        use OpenapiFirst::RequestValidation
         run OpenapiFirst::OperationResolver.new(app, namespace: namespace)
       end
     end

@@ -3,12 +3,11 @@
 require_relative 'spec_helper'
 require 'rack'
 require 'rack/test'
-require 'openapi_first/router'
-require 'openapi_first/request_body_validation'
+require 'openapi_first'
 
 PET_EXPANDED_SPEC = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
 
-RSpec.describe OpenapiFirst::RequestBodyValidation do
+RSpec.describe 'Request body validation' do
   let(:path) do
     '/pets'
   end
@@ -20,7 +19,7 @@ RSpec.describe OpenapiFirst::RequestBodyValidation do
       Rack::Builder.new do
         use OpenapiFirst::Router, spec: PET_EXPANDED_SPEC,
                                   allow_unknown_operation: true
-        use OpenapiFirst::RequestBodyValidation
+        use OpenapiFirst::RequestValidation
         run lambda { |_env|
           Rack::Response.new('hello', 200)
         }
