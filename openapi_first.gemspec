@@ -16,6 +16,8 @@ Gem::Specification.new do |spec|
 
   if spec.respond_to?(:metadata)
     spec.metadata['https://github.com/ahx/openapi_first'] = spec.homepage
+    spec.metadata['source_code_uri'] = 'https://github.com/ahx/openapi_first'
+    spec.metadata['changelog_uri'] = 'https://github.com/ahx/openapi_first/blob/master/CHANGELOG.md'
   else
     raise 'RubyGems 2.0 or newer is required to protect against ' \
       'public gem pushes.'
