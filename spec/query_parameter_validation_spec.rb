@@ -103,12 +103,12 @@ RSpec.describe 'Query parameter validation' do
       expect(last_response.status).to be 200
     end
 
-    describe('allow_additional_parameters: true') do
+    describe('allow_unknown_query_parameters: true') do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::Router, spec: SEARCH_SPEC
           use OpenapiFirst::RequestValidation,
-              allow_additional_parameters: true
+              allow_unknown_query_parameters: true
           run lambda { |_env|
             Rack::Response.new('hello', 200)
           }

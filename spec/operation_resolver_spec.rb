@@ -28,7 +28,8 @@ RSpec.describe OpenapiFirst::OperationResolver do
         use OpenapiFirst::Router,
             spec: PET_EXPANDED_SPEC,
             allow_unknown_operation: true
-        use OpenapiFirst::RequestValidation, allow_additional_parameters: true
+        use OpenapiFirst::RequestValidation,
+            allow_unknown_query_parameters: true
         use OpenapiFirst::OperationResolver, namespace: MyApi
         run ->(_env) { Rack::Response.new('not found') }
       end

@@ -8,9 +8,9 @@ require_relative 'validation_format'
 
 module OpenapiFirst
   class RequestValidation
-    def initialize(app, allow_additional_parameters: false)
+    def initialize(app, allow_unknown_query_parameters: false)
       @app = app
-      @allow_additional_parameters = allow_additional_parameters
+      @allow_unknown_query_parameters = allow_unknown_query_parameters
     end
 
     def call(env) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
@@ -100,7 +100,7 @@ module OpenapiFirst
     def validate_query_parameters!(env, operation, params)
       json_schema = QueryParameters.new(
         operation: operation,
-        allow_additional_parameters: @allow_additional_parameters
+        allow_unknown_parameters: @allow_unknown_query_parameters
       ).to_json_schema
 
       return unless json_schema

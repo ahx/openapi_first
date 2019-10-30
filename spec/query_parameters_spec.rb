@@ -49,7 +49,7 @@ RSpec.describe OpenapiFirst::QueryParameters do
     it 'returns the JSON Schema for the request' do
       query_parameters = described_class.new(
         operation: spec.operations.first,
-        allow_additional_parameters: false
+        allow_unknown_parameters: false
       )
       expect(query_parameters.to_json_schema).to eq expected_schema
     end

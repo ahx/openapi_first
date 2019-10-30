@@ -2,9 +2,9 @@
 
 module OpenapiFirst
   class QueryParameters
-    def initialize(operation:, allow_additional_parameters:)
+    def initialize(operation:, allow_unknown_parameters: false)
       @operation = operation
-      @additional_properties = allow_additional_parameters
+      @allow_unknown_parameters = allow_unknown_parameters
     end
 
     def to_json_schema
@@ -13,7 +13,7 @@ module OpenapiFirst
       @operation.query_parameters.each_with_object(
         'type' => 'object',
         'required' => [],
-        'additionalProperties' => @additional_properties,
+        'additionalProperties' => @allow_unknown_parameters,
         'properties' => {}
       ) do |parameter, schema|
         schema['required'] << parameter.name if parameter.required
