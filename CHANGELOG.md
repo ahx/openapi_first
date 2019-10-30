@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.6.5
+
 - Merge QueryParameterValidation and ReqestBodyValidation middlewares into RequestValidation
 - Rename option to `allow_unknown_query_paramerters`
 
