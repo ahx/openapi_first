@@ -6,8 +6,6 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.open
 
 Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](http://speccy.io/) to make sure the file is valid.
 
-We recommend saving the file as `openapi/openapi.yaml`.
-
 Now implement your API:
 
 ```ruby
