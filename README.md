@@ -30,7 +30,7 @@ The above will:
 - Map the request to a method call `Pets.find_pet` based on the `operationId` in the API description
 - Set the response content type according to your spec (here with the default status code `200`)
 
-Resolver functions (`find_pet`) are called with two arguments:
+Handler functions (`find_pet`) are called with two arguments:
 
 - `params` - Holds the parsed request body, filtered query params and path parameters
 - `res` - Holds a Rack::Response that you can modify if needed
