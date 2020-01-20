@@ -20,7 +20,7 @@ RSpec.describe 'Query parameter validation' do
                                 allow_unknown_operation: true
       use OpenapiFirst::RequestValidation
       run lambda { |_env|
-        Rack::Response.new('hello', 200)
+        Rack::Response.new('hello', 200).finish
       }
     end
   end
@@ -110,7 +110,7 @@ RSpec.describe 'Query parameter validation' do
           use OpenapiFirst::RequestValidation,
               allow_unknown_query_parameters: true
           run lambda { |_env|
-            Rack::Response.new('hello', 200)
+            Rack::Response.new('hello', 200).finish
           }
         end
       end

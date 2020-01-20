@@ -11,7 +11,7 @@ RSpec.describe OpenapiFirst::Coverage do
   end
 
   let(:subject) do
-    app = ->(_env) { Rack::Response.new('hello') }
+    app = ->(_env) { Rack::Response.new('hello').finish }
     described_class.new(app, spec)
   end
 
