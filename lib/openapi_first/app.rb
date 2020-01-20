@@ -5,7 +5,7 @@ require 'rack'
 module OpenapiFirst
   class App
     def initialize(
-      app = nil, # rubocop:disable Style/OptionalArguments
+      app,
       spec,
       namespace:,
       allow_unknown_operation: !app.nil?

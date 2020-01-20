@@ -8,9 +8,11 @@ require_relative 'validation_format'
 
 module OpenapiFirst
   class RequestValidation
-    def initialize(app, allow_unknown_query_parameters: false)
+    def initialize(app, options = {})
       @app = app
-      @allow_unknown_query_parameters = allow_unknown_query_parameters
+      @allow_unknown_query_parameters = options.fetch(
+        :allow_unknown_query_parameters, false
+      )
     end
 
     def call(env) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
@@ -125,9 +127,7 @@ module OpenapiFirst
     def serialize_query_parameter_errors(validation_errors)
       validation_errors.map do |error|
         {
-          source: {
-            parameter: File.basename(error['data_pointer'])
-          }
+          source: { parameter: File.basename(error['data_pointer']) }
         }.update(ValidationFormat.error_details(error))
       end
     end

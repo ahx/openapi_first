@@ -9,10 +9,10 @@ module OpenapiFirst
   class Router
     NOT_FOUND = Rack::Response.new('', 404).finish.freeze
 
-    def initialize(app, spec:, allow_unknown_operation: false)
+    def initialize(app, options)
       @app = app
-      @spec = spec
-      @allow_unknown_operation = allow_unknown_operation
+      @spec = options.fetch(:spec)
+      @allow_unknown_operation = options.fetch(:allow_unknown_operation, false)
     end
 
     def call(env)
