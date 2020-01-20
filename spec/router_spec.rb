@@ -8,18 +8,18 @@ require 'openapi_first/router'
 PETSTORE_SPEC = OpenapiFirst.load('./spec/data/petstore.yaml')
 
 RSpec.describe OpenapiFirst::Router do
-  describe '#call' do
-    include Rack::Test::Methods
+  include Rack::Test::Methods
 
-    let(:app) do
-      Rack::Builder.new do
-        use OpenapiFirst::Router, spec: PETSTORE_SPEC
-        run lambda { |_env|
-          Rack::Response.new('hello', 200)
-        }
-      end
+  let(:app) do
+    Rack::Builder.new do
+      use OpenapiFirst::Router, spec: PETSTORE_SPEC
+      run lambda { |_env|
+        Rack::Response.new('hello', 200).finish
+      }
     end
+  end
 
+  describe '#call' do
     let(:path) do
       '/pets'
     end
@@ -45,28 +45,25 @@ RSpec.describe OpenapiFirst::Router do
     end
 
     it 'adds the operation to env ' do
-      env = Rack::MockRequest.env_for(path, params: query_params)
-      app.call(env)
+      get path, query_params
 
-      operation = env[OpenapiFirst::OPERATION]
+      operation = last_request.env[OpenapiFirst::OPERATION]
       expect(operation.operation_id).to eq 'listPets'
     end
 
     describe 'path parameters' do
       it 'adds path parameters to env ' do
-        env = Rack::MockRequest.env_for('/pets/1')
-        app.call(env)
+        get '/pets/1'
 
-        params = env[OpenapiFirst::PATH_PARAMS]
+        params = last_request.env[OpenapiFirst::PATH_PARAMS]
         expect(params).to eq('petId' => '1')
       end
 
       it 'does not add path parameters if not defined for operation' do
         expect(Mustermann::Template).to_not receive(:new)
-        env = Rack::MockRequest.env_for('/pets')
-        app.call(env)
+        get 'pets'
 
-        params = env[OpenapiFirst::PATH_PARAMS]
+        params = last_request.env[OpenapiFirst::PATH_PARAMS]
         expect(params).to be_nil
       end
     end
@@ -78,7 +75,7 @@ RSpec.describe OpenapiFirst::Router do
               spec: PETSTORE_SPEC,
               allow_unknown_operation: true
           run lambda { |_env|
-            Rack::Response.new('hello', 200)
+            Rack::Response.new('hello', 200).finish
           }
         end
       end
