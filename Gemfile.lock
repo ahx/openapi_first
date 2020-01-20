@@ -4,8 +4,8 @@ PATH
     openapi_first (0.6.5)
       json_schemer (~> 0.2)
       multi_json (~> 1.13)
-      oas_parser (~> 0.19)
-      rack (~> 2)
+      oas_parser (~> 0.2)
+      rack (~> 2.1)
 
 GEM
   remote: https://rubygems.org/
