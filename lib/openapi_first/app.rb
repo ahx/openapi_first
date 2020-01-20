@@ -5,12 +5,13 @@ require 'rack'
 module OpenapiFirst
   class App
     def initialize(
-      app = nil, # rubocop:disable Style/OptionalArguments
+      app,
       spec,
       namespace:,
       allow_unknown_operation: !app.nil?
     )
-      @stack = Rack::Builder.new do
+      @stack = Rack::Builder.app do
+        freeze_app
         use OpenapiFirst::Router,
             spec: spec,
             allow_unknown_operation: allow_unknown_operation

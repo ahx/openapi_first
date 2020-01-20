@@ -57,7 +57,7 @@ RSpec.describe OpenapiFirst do
         spec = OpenapiFirst.load(SPEC_PATH)
         use OpenapiFirst.middleware(spec, namespace: MyApi)
         run lambda { |_env|
-          Rack::Response.new('hello', 200)
+          Rack::Response.new('hello', 200).finish
         }
       end
     end

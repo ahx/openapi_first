@@ -1,4 +1,4 @@
-FROM ruby:2.6.5-slim
+FROM ruby:2.7-slim
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y build-essential curl git && apt-get -y autoremove
 RUN gem install bundler

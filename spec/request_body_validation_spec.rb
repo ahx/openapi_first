@@ -21,7 +21,7 @@ RSpec.describe 'Request body validation' do
                                   allow_unknown_operation: true
         use OpenapiFirst::RequestValidation
         run lambda { |_env|
-          Rack::Response.new('hello', 200)
+          Rack::Response.new('hello', 200).finish
         }
       end
     end

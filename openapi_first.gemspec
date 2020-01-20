@@ -27,15 +27,15 @@ Gem::Specification.new do |spec|
     `git ls-files -z`
       .split("\x0")
       .reject { |f| f.match(%r{^(test|spec|features)/}) }
-      .reject { |f| %w[Dockerfile Jenkinsfile].include?(f) }
+      .reject { |f| %w[Dockerfile Jenkinsfile .tool-versions].include?(f) }
   end
   spec.bindir        = 'exe'
   spec.require_paths = ['lib']
 
   spec.add_dependency 'json_schemer', '~> 0.2'
   spec.add_dependency 'multi_json', '~> 1.13'
-  spec.add_dependency 'oas_parser', '~> 0.19'
-  spec.add_dependency 'rack', '~> 2'
+  spec.add_dependency 'oas_parser', '~> 0.2'
+  spec.add_dependency 'rack', '~> 2.1'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'rack-test', '~> 1'

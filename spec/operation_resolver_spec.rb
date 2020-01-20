@@ -31,7 +31,7 @@ RSpec.describe OpenapiFirst::OperationResolver do
         use OpenapiFirst::RequestValidation,
             allow_unknown_query_parameters: true
         use OpenapiFirst::OperationResolver, namespace: MyApi
-        run ->(_env) { Rack::Response.new('not found') }
+        run ->(_env) { Rack::Response.new('not found').finish }
       end
     end
 

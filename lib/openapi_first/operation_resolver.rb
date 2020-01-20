@@ -7,9 +7,9 @@ module OpenapiFirst
     NOT_FOUND = Rack::Response.new('', 404).finish.freeze
     DEFAULT_APP = ->(_env) { NOT_FOUND }
 
-    def initialize(app = DEFAULT_APP, namespace:)
+    def initialize(app = DEFAULT_APP, options) # rubocop:disable Style/OptionalArguments
       @app = app
-      @namespace = namespace
+      @namespace = options.fetch(:namespace)
     end
 
     def call(env) # rubocop:disable Metrics/AbcSize

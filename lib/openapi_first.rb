@@ -26,7 +26,7 @@ module OpenapiFirst
 
   def self.app(spec, namespace:)
     spec = OpenapiFirst.load(spec) if spec.is_a?(String)
-    App.new(spec, namespace: namespace)
+    App.new(nil, spec, namespace: namespace)
   end
 
   def self.middleware(spec, namespace:)
@@ -35,12 +35,13 @@ module OpenapiFirst
   end
 
   class AppWithOptions
-    def initialize(*options)
+    def initialize(spec, options)
+      @spec = spec
       @options = options
     end
 
     def new(app)
-      App.new(app, *@options)
+      App.new(app, @spec, **@options)
     end
   end
 
