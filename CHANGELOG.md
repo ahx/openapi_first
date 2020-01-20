@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 0.6.6
+- Remove warnings for Ruby 2.7
+
 ## 0.6.5
 
 - Merge QueryParameterValidation and ReqestBodyValidation middlewares into RequestValidation
