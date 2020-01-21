@@ -10,6 +10,7 @@ module OpenapiFirst
         path.path.gsub('{', ':').gsub('}','')
       end
       @path_tree = R2ree.new(normalized_paths)
+      @paths = @spec.paths
     end
 
     def operations
@@ -19,8 +20,7 @@ module OpenapiFirst
     def find_operation!(request)
       path_index = @path_tree.find(request.path)
       raise OasParser::PathNotFound if path_index == -1
-      @spec
-        .paths[path_index]
+      @paths[path_index]
         .endpoint_by_method(request.request_method.downcase)
     end
 
