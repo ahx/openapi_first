@@ -35,8 +35,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'json_schemer', '~> 0.2'
   spec.add_dependency 'multi_json', '~> 1.13'
   spec.add_dependency 'oas_parser', '~> 0.23'
-  spec.add_dependency 'rack', '~> 2.1'
   spec.add_dependency 'r2ree', '~> 0.1'
+  spec.add_dependency 'rack', '~> 2.1'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'rack-test', '~> 1'
