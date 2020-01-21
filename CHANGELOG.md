@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 0.6.7
+- Fix: version number of oas_parser
+
 ## 0.6.6
 - Remove warnings for Ruby 2.7
 
