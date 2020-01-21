@@ -55,9 +55,16 @@ module OpenapiFirst
         env[QUERY_PARAMS],
         env[REQUEST_BODY]
       ].tap(&:compact!)
-      hash = {}.merge!(*sources)
-      hash.define_singleton_method(:env) { env }
-      hash
+      Params.new(env).merge!(*sources)
+    end
+  end
+
+  class Params < Hash
+    attr_reader :env
+
+    def initialize(env)
+      @env = env
+      super
     end
   end
 end
