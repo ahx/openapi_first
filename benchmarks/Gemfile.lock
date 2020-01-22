@@ -1,10 +1,11 @@
 PATH
   remote: ..
   specs:
-    openapi_first (0.6.6)
+    openapi_first (0.6.7)
       json_schemer (~> 0.2)
       multi_json (~> 1.13)
       oas_parser (~> 0.23)
+      r2ree (~> 0.1)
       rack (~> 2.1)
 
 GEM
@@ -100,6 +101,7 @@ GEM
       nokogiri
     openapi_parser (0.8.0)
     public_suffix (4.0.3)
+    r2ree (0.1.2)
     rack (2.1.1)
     rack-accept (0.4.5)
       rack (>= 0.4)

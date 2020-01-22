@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Performance: About 25% performance increase (i/s) with help of c++ based radix-tree and some optimizations
+
 ## 0.6.7
 - Fix: version number of oas_parser
 
