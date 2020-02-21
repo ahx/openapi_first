@@ -4,7 +4,7 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.open
 
 ## TL;DR
 
-Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](http://speccy.io/) to make sure the file is valid.
+Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](https://github.com/stoplightio/spectral/) to make sure the file is valid.
 In the following examples, the OpenAPI file is named `openapi/openapi.yaml`.
 
 Now implement your API:
