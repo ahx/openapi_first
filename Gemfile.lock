@@ -70,7 +70,7 @@ GEM
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rainbow (3.0.0)
-    rake (10.5.0)
+    rake (13.0.1)
     regexp_parser (1.7.0)
     rexml (3.2.4)
     rspec (3.9.0)
@@ -107,12 +107,12 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 2.0)
+  bundler (~> 2)
   openapi_first!
   pry
   rack-test (~> 1)
-  rake (~> 10.0)
-  rspec (~> 3.0)
+  rake (~> 13)
+  rspec (~> 3)
   rubocop
 
 BUNDLED WITH
