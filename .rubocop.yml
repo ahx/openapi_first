@@ -6,3 +6,9 @@ BlockLength:
   Exclude:
   - 'spec/**/*.rb'
   - '*.gemspec'
+Style/HashEachMethods:
+  Enabled: false
+Style/HashTransformKeys:
+  Enabled: true
+Style/HashTransformValues:
+  Enabled: true

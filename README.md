@@ -4,7 +4,7 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.open
 
 ## TL;DR
 
-Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](http://speccy.io/) to make sure the file is valid.
+Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](https://github.com/stoplightio/spectral/) to make sure the file is valid.
 In the following examples, the OpenAPI file is named `openapi/openapi.yaml`.
 
 Now implement your API:
@@ -230,7 +230,7 @@ end
 
 ## Mocking
 
-Currently out of scope.
+Out of scope. Use [Prism](https://github.com/stoplightio/prism) or [fakeit](https://github.com/JustinFeng/fakeit).
 
 ## Alternatives
 
@@ -238,9 +238,11 @@ This gem is inspired by [committee](https://github.com/interagent/committee), wh
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+Run `bin/setup` to install dependencies.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Run `bundle exec rspec` to run the tests.
+
+See `bundle exec rake -T` for rubygems related tasks.
 
 ### Run benchmarks
 
