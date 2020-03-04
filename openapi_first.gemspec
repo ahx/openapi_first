@@ -36,8 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'multi_json', '~> 1.14'
   spec.add_dependency 'mustermann-contrib', '~> 1.1.1'
   spec.add_dependency 'oas_parser', '~> 0.24'
-  spec.add_dependency 'r2ree', '~> 0.1'
-  spec.add_dependency 'rack', '~> 2.1'
+  spec.add_dependency 'rack', '~> 2.2'
 
   spec.add_development_dependency 'bundler', '~> 2'
   spec.add_development_dependency 'rack-test', '~> 1'

@@ -6,8 +6,7 @@ PATH
       multi_json (~> 1.14)
       mustermann-contrib (~> 1.1.1)
       oas_parser (~> 0.24)
-      r2ree (~> 0.1)
-      rack (~> 2.1)
+      rack (~> 2.2)
 
 GEM
   remote: https://rubygems.org/
@@ -87,7 +86,7 @@ GEM
       mustermann (= 1.1.1)
     mustermann-grape (1.0.1)
       mustermann (>= 1.0.0)
-    nokogiri (1.10.8)
+    nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
     oas_parser (0.24.0)
       activesupport (>= 4.0.0)
@@ -99,7 +98,6 @@ GEM
       nokogiri
     openapi_parser (0.8.0)
     public_suffix (4.0.3)
-    r2ree (0.1.2)
     rack (2.2.2)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -113,7 +111,7 @@ GEM
       rack (~> 2.0)
       rack-protection (= 2.0.8.1)
       tilt (~> 2.0)
-    syro (3.1.1)
+    syro (3.2.0)
       rack (>= 1.6.0)
       seg
     thread_safe (0.3.6)
@@ -121,7 +119,7 @@ GEM
     tzinfo (1.2.6)
       thread_safe (~> 0.1)
     uri_template (0.7.0)
-    zeitwerk (2.2.2)
+    zeitwerk (2.3.0)
 
 PLATFORMS
   ruby

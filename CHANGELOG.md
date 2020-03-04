@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 0.6.9
+- Removed radix tree, because of a bug (https://github.com/namusyaka/r2ree-ruby/issues/2)
+
 ## 0.6.8
 - Performance: About 25% performance increase (i/s) with help of c++ based radix-tree and some optimizations
 - Update dependencies
