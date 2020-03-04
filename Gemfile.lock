@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    openapi_first (0.6.8)
+    openapi_first (0.6.9)
       json_schemer (~> 0.2)
       multi_json (~> 1.14)
       mustermann-contrib (~> 1.1.1)
