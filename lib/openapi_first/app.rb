@@ -7,16 +7,15 @@ module OpenapiFirst
     def initialize(
       app,
       spec,
-      namespace:,
-      allow_unknown_operation: !app.nil?
+      namespace:
     )
       @stack = Rack::Builder.app do
         freeze_app
         use OpenapiFirst::Router,
             spec: spec,
-            allow_unknown_operation: allow_unknown_operation
+            namespace: namespace
         use OpenapiFirst::RequestValidation
-        run OpenapiFirst::OperationResolver.new(app, namespace: namespace)
+        run OpenapiFirst::OperationResolver.new
       end
     end
 
