@@ -14,7 +14,7 @@ examples = [
   [Rack::MockRequest.env_for('/hello?filter[id]=1,2'), 200]
 ]
 
-apps = Dir['./apps/*.ru'].each_with_object({}) do |config, hash|
+apps = Dir['./apps/openapi_first.ru'].each_with_object({}) do |config, hash|
   hash[config] = Rack::Builder.parse_file(config).first
 end
 apps.freeze
@@ -31,7 +31,7 @@ Benchmark.ips do |x|
   end
   x.compare!
 end
-
+exit
 Benchmark.memory do |x|
   apps.each do |config, app|
     x.report(config) do

@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 require 'rack'
-require 'json_schemer'
-require 'multi_json'
-require 'mustermann/template'
+require 'hanami/router'
 
 module OpenapiFirst
   class Router
@@ -11,25 +9,35 @@ module OpenapiFirst
 
     def initialize(app, options)
       @app = app
-      @spec = options.fetch(:spec)
       @allow_unknown_operation = options.fetch(:allow_unknown_operation, false)
+      @router = build_router(options.fetch(:spec).operations)
     end
 
     def call(env)
-      req = Rack::Request.new(env)
-      operation = env[OPERATION] = @spec.find_operation(req)
-      path_params = find_path_params(operation, req)
-      env[PATH_PARAMS] = path_params if path_params
+      route = @router.recognize(env)
+      operation = env[OPERATION] = route.endpoint
+      env[PATH_PARAMS] = route.params
       return @app.call(env) if operation || @allow_unknown_operation
 
       NOT_FOUND
     end
 
-    def find_path_params(operation, req)
-      return unless operation&.path_parameters&.any?
+    private
 
-      pattern = Mustermann::Template.new(operation.path.path)
-      pattern.params(req.path)
+    def build_router(operations)
+      router = Hanami::Router.new { }
+      operations.each do |operation|
+        normalized_path = operation.path.path.gsub('{', ':').gsub('}', '')
+        # TODO: Fail loudly if operationIs is missing
+        next if operation.operation_id.nil?
+
+        router.public_send(
+          operation.method,
+          normalized_path,
+          to: operation
+        )
+      end
+      router
     end
   end
 end
