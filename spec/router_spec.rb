@@ -12,7 +12,7 @@ RSpec.describe OpenapiFirst::Router do
 
   let(:app) do
     Rack::Builder.new do
-      use OpenapiFirst::Router, spec: PETSTORE_SPEC
+      use OpenapiFirst::Router, spec: PETSTORE_SPEC, namespace: namespace
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
@@ -73,7 +73,8 @@ RSpec.describe OpenapiFirst::Router do
         Rack::Builder.new do
           use OpenapiFirst::Router,
               spec: PETSTORE_SPEC,
-              allow_unknown_operation: true
+              allow_unknown_operation: true,
+              namespace: namespace
           run lambda { |_env|
             Rack::Response.new('hello', 200).finish
           }
