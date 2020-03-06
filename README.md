@@ -36,8 +36,6 @@ Handler functions (`find_pet`) are called with two arguments:
 - `res` - Holds a Rack::Response that you can modify if needed
   If you want to access to plain Rack env you can call `params.env`.
 
-You can also use the provided Rack middlewares to auto-implement only certain aspects of the request-response flow like query parameter or request body parameter validation based on your OpenAPI file. Read on to learn how.
-
 ### Handling only certain paths
 
 You can filter the URIs that should be handled by pass ing `only` to `OpenapiFirst.load`:
@@ -57,9 +55,9 @@ run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
 
 When using the middleware, all requests that are not part of the API description will be passed to the next app.
 
-## Try it out
+### Try it out
 
-See [example](examples)
+See [examples](examples).
 
 
 ## Installation
@@ -72,21 +70,31 @@ gem 'openapi_first'
 
 OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
-## How it works
+## Handlers
 
-OpenapiFirst offers Rack middlewares to auto-implement different aspects for request handling:
+OpenapiFirst maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description.
 
-- Request validation
-- Mapping request to a function call
+It works like this:
 
-It starts by adding a router middleware:
+- "create_pet" or "createPet" or "create pet" calls `MyApi.create_pet(params, response)`
+- "some_things.create" calls: `MyApi::SomeThings.create(params, response)`
+- "pets#create" calls: `MyApi::Pets::Create.new.call(params, response)`
 
-```ruby
-spec = OpenapiFirst.load('petstore.yaml')
-use OpenapiFirst::Router, spec: spec
-```
+These handler methods are called with two arguments:
 
-If the request is not valid, these middlewares return a 400 status code with a body that describes the error. If unkwon routes in your application exist, which are not specified in the API description, set `:allow_unknown_operation` to `true`.
+- `params` - Holds the parsed request body, filtered query params and path parameters
+- `res` - Holds a Rack::Response that you can modify if needed
+
+You can call `params.env` to access the Rack env (just like in [Hanami actions](https://guides.hanamirb.org/actions/parameters/))
+
+There are two ways to set the response body:
+
+- Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
+- Returning a value from the function (see example above) (this will always converted to JSON)
+
+## Request validation
+
+If the request is not valid, these middlewares return a 400 status code with a body that describes the error.
 
 The error responses conform with [JSON:API](https://jsonapi.org).
 
@@ -107,14 +115,8 @@ content-type: "application/vnd.api+json"
   ]
 }
 ```
-## Request validation
 
-```ruby
-# Add the middleware:
-use OpenapiFirst::RequestValidation
-```
-
-## Query parameter validation
+### Query parameter validation
 
 By default OpenapiFirst does not allow additional query parameters and will respond with 400 if additional parameters are sent. You can allow additional parameters with `allow_allow_unknown_query_parameters: true`:
 
@@ -131,54 +133,6 @@ This will add the parsed request body to `env[OpenapiFirst::REQUEST_BODY]`.
 ### Header, Cookie, Path parameter validation
 
 tbd.
-
-## Mapping the request to a method call
-
-OpenapiFirst uses a `OperationResolver` middleware to map the HTTP request to a method call.
-
-The resolver function is found via the [`operationId`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) attribute in your API description like this:
-
-- `create_pet` will map to `MyApi.create_pet(params, response)`
-- `some_things.create` will map to `MyApi::SomeThings.create(params, response)`
-- `pets#create` will map to `MyApi::Pets::Create.new.call(params, response)` (like [Hanami::Router](https://github.com/hanami/router#controllers))
-
-These handler methods are called with two arguments:
-
-- `params` - Holds the parsed request body, filtered query params and path parameters
-- `res` - Holds a Rack::Response that you can modify if needed
-
-You can call `params.env` to access the Rack env (just like in [Hanami actions](https://guides.hanamirb.org/actions/parameters/))
-
-There are two ways to set the response body:
-
-- Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
-- Returning a value from the function (see example above) (this will always converted to JSON)
-
-### Adding the middleware
-
-```ruby
-# Define some methods
-module MyApi
-  def self.create_pet(params, res)
-    res.status = 201
-    {
-      id: '1',
-      name: params['name']
-    }
-  end
-end
-
-# Add the middleware:
-use OpenapiFirst::OperationResolver, namespace: MyApi
-# If the operation was not found in the OAS file, the next app will be called
-
-# OR use it as a Rack app via `run`:
-run OpenapiFirst::OperationResolver, namespace: Pets
-# If the operation was not found, this will return 404
-
-# Now make a request like
-# POST /pets, { name: 'Oscar' }
-```
 
 ## Response validation
 
