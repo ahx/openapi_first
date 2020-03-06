@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Make use of hanami-router, because it's fast
+- Move the namespace option to Router
+- Remove OpenapiFirst::Coverage
 
 ## 0.6.9
 - Removed radix tree, because of a bug (https://github.com/namusyaka/r2ree-ruby/issues/2)
