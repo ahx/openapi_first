@@ -18,14 +18,31 @@ module OpenapiFirst
       @router.call(env)
     end
 
+    def find_handler(operation_id)
+      name = Hanami::Utils::String.underscore(operation_id)
+      if name.include?('.')
+        module_name, method_name = name.split('.')
+        return @namespace.const_get(module_name.camelize).method(method_name)
+      end
+
+      if name.include?('#')
+        module_name, class_name = name.split('#')
+        klass = @namespace.const_get(module_name.camelize)
+                          .const_get(class_name.camelize)
+        return ->(params, res) { klass.new.call(params, res) }
+      end
+      @namespace.method(name)
+    end
+
     private
 
     def build_router(operations)
       router = Hanami::Router.new {}
       operations.each do |operation|
         normalized_path = operation.path.path.gsub('{', ':').gsub('}', '')
-        # TODO: Fail loudly if operationId is missing
-        next if operation.operation_id.nil?
+        if operation.operation_id.nil?
+          warn "operationId is missing in '#{operation.method} #{operation.path.path}'. I am ignoring this operation."
+        end
 
         router.public_send(
           operation.method,
@@ -39,22 +56,6 @@ module OpenapiFirst
         )
       end
       router
-    end
-
-    def find_handler(operation_id)
-      name = Hanami::Utils::String.underscore(operation_id)
-      if name.operation_id.include?('.')
-        module_name, method_name = name.operation_id.split('.')
-        return @namespace.const_get(module_name.camelize).method(method_name)
-      end
-
-      if name.operation_id.include?('#')
-        module_name, class_name = name.operation_id.split('#')
-        klass = @namespace.const_get(module_name.camelize)
-                          .const_get(class_name.camelize)
-        return ->(params, res) { klass.new(params, res) }
-      end
-      @namespace.method(name.operation_id)
     end
   end
 end

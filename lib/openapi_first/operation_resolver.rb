@@ -6,8 +6,6 @@ module OpenapiFirst
   class OperationResolver
     def call(env) # rubocop:disable Metrics/AbcSize
       operation = env[OpenapiFirst::OPERATION]
-      return @app.call(env) unless operation
-
       operation_id = operation.operation_id
       res = Rack::Response.new
       params = build_params(env)

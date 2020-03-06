@@ -5,7 +5,7 @@ require 'rack'
 module OpenapiFirst
   class App
     def initialize(
-      app,
+      _app,
       spec,
       namespace:
     )

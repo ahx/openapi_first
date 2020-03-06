@@ -5,17 +5,15 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first/router'
 
-PETSTORE_SPEC = OpenapiFirst.load('./spec/data/petstore.yaml')
-
 RSpec.describe OpenapiFirst::Router do
   include Rack::Test::Methods
 
   let(:app) do
     Rack::Builder.new do
-      use OpenapiFirst::Router, spec: PETSTORE_SPEC, namespace: namespace
-      run lambda { |_env|
-        Rack::Response.new('hello', 200).finish
-      }
+      use OpenapiFirst::Router,
+          spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+          namespace: Web
+      run lambda { |_env| Rack::Response.new('hello', 200).finish }
     end
   end
 
@@ -28,20 +26,29 @@ RSpec.describe OpenapiFirst::Router do
       {}
     end
 
+    before do
+      namespace = double(
+        :namespace,
+        list_pets: nil,
+        show_pet_by_id: nil
+      )
+      stub_const('Web', namespace)
+    end
+
     it 'returns 404 if path is not found' do
       query_params.delete('term')
       get '/unknown', query_params
 
       expect(last_response.status).to be 404
-      expect(last_response.body).to eq ''
+      expect(last_response.body).to eq 'Not Found'
     end
 
-    it 'returns 404 if method is not found' do
+    it 'returns 405 (not allowed) if method is not found' do
       query_params.delete('term')
       delete path, query_params
 
-      expect(last_response.status).to be 404
-      expect(last_response.body).to eq ''
+      expect(last_response.status).to be 405
+      expect(last_response.body).to eq 'Not Allowed'
     end
 
     it 'adds the operation to env ' do
@@ -72,21 +79,60 @@ RSpec.describe OpenapiFirst::Router do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::Router,
-              spec: PETSTORE_SPEC,
+              spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
               allow_unknown_operation: true,
-              namespace: namespace
+              namespace: Web
           run lambda { |_env|
             Rack::Response.new('hello', 200).finish
           }
         end
       end
+    end
+  end
 
-      it 'allow unkown operation' do
-        get '/unknown', query_params
+  describe '#find_handler' do
+    let(:router) do
+      described_class.new(
+        nil,
+        spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+        namespace: Web
+      )
+    end
 
-        expect(last_response.status).to be 200
-        expect(last_response.body).to eq 'hello'
-      end
+    before do
+      stub_const(
+        'Web',
+        Module.new do
+          def self.some_method(_params, _res); end
+        end
+      )
+      stub_const(
+        'Web::Things',
+        Class.new do
+          def self.some_class_method(_params, _res); end
+        end
+      )
+      stub_const(
+        'Web::Things::Index',
+        Class.new do
+          def call(_params, _res); end
+        end
+      )
+    end
+
+    it 'finds some_method' do
+      expect(Web).to receive(:some_method)
+      router.find_handler('some_method').call
+    end
+
+    it 'finds things.some_method' do
+      expect(Web::Things).to receive(:some_class_method)
+      router.find_handler('things.some_class_method').call
+    end
+
+    it 'finds things#index' do
+      expect_any_instance_of(Web::Things::Index).to receive(:call)
+      router.find_handler('things#index').call(double, double)
     end
   end
 end

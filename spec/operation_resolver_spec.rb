@@ -11,27 +11,14 @@ RSpec.describe OpenapiFirst::OperationResolver do
   describe '#call' do
     include Rack::Test::Methods
 
-    module MyApi
-      def self.find_pets(_params, _res); end
-
-      def self.create_pet(_params, _res); end
-
-      def self.update_pet(_params, _res); end
-
-      def self.delete_pet(_params, res)
-        res.status = 204
-      end
-    end
-
     let(:app) do
       Rack::Builder.new do
         use OpenapiFirst::Router,
             spec: PET_EXPANDED_SPEC,
-            allow_unknown_operation: true
+            namespace: MyApi
         use OpenapiFirst::RequestValidation,
             allow_unknown_query_parameters: true
-        use OpenapiFirst::OperationResolver, namespace: MyApi
-        run ->(_env) { Rack::Response.new('not found').finish }
+        run OpenapiFirst::OperationResolver.new
       end
     end
 
@@ -46,6 +33,22 @@ RSpec.describe OpenapiFirst::OperationResolver do
 
     let(:response_body) do
       json_load(last_response.body, symbolize_keys: true)
+    end
+
+    before do
+      namespace = Module.new do
+        def self.find_pets(_params, _res); end
+
+        def self.create_pet(_params, _res); end
+
+        def self.update_pet(_params, _res); end
+
+        def self.delete_pet(_params, res)
+          res.status = 204
+        end
+      end
+
+      stub_const('MyApi', namespace)
     end
 
     it 'calls a method on the namespace module' do
@@ -166,50 +169,8 @@ RSpec.describe OpenapiFirst::OperationResolver do
         header Rack::CONTENT_TYPE, 'application/json'
         get '/unknown'
 
-        expect(last_response.body).to eq 'not found'
+        expect(last_response.body).to eq 'Not Found'
       end
-    end
-
-    context 'when run as rack app' do
-      let(:app) do
-        described_class.new(namespace: MyApi)
-      end
-
-      it 'works' do
-        get '/pets'
-        expect(last_response.status).to be 404
-      end
-    end
-  end
-
-  describe '#find_handler' do
-    module MyApi
-      module Things
-        def self.some_class_method; end
-
-        class Index
-          def call; end
-        end
-      end
-    end
-
-    it 'finds some_method' do
-      namespace = double(:some_method)
-      resolver = described_class.new(namespace: namespace)
-      expect(namespace).to receive(:some_method)
-      resolver.find_handler('some_method').call
-    end
-
-    it 'finds things.some_method' do
-      resolver = described_class.new(namespace: MyApi)
-      expect(MyApi::Things).to receive(:some_class_method)
-      resolver.find_handler('things.some_class_method').call
-    end
-
-    it 'finds things#index' do
-      resolver = described_class.new(namespace: MyApi)
-      expect_any_instance_of(MyApi::Things::Index).to receive(:call)
-      resolver.find_handler('things#index').call
     end
   end
 end

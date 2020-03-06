@@ -17,12 +17,16 @@ RSpec.describe 'Query parameter validation' do
   let(:app) do
     Rack::Builder.app do
       use OpenapiFirst::Router, spec: SEARCH_SPEC,
-                                allow_unknown_operation: true
+                                namespace: Web
       use OpenapiFirst::RequestValidation
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
     end
+  end
+
+  before do
+    stub_const('Web', double('Web', search: nil, info: nil))
   end
 
   describe '#call' do
@@ -84,12 +88,6 @@ RSpec.describe 'Query parameter validation' do
       expect(last_request.env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
     end
 
-    it 'skips parameter validation if operation was not found' do
-      post path, query_params
-
-      expect(last_response.status).to be 200
-    end
-
     it 'skips parameter validation if no parameters are defined' do
       get '/info', query_params
 
@@ -106,7 +104,8 @@ RSpec.describe 'Query parameter validation' do
     describe('allow_unknown_query_parameters: true') do
       let(:app) do
         Rack::Builder.new do
-          use OpenapiFirst::Router, spec: SEARCH_SPEC
+          use OpenapiFirst::Router, spec: SEARCH_SPEC,
+            namespace: Web
           use OpenapiFirst::RequestValidation,
               allow_unknown_query_parameters: true
           run lambda { |_env|
