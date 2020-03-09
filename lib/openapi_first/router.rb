@@ -2,7 +2,7 @@
 
 require 'rack'
 require 'hanami/router'
-require 'hanami/utils/string'
+require_relative 'utils'
 
 module OpenapiFirst
   class Router
@@ -19,22 +19,31 @@ module OpenapiFirst
     end
 
     def find_handler(operation_id)
-      name = Hanami::Utils::String.underscore(operation_id)
+      name = operation_id.match(/:*(.*)/)&.to_a[1]
+      return if name.nil?
+
       if name.include?('.')
         module_name, method_name = name.split('.')
-        return @namespace.const_get(module_name.camelize).method(method_name)
+        klass = find_const(@namespace, module_name)
+        return klass&.method(Utils.underscore(method_name))
       end
-
       if name.include?('#')
-        module_name, class_name = name.split('#')
-        klass = @namespace.const_get(module_name.camelize)
-                          .const_get(class_name.camelize)
+        module_name, klass_name = name.split('#')
+        const = find_const(@namespace, module_name)
+        klass = find_const(const, klass_name)
         return ->(params, res) { klass.new.call(params, res) }
       end
-      @namespace.method(name)
+      @namespace.method(Utils.underscore(name))
     end
 
     private
+
+    def find_const(parent, name)
+      name = Utils.classify(name)
+      return unless parent.const_defined?(name, false)
+
+      parent.const_get(name, false)
+    end
 
     def build_router(operations)
       router = Hanami::Router.new {}
@@ -42,6 +51,7 @@ module OpenapiFirst
         normalized_path = operation.path.path.gsub('{', ':').gsub('}', '')
         if operation.operation_id.nil?
           warn "operationId is missing in '#{operation.method} #{operation.path.path}'. I am ignoring this operation."
+          next
         end
 
         router.public_send(

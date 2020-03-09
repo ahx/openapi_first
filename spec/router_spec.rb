@@ -134,5 +134,15 @@ RSpec.describe OpenapiFirst::Router do
       expect_any_instance_of(Web::Things::Index).to receive(:call)
       router.find_handler('things#index').call(double, double)
     end
+
+    it 'does not find inherited constants' do
+      expect(router.find_handler('string.to_s')).to be_nil
+      expect(router.find_handler('::string.to_s')).to be_nil
+    end
+
+    it 'does not find nested constants' do
+      expect(router.find_handler('foo.bar.to_s')).to be_nil
+      expect(router.find_handler('::foo::baz.to_s')).to be_nil
+    end
   end
 end
