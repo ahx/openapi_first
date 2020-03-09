@@ -15,7 +15,9 @@ RSpec.describe OpenapiFirst do
   include Rack::Test::Methods
 
   module MyApi
-    def self.update_pet(_params, _res); end
+    def self.update_pet(_params, _res)
+      'updated'
+    end
   end
 
   SPEC_PATH = './spec/data/petstore-expanded.yaml'
@@ -41,6 +43,7 @@ RSpec.describe OpenapiFirst do
     it 'runs the app' do
       patch '/pets/1', json_dump(request_body)
 
+      expect(last_response.body).to eq 'updated'
       expect(last_response.status).to eq 200
     end
 
@@ -69,6 +72,7 @@ RSpec.describe OpenapiFirst do
     it 'runs the app' do
       patch '/pets/1', json_dump(request_body)
 
+      expect(last_response.body).to eq 'updated'
       expect(last_response.status).to eq 200
     end
 

@@ -13,7 +13,7 @@ RSpec.describe OpenapiFirst::Router do
       use OpenapiFirst::Router,
           spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
           namespace: Web
-      run lambda { |_env| Rack::Response.new('hello', 200).finish }
+      run ->(_env) { Rack::Response.new('hello', 200).finish }
     end
   end
 
@@ -40,15 +40,15 @@ RSpec.describe OpenapiFirst::Router do
       get '/unknown', query_params
 
       expect(last_response.status).to be 404
-      expect(last_response.body).to eq 'Not Found'
+      expect(last_response.body).to eq ''
     end
 
-    it 'returns 405 (not allowed) if method is not found' do
+    it 'returns 400 if method is not found' do
       query_params.delete('term')
       delete path, query_params
 
-      expect(last_response.status).to be 405
-      expect(last_response.body).to eq 'Not Allowed'
+      expect(last_response.status).to be 404
+      expect(last_response.body).to eq ''
     end
 
     it 'adds the operation to env ' do

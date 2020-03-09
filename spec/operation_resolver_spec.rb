@@ -69,6 +69,17 @@ RSpec.describe OpenapiFirst::OperationResolver do
       expect(last_response[Rack::CONTENT_LENGTH]).to eq '18'
     end
 
+    it 'allows to set the response body as a string via return value' do
+      pets = 'text'
+      expect(MyApi).to receive(:find_pets) do |_params, _res|
+        pets
+      end
+
+      get '/pets'
+      expect(last_response.body).to eq(pets)
+      expect(last_response[Rack::CONTENT_LENGTH]).to eq '4'
+    end
+
     it 'allows to set the response body via res.write' do
       expected_body = 'Hi!'
       expect(MyApi).to receive(:find_pets) do |_req, res|
@@ -124,7 +135,7 @@ RSpec.describe OpenapiFirst::OperationResolver do
     describe 'params' do
       it 'has allowed query string parameters' do
         expected_params = {
-          tags: ['foo']
+          'tags' => ['foo']
         }
         expect(MyApi).to receive(:find_pets) do |params, _res|
           expect(params).to eq expected_params
@@ -161,15 +172,6 @@ RSpec.describe OpenapiFirst::OperationResolver do
         end
 
         get '/pets'
-      end
-    end
-
-    context 'when operation was not found' do
-      it 'calls the next app' do
-        header Rack::CONTENT_TYPE, 'application/json'
-        get '/unknown'
-
-        expect(last_response.body).to eq 'Not Found'
       end
     end
   end

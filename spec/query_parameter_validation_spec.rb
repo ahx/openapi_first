@@ -105,7 +105,7 @@ RSpec.describe 'Query parameter validation' do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::Router, spec: SEARCH_SPEC,
-            namespace: Web
+                                    namespace: Web
           use OpenapiFirst::RequestValidation,
               allow_unknown_query_parameters: true
           run lambda { |_env|

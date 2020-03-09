@@ -5,7 +5,7 @@ require 'rack'
 module OpenapiFirst
   class App
     def initialize(
-      _app,
+      parent_app,
       spec,
       namespace:
     )
@@ -13,7 +13,8 @@ module OpenapiFirst
         freeze_app
         use OpenapiFirst::Router,
             spec: spec,
-            namespace: namespace
+            namespace: namespace,
+            parent_app: parent_app
         use OpenapiFirst::RequestValidation
         run OpenapiFirst::OperationResolver.new
       end

@@ -18,7 +18,8 @@ RSpec.describe 'Request body validation' do
     before do
       stub_const(
         'Web',
-        double('Web', update_pet: nil, find_pets: nil, create_pet: nil))
+        double('Web', update_pet: nil, find_pets: nil, create_pet: nil)
+      )
     end
 
     let(:app) do
