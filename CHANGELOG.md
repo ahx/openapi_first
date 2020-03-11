@@ -3,8 +3,10 @@
 ## Unreleased
 
 - Make use of hanami-router, because it's fast
-- Move the namespace option to Router
 - Remove OpenapiFirst::Coverage
+- Remove option `allow_unknown_query_paramerters`
+- Move the namespace option to Router
+- Convert numeric parameters to `Integer` or `Float`
 
 ## 0.6.9
 - Removed radix tree, because of a bug (https://github.com/namusyaka/r2ree-ruby/issues/2)

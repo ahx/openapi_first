@@ -57,23 +57,22 @@ module OpenapiFirst
     def build_router(operations) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       router = Hanami::Router.new {}
       operations.each do |operation|
-        normalized_path = operation.path.path.gsub('{', ':').gsub('}', '')
+        normalized_path = operation.path.gsub('{', ':').gsub('}', '')
         if operation.operation_id.nil?
-          warn "operationId is missing in '#{operation.method} #{operation.path.path}'. I am ignoring this operation." # rubocop:disable Layout/LineLength
+          warn "operationId is missing in '#{operation.method} #{operation.path}'. I am ignoring this operation." # rubocop:disable Layout/LineLength
           next
         end
         handler = find_handler(operation.operation_id)
         if handler.nil?
-          warn "could not find handler for '#{operation.operation_id}' (#{operation.method} #{operation.path.path}). I am ignoring this operation." # rubocop:disable Layout/LineLength
+          warn "could not find handler for '#{operation.operation_id}' (#{operation.method} #{operation.path}). I am ignoring this operation." # rubocop:disable Layout/LineLength
           next
         end
-        path_parameters = operation.path_parameters.map { |f| f.name.to_sym }
         router.public_send(
           operation.method,
           normalized_path,
           to: lambda do |env|
             env[OPERATION] = operation
-            env[PATH_PARAMS] = env['router.params'].slice(*path_parameters)
+            env[PARAMS] = Utils.deep_stringify(env['router.params'])
             env[HANDLER] = handler
             @app.call(env)
           end

@@ -62,15 +62,15 @@ RSpec.describe OpenapiFirst::Router do
       it 'adds path parameters to env ' do
         get '/pets/1'
 
-        params = last_request.env[OpenapiFirst::PATH_PARAMS]
-        expect(params).to eq(petId: '1')
+        params = last_request.env[OpenapiFirst::PARAMS]
+        expect(params).to eq('petId' => '1')
       end
 
       it 'does not add path parameters if not defined for operation' do
         expect(Mustermann::Template).to_not receive(:new)
         get 'pets'
 
-        params = last_request.env[OpenapiFirst::PATH_PARAMS]
+        params = last_request.env[OpenapiFirst::PARAMS]
         expect(params).to be_empty
       end
     end

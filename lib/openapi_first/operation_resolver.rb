@@ -11,7 +11,7 @@ module OpenapiFirst
       handler = env[HANDLER]
       result = handler.call(params, res)
       res.write serialize(result) if result && res.body.empty?
-      res[Rack::CONTENT_TYPE] ||= find_content_type(operation, res.status)
+      res[Rack::CONTENT_TYPE] ||= operation.content_type_for(res.status)
       res.finish
     end
 
@@ -23,17 +23,9 @@ module OpenapiFirst
       MultiJson.dump(result)
     end
 
-    def find_content_type(operation, status)
-      content = operation
-                .response_by_code(status.to_s, use_default: true)
-                .content
-      content.keys[0] if content
-    end
-
     def build_params(env)
       sources = [
-        env[PATH_PARAMS],
-        env[QUERY_PARAMS],
+        env[PARAMS],
         env[REQUEST_BODY]
       ].tap(&:compact!)
       Params.new(env).merge!(*sources)

@@ -116,11 +116,11 @@ content-type: "application/vnd.api+json"
 }
 ```
 
-### Query parameter validation
+### Parameter validation
 
-By default OpenapiFirst does not allow additional query parameters and will respond with 400 if additional parameters are sent. You can allow additional parameters with `allow_allow_unknown_query_parameters: true`:
+The middleware filteres all top-level query parameters and paths parameters and tries to convert numeric values. Meaning, if you have an `:something_id` path with `type: integer`, it will try convert the value to an integer.
+Note that is currently does not convert date, date-time or time formats and that conversion is currently on done for path and query parameters, but not for request bodies.
 
-The middleware filteres all top-level query parameters and adds these to the Rack env: `env[OpenapiFirst::QUERY_PARAMS]`.
 If you want to forbid _nested_ query parameters you will need to use [`additionalProperties: false`](https://json-schema.org/understanding-json-schema/reference/object.html#properties) in your query parameter JSON schema.
 
 _OpenapiFirst always treats query parameters like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values), **but** it just works with nested objects (`filter[foo][bar]=baz`) (see [this discussion](https://github.com/OAI/OpenAPI-Specification/issues/1706))._

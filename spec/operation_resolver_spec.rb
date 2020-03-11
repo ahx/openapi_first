@@ -16,8 +16,7 @@ RSpec.describe OpenapiFirst::OperationResolver do
         use OpenapiFirst::Router,
             spec: PET_EXPANDED_SPEC,
             namespace: MyApi
-        use OpenapiFirst::RequestValidation,
-            allow_unknown_query_parameters: true
+        use OpenapiFirst::RequestValidation
         run OpenapiFirst::OperationResolver.new
       end
     end
@@ -127,7 +126,7 @@ RSpec.describe OpenapiFirst::OperationResolver do
 
       it 'defaults to nothing' do
         delete '/pets/1'
-        expect(last_response.status).to eq(204)
+        expect(last_response.status).to eq(204), last_response.body
         expect(last_response[Rack::CONTENT_TYPE]).to eq nil
       end
     end
@@ -151,7 +150,7 @@ RSpec.describe OpenapiFirst::OperationResolver do
         }
 
         expected_params = {
-          id: '1'
+          'id' => 1
         }.merge(pet)
 
         expect(MyApi).to receive(:update_pet) do |params, _res|
@@ -160,6 +159,7 @@ RSpec.describe OpenapiFirst::OperationResolver do
 
         header Rack::CONTENT_TYPE, 'application/json'
         patch '/pets/1', json_dump(pet)
+        expect(last_response.status).to eq(200), last_response.body
       end
     end
 

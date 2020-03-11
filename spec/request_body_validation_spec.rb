@@ -133,7 +133,7 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         patch '/pets/1'
 
-        expect(last_response.status).to be 200
+        expect(last_response.status).to eq(200), last_response.body
         expect(last_response.body).to eq 'hello'
       end
     end

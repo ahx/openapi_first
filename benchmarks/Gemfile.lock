@@ -1,8 +1,9 @@
 PATH
   remote: ..
   specs:
-    openapi_first (0.6.9)
+    openapi_first (0.7.0.alpha1)
       hanami-router (~> 2.0.alpha)
+      hanami-utils (~> 2.0.alpha)
       json_schemer (~> 0.2)
       multi_json (~> 1.14)
       oas_parser (~> 0.24)
@@ -65,6 +66,9 @@ GEM
       mustermann (~> 1.0)
       mustermann-contrib (~> 1.0)
       rack (~> 2.0)
+    hanami-utils (2.0.0.alpha1)
+      concurrent-ruby (~> 1.0)
+      transproc (~> 1.0)
     hansi (0.2.0)
     hash-deep-merge (0.1.1)
     i18n (1.8.2)
@@ -116,6 +120,7 @@ GEM
       seg
     thread_safe (0.3.6)
     tilt (2.0.10)
+    transproc (1.1.1)
     tzinfo (1.2.6)
       thread_safe (~> 0.1)
     uri_template (0.7.0)

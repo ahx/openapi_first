@@ -7,7 +7,7 @@ require 'openapi_first'
 
 SEARCH_SPEC = OpenapiFirst.load('./spec/data/search.yaml')
 
-RSpec.describe 'Query parameter validation' do
+RSpec.describe 'Parameter validation' do
   include Rack::Test::Methods
 
   let(:path) do
@@ -30,7 +30,7 @@ RSpec.describe 'Query parameter validation' do
   end
 
   describe '#call' do
-    let(:query_params) do
+    let(:params) do
       {
         'term' => 'Oscar'
       }
@@ -41,17 +41,17 @@ RSpec.describe 'Query parameter validation' do
     end
 
     it 'returns 400 if query parameter is missing' do
-      query_params.delete('term')
-      get path, query_params
+      params.delete('term')
+      get path, params
 
-      expect(last_response.status).to be 400
+      expect(last_response.status).to eq 400
       error = response_body[:errors][0]
       expect(error[:title]).to eq 'is missing required properties: term'
     end
 
     it 'returns 400 if query parameter is not valid' do
-      query_params[:birthdate] = 'not-a-date'
-      get path, query_params
+      params[:birthdate] = 'not-a-date'
+      get path, params
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
@@ -60,8 +60,8 @@ RSpec.describe 'Query parameter validation' do
     end
 
     it 'returns 400 if query parameter does not match pattern' do
-      query_params[:include] = 'foo,bar'
-      get path, query_params
+      params[:include] = 'foo,bar'
+      get path, params
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
@@ -72,59 +72,66 @@ RSpec.describe 'Query parameter validation' do
       expect(error[:source][:parameter]).to eq 'include'
     end
 
-    it 'does not allow additional query parameters by default' do
-      query_params.update(foo: 'bar')
-      get path, query_params
-
-      expect(last_response.status).to be 400
-      error = response_body[:errors][0]
-      expect(error[:title]).to eq('unknown fields are not allowed')
-      expect(error[:source][:parameter]).to eq 'foo'
-    end
-
     it 'adds filtered query parameters to env ' do
-      get path, query_params
+      get path, params
 
-      expect(last_request.env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
+      expect(last_request.env[OpenapiFirst::PARAMS]).to eq params
     end
 
     it 'skips parameter validation if no parameters are defined' do
-      get '/info', query_params
+      get '/info', params
 
       puts last_response.body
       expect(last_response.status).to be 200
     end
 
     it 'succeeds if query parameter are valid' do
-      get path, query_params
+      get path, params
 
       expect(last_response.status).to be 200
     end
 
-    describe('allow_unknown_query_parameters: true') do
-      let(:app) do
-        Rack::Builder.new do
-          use OpenapiFirst::Router, spec: SEARCH_SPEC,
-                                    namespace: Web
-          use OpenapiFirst::RequestValidation,
-              allow_unknown_query_parameters: true
-          run lambda { |_env|
-            Rack::Response.new('hello', 200).finish
-          }
-        end
+    it 'does not pass unknown query parameters to the handler' do
+      get path, params.merge(foo: 'bar')
+
+      expect(last_response.status).to eq 200
+      expect(last_request.env[OpenapiFirst::PARAMS]).to eq params
+    end
+
+    describe 'type conversion' do
+      let(:last_params) { last_request.env[OpenapiFirst::PARAMS] }
+
+      it 'converts to integer' do
+        get path, params.merge(limit: '100')
+
+        expect(last_response.status).to eq(200), last_response.body
+        expect(last_params['limit']).to eq 100
+
+        get path, params.merge(limit: 'invalid')
+        expect(last_response.status).to eq(400)
+
+        get path, params.merge(limit: '0x23')
+        expect(last_response.status).to eq(400)
       end
 
-      it 'does allow additional query parameters by default' do
-        query_params[:foo] = 'bar'
-        get path, query_params
+      it 'converts to float (number)' do
+        get path, params.merge(weight: '1.5')
 
-        expect(last_response.status).to be 200
+        expect(last_response.status).to eq(200), last_response.body
+        expect(last_params['weight']).to eq 1.5
+
+        get path, params.merge(limit: 'invalid')
+        expect(last_response.status).to eq(400)
+
+        get path, params.merge(limit: '0x23')
+        expect(last_response.status).to eq(400)
       end
 
-      it 'still adds filtered query parameters to env ' do
-        get path, query_params.merge(foo: 'bar')
+      it 'converts nested params' do
+        get path, params.merge(filter: { id: '100', tag: 'foo' })
 
-        expect(last_request.env[OpenapiFirst::QUERY_PARAMS]).to eq query_params
+        expect(last_response.status).to eq(200), last_response.body
+        expect(last_params['filter']['id']).to eq 100
       end
     end
   end
