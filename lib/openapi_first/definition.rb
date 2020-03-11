@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'operation'
+
 module OpenapiFirst
   class Definition
     def initialize(parsed)
@@ -7,7 +9,7 @@ module OpenapiFirst
     end
 
     def operations
-      @spec.endpoints
+      @spec.endpoints.map { |e| Operation.new(e) }
     end
 
     def find_operation!(request)

@@ -1,19 +1,18 @@
 # frozen_string_literal: true
 
 require_relative 'spec_helper'
-require 'openapi_first/query_parameters'
+require 'openapi_first/operation'
 
-RSpec.describe OpenapiFirst::QueryParameters do
-  let(:spec) { OpenapiFirst.load('./spec/data/search.yaml') }
+RSpec.describe OpenapiFirst::Operation do
+  let(:spec) { OpenapiFirst.load('./spec/data/parameters.yaml') }
 
-  describe '#to_json_schema' do
+  describe '#parameters_json_schema' do
     let(:expected_schema) do
       {
         'type' => 'object',
         'required' => %w[
           term
         ],
-        'additionalProperties' => false,
         'properties' => {
           'birthdate' => {
             'format' => 'date',
@@ -47,11 +46,8 @@ RSpec.describe OpenapiFirst::QueryParameters do
     end
 
     it 'returns the JSON Schema for the request' do
-      query_parameters = described_class.new(
-        operation: spec.operations.first,
-        allow_unknown_parameters: false
-      )
-      expect(query_parameters.to_json_schema).to eq expected_schema
+      schema = described_class.new(spec.operations.first).parameters_json_schema
+      expect(schema).to eq expected_schema
     end
   end
 end

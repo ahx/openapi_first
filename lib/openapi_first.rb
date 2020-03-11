@@ -12,9 +12,9 @@ require 'openapi_first/app'
 
 module OpenapiFirst
   OPERATION = 'openapi_first.operation'
-  PATH_PARAMS = 'openapi_first.path_params'
+  PARAMS = 'openapi_first.params'
   REQUEST_BODY = 'openapi_first.parsed_request_body'
-  QUERY_PARAMS = 'openapi_first.query_params'
+  HANDLER = 'openapi_first.handler'
 
   def self.load(spec_path, only: nil)
     content = YAML.load_file(spec_path)

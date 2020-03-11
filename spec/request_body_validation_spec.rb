@@ -15,10 +15,17 @@ RSpec.describe 'Request body validation' do
   describe '#call' do
     include Rack::Test::Methods
 
+    before do
+      stub_const(
+        'Web',
+        double('Web', update_pet: nil, find_pets: nil, create_pet: nil)
+      )
+    end
+
     let(:app) do
       Rack::Builder.new do
         use OpenapiFirst::Router, spec: PET_EXPANDED_SPEC,
-                                  allow_unknown_operation: true
+                                  namespace: Web
         use OpenapiFirst::RequestValidation
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
@@ -112,17 +119,6 @@ RSpec.describe 'Request body validation' do
       expect(error[:title]).to eq 'Unsupported Media Type'
     end
 
-    describe 'when operation was not found' do
-      it 'skips request body validation' do
-        request_body[:name] = 43
-        header Rack::CONTENT_TYPE, 'application/json'
-        put path, json_dump(request_body)
-
-        expect(last_response.status).to be 200
-        expect(last_response.body).to eq 'hello'
-      end
-    end
-
     describe 'when operation does not specify request body' do
       it 'skips request body validation' do
         get '/pets'
@@ -137,7 +133,7 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         patch '/pets/1'
 
-        expect(last_response.status).to be 200
+        expect(last_response.status).to eq(200), last_response.body
         expect(last_response.body).to eq 'hello'
       end
     end

@@ -5,17 +5,15 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first/router'
 
-PETSTORE_SPEC = OpenapiFirst.load('./spec/data/petstore.yaml')
-
 RSpec.describe OpenapiFirst::Router do
   include Rack::Test::Methods
 
   let(:app) do
     Rack::Builder.new do
-      use OpenapiFirst::Router, spec: PETSTORE_SPEC
-      run lambda { |_env|
-        Rack::Response.new('hello', 200).finish
-      }
+      use OpenapiFirst::Router,
+          spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+          namespace: Web
+      run ->(_env) { Rack::Response.new('hello', 200).finish }
     end
   end
 
@@ -28,6 +26,15 @@ RSpec.describe OpenapiFirst::Router do
       {}
     end
 
+    before do
+      namespace = double(
+        :namespace,
+        list_pets: nil,
+        show_pet_by_id: nil
+      )
+      stub_const('Web', namespace)
+    end
+
     it 'returns 404 if path is not found' do
       query_params.delete('term')
       get '/unknown', query_params
@@ -36,7 +43,7 @@ RSpec.describe OpenapiFirst::Router do
       expect(last_response.body).to eq ''
     end
 
-    it 'returns 404 if method is not found' do
+    it 'returns 400 if method is not found' do
       query_params.delete('term')
       delete path, query_params
 
@@ -55,7 +62,7 @@ RSpec.describe OpenapiFirst::Router do
       it 'adds path parameters to env ' do
         get '/pets/1'
 
-        params = last_request.env[OpenapiFirst::PATH_PARAMS]
+        params = last_request.env[OpenapiFirst::PARAMS]
         expect(params).to eq('petId' => '1')
       end
 
@@ -63,8 +70,8 @@ RSpec.describe OpenapiFirst::Router do
         expect(Mustermann::Template).to_not receive(:new)
         get 'pets'
 
-        params = last_request.env[OpenapiFirst::PATH_PARAMS]
-        expect(params).to be_nil
+        params = last_request.env[OpenapiFirst::PARAMS]
+        expect(params).to be_empty
       end
     end
 
@@ -72,20 +79,70 @@ RSpec.describe OpenapiFirst::Router do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::Router,
-              spec: PETSTORE_SPEC,
-              allow_unknown_operation: true
+              spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+              allow_unknown_operation: true,
+              namespace: Web
           run lambda { |_env|
             Rack::Response.new('hello', 200).finish
           }
         end
       end
+    end
+  end
 
-      it 'allow unkown operation' do
-        get '/unknown', query_params
+  describe '#find_handler' do
+    let(:router) do
+      described_class.new(
+        nil,
+        spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+        namespace: Web
+      )
+    end
 
-        expect(last_response.status).to be 200
-        expect(last_response.body).to eq 'hello'
-      end
+    before do
+      stub_const(
+        'Web',
+        Module.new do
+          def self.some_method(_params, _res); end
+        end
+      )
+      stub_const(
+        'Web::Things',
+        Class.new do
+          def self.some_class_method(_params, _res); end
+        end
+      )
+      stub_const(
+        'Web::Things::Index',
+        Class.new do
+          def call(_params, _res); end
+        end
+      )
+    end
+
+    it 'finds some_method' do
+      expect(Web).to receive(:some_method)
+      router.find_handler('some_method').call
+    end
+
+    it 'finds things.some_method' do
+      expect(Web::Things).to receive(:some_class_method)
+      router.find_handler('things.some_class_method').call
+    end
+
+    it 'finds things#index' do
+      expect_any_instance_of(Web::Things::Index).to receive(:call)
+      router.find_handler('things#index').call(double, double)
+    end
+
+    it 'does not find inherited constants' do
+      expect(router.find_handler('string.to_s')).to be_nil
+      expect(router.find_handler('::string.to_s')).to be_nil
+    end
+
+    it 'does not find nested constants' do
+      expect(router.find_handler('foo.bar.to_s')).to be_nil
+      expect(router.find_handler('::foo::baz.to_s')).to be_nil
     end
   end
 end

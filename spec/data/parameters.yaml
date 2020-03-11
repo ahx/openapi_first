@@ -37,8 +37,6 @@ paths:
                 type: string
               other:
                 type: object
-              id:
-                type: integer
         - name: limit
           in: query
           description: How many items to return at one time (max 100)
@@ -46,12 +44,6 @@ paths:
           schema:
             type: integer
             format: int32
-        - name: weight
-          in: query
-          description: An arbitrary parameter to test conversion to floats
-          required: false
-          schema:
-            type: number
         - name: birthdate
           in: query
           description: Search for a pet born on this date
@@ -59,20 +51,6 @@ paths:
           schema:
             type: string
             format: date
-        - name: date_time
-          in: query
-          description: An arbitrary parameter to test conversion to date-time
-          required: false
-          schema:
-            type: string
-            format: date-time
-        - name: time
-          in: query
-          description: An arbitrary parameter to test conversion to time
-          required: false
-          schema:
-            type: string
-            format: time
         - name: include
           in: query
           description: Relations you want to include

@@ -13,6 +13,7 @@ RSpec.describe 'Example App' do
 
   it 'does not explode' do
     get '/'
+    expect(last_response.status).to eq(200)
     expect(json_load(last_response.body)).to eq('hello' => 'world')
   end
 
