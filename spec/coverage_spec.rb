@@ -24,7 +24,7 @@ RSpec.describe OpenapiFirst::Coverage do
   describe '#to_be_called' do
     it 'starts with all endpoints' do
       expected_endpoints = %w[/pets#get /pets#post /pets/{petId}#get]
-      expect(app.to_be_called).to eq  expected_endpoints
+      expect(app.to_be_called).to eq expected_endpoints
     end
 
     it 'removes an endpoint after it was called' do
