@@ -49,6 +49,16 @@ RSpec.describe OpenapiFirst::Operation do
       schema = described_class.new(spec.operations.first).parameters_json_schema
       expect(schema).to eq expected_schema
     end
+
+    describe 'with flat named nested[params]' do
+      let(:spec) { OpenapiFirst.load('./spec/data/parameters-flat.yaml') }
+
+      it 'converts it to a nested schema' do
+        schema = described_class.new(spec.operations.first).parameters_json_schema
+        pp schema
+        expect(schema).to eq expected_schema
+      end
+    end
   end
 
   describe '#content_type_for' do

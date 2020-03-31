@@ -44,8 +44,27 @@ module OpenapiFirst
         'required' => [],
         'properties' => {}
       ) do |parameter, schema|
-        schema['required'] << parameter.name if parameter.required
-        schema['properties'][parameter.name] = parameter.schema
+        params = Rack::Utils.parse_nested_query(parameter.name)
+        generate_schema(schema, params, parameter)
+      end
+    end
+
+    def generate_schema(schema, params, parameter)
+      params.each do |key, value|
+        case value
+        when Hash
+          property_schema = {
+            'type' => 'object',
+            'required' => parameter.required ? [value.keys.first] : [],
+            'properties' => {}
+          }
+          schema['required'] << key if parameter.required
+          generate_schema(property_schema, value, parameter)
+          schema['properties'][key] = property_schema
+        else
+          schema['required'] << parameter.name if parameter.required && value
+          schema['properties'][key] = parameter.schema
+        end
       end
     end
   end

@@ -1,0 +1,99 @@
+openapi: "3.0.2"
+info:
+  version: 1.0.0
+  title: Search example
+  contact:
+    name: Contact Name
+    email: contact@example.com
+    url: https://example.com/
+servers:
+  - url: http://example.com
+tags:
+  - name: search
+    description: Search
+paths:
+  /search:
+    get:
+      summary: Search for pets
+      operationId: search
+      tags:
+        - search
+      parameters:
+        - name: term
+          in: query
+          description: The term you want to search for
+          required: true
+          schema:
+            type: string
+        - name: filter[tag]
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: filter[other]
+          in: query
+          required: true
+          schema:
+            type: object
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100)
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: birthdate
+          in: query
+          description: Search for a pet born on this date
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: include
+          in: query
+          description: Relations you want to include
+          required: false
+          schema:
+            type: string
+            pattern: (parents|children)+(,(parents|children))*
+      responses:
+        "200":
+          description: A paged array of pets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pets"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /info:
+    get:
+      summary: Get some info
+      operationId: info
+      tags:
+        - search
+      responses:
+        "200":
+          description: ok
+
+components:
+  schemas:
+    Pets:
+      type: array
+      items:
+        $ref: "#/components/schemas/Pet"
+    Pet:
+      $ref: "./components/schemas/pet.yaml#/Pet"
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
