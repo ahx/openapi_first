@@ -75,6 +75,15 @@ RSpec.describe OpenapiFirst::Router do
       end
     end
 
+    describe 'query parameters' do
+      it 'adds query parameters to env ' do
+        get '/pets?limit=2'
+
+        params = last_request.env[OpenapiFirst::PARAMS]
+        expect(params).to eq('limit' => '2')
+      end
+    end
+
     describe('allow_unknown_operation: true') do
       let(:app) do
         Rack::Builder.new do
