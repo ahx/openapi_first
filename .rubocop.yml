@@ -6,6 +6,10 @@ BlockLength:
   Exclude:
   - 'spec/**/*.rb'
   - '*.gemspec'
+Lint/RaiseException:
+  Enabled: true
+Lint/StructNewOverride:
+  Enabled: true
 Style/HashEachMethods:
   Enabled: false
 Style/HashTransformKeys:
