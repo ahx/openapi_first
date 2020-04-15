@@ -28,11 +28,10 @@ module OpenapiFirst
                 .response_by_code(status.to_s, use_default: true)
                 .content
       content.keys[0] if content
-
-      rescue OasParser::ResponseCodeNotFound => e
-        operation_name = "#{method.upcase} #{path}"
-        message = "Response status code or default not found: #{status} for '#{operation_name}'"
-        raise OpenapiFirst::ResponseCodeNotFoundError, message
+    rescue OasParser::ResponseCodeNotFound
+      operation_name = "#{method.upcase} #{path}"
+      message = "Response status code or default not found: #{status} for '#{operation_name}'" # rubocop:disable Layout/LineLength
+      raise OpenapiFirst::ResponseCodeNotFoundError, message
     end
 
     private
