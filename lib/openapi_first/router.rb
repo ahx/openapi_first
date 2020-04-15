@@ -37,7 +37,11 @@ module OpenapiFirst
         module_name, klass_name = name.split('#')
         const = find_const(@namespace, module_name)
         klass = find_const(const, klass_name)
-        return ->(params, res) { klass.new.call(params, res) }
+        if klass.instance_method(:initialize).arity.zero?
+          return ->(params, res) { klass.new.call(params, res) }
+        end
+
+        return ->(params, res) { klass.new(params.env).call(params, res) }
       end
       method_name = Utils.underscore(name)
       return unless @namespace.respond_to?(method_name)
