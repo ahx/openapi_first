@@ -14,13 +14,17 @@ RSpec.describe OpenapiFirst do
 
   include Rack::Test::Methods
 
-  module MyApi
-    def self.update_pet(_params, _res)
-      'updated'
-    end
+  before do
+    stub_const('SPEC_PATH', './spec/data/petstore-expanded.yaml')
+    stub_const(
+      'MyApi',
+      Module.new do
+        def self.update_pet(_params, _res)
+          'updated'
+        end
+      end
+    )
   end
-
-  SPEC_PATH = './spec/data/petstore-expanded.yaml'
 
   let(:request_body) do
     {
