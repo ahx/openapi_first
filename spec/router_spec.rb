@@ -72,6 +72,19 @@ RSpec.describe OpenapiFirst::Router do
       expect(env[Rack::PATH_INFO]).to eq '/42'
     end
 
+    it 'respects unknown SCRIPT_NAME do' do
+      env = Rack::MockRequest.env_for('/', method: :get)
+      env[Rack::SCRIPT_NAME] = '/fets'
+      env[Rack::PATH_INFO] = '/42'
+
+      app.call(env)
+      operation = env[OpenapiFirst::OPERATION]
+      expect(operation).to be_nil
+
+      expect(env[Rack::SCRIPT_NAME]).to eq '/fets'
+      expect(env[Rack::PATH_INFO]).to eq '/42'
+    end
+
     describe 'path parameters' do
       it 'adds path parameters to env ' do
         get '/pets/1'
