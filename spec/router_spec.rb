@@ -8,16 +8,16 @@ require 'openapi_first/router'
 RSpec.describe OpenapiFirst::Router do
   include Rack::Test::Methods
 
-  let(:app) do
-    Rack::Builder.new do
-      use OpenapiFirst::Router,
-          spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
-          namespace: Web
-      run ->(_env) { Rack::Response.new('hello', 200).finish }
-    end
-  end
-
   describe '#call' do
+    let(:app) do
+      Rack::Builder.new do
+        use OpenapiFirst::Router,
+            spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+            namespace: Web
+        run ->(_env) { Rack::Response.new('hello', 200).finish }
+      end
+    end
+
     let(:path) do
       '/pets'
     end
@@ -58,31 +58,53 @@ RSpec.describe OpenapiFirst::Router do
       expect(operation.operation_id).to eq 'listPets'
     end
 
-    # This is useful if the app is mounted via Syro or else
-    it 'respects SCRIPT_NAME do' do
-      env = Rack::MockRequest.env_for('/', method: :get)
-      env[Rack::SCRIPT_NAME] = '/pets'
-      env[Rack::PATH_INFO] = '/42'
+    describe 'respecting SCRIPT_NAME' do
+      let(:failure_app) do
+        ->(_env) { Rack::Response.new.finish  }
+      end
 
-      app.call(env)
-      operation = env[OpenapiFirst::OPERATION]
-      expect(operation.operation_id).to eq 'showPetById'
+      let(:upstream_app) do
+        ->(_env) { Rack::Response.new.finish  }
+      end
 
-      expect(env[Rack::SCRIPT_NAME]).to eq '/pets'
-      expect(env[Rack::PATH_INFO]).to eq '/42'
-    end
+      let(:app) do
+        OpenapiFirst::Router.new(
+          upstream_app,
+          parent_app: failure_app,
+          spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+          namespace: Web
+        )
+      end
 
-    it 'respects unknown SCRIPT_NAME do' do
-      env = Rack::MockRequest.env_for('/', method: :get)
-      env[Rack::SCRIPT_NAME] = '/fets'
-      env[Rack::PATH_INFO] = '/42'
+      it 'uses SCRIPT_NAME to build the whole path' do
+        env = Rack::MockRequest.env_for('/42', script_name: '/pets')
 
-      app.call(env)
-      operation = env[OpenapiFirst::OPERATION]
-      expect(operation).to be_nil
+        expect(upstream_app).to receive(:call) do |cenv|
+          expect(cenv[Rack::SCRIPT_NAME]).to eq '/pets'
+          expect(cenv[Rack::PATH_INFO]).to eq '/42'
+        end
 
-      expect(env[Rack::SCRIPT_NAME]).to eq '/fets'
-      expect(env[Rack::PATH_INFO]).to eq '/42'
+        app.call(env)
+        operation = env[OpenapiFirst::OPERATION]
+        expect(operation.operation_id).to eq 'showPetById'
+
+        expect(env[Rack::SCRIPT_NAME]).to eq '/pets'
+        expect(env[Rack::PATH_INFO]).to eq '/42'
+      end
+
+      it 'calls parent app with original env if route was not found' do
+        env = Rack::MockRequest.env_for('/42', script_name: '/unknown')
+
+        expect(failure_app).to receive(:call) do |cenv|
+          expect(cenv[Rack::SCRIPT_NAME]).to eq '/unknown'
+          expect(cenv[Rack::PATH_INFO]).to eq '/42'
+        end
+
+        app.call(env)
+
+        expect(env[Rack::SCRIPT_NAME]).to eq '/unknown'
+        expect(env[Rack::PATH_INFO]).to eq '/42'
+      end
     end
 
     describe 'path parameters' do
