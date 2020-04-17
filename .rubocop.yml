@@ -2,10 +2,14 @@ AllCops:
   TargetRubyVersion: 2.6
 Style/Documentation:
   Enabled: false
+Style/ExponentialNotation:
+  Enabled: true
 Metrics/BlockLength:
   Exclude:
   - 'spec/**/*.rb'
   - '*.gemspec'
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
 Lint/RaiseException:
   Enabled: true
 Lint/StructNewOverride:
