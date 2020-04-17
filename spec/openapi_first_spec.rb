@@ -58,36 +58,6 @@ RSpec.describe OpenapiFirst do
     end
   end
 
-  describe '.middleware' do
-    let(:app) do
-      Rack::Builder.new do
-        spec = OpenapiFirst.load(SPEC_PATH)
-        use OpenapiFirst.middleware(spec, namespace: MyApi)
-        run lambda { |_env|
-          Rack::Response.new('hello', 200).finish
-        }
-      end
-    end
-
-    before do
-      header Rack::CONTENT_TYPE, 'application/json'
-    end
-
-    it 'runs the app' do
-      patch '/pets/1', json_dump(request_body)
-
-      expect(last_response.body).to eq 'updated'
-      expect(last_response.status).to eq 200
-    end
-
-    it 'calls the next app if path is unknown' do
-      patch '/unknown', json_dump(request_body)
-
-      expect(last_response.status).to eq 200
-      expect(last_response.body).to eq 'hello'
-    end
-  end
-
   describe '.load' do
     it 'returns a Definition' do
       expect(OpenapiFirst.load(SPEC_PATH)).to be_a OpenapiFirst::Definition
