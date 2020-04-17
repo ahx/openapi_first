@@ -64,7 +64,7 @@ module OpenapiFirst
 
     def initialize(env)
       @env = env
-      super
+      super()
     end
   end
 end
