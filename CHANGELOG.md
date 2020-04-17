@@ -1,13 +1,13 @@
 # Changelog
 
-## Unreleased
-
+## 0.7.0
 - Make use of hanami-router, because it's fast
 - Remove option `allow_unknown_query_paramerters`
 - Move the namespace option to Router
 - Convert numeric path and query parameters  to `Integer` or `Float`
 - Pass the Rack env if your action class' initializers accepts an argument
 - Respec rack's `env['SCRIPT_NAME']` in router
+- Add MIT license
 
 ## 0.6.10
 - Bugfix: params.env['unknown'] now returns `nil` as expected. Thanks @tristandruyen.
