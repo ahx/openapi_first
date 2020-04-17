@@ -127,7 +127,18 @@ RSpec.describe OpenapiFirst::Router do
           def call(_params, _res); end
         end
       )
+      stub_const(
+        'Web::Things::Show',
+        Class.new do
+          def initialize(env); end
+
+          def call(_params, _res); end
+        end
+      )
     end
+
+    let(:env) { double }
+    let(:params) { double(:params, env: env) }
 
     it 'finds some_method' do
       expect(Web).to receive(:some_method)
@@ -141,7 +152,16 @@ RSpec.describe OpenapiFirst::Router do
 
     it 'finds things#index' do
       expect_any_instance_of(Web::Things::Index).to receive(:call)
-      router.find_handler('things#index').call(double, double)
+      router.find_handler('things#index').call(params, double)
+    end
+
+    it 'finds things#show with initializer' do
+      handler = router.find_handler('things#show')
+      response = double
+      action = ->(params, res) {}
+      expect(Web::Things::Show).to receive(:new).with(env) { action }
+      expect(action).to receive(:call).with(params, response)
+      handler.call(params, response)
     end
 
     it 'does not find inherited constants' do
