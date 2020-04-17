@@ -16,12 +16,18 @@ module OpenapiFirst
     end
 
     def call(env)
+      original_path_info = env[Rack::PATH_INFO]
+      # Overwrite PATH_INFO temporarily, because hanami-router does not respect SCRIPT_NAME # rubocop:disable Layout/LineLength
+      env[Rack::PATH_INFO] = Rack::Request.new(env).path
+
       route = @router.recognize(env)
       return route.endpoint.call(env) if route.routable?
 
       return @parent_app.call(env) if @parent_app
 
       NOT_FOUND
+    ensure
+      env[Rack::PATH_INFO] = original_path_info
     end
 
     def find_handler(operation_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
