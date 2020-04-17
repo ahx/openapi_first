@@ -9,6 +9,9 @@
 - Convert numeric parameters to `Integer` or `Float`
 - Pass the Rack env if your action class' initializers accepts an argument
 
+## 0.6.10
+- Bugfix: params.env['unknown'] now returns `nil` as expected. Thanks @tristandruyen.
+
 ## 0.6.9
 - Removed radix tree, because of a bug (https://github.com/namusyaka/r2ree-ruby/issues/2)
 
