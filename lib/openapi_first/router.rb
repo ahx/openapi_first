@@ -76,7 +76,7 @@ module OpenapiFirst
         end
         handler = find_handler(operation.operation_id)
         if handler.nil?
-          warn "could not find handler for '#{operation.operation_id}' (#{operation.method} #{operation.path}). I am ignoring this operation." # rubocop:disable Layout/LineLength
+          warn "#{self.class.name} cannot not find handler for '#{operation.operation_id}' (#{operation.method} #{operation.path}). This operation will be ignored." # rubocop:disable Layout/LineLength
           next
         end
         router.public_send(
