@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.1
+- Add missing `require` to work with new version of `oas_parser`
+
 ## 0.7.0
 - Make use of hanami-router, because it's fast
 - Remove option `allow_unknown_query_paramerters`
