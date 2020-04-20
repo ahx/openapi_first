@@ -52,6 +52,12 @@ paths:
           required: false
           schema:
             type: number
+        - name: starred
+          in: query
+          description: An arbitrary parameter to test conversion to booleans
+          required: false
+          schema:
+            type: boolean
         - name: birthdate
           in: query
           description: Search for a pet born on this date
