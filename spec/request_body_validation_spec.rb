@@ -69,6 +69,13 @@ RSpec.describe 'Request body validation' do
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
 
+    it 'updates INBOX' do
+      header Rack::CONTENT_TYPE, 'application/json'
+      post path, json_dump(request_body)
+
+      expect(last_request.env[OpenapiFirst::INBOX]).to eq request_body
+    end
+
     it 'returns 400 if request body is not valid' do
       request_body['attributes']['name'] = 43
       header Rack::CONTENT_TYPE, 'application/json'

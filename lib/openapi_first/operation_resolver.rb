@@ -8,7 +8,7 @@ module OpenapiFirst
     def call(env)
       operation = env[OpenapiFirst::OPERATION]
       res = Rack::Response.new
-      inbox = env[INBOX] = build_inbox(env)
+      inbox = env[INBOX]
       handler = env[HANDLER]
       result = handler.call(inbox, res)
       res.write serialize(result) if result && res.body.empty?
@@ -22,14 +22,6 @@ module OpenapiFirst
       return result if result.is_a?(String)
 
       MultiJson.dump(result)
-    end
-
-    def build_inbox(env)
-      sources = [
-        env[PARAMETERS],
-        env[REQUEST_BODY]
-      ].tap(&:compact!)
-      Inbox.new(env).merge!(*sources)
     end
   end
 end
