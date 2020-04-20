@@ -5,6 +5,7 @@ require 'oas_parser/path' # TODO: Remove when Nexmo/oas_parser/pull/49 is merged
 require 'oas_parser'
 require 'openapi_first/definition'
 require 'openapi_first/version'
+require 'openapi_first/inbox'
 require 'openapi_first/router'
 require 'openapi_first/request_validation'
 require 'openapi_first/response_validator'
@@ -13,8 +14,9 @@ require 'openapi_first/app'
 
 module OpenapiFirst
   OPERATION = 'openapi_first.operation'
-  PARAMS = 'openapi_first.params'
+  PARAMETERS = 'openapi_first.parameters'
   REQUEST_BODY = 'openapi_first.parsed_request_body'
+  INBOX = 'openapi_first.inbox'
   HANDLER = 'openapi_first.handler'
 
   def self.load(spec_path, only: nil)

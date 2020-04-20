@@ -132,24 +132,20 @@ RSpec.describe OpenapiFirst::OperationResolver do
     end
 
     describe 'params' do
-      it 'behaves like a hash' do
-        params = OpenapiFirst::Params.new(:fake_env)
+      it 'is also as INBOX in env' do
+        expect(MyApi).to receive(:find_pets) do |params, _res|
+          expect(params).to be params.env[OpenapiFirst::INBOX]
+        end
 
-        params.merge!(existing: :value)
-        params['existing'] = 'other_value'
-
-        expect(params[:existing]).to eq :value
-        expect(params['existing']).to eq 'other_value'
+        get '/pets', 'tags[]' => 'foo', 'foo' => 'bar'
       end
 
-      it 'returns nil on non-existant keys' do
-        params = OpenapiFirst::Params.new(:fake_env)
-        expect(params[:non_existing]).to be_nil
-      end
+      it 'is an instance of Inbox' do
+        expect(MyApi).to receive(:find_pets) do |params, _res|
+          expect(params).to be_a OpenapiFirst::Inbox
+        end
 
-      it 'has an env' do
-        params = OpenapiFirst::Params.new(:fake_env)
-        expect(params.env).to eq :fake_env
+        get '/pets', 'tags[]' => 'foo', 'foo' => 'bar'
       end
 
       it 'has allowed query string parameters' do

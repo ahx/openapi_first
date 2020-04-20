@@ -84,7 +84,7 @@ module OpenapiFirst
           normalized_path,
           to: lambda do |env|
             env[OPERATION] = operation
-            env[PARAMS] = Utils.deep_stringify(env['router.params'])
+            env[PARAMETERS] = Utils.deep_stringify(env['router.params'])
             env[HANDLER] = handler
             @app.call(env)
           end

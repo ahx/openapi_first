@@ -111,7 +111,7 @@ RSpec.describe OpenapiFirst::Router do
       it 'adds path parameters to env ' do
         get '/pets/1'
 
-        params = last_request.env[OpenapiFirst::PARAMS]
+        params = last_request.env[OpenapiFirst::PARAMETERS]
         expect(params).to eq('petId' => '1')
       end
 
@@ -119,7 +119,7 @@ RSpec.describe OpenapiFirst::Router do
         expect(Mustermann::Template).to_not receive(:new)
         get 'pets'
 
-        params = last_request.env[OpenapiFirst::PARAMS]
+        params = last_request.env[OpenapiFirst::PARAMETERS]
         expect(params).to be_empty
       end
     end
@@ -128,7 +128,7 @@ RSpec.describe OpenapiFirst::Router do
       it 'adds query parameters to env ' do
         get '/pets?limit=2'
 
-        params = last_request.env[OpenapiFirst::PARAMS]
+        params = last_request.env[OpenapiFirst::PARAMETERS]
         expect(params).to eq('limit' => '2')
       end
     end

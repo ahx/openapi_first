@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
 require 'rack'
+require_relative 'inbox'
 
 module OpenapiFirst
   class OperationResolver
     def call(env)
       operation = env[OpenapiFirst::OPERATION]
       res = Rack::Response.new
-      params = build_params(env)
+      inbox = env[INBOX] = build_inbox(env)
       handler = env[HANDLER]
-      result = handler.call(params, res)
+      result = handler.call(inbox, res)
       res.write serialize(result) if result && res.body.empty?
       res[Rack::CONTENT_TYPE] ||= operation.content_type_for(res.status)
       res.finish
@@ -23,21 +24,12 @@ module OpenapiFirst
       MultiJson.dump(result)
     end
 
-    def build_params(env)
+    def build_inbox(env)
       sources = [
-        env[PARAMS],
+        env[PARAMETERS],
         env[REQUEST_BODY]
       ].tap(&:compact!)
-      Params.new(env).merge!(*sources)
-    end
-  end
-
-  class Params < Hash
-    attr_reader :env
-
-    def initialize(env)
-      @env = env
-      super()
+      Inbox.new(env).merge!(*sources)
     end
   end
 end
