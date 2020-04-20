@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- Path and query parameters with `type: boolean` now get converted to `true`/`false`
+- Rename `OpenapiFirst::PARAMS` to `OpenapiFirst::PARAMETERS`
+
 ## 0.7.1
 - Add missing `require` to work with new version of `oas_parser`
 
