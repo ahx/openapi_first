@@ -98,7 +98,9 @@ RSpec.describe 'Parameter validation' do
     end
 
     describe 'type conversion' do
-      let(:last_params) { last_request.env[OpenapiFirst::PARAMS] }
+      def last_params
+        last_request.env[OpenapiFirst::PARAMS]
+      end
 
       it 'converts to integer' do
         get path, params.merge(limit: '100')
@@ -124,6 +126,20 @@ RSpec.describe 'Parameter validation' do
 
         get path, params.merge(limit: '0x23')
         expect(last_response.status).to eq(400)
+      end
+
+      it 'converts to boolean' do
+        get path, params.merge(starred: 'true')
+        expect(last_response.status).to eq(200), last_response.body
+        expect(last_params['starred']).to eq true
+
+        get path, params.merge(starred: 'false')
+        expect(last_response.status).to eq(200), last_response.body
+        expect(last_params['starred']).to eq false
+
+        get path, params.merge(starred: 'wrong')
+        expect(last_response.status).to eq(400)
+        expect(last_params['starred']).to eq 'wrong'
       end
 
       it 'converts nested params' do
