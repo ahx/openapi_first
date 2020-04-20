@@ -52,11 +52,14 @@ module OpenapiFirst
 
     def find_endpoint(env)
       original_path_info = env[Rack::PATH_INFO]
+      original_script_name = env[Rack::SCRIPT_NAME]
       # Overwrite PATH_INFO temporarily, because hanami-router does not respect SCRIPT_NAME # rubocop:disable Layout/LineLength
       env[Rack::PATH_INFO] = Rack::Request.new(env).path
+      env[Rack::SCRIPT_NAME] = ''
       @router.recognize(env).endpoint
     ensure
       env[Rack::PATH_INFO] = original_path_info
+      env[Rack::SCRIPT_NAME] = original_script_name
     end
 
     def find_const(parent, name)

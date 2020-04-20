@@ -79,9 +79,9 @@ RSpec.describe OpenapiFirst::Router do
       it 'uses SCRIPT_NAME to build the whole path' do
         env = Rack::MockRequest.env_for('/42', script_name: '/pets')
 
-        expect(upstream_app).to receive(:call) do |cenv|
-          expect(cenv[Rack::SCRIPT_NAME]).to eq '/pets'
-          expect(cenv[Rack::PATH_INFO]).to eq '/42'
+        expect(upstream_app).to receive(:call) do |upstream_env|
+          expect(upstream_env[Rack::SCRIPT_NAME]).to eq '/pets'
+          expect(upstream_env[Rack::PATH_INFO]).to eq '/42'
         end
 
         app.call(env)
@@ -90,6 +90,19 @@ RSpec.describe OpenapiFirst::Router do
 
         expect(env[Rack::SCRIPT_NAME]).to eq '/pets'
         expect(env[Rack::PATH_INFO]).to eq '/42'
+      end
+
+      it 'passes modified PATH_INFO and SCRIPT_NAME to router lib' do
+        env = Rack::MockRequest.env_for('/42', script_name: '/pets')
+
+        expect_any_instance_of(Hanami::Router)
+          .to receive(:recognize) do |_router, modified_env|
+          expect(modified_env[Rack::SCRIPT_NAME]).to eq ''
+          expect(modified_env[Rack::PATH_INFO]).to eq '/pets/42'
+          double(:route, endpoint: nil)
+        end
+
+        app.call(env)
       end
 
       it 'calls parent app with original env if route was not found' do
