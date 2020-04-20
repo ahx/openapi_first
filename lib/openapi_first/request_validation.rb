@@ -133,11 +133,11 @@ module OpenapiFirst
 
       begin
         return Integer(value, 10) if schema['type'] == 'integer'
-        return to_boolean(value) if schema['type'] == 'boolean'
         return Float(value) if schema['type'] == 'number'
       rescue ArgumentError
         value
       end
+      return to_boolean(value) if schema['type'] == 'boolean'
 
       value
     end
@@ -145,7 +145,8 @@ module OpenapiFirst
     def to_boolean(value)
       return true if value == 'true'
       return false if value == 'false'
-      # value
+
+      value
     end
   end
 end
