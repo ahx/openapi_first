@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'yaml'
-require 'oas_parser/path' # TODO: Remove when Nexmo/oas_parser/pull/49 is merged
 require 'oas_parser'
 require 'openapi_first/definition'
 require 'openapi_first/version'

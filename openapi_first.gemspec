@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hanami-utils', '~> 2.0.alpha1'
   spec.add_dependency 'json_schemer', '~> 0.2'
   spec.add_dependency 'multi_json', '~> 1.14'
-  spec.add_dependency 'oas_parser', '~> 0.24'
+  spec.add_dependency 'oas_parser', '~> 0.25.1'
   spec.add_dependency 'rack', '~> 2.2'
 
   spec.add_development_dependency 'bundler', '~> 2'
