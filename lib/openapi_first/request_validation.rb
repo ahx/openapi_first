@@ -16,7 +16,7 @@ module OpenapiFirst
       return @app.call(env) unless operation
 
       catch(:halt) do
-        validate_query_parameters!(env, operation, env[PARAMS])
+        validate_query_parameters!(env, operation, env[PARAMETERS])
         req = Rack::Request.new(env)
         content_type = req.content_type
         return @app.call(env) unless operation.request_body
@@ -106,7 +106,7 @@ module OpenapiFirst
       if errors.any?
         halt error_response(400, serialize_query_parameter_errors(errors))
       end
-      env[PARAMS] = params
+      env[PARAMETERS] = params
     end
 
     def filtered_params(json_schema, params)

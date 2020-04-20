@@ -25,7 +25,7 @@ module OpenapiFirst
 
     def build_params(env)
       sources = [
-        env[PARAMS],
+        env[PARAMETERS],
         env[REQUEST_BODY]
       ].tap(&:compact!)
       Params.new(env).merge!(*sources)

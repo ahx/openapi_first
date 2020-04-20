@@ -13,7 +13,7 @@ require 'openapi_first/app'
 
 module OpenapiFirst
   OPERATION = 'openapi_first.operation'
-  PARAMS = 'openapi_first.params'
+  PARAMETERS = 'openapi_first.parameters'
   REQUEST_BODY = 'openapi_first.parsed_request_body'
   HANDLER = 'openapi_first.handler'
 
