@@ -78,6 +78,12 @@ RSpec.describe 'Parameter validation' do
       expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq params
     end
 
+    it 'updates INBOX' do
+      get path, params
+
+      expect(last_request.env[OpenapiFirst::INBOX]).to eq params
+    end
+
     it 'skips parameter validation if no parameters are defined' do
       get '/info', params
 

@@ -132,7 +132,7 @@ RSpec.describe OpenapiFirst::OperationResolver do
     end
 
     describe 'params' do
-      it 'is also as INBOX in env' do
+      it 'uses INBOX from env' do
         expect(MyApi).to receive(:find_pets) do |params, _res|
           expect(params).to be params.env[OpenapiFirst::INBOX]
         end

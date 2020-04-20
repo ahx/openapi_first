@@ -3,6 +3,7 @@
 require 'rack'
 require 'json_schemer'
 require 'multi_json'
+require_relative 'inbox'
 require_relative 'validation_format'
 
 module OpenapiFirst
@@ -15,6 +16,7 @@ module OpenapiFirst
       operation = env[OpenapiFirst::OPERATION]
       return @app.call(env) unless operation
 
+      env[INBOX] = Inbox.new(env)
       catch(:halt) do
         validate_query_parameters!(env, operation, env[PARAMETERS])
         req = Rack::Request.new(env)
@@ -47,7 +49,7 @@ module OpenapiFirst
       if errors.any?
         halt(error_response(400, serialize_request_body_errors(errors)))
       end
-      env[OpenapiFirst::REQUEST_BODY] = parsed_request_body
+      env[INBOX].merge! env[REQUEST_BODY] = parsed_request_body
     end
 
     def validate_request_content_type!(content_type, operation)
@@ -107,6 +109,7 @@ module OpenapiFirst
         halt error_response(400, serialize_query_parameter_errors(errors))
       end
       env[PARAMETERS] = params
+      env[INBOX].merge! params
     end
 
     def filtered_params(json_schema, params)
