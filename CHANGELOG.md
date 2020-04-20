@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Add merged parameter and request body available to env at `env[OpenapiFirst::INBOX]` in request validation
 - Path and query parameters with `type: boolean` now get converted to `true`/`false`
 - Rename `OpenapiFirst::PARAMS` to `OpenapiFirst::PARAMETERS`
 
