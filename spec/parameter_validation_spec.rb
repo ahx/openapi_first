@@ -81,7 +81,6 @@ RSpec.describe 'Parameter validation' do
     it 'skips parameter validation if no parameters are defined' do
       get '/info', params
 
-      puts last_response.body
       expect(last_response.status).to be 200
     end
 
