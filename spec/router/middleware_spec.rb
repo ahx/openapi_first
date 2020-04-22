@@ -116,7 +116,6 @@ RSpec.describe OpenapiFirst::Router do
       end
 
       it 'does not add path parameters if not defined for operation' do
-        expect(Mustermann::Template).to_not receive(:new)
         get 'pets'
 
         params = last_request.env[OpenapiFirst::PARAMETERS]
