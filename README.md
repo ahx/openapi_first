@@ -39,11 +39,11 @@ Handler functions (`find_pet`) are called with two arguments:
 ## Rack middlewares 
 OpenapiFirst consists of these Rack middlewares:
 
-- `OpenapiFirst::Router` finds the operation for the current request and finds a handler (if namespace option is given)
-- `OpenapiFirst::RequestValidation` validates the request and returns 400 if it's invalid
-- `OpenapiFirst::OperationResolver` calls the handler
+- `OpenapiFirst::Router` finds the operation for the current request or returns 404 if no operation was found. If a namespace option is given it also finds a handler.
+- `OpenapiFirst::RequestValidation` validates the request against the found operation and returns 400 if the request is invalid.
+- `OpenapiFirst::OperationResolver` calls the found handler
 
-Instead of using `OpenapiFirst.app` you can use these middlwares by itself.
+Instead of using `OpenapiFirst.app` you can use these middlewares by itself.
 
 ## Usage within your Rack webframework
 If you just want to use the request validation part without any handlers you can use the rack middlewares standalone and don't need to pass a `namespace` option:
