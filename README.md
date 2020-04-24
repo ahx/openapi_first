@@ -1,13 +1,32 @@
 # OpenapiFirst
 
-OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.openapis.org/) API description. The idea is that you create an API description first, then add a method that returns data and implements your business logic and be done.
-
-## TL;DR
+OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.openapis.org/) API description. The idea is that you create an API description first, then add code that returns data and implements your business logic and be done.
 
 Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](https://github.com/stoplightio/spectral/) to make sure the file is valid.
-In the following examples, the OpenAPI file is named `openapi/openapi.yaml`.
 
-Now implement your API:
+## Rack middlewares
+OpenapiFirst consists of these Rack middlewares:
+
+- `OpenapiFirst::Router` finds the operation for the current request or returns 404 if no operation was found.
+- `OpenapiFirst::RequestValidation` validates the request against the found operation and returns 400 if the request is invalid.
+- `OpenapiFirst::OperationResolver` calls the [handler](#handlers) found for the operation.
+
+## Usage within your Rack webframework
+If you just want to use the request validation part without any handlers you can use the rack middlewares standalone:
+
+```ruby
+use OpenapiFirst::Router, spec: OpenapiFirst.load('./openapi/openapi.yaml')
+use OpenapiFirst::RequestValidation
+```
+
+### Rack env variables
+These variables will available in your rack env:
+
+- `env[OpenapiFirst::OPERATION]` - Holds an Operation object that responsed about `operation_id` and `path`. This is useful for introspection.
+- `env[OpenapiFirst::INBOX]`. Holds the (filtered) path and query parameters and the response body.
+
+## Standalone usage
+You can implement your API in conveniently with just OpenapiFirst.
 
 ```ruby
 module Pets
@@ -24,7 +43,7 @@ require 'openapi_first'
 run OpenapiFirst.app('./openapi/openapi.yaml', namespace: Pets)
 ```
 
-The above will:
+The above will use the mentioned Rack middlewares to:
 
 - Validate the request and respond with 400 if the request does not match with your API description
 - Map the request to a method call `Pets.find_pet` based on the `operationId` in the API description
@@ -35,48 +54,10 @@ Handler functions (`find_pet`) are called with two arguments:
 - `params` - Holds the parsed request body, filtered query params and path parameters
 - `res` - Holds a Rack::Response that you can modify if needed
   If you want to access to plain Rack env you can call `params.env`.
-  
-## Rack middlewares 
-OpenapiFirst consists of these Rack middlewares:
 
-- `OpenapiFirst::Router` finds the operation for the current request or returns 404 if no operation was found. If a namespace option is given it also finds a handler.
-- `OpenapiFirst::RequestValidation` validates the request against the found operation and returns 400 if the request is invalid.
-- `OpenapiFirst::OperationResolver` calls the found handler
+### Handlers
 
-Instead of using `OpenapiFirst.app` you can use these middlewares by itself.
-
-## Usage within your Rack webframework
-If you just want to use the request validation part without any handlers you can use the rack middlewares standalone and don't need to pass a `namespace` option:
-
-```ruby
-use OpenapiFirst::Router, spec: OpenapiFirst.load('./openapi/openapi.yaml')
-use OpenapiFirst::RequestValidation
-```
-
-### Rack env variables
-These variables will available in your rack env:
-
-- `env[OpenapiFirst::OPERATION]` - Holds an Operation object that responsed about `operation_id` and `path`. This is useful for introspection.
-- `env[OpenapiFirst::INBOX]`. Holds the (filtered) path and query parameters and the response body.
-
-## Try it out
-
-See [examples](examples).
-
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'openapi_first'
-```
-
-OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
-
-## Handlers
-
-OpenapiFirst maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description.
+OpenapiFirst maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it via the `OperationResolver` middleware.
 
 It works like this:
 
@@ -95,6 +76,28 @@ There are two ways to set the response body:
 
 - Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
 - Returning a value from the function (see example above) (this will always converted to JSON)
+
+### If your API description does not contain all endpoints
+
+```ruby
+run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
+```
+
+Here all requests that are not part of the API description will be passed to the next app.
+
+### Try it out
+
+See [examples](examples).
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'openapi_first'
+```
+
+OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
 ## Request validation
 
@@ -151,14 +154,6 @@ validator = OpenapiFirst::ResponseValidator.new(spec)
 expect(validator.validate(last_request, last_response).errors).to be_empty
 ```
 
-## If your API description does not contain all endpoints
-
-```ruby
-run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
-```
-
-Here all requests that are not part of the API description will be passed to the next app.
-
 ## Handling only certain paths
 
 You can filter the URIs that should be handled by passing `only` to `OpenapiFirst.load`:
@@ -167,7 +162,6 @@ You can filter the URIs that should be handled by passing `only` to `OpenapiFirs
 spec = OpenapiFirst.load './openapi/openapi.yaml', only: '/pets'.method(:==)
 run OpenapiFirst.app(spec, namespace: Pets)
 ```
-
 
 ## Coverage
 
