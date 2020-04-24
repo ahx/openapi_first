@@ -35,6 +35,15 @@ Handler functions (`find_pet`) are called with two arguments:
 - `params` - Holds the parsed request body, filtered query params and path parameters
 - `res` - Holds a Rack::Response that you can modify if needed
   If you want to access to plain Rack env you can call `params.env`.
+  
+## Rack middlewares 
+OpenapiFirst consists of these Rack middlewares:
+
+- `OpenapiFirst::Router` finds the operation for the current request and finds a handler (if namespace option is given)
+- `OpenapiFirst::RequestValidation` validates the request and returns 400 if it's invalid
+- `OpenapiFirst::OperationResolver` calls the handler
+
+Instead of using `OpenapiFirst.app` you can use these middlwares by itself.
 
 ## Usage within your Rack webframework
 If you just want to use the request validation part without any handlers you can use the rack middlewares standalone and don't need to pass a `namespace` option:
@@ -50,7 +59,7 @@ These variables will available in your rack env:
 - `env[OpenapiFirst::OPERATION]` - Holds an Operation object that responsed about `operation_id` and `path`. This is useful for introspection.
 - `env[OpenapiFirst::INBOX]`. Holds the (filtered) path and query parameters and the response body.
 
-### Try it out
+## Try it out
 
 See [examples](examples).
 
