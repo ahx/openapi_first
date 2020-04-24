@@ -10,7 +10,7 @@ module OpenapiFirst
 
     def initialize(app, options)
       @app = app
-      @namespace = options.fetch(:namespace)
+      @namespace = options.fetch(:namespace, nil)
       @parent_app = options.fetch(:parent_app, nil)
       @router = build_router(options.fetch(:spec).operations)
     end
@@ -74,8 +74,8 @@ module OpenapiFirst
           warn "operationId is missing in '#{operation.method} #{operation.path}'. I am ignoring this operation." # rubocop:disable Layout/LineLength
           next
         end
-        handler = find_handler(operation.operation_id)
-        if handler.nil?
+        handler = @namespace && find_handler(operation.operation_id)
+        if @namespace && handler.nil?
           warn "#{self.class.name} cannot not find handler for '#{operation.operation_id}' (#{operation.method} #{operation.path}). This operation will be ignored." # rubocop:disable Layout/LineLength
           next
         end

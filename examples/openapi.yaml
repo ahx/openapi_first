@@ -12,7 +12,7 @@ tags:
 paths:
   /:
     get:
-      operationId: find_thing
+      operationId: things#index
       summary: Get metadata from the root of the API
       tags: ["Metadata"]
       responses:
