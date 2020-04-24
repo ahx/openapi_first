@@ -5,8 +5,6 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first'
 
-SEARCH_SPEC = OpenapiFirst.load('./spec/data/search.yaml')
-
 RSpec.describe 'Parameter validation' do
   include Rack::Test::Methods
 
@@ -16,17 +14,13 @@ RSpec.describe 'Parameter validation' do
 
   let(:app) do
     Rack::Builder.app do
-      use OpenapiFirst::Router, spec: SEARCH_SPEC,
-                                namespace: Web
+      spec = OpenapiFirst.load('./spec/data/search.yaml')
+      use OpenapiFirst::Router, spec: spec
       use OpenapiFirst::RequestValidation
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
     end
-  end
-
-  before do
-    stub_const('Web', double('Web', search: nil, info: nil))
   end
 
   describe '#call' do

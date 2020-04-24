@@ -5,8 +5,6 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first'
 
-PET_EXPANDED_SPEC = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
-
 RSpec.describe 'Request body validation' do
   let(:path) do
     '/pets'
@@ -15,17 +13,10 @@ RSpec.describe 'Request body validation' do
   describe '#call' do
     include Rack::Test::Methods
 
-    before do
-      stub_const(
-        'Web',
-        double('Web', update_pet: nil, find_pets: nil, create_pet: nil)
-      )
-    end
-
     let(:app) do
       Rack::Builder.new do
-        use OpenapiFirst::Router, spec: PET_EXPANDED_SPEC,
-                                  namespace: Web
+        spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
+        use OpenapiFirst::Router, spec: spec
         use OpenapiFirst::RequestValidation
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
