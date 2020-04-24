@@ -132,6 +132,33 @@ RSpec.describe OpenapiFirst::Router do
       end
     end
 
+    describe 'without namespace' do
+      let(:app) do
+        Rack::Builder.new do
+          use OpenapiFirst::Router,
+              spec: OpenapiFirst.load('./spec/data/petstore.yaml')
+          run ->(_env) { Rack::Response.new('hello', 200).finish }
+        end
+      end
+
+      it 'still adds operation and parameters to env' do
+        get '/pets?limit=2'
+
+        operation = last_request.env[OpenapiFirst::OPERATION]
+        expect(operation.operation_id).to eq 'listPets'
+
+        params = last_request.env[OpenapiFirst::PARAMETERS]
+        expect(params).to eq('limit' => '2')
+
+        expect(last_response.status).to eq 200
+      end
+
+      it 'returns 404 if path could not be found' do
+        get '/unknown'
+        expect(last_response.status).to eq 404
+      end
+    end
+
     describe('allow_unknown_operation: true') do
       let(:app) do
         Rack::Builder.new do

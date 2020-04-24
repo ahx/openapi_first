@@ -36,24 +36,19 @@ Handler functions (`find_pet`) are called with two arguments:
 - `res` - Holds a Rack::Response that you can modify if needed
   If you want to access to plain Rack env you can call `params.env`.
 
-### Handling only certain paths
-
-You can filter the URIs that should be handled by pass ing `only` to `OpenapiFirst.load`:
-
-```ruby
-spec = OpenapiFirst.load './openapi/openapi.yaml', only: '/pets'.method(:==)
-run OpenapiFirst.app(spec, namespace: Pets)
-```
-
-### Usage as Rack middleware
+## Usage within your Rack webframework
+If you just want to use the request validation part without any handlers you can use the rack middlewares standalone and don't need to pass a `namespace` option:
 
 ```ruby
-# Just like the above, except the last line
-# ...
-run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
+use OpenapiFirst::Router, spec: OpenapiFirst.load('./openapi/openapi.yaml')
+use OpenapiFirst::RequestValidation
 ```
 
-When using the middleware, all requests that are not part of the API description will be passed to the next app.
+### Rack env variables
+These variables will available in your rack env:
+
+- `env[OpenapiFirst::OPERATION]` - Holds an Operation object that responsed about `operation_id` and `path`. This is useful for introspection.
+- `env[OpenapiFirst::INBOX]`. Holds the (filtered) path and query parameters and the response body.
 
 ### Try it out
 
@@ -146,6 +141,24 @@ validator = OpenapiFirst::ResponseValidator.new(spec)
 
 expect(validator.validate(last_request, last_response).errors).to be_empty
 ```
+
+## If your API description does not contain all endpoints
+
+```ruby
+run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
+```
+
+Here all requests that are not part of the API description will be passed to the next app.
+
+## Handling only certain paths
+
+You can filter the URIs that should be handled by passing `only` to `OpenapiFirst.load`:
+
+```ruby
+spec = OpenapiFirst.load './openapi/openapi.yaml', only: '/pets'.method(:==)
+run OpenapiFirst.app(spec, namespace: Pets)
+```
+
 
 ## Coverage
 
