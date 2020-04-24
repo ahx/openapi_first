@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.0
+- Make request validation usable standalone
+
 ## 0.8.0
 - Add merged parameter and request body available to env at `env[OpenapiFirst::INBOX]` in request validation
 - Path and query parameters with `type: boolean` now get converted to `true`/`false`
