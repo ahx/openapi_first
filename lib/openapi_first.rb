@@ -8,6 +8,7 @@ require 'openapi_first/inbox'
 require 'openapi_first/router'
 require 'openapi_first/request_validation'
 require 'openapi_first/response_validator'
+require 'openapi_first/response_validation'
 require 'openapi_first/operation_resolver'
 require 'openapi_first/app'
 
