@@ -23,7 +23,7 @@ use OpenapiFirst::RequestValidation
 These variables will available in your rack env:
 
 - `env[OpenapiFirst::OPERATION]` - Holds an Operation object that responsed about `operation_id` and `path`. This is useful for introspection.
-- `env[OpenapiFirst::INBOX]`. Holds the (filtered) path and query parameters and the response body.
+- `env[OpenapiFirst::INBOX]`. Holds the (filtered) path and query parameters and the parsed request body.
 
 ## Standalone usage
 You can implement your API in conveniently with just OpenapiFirst.
