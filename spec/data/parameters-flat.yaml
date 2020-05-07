@@ -32,9 +32,9 @@ paths:
             type: string
         - name: filter[other]
           in: query
-          required: true
+          required: false
           schema:
-            type: object
+            type: string
         - name: limit
           in: query
           description: How many items to return at one time (max 100)

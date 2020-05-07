@@ -7,6 +7,10 @@ RSpec.describe OpenapiFirst::Operation do
   let(:spec) { OpenapiFirst.load('./spec/data/parameters.yaml') }
 
   describe '#parameters_json_schema' do
+    let(:schema) do
+      described_class.new(spec.operations.first).parameters_json_schema
+    end
+
     let(:expected_schema) do
       {
         'type' => 'object',
@@ -46,16 +50,49 @@ RSpec.describe OpenapiFirst::Operation do
     end
 
     it 'returns the JSON Schema for the request' do
-      schema = described_class.new(spec.operations.first).parameters_json_schema
       expect(schema).to eq expected_schema
     end
 
     describe 'with flat named nested[params]' do
       let(:spec) { OpenapiFirst.load('./spec/data/parameters-flat.yaml') }
 
+      let(:expected_schema) do
+        {
+          'type' => 'object',
+          'required' => %w[term filter],
+          'properties' => {
+            'birthdate' => {
+              'format' => 'date',
+              'type' => 'string'
+            },
+            'filter' => {
+              'type' => 'object',
+              'required' => ['tag'],
+              'properties' => {
+                'tag' => {
+                  'type' => 'string'
+                },
+                'other' => {
+                  'type' => 'string'
+                }
+              }
+            },
+            'include' => {
+              'type' => 'string',
+              'pattern' => '(parents|children)+(,(parents|children))*'
+            },
+            'limit' => {
+              'type' => 'integer',
+              'format' => 'int32'
+            },
+            'term' => {
+              'type' => 'string'
+            }
+          }
+        }
+      end
+
       it 'converts it to a nested schema' do
-        schema = described_class.new(spec.operations.first).parameters_json_schema
-        pp schema
         expect(schema).to eq expected_schema
       end
     end

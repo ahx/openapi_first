@@ -12,10 +12,12 @@ RSpec.describe 'Parameter validation' do
     '/search'
   end
 
+  let(:spec) { OpenapiFirst.load('./spec/data/search.yaml') }
+
   let(:app) do
+    oas = spec
     Rack::Builder.app do
-      spec = OpenapiFirst.load('./spec/data/search.yaml')
-      use OpenapiFirst::Router, spec: spec
+      use OpenapiFirst::Router, spec: oas
       use OpenapiFirst::RequestValidation
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
@@ -95,6 +97,33 @@ RSpec.describe 'Parameter validation' do
 
       expect(last_response.status).to eq 200
       expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq params
+    end
+
+    describe 'with nested[param]' do
+      let(:spec) { OpenapiFirst.load('./spec/data/parameters-flat.yaml') }
+
+      let(:params) do
+        {
+          'term' => 'Oscar',
+          'filter' => { 'tag' => 'dogs', 'other' => 'things' }
+        }
+      end
+
+      it 'returns 400 if nested[parameter] is missing' do
+        params['filter'].delete('tag')
+        get path, params
+
+        expect(last_response.status).to eq 400
+        error = response_body[:errors][0]
+        expect(error[:source][:parameter]).to eq 'filter'
+        expect(error[:title]).to eq 'is missing required properties: tag'
+      end
+
+      it 'passes if query parameters are valid' do
+        get path, params
+
+        expect(last_response.status).to eq 200
+      end
     end
 
     describe 'type conversion' do
