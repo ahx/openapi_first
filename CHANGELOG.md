@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.0
+- Add support for query parameters named `"some[thing]"` ([issue](https://github.com/ahx/openapi_first/issues/40))
+
 ## 0.9.0
 - Make request validation usable standalone
 

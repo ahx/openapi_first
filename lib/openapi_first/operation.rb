@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'forwardable'
+require_relative 'utils'
 
 module OpenapiFirst
   class Operation
@@ -39,14 +40,31 @@ module OpenapiFirst
     def build_parameters_json_schema
       return unless @operation.parameters&.any?
 
-      @operation.parameters.each_with_object(
+      @operation.parameters.each_with_object(new_node) do |parameter, schema|
+        params = Rack::Utils.parse_nested_query(parameter.name)
+        generate_schema(schema, params, parameter)
+      end
+    end
+
+    def generate_schema(schema, params, parameter)
+      params.each do |key, value|
+        schema['required'] << key if parameter.required
+        if value.is_a? Hash
+          property_schema = new_node
+          generate_schema(property_schema, value, parameter)
+          Utils.deep_merge!(schema['properties'], { key => property_schema })
+        else
+          schema['properties'][key] = parameter.schema
+        end
+      end
+    end
+
+    def new_node
+      {
         'type' => 'object',
         'required' => [],
         'properties' => {}
-      ) do |parameter, schema|
-        schema['required'] << parameter.name if parameter.required
-        schema['properties'][parameter.name] = parameter.schema
-      end
+      }
     end
   end
 end
