@@ -67,10 +67,13 @@ RSpec.describe OpenapiFirst::Operation do
             },
             'filter' => {
               'type' => 'object',
-              'required' => ['tag'],
+              'required' => %w[tag id],
               'properties' => {
                 'tag' => {
                   'type' => 'string'
+                },
+                'id' => {
+                  'type' => 'integer'
                 },
                 'other' => {
                   'type' => 'string'

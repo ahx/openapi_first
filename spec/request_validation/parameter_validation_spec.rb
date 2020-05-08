@@ -105,7 +105,7 @@ RSpec.describe 'Parameter validation' do
       let(:params) do
         {
           'term' => 'Oscar',
-          'filter' => { 'tag' => 'dogs', 'other' => 'things' }
+          'filter' => { 'tag' => 'dogs', 'id' => '1', 'other' => 'things' }
         }
       end
 

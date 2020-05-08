@@ -46,9 +46,10 @@ module OpenapiFirst
       end
     end
 
-    def generate_schema(schema, params, parameter)
+    def generate_schema(schema, params, parameter) # rubocop:disable Metrics/MethodLength
+      required = Set.new(schema['required'])
       params.each do |key, value|
-        schema['required'] << key if parameter.required
+        required << key if parameter.required
         if value.is_a? Hash
           property_schema = new_node
           generate_schema(property_schema, value, parameter)
@@ -57,6 +58,7 @@ module OpenapiFirst
           schema['properties'][key] = parameter.schema
         end
       end
+      schema['required'] = required.to_a
     end
 
     def new_node
