@@ -44,12 +44,20 @@ module OpenapiFirst
       schema = request_body_schema(content_type, operation)
       return unless schema
 
-      parsed_request_body = MultiJson.load(body)
+      parsed_request_body = parse_request_body!(body)
       errors = validate_json_schema(schema, parsed_request_body)
       if errors.any?
         halt(error_response(400, serialize_request_body_errors(errors)))
       end
       env[INBOX].merge! env[REQUEST_BODY] = parsed_request_body
+    end
+
+    def parse_request_body!(body)
+      MultiJson.load(body)
+    rescue MultiJson::ParseError => e
+      err = { title: 'Failed to parse body as JSON' }
+      err[:detail] = e.cause unless ENV['RACK_ENV'] == 'production'
+      halt(error_response(400, [err]))
     end
 
     def validate_request_content_type!(content_type, operation)
