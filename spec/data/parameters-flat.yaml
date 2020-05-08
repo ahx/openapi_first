@@ -30,6 +30,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: filter[id]
+          in: query
+          required: true
+          schema:
+            type: integer
         - name: filter[other]
           in: query
           required: false
