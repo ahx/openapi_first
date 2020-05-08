@@ -11,6 +11,14 @@ OpenapiFirst consists of these Rack middlewares:
 - `OpenapiFirst::RequestValidation` validates the request against the found operation and returns 400 if the request is invalid.
 - `OpenapiFirst::OperationResolver` calls the [handler](#handlers) found for the operation.
 
+### OpenapiFirst::Router
+Options and their defaults:
+
+| Name | Possible values | Description | Default
+|:---|---|---|---|
+| `not_found:` |`nil`, `:continue`, `Proc`| Specifies what to do if path was not found in the API description. `:continue` does nothing an calls the next app, `nil` returns a 404 response, can also be `Proc` (or something that responds to `call`) to customize the response. | nil
+|
+
 ## Usage within your Rack webframework
 If you just want to use the request validation part without any handlers you can use the rack middlewares standalone:
 

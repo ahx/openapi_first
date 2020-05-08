@@ -7,11 +7,18 @@ require_relative 'utils'
 module OpenapiFirst
   class Router
     NOT_FOUND = Rack::Response.new('', 404).finish.freeze
+    DEFAULT_NOT_FOUND_APP = ->(_env) { NOT_FOUND }
 
     def initialize(app, options)
       @app = app
       @namespace = options.fetch(:namespace, nil)
       @parent_app = options.fetch(:parent_app, nil)
+      @failure_app = find_failure_app(options[:not_found])
+      if @failure_app.nil?
+        raise ArgumentError,
+              'not_found must be nil, :continue or must respond to call'
+      end
+
       @router = build_router(options.fetch(:spec).operations)
     end
 
@@ -20,7 +27,7 @@ module OpenapiFirst
       return endpoint.call(env) if endpoint
       return @parent_app.call(env) if @parent_app
 
-      NOT_FOUND
+      @failure_app.call(env)
     end
 
     def find_handler(operation_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
@@ -49,6 +56,13 @@ module OpenapiFirst
     end
 
     private
+
+    def find_failure_app(option)
+      return DEFAULT_NOT_FOUND_APP if option.nil?
+      return @app if option == :continue
+
+      option if option.respond_to?(:call)
+    end
 
     def find_endpoint(env)
       original_path_info = env[Rack::PATH_INFO]
