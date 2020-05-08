@@ -100,6 +100,16 @@ RSpec.describe 'Request body validation' do
       expect(error[:source][:pointer]).to eq '/attributes/foo'
     end
 
+    it 'returns 400 if request body is invalid JSON' do
+      header Rack::CONTENT_TYPE, 'application/json'
+      post path, '{fo},'
+
+      expect(last_response.status).to be 400
+      error = response_body[:errors][0]
+      expect(error[:title]).to eq 'Failed to parse body as JSON'
+      expect(error[:detail]).to include "unexpected token at '{fo},'"
+    end
+
     it 'returns 415 if required request body is missing' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path

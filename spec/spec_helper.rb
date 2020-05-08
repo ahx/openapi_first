@@ -4,6 +4,8 @@ require 'bundler/setup'
 require 'openapi_first'
 require 'multi_json'
 
+ENV['RACK_ENV'] = 'test'
+
 module OpenapiFirstSpecHelpers
   def find_operation(spec, path, method)
     spec.path_by_path(path).endpoint_by_method(method.to_s.downcase)
