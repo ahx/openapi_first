@@ -2,6 +2,7 @@
 
 require 'forwardable'
 require_relative 'utils'
+require_relative 'response_object'
 
 module OpenapiFirst
   class Operation
@@ -25,17 +26,34 @@ module OpenapiFirst
     end
 
     def content_type_for(status)
-      content = @operation
-                .response_by_code(status.to_s, use_default: true)
-                .content
+      content = response_for(status)['content']
       content.keys[0] if content
+    end
+
+    def response_schema_for(status, content_type)
+      content = response_for(status)['content']
+      return if content.nil? || content.empty?
+
+      media_type = content[content_type]
+      unless media_type
+        message = "Response media type found: '#{content_type}' for '#{operation_name}'" # rubocop:disable Layout/LineLength
+        raise ResponseMediaTypeNotFoundError, message
+      end
+      media_type['schema']
+    end
+
+    def response_for(status)
+      @operation.response_by_code(status.to_s, use_default: true).raw
     rescue OasParser::ResponseCodeNotFound
-      operation_name = "#{method.upcase} #{path}"
       message = "Response status code or default not found: #{status} for '#{operation_name}'" # rubocop:disable Layout/LineLength
       raise OpenapiFirst::ResponseCodeNotFoundError, message
     end
 
     private
+
+    def operation_name
+      "#{method.upcase} #{path}"
+    end
 
     def build_parameters_json_schema
       return unless @operation.parameters&.any?

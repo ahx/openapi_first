@@ -17,6 +17,13 @@ module OpenapiFirst
       Validation.new([e.message])
     end
 
+    def validate_operation(request, response)
+      errors = validation_errors(request, response)
+      Validation.new(errors || [])
+    rescue OasParser::ResponseCodeNotFound, OasParser::MethodNotFound => e
+      Validation.new([e.message])
+    end
+
     private
 
     def validation_errors(request, response)
@@ -46,8 +53,7 @@ module OpenapiFirst
                       .merge!(
                         data_pointer: error['data_pointer'],
                         schema_pointer: error['schema_pointer']
-                      ).tap do |formatted|
-      end
+                      )
     end
 
     def response_for(request, response)

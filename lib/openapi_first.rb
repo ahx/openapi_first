@@ -50,5 +50,7 @@ module OpenapiFirst
 
   class Error < StandardError; end
   class NotFoundError < Error; end
-  class ResponseCodeNotFoundError < NotFoundError; end
+  class ResponseCodeNotFoundError < Error; end
+  class ResponseMediaTypeNotFoundError < Error; end
+  class ResponseBodyInvalidError < Error; end
 end

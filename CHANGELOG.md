@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Add ResponseValidation middleware that validates the response body
 - Add `raise` option to Router middleware to raise an error if request could not be found in the API description similar to committee's raise option.
 - Move namespace option from Router to OperationResolver
 

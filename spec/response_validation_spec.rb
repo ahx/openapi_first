@@ -14,15 +14,17 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       spec = OpenapiFirst.load('./spec/data/petstore.yaml')
       use OpenapiFirst::Router, spec: spec
       use OpenapiFirst::ResponseValidation
-      run lambda { |_env| res.finish }
+      run ->(_env) { res.finish }
     end
   end
 
   let(:response_body) { json_dump([{ id: 42, name: 'hans' }]) }
   let(:status) { 200 }
-  let(:headers) { { 'X-HEAD' => '/api/next-page' } }
-  let(:response) { Rack::MockResponse.new(status, headers, response_body) }
-  let(:path) { '/pets'}
+  let(:headers) do
+    { Rack::CONTENT_TYPE => 'application/json', 'X-HEAD' => '/api/next-page' }
+  end
+  let(:response) { Rack::Response.new(response_body, status, headers) }
+  let(:path) { '/pets' }
 
   describe 'with a valid response' do
     it 'returns no errors' do
@@ -38,7 +40,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
 
     specify do
       get path
-      expect(last_response.status).to eq 500
+      expect(last_response.status).to eq 404
     end
   end
 
@@ -46,13 +48,13 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     let(:app) do
       Rack::Builder.app do
         use OpenapiFirst::ResponseValidation
-        run lambda { |_env| [200, {}, ''] }
+        run ->(_env) { [200, {}, ''] }
       end
     end
 
     specify do
       get '/unknown'
-      expect(last_response.status).to eq 500
+      expect(last_response.status).to eq 200
     end
   end
 
@@ -60,24 +62,31 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     let(:status) { 407 }
 
     specify do
-      get path
-      expect(last_response.status).to eq 500
+      expect do
+        get '/pets/42'
+      end.to raise_error OpenapiFirst::ResponseCodeNotFoundError
     end
   end
 
-  describe 'missing field in response body' do
+  describe 'response body invalid' do
     let(:response_body) do
       json_dump([
-        { name: 'hans' },
-        { id: 2, name: 'Voldemort' }
-      ])
+                  { name: 'hans' },
+                  { id: '2', name: 'Voldemort' }
+                ])
     end
 
     specify do
-      get path
-      expect(last_response.status).to eq 500
+      message = [
+        'is missing required properties: id at /0',
+        'should be a integer at /1/id'
+      ].join(', ')
+      expect do
+        get '/pets/42'
+      end.to raise_error OpenapiFirst::ResponseBodyInvalidError, message
     end
   end
 
-  describe 'missing header'
+  describe 'unknown content-type' do
+  end
 end
