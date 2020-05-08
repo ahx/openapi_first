@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.2
+- Return 400 if request body has invalid JSON ([issue](https://github.com/ahx/openapi_first/issues/73)) thanks Thomas Frütel
+
+## 0.10.1
+- Fix duplicated key in `required` when generating JSON schema for `some[thing]` parameters
+
 ## 0.10.0
 - Add support for query parameters named `"some[thing]"` ([issue](https://github.com/ahx/openapi_first/issues/40))
 
