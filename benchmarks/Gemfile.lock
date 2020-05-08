@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    openapi_first (0.10.0)
+    openapi_first (0.10.1)
       deep_merge (>= 1.2.1)
       hanami-router (~> 2.0.alpha2)
       hanami-utils (~> 2.0.alpha1)
