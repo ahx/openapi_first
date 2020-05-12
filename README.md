@@ -204,7 +204,7 @@ Out of scope. Use [Prism](https://github.com/stoplightio/prism) or [fakeit](http
 
 ## Alternatives
 
-This gem is inspired by [committee](https://github.com/interagent/committee), which has much more features like response stubs or support for Hyper-Schema or OpenAPI 2.
+This gem is inspired by [committee](https://github.com/interagent/committee) (Ruby) and [connexion](https://github.com/zalando/connexion) (Python).
 
 ## Development
 
