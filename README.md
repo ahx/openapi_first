@@ -18,7 +18,7 @@ Options and their defaults:
 |:---|---|---|---|
 | `not_found:` |`nil`, `:continue`, `Proc`| Specifies what to do if path was not found in the API description. `nil` (default) returns a 404 response. `:continue` does nothing an calls the next app. `Proc` (or something that responds to `call`) to customize the response. | `nil` (return 404)
 | `raise:` |`false`, `true` | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description. | `false` (don't raise an exception)
-|
+
 
 ## Usage within your Rack webframework
 If you just want to use the request validation part without any handlers you can use the rack middlewares standalone:
