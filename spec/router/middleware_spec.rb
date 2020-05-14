@@ -156,19 +156,116 @@ RSpec.describe OpenapiFirst::Router do
       it 'returns 404 if path could not be found' do
         get '/unknown'
         expect(last_response.status).to eq 404
+        expect(last_response.body).to eq ''
       end
     end
 
-    describe('allow_unknown_operation: true') do
+    describe('raise option') do
       let(:app) do
+        val = option
         Rack::Builder.new do
           use OpenapiFirst::Router,
               spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
-              allow_unknown_operation: true,
-              namespace: Web
+              raise: val
           run lambda { |_env|
             Rack::Response.new('hello', 200).finish
           }
+        end
+      end
+
+      describe('with nil') do
+        let(:option) { nil }
+
+        it 'returns 404' do
+          get '/unknown'
+
+          expect(last_response.status).to eq 404
+        end
+      end
+
+      describe('with false') do
+        let(:option) { nil }
+
+        it 'returns 404' do
+          get '/unknown'
+
+          expect(last_response.status).to eq 404
+        end
+      end
+
+      describe('with true') do
+        let(:option) { :raise }
+
+        it 'raises an error if path was not found' do
+          msg = "Could not find definition for GET '/unknown' in API description ./spec/data/petstore.yaml" # rubocop:disable Layout/LineLength
+          expect do
+            get '/unknown'
+          end.to raise_error OpenapiFirst::NotFoundError, msg
+        end
+
+        it 'raises an error if request method was not found' do
+          msg = "Could not find definition for DELETE '/pets' in API description ./spec/data/petstore.yaml" # rubocop:disable Layout/LineLength
+          expect do
+            delete '/pets'
+          end.to raise_error OpenapiFirst::NotFoundError, msg
+        end
+      end
+    end
+
+    describe('not_found option') do
+      let(:app) do
+        val = option
+        Rack::Builder.new do
+          use OpenapiFirst::Router,
+              spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+              not_found: val
+          run lambda { |_env|
+            Rack::Response.new('hello', 200).finish
+          }
+        end
+      end
+
+      describe('with :continue') do
+        let(:option) { :continue }
+
+        it 'calls the next app' do
+          get '/unknown'
+
+          expect(last_response.status).to be 200
+          expect(last_response.body).to eq 'hello'
+        end
+      end
+
+      describe('with nil') do
+        let(:option) { nil }
+
+        it 'calls the next app' do
+          get '/unknown'
+
+          expect(last_response.status).to be 404
+          expect(last_response.body).to eq ''
+        end
+      end
+
+      describe('with invalid option') do
+        let(:option) { :invalid }
+
+        it 'raises an error' do
+          msg = 'not_found must be nil, :continue or must respond to call'
+          expect { get path }.to raise_error ArgumentError, msg
+        end
+      end
+
+      describe('with custom rack endpoint') do
+        let(:option) do
+          ->(_env) { Rack::Response.new('hello', 412).finish }
+        end
+
+        it 'calls the endpoint' do
+          get '/unknown'
+
+          expect(last_response.status).to be 412
+          expect(last_response.body).to eq 'hello'
         end
       end
     end

@@ -11,4 +11,11 @@ RSpec.describe OpenapiFirst::Definition do
       expect(definition.operations.map(&:operation_id)).to eq expected_ids
     end
   end
+
+  describe '#filepath' do
+    it 'returns the path of the file' do
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml')
+      expect(definition.filepath).to eq './spec/data/petstore.yaml'
+    end
+  end
 end

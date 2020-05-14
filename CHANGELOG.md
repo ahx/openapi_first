@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Add `raise` option to Router middleware to raise an error if request could not be found in the API description similar to committee's raise option.
+
 ## 0.10.2
 - Return 400 if request body has invalid JSON ([issue](https://github.com/ahx/openapi_first/issues/73)) thanks Thomas Frütel
 
