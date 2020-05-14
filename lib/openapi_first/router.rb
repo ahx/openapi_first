@@ -9,22 +9,30 @@ module OpenapiFirst
     NOT_FOUND = Rack::Response.new('', 404).finish.freeze
     DEFAULT_NOT_FOUND_APP = ->(_env) { NOT_FOUND }
 
-    def initialize(app, options)
+    def initialize(app, options) # rubocop:disable Metrics/MethodLength
       @app = app
       @namespace = options.fetch(:namespace, nil)
       @parent_app = options.fetch(:parent_app, nil)
+      @raise = options.fetch(:raise, false)
       @failure_app = find_failure_app(options[:not_found])
       if @failure_app.nil?
         raise ArgumentError,
               'not_found must be nil, :continue or must respond to call'
       end
-
-      @router = build_router(options.fetch(:spec).operations)
+      spec = options.fetch(:spec)
+      @filepath = spec.filepath
+      @router = build_router(spec.operations)
     end
 
     def call(env)
       endpoint = find_endpoint(env)
       return endpoint.call(env) if endpoint
+
+      if @raise
+        req = Rack::Request.new(env)
+        msg = "Could not find definition for #{req.request_method} '#{req.path}' in API description #{@filepath}" # rubocop:disable Layout/LineLength
+        raise NotFoundError, msg
+      end
       return @parent_app.call(env) if @parent_app
 
       @failure_app.call(env)

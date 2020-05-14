@@ -48,5 +48,6 @@ module OpenapiFirst
   end
 
   class Error < StandardError; end
-  class ResponseCodeNotFoundError < Error; end
+  class NotFoundError < Error; end
+  class ResponseCodeNotFoundError < NotFoundError; end
 end

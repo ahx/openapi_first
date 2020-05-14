@@ -160,6 +160,58 @@ RSpec.describe OpenapiFirst::Router do
       end
     end
 
+    describe('raise option') do
+      let(:app) do
+        val = option
+        Rack::Builder.new do
+          use OpenapiFirst::Router,
+              spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+              raise: val
+          run lambda { |_env|
+            Rack::Response.new('hello', 200).finish
+          }
+        end
+      end
+
+      describe('with nil') do
+        let(:option) { nil }
+
+        it 'returns 404' do
+          get '/unknown'
+
+          expect(last_response.status).to eq 404
+        end
+      end
+
+      describe('with false') do
+        let(:option) { nil }
+
+        it 'returns 404' do
+          get '/unknown'
+
+          expect(last_response.status).to eq 404
+        end
+      end
+
+      describe('with true') do
+        let(:option) { :raise }
+
+        it 'raises an error if path was not found' do
+          msg = "Could not find definition for GET '/unknown' in API description ./spec/data/petstore.yaml" # rubocop:disable Layout/LineLength
+          expect do
+            get '/unknown'
+          end.to raise_error OpenapiFirst::NotFoundError, msg
+        end
+
+        it 'raises an error if request method was not found' do
+          msg = "Could not find definition for DELETE '/pets' in API description ./spec/data/petstore.yaml" # rubocop:disable Layout/LineLength
+          expect do
+            delete '/pets'
+          end.to raise_error OpenapiFirst::NotFoundError, msg
+        end
+      end
+    end
+
     describe('not_found option') do
       let(:app) do
         val = option
