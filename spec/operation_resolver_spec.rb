@@ -5,19 +5,19 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first'
 
-PET_EXPANDED_SPEC = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
-
 RSpec.describe OpenapiFirst::OperationResolver do
   describe '#call' do
     include Rack::Test::Methods
 
     let(:app) do
       Rack::Builder.new do
-        use OpenapiFirst::Router,
-            spec: PET_EXPANDED_SPEC,
-            namespace: MyApi
+        spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
+        use OpenapiFirst::Router, spec: spec
         use OpenapiFirst::RequestValidation
-        run OpenapiFirst::OperationResolver.new
+        run OpenapiFirst::OperationResolver.new(
+          spec: spec,
+          namespace: MyApi
+        )
       end
     end
 

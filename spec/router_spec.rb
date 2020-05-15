@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../spec_helper'
+require 'spec_helper'
 require 'rack'
 require 'rack/test'
 require 'openapi_first/router'
@@ -12,8 +12,7 @@ RSpec.describe OpenapiFirst::Router do
     let(:app) do
       Rack::Builder.new do
         use OpenapiFirst::Router,
-            spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
-            namespace: Web
+            spec: OpenapiFirst.load('./spec/data/petstore.yaml')
         run ->(_env) { Rack::Response.new('hello', 200).finish }
       end
     end
@@ -24,15 +23,6 @@ RSpec.describe OpenapiFirst::Router do
 
     let(:query_params) do
       {}
-    end
-
-    before do
-      namespace = double(
-        :namespace,
-        list_pets: nil,
-        show_pet_by_id: nil
-      )
-      stub_const('Web', namespace)
     end
 
     it 'returns 404 if path is not found' do

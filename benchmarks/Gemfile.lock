@@ -25,9 +25,9 @@ GEM
     benchmark-memory (0.1.2)
       memory_profiler (~> 0.9)
     builder (3.2.4)
-    committee (3.3.0)
+    committee (4.0.0)
       json_schema (~> 0.14, >= 0.14.3)
-      openapi_parser (>= 0.6.1)
+      openapi_parser (>= 0.11.1)
       rack (>= 1.5)
     concurrent-ruby (1.1.6)
     deep_merge (1.2.1)
@@ -101,8 +101,8 @@ GEM
       hash-deep-merge
       mustermann-contrib (~> 1.1.1)
       nokogiri
-    openapi_parser (0.10.0)
-    public_suffix (4.0.4)
+    openapi_parser (0.11.1)
+    public_suffix (4.0.5)
     rack (2.2.2)
     rack-accept (0.4.5)
       rack (>= 0.4)

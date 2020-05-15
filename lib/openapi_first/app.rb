@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rack'
+require 'logger'
 
 module OpenapiFirst
   class App
@@ -11,12 +12,12 @@ module OpenapiFirst
     )
       @stack = Rack::Builder.app do
         freeze_app
-        use OpenapiFirst::Router,
-            spec: spec,
-            namespace: namespace,
-            parent_app: parent_app
+        use OpenapiFirst::Router, spec: spec, parent_app: parent_app
         use OpenapiFirst::RequestValidation
-        run OpenapiFirst::OperationResolver.new
+        run OpenapiFirst::OperationResolver.new(
+          spec: spec,
+          namespace: namespace
+        )
       end
     end
 

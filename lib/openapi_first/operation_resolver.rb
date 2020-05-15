@@ -2,15 +2,20 @@
 
 require 'rack'
 require_relative 'inbox'
+require_relative 'find_handler'
 
 module OpenapiFirst
   class OperationResolver
+    def initialize(spec:, namespace:)
+      @handlers = FindHandler.new(spec, namespace).all
+      @namespace = namespace
+    end
+
     def call(env)
       operation = env[OpenapiFirst::OPERATION]
       res = Rack::Response.new
-      inbox = env[INBOX]
-      handler = env[HANDLER]
-      result = handler.call(inbox, res)
+      handler = @handlers[operation.operation_id]
+      result = handler.call(env[INBOX], res)
       res.write serialize(result) if result && res.body.empty?
       res[Rack::CONTENT_TYPE] ||= operation.content_type_for(res.status)
       res.finish
