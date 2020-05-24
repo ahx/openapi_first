@@ -187,14 +187,14 @@ RSpec.describe OpenapiFirst::Router do
         let(:option) { :raise }
 
         it 'raises an error if path was not found' do
-          msg = "Could not find definition for GET '/unknown' in API description ./spec/data/petstore.yaml" # rubocop:disable Layout/LineLength
+          msg = "Could not find definition for GET '/unknown' in API description ./spec/data/petstore.yaml"
           expect do
             get '/unknown'
           end.to raise_error OpenapiFirst::NotFoundError, msg
         end
 
         it 'raises an error if request method was not found' do
-          msg = "Could not find definition for DELETE '/pets' in API description ./spec/data/petstore.yaml" # rubocop:disable Layout/LineLength
+          msg = "Could not find definition for DELETE '/pets' in API description ./spec/data/petstore.yaml"
           expect do
             delete '/pets'
           end.to raise_error OpenapiFirst::NotFoundError, msg

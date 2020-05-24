@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'deep_merge', '>= 1.2.1'
-  spec.add_dependency 'hanami-router', '~> 2.0.alpha2'
+  spec.add_dependency 'hanami-router', '~> 2.0.alpha3'
   spec.add_dependency 'hanami-utils', '~> 2.0.alpha1'
   spec.add_dependency 'json_schemer', '~> 0.2'
   spec.add_dependency 'multi_json', '~> 1.14'

@@ -29,7 +29,7 @@ module OpenapiFirst
 
       if @raise
         req = Rack::Request.new(env)
-        msg = "Could not find definition for #{req.request_method} '#{req.path}' in API description #{@filepath}" # rubocop:disable Layout/LineLength
+        msg = "Could not find definition for #{req.request_method} '#{req.path}' in API description #{@filepath}"
         raise NotFoundError, msg
       end
       return @parent_app.call(env) if @parent_app
@@ -48,7 +48,6 @@ module OpenapiFirst
 
     def find_endpoint(env)
       original_path_info = env[Rack::PATH_INFO]
-      # Overwrite PATH_INFO temporarily, because hanami-router does not respect SCRIPT_NAME # rubocop:disable Layout/LineLength
       env[Rack::PATH_INFO] = Rack::Request.new(env).path
       @router.recognize(env).endpoint
     ensure
@@ -60,7 +59,7 @@ module OpenapiFirst
       operations.each do |operation|
         normalized_path = operation.path.gsub('{', ':').gsub('}', '')
         if operation.operation_id.nil?
-          warn "operationId is missing in '#{operation.method} #{operation.path}'. I am ignoring this operation." # rubocop:disable Layout/LineLength
+          warn "operationId is missing in '#{operation.method} #{operation.path}'. I am ignoring this operation."
           next
         end
         router.public_send(

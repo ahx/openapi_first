@@ -83,9 +83,7 @@ module OpenapiFirst
       return unless content
 
       content_type = content[response.content_type]
-      unless content_type
-        return ["Content type not found: '#{response.content_type}'"]
-      end
+      return ["Content type not found: '#{response.content_type}'"] unless content_type
 
       response_schema = content_type['schema']
       return unless response_schema

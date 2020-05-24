@@ -36,7 +36,7 @@ module OpenapiFirst
 
       media_type = content[content_type]
       unless media_type
-        message = "Response media type found: '#{content_type}' for '#{operation_name}'" # rubocop:disable Layout/LineLength
+        message = "Response media type found: '#{content_type}' for '#{operation_name}'"
         raise ResponseMediaTypeNotFoundError, message
       end
       media_type['schema']
@@ -45,7 +45,7 @@ module OpenapiFirst
     def response_for(status)
       @operation.response_by_code(status.to_s, use_default: true).raw
     rescue OasParser::ResponseCodeNotFound
-      message = "Response status code or default not found: #{status} for '#{operation_name}'" # rubocop:disable Layout/LineLength
+      message = "Response status code or default not found: #{status} for '#{operation_name}'"
       raise OpenapiFirst::ResponseCodeNotFoundError, message
     end
 

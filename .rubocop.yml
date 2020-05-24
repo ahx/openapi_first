@@ -8,9 +8,15 @@ Metrics/BlockLength:
   Exclude:
   - 'spec/**/*.rb'
   - '*.gemspec'
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
 Layout/SpaceAroundMethodCallOperator:
   Enabled: true
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
 Lint/RaiseException:
+  Enabled: true
+Style/SlicingWithRange:
   Enabled: true
 Lint/StructNewOverride:
   Enabled: true

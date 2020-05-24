@@ -46,9 +46,7 @@ module OpenapiFirst
 
       parsed_request_body = parse_request_body!(body)
       errors = validate_json_schema(schema, parsed_request_body)
-      if errors.any?
-        halt(error_response(400, serialize_request_body_errors(errors)))
-      end
+      halt(error_response(400, serialize_request_body_errors(errors))) if errors.any?
       env[INBOX].merge! env[REQUEST_BODY] = parsed_request_body
     end
 
@@ -113,9 +111,7 @@ module OpenapiFirst
 
       params = filtered_params(json_schema, params)
       errors = JSONSchemer.schema(json_schema).validate(params)
-      if errors.any?
-        halt error_response(400, serialize_query_parameter_errors(errors))
-      end
+      halt error_response(400, serialize_query_parameter_errors(errors)) if errors.any?
       env[PARAMETERS] = params
       env[INBOX].merge! params
     end
