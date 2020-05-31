@@ -1,5 +1,7 @@
 # OpenapiFirst
 
+[![Join the chat at https://gitter.im/ahx/openapi_first](https://badges.gitter.im/ahx/openapi_first.svg)](https://gitter.im/ahx/openapi_first?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.openapis.org/) API description. The idea is that you create an API description first, then add code that returns data and implements your business logic and be done.
 
 Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](https://github.com/stoplightio/spectral/) to make sure the file is valid.
