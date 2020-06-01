@@ -9,7 +9,7 @@ OpenapiFirst consists of these Rack middlewares:
 
 - `OpenapiFirst::Router` – Finds the operation for the current request or returns 404 if no operation was found. This can be customized.
 - `OpenapiFirst::RequestValidation` – Validates the request against the API description and returns 400 if the request is invalid.
-- `OpenapiFirst::OperationResolver` calls the [handler](#handlers) found for the operation.
+- `OpenapiFirst::Responder` calls the [handler](#handlers) found for the operation.
 - `OpenapiFirst::ResponseValidation` (Work in progress) validates the response and raises an exception if the response body is invalid.
 
 ## OpenapiFirst::Router
@@ -73,7 +73,7 @@ Handler functions (`find_pet`) are called with two arguments:
 
 ### Handlers
 
-OpenapiFirst maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it via the `OperationResolver` middleware.
+OpenapiFirst maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it via the `Responder` middleware.
 
 It works like this:
 
