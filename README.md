@@ -10,6 +10,7 @@ OpenapiFirst consists of these Rack middlewares:
 - `OpenapiFirst::Router` – Finds the operation for the current request or returns 404 if no operation was found. This can be customized.
 - `OpenapiFirst::RequestValidation` – Validates the request against the API description and returns 400 if the request is invalid.
 - `OpenapiFirst::OperationResolver` calls the [handler](#handlers) found for the operation.
+- `OpenapiFirst::ResponseValidation` (Work in progress) validates the response and raises an exception if the response body is invalid.
 
 ## OpenapiFirst::Router
 Options and their defaults:
@@ -19,6 +20,11 @@ Options and their defaults:
 | `not_found:` |`nil`, `:continue`, `Proc`| Specifies what to do if path was not found in the API description. `nil` (default) returns a 404 response. `:continue` does nothing an calls the next app. `Proc` (or something that responds to `call`) to customize the response. | `nil` (return 404)
 | `raise:` |`false`, `true` | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description. | `false` (don't raise an exception)
 
+## OpenapiFirst::ResponseValidation
+
+```ruby
+use OpenapiFirst::ResponseValidation if ENV['RACK_ENV'] == 'test'
+```
 
 ## Usage within your Rack webframework
 If you just want to use the request validation part without any handlers you can use the rack middlewares standalone:
