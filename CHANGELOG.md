@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Make OpenapiFirst.app raise an error in test env when request path is not specified
 - Raise error if you forget to add the Router middleware
 - Rename OperationResolver to Responder
 - Add ResponseValidation middleware that validates the response body
