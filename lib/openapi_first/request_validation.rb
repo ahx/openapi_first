@@ -11,7 +11,7 @@ module OpenapiFirst
   class RequestValidation # rubocop:disable Metrics/ClassLength
     prepend RouterRequired
 
-    def initialize(app, _options = {})
+    def initialize(app)
       @app = app
     end
 
