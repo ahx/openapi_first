@@ -35,9 +35,7 @@ RSpec.describe OpenapiFirst do
 
   describe '.app' do
     let(:app) do
-      Rack::Builder.app do
-        run OpenapiFirst.app(SPEC_PATH, namespace: MyApi)
-      end
+      OpenapiFirst.app(SPEC_PATH, namespace: MyApi)
     end
 
     before do
@@ -55,6 +53,18 @@ RSpec.describe OpenapiFirst do
       expect do
         patch '/unknown', json_dump(request_body)
       end.to raise_error OpenapiFirst::NotFoundError
+    end
+
+    describe 'if RACK_ENV is production' do
+      let(:app) do
+        stub_const('ENV', { 'RACK_ENV' => 'production' })
+        OpenapiFirst.app(SPEC_PATH, namespace: MyApi)
+      end
+
+      it 'returns 404 if path is unknown and we are not testing' do
+        patch '/unknown', json_dump(request_body)
+        expect(last_response.status).to eq 404
+      end
     end
   end
 
