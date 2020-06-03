@@ -29,12 +29,12 @@ module OpenapiFirst
 
   def self.app(spec, namespace:)
     spec = OpenapiFirst.load(spec) if spec.is_a?(String)
-    App.new(nil, spec, namespace: namespace)
+    App.new(nil, spec, namespace: namespace, router_raise: true)
   end
 
   def self.middleware(spec, namespace:)
     spec = OpenapiFirst.load(spec) if spec.is_a?(String)
-    AppWithOptions.new(spec, namespace: namespace)
+    AppWithOptions.new(spec, namespace: namespace, router_raise: false)
   end
 
   class AppWithOptions

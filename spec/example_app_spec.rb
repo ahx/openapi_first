@@ -17,8 +17,9 @@ RSpec.describe 'Example App' do
     expect(json_load(last_response.body)).to eq('hello' => 'world')
   end
 
-  it 'returns 404' do
-    get '/unknown'
-    expect(last_response.status).to eq 404
+  it 'raises OpenapiFirst::NotFoundError' do
+    expect do
+      get '/unknown'
+    end.to raise_error OpenapiFirst::NotFoundError
   end
 end
