@@ -4,10 +4,13 @@ require 'rack'
 require 'json_schemer'
 require 'multi_json'
 require_relative 'inbox'
+require_relative 'router_required'
 require_relative 'validation_format'
 
 module OpenapiFirst
   class RequestValidation # rubocop:disable Metrics/ClassLength
+    prepend RouterRequired
+
     def initialize(app, _options = {})
       @app = app
     end

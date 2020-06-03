@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Raise error if you forget to add the Router middleware
 - Rename OperationResolver to Responder
 - Add ResponseValidation middleware that validates the response body
 - Add `raise` option to Router middleware to raise an error if request could not be found in the API description similar to committee's raise option.

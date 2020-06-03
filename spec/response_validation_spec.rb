@@ -26,6 +26,23 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   let(:response) { Rack::Response.new(response_body, status, headers) }
   let(:path) { '/pets' }
 
+  describe 'if router is not used' do
+    let(:app) do
+      Rack::Builder.app do
+        use OpenapiFirst::ResponseValidation
+        run lambda { |_env|
+          Rack::Response.new('hello', 200).finish
+        }
+      end
+    end
+
+    it 'raises an error' do
+      expect do
+        get path
+      end.to raise_error RuntimeError, 'OpenapiFirst::Router missing in middleware stack. Did you forget adding OpenapiFirst::Router?' # rubocop:disable Layout/LineLength
+    end
+  end
+
   describe 'with a valid response' do
     it 'returns no errors' do
       get path
@@ -35,18 +52,11 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'unknown path' do
-    let(:path) { '/unknown' }
-
-    specify do
-      get path
-      expect(last_response.status).to eq 404
-    end
-  end
-
   describe 'no operation found' do
     let(:app) do
       Rack::Builder.app do
+        spec = OpenapiFirst.load('./spec/data/petstore.yaml')
+        use OpenapiFirst::Router, spec: spec, not_found: :continue
         use OpenapiFirst::ResponseValidation
         run ->(_env) { [200, {}, ''] }
       end
