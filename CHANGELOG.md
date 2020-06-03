@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.11.0
+- Raise error if you forgot to add the Router middleware
 - Make OpenapiFirst.app raise an error in test env when request path is not specified
-- Raise error if you forget to add the Router middleware
 - Rename OperationResolver to Responder
 - Add ResponseValidation middleware that validates the response body
 - Add `raise` option to Router middleware to raise an error if request could not be found in the API description similar to committee's raise option.

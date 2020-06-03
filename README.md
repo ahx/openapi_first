@@ -14,13 +14,13 @@ OpenapiFirst consists of these Rack middlewares:
 - [`OpenapiFirst::Router`](#OpenapiFirst::Router) – Finds the OpenAPI operation for the current request or returns 404 if no operation was found. This can be customized.
 - [`OpenapiFirst::RequestValidation`](#OpenapiFirst::RequestValidation) – Validates the request against the API description and returns 400 if the request is invalid.
 - [`OpenapiFirst::Responder`](#OpenapiFirst::Responder) calls the [handler](#handlers) found for the operation.
-- [`OpenapiFirst::ResponseValidation`](#OpenapiFirst::ResponseValidation) (Work in progress) validates the response and raises an exception if the response body is invalid.
+- [`OpenapiFirst::ResponseValidation`](#OpenapiFirst::ResponseValidation) Validates the response and raises an exception if the response body is invalid.
 
 ## OpenapiFirst::Router
 You always have to add this middleware first in order to make the other middlewares work.
 
 ```ruby
-  use OpenapiFirst::Router, spec: OpenapiFirst.load('./openapi/openapi.yaml')
+use OpenapiFirst::Router, spec: OpenapiFirst.load('./openapi/openapi.yaml')
 ```
 
 This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation object that responds to `operation_id` and `path`.
@@ -88,13 +88,13 @@ This Rack endpoint maps the HTTP request to a method call based on the [operatio
 Currently there are no customization options for this part. Please [share your ideas](#contributing) on how to best meet your needs and preferred style.
 
 ```ruby
-run OpenapiFirst::Responder, spec:
+run OpenapiFirst::Responder, spec: OpenapiFirst.load('./openapi/openapi.yaml')
 ```
 
 | Name | Description
-|:---|---|---|---|
-|`spec:`| The spec loaded via `OpenapiFirst.load`
-| `namespace:` | A class or module where to find the handler method.
+|:---|---|
+|`spec:`| The spec loaded via `OpenapiFirst.load` |
+| `namespace:` | A class or module where to find the handler method. |
 
 It works like this:
 
