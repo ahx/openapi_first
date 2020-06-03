@@ -61,8 +61,7 @@ RSpec.describe OpenapiFirst::Router do
         OpenapiFirst::Router.new(
           upstream_app,
           parent_app: failure_app,
-          spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
-          namespace: Web
+          spec: OpenapiFirst.load('./spec/data/petstore.yaml')
         )
       end
 
