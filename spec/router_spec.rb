@@ -26,11 +26,17 @@ RSpec.describe OpenapiFirst::Router do
     end
 
     it 'returns 404 if path is not found' do
-      query_params.delete('term')
       get '/unknown', query_params
 
       expect(last_response.status).to be 404
       expect(last_response.body).to eq ''
+    end
+
+    it 'adds an empty operation if path is not found' do
+      get '/unknown', query_params
+
+      operation = last_request.env.fetch(OpenapiFirst::OPERATION)
+      expect(operation).to be_nil
     end
 
     it 'returns 400 if method is not found' do
