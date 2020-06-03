@@ -2,10 +2,13 @@
 
 require 'json_schemer'
 require 'multi_json'
+require_relative 'router_required'
 require_relative 'validation'
 
 module OpenapiFirst
   class ResponseValidation
+    prepend RouterRequired
+
     def initialize(app)
       @app = app
     end

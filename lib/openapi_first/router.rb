@@ -24,6 +24,7 @@ module OpenapiFirst
     end
 
     def call(env)
+      env[OPERATION] = nil
       endpoint = find_endpoint(env)
       return endpoint.call(env) if endpoint
 

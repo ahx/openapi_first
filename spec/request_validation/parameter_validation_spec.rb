@@ -36,6 +36,23 @@ RSpec.describe 'Parameter validation' do
       json_load(last_response.body, symbolize_keys: true)
     end
 
+    describe 'if router is not used' do
+      let(:app) do
+        Rack::Builder.app do
+          use OpenapiFirst::RequestValidation
+          run lambda { |_env|
+            Rack::Response.new('hello', 200).finish
+          }
+        end
+      end
+
+      it 'raises an error' do
+        expect do
+          get path, params
+        end.to raise_error RuntimeError, 'OpenapiFirst::Router missing in middleware stack. Did you forget adding OpenapiFirst::Router?' # rubocop:disable Layout/LineLength
+      end
+    end
+
     it 'returns 400 if query parameter is missing' do
       params.delete('term')
       get path, params
