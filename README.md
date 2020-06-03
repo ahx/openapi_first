@@ -4,47 +4,127 @@
 
 OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.openapis.org/) API description. The idea is that you create an API description first, then add code that returns data and implements your business logic and be done.
 
-Start with writing an OpenAPI file that describes the API, which you are about to write. Use a [validator](https://github.com/stoplightio/spectral/) to make sure the file is valid.
+Start with writing an OpenAPI file that describes the API, which you are about to implement. Use a [validator](https://github.com/stoplightio/spectral/) to make sure the file is valid.
+
+You can use OpenapiFirst via its [Rack middlewares](#rack-middlewares) or in [standalone mode](#standalone-usage).
 
 ## Rack middlewares
 OpenapiFirst consists of these Rack middlewares:
 
-- `OpenapiFirst::Router` – Finds the operation for the current request or returns 404 if no operation was found. This can be customized.
-- `OpenapiFirst::RequestValidation` – Validates the request against the API description and returns 400 if the request is invalid.
-- `OpenapiFirst::Responder` calls the [handler](#handlers) found for the operation.
-- `OpenapiFirst::ResponseValidation` (Work in progress) validates the response and raises an exception if the response body is invalid.
+- [`OpenapiFirst::Router`](#OpenapiFirst::Router) – Finds the OpenAPI operation for the current request or returns 404 if no operation was found. This can be customized.
+- [`OpenapiFirst::RequestValidation`](#OpenapiFirst::RequestValidation) – Validates the request against the API description and returns 400 if the request is invalid.
+- [`OpenapiFirst::Responder`](#OpenapiFirst::Responder) calls the [handler](#handlers) found for the operation.
+- [`OpenapiFirst::ResponseValidation`](#OpenapiFirst::ResponseValidation) (Work in progress) validates the response and raises an exception if the response body is invalid.
 
 ## OpenapiFirst::Router
+You always have to add this middleware first in order to make the other middlewares work.
+
+```ruby
+  use OpenapiFirst::Router, spec: OpenapiFirst.load('./openapi/openapi.yaml')
+```
+
+This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation object that responds to `operation_id` and `path`.
+
 Options and their defaults:
 
 | Name | Possible values | Description | Default
 |:---|---|---|---|
-| `not_found:` |`nil`, `:continue`, `Proc`| Specifies what to do if path was not found in the API description. `nil` (default) returns a 404 response. `:continue` does nothing an calls the next app. `Proc` (or something that responds to `call`) to customize the response. | `nil` (return 404)
+|`spec:`| | The spec loaded via `OpenapiFirst.load` ||
+| `not_found:` |`nil`, `:continue`, `Proc`| Specifies what to do if the path was not found in the API description. `nil` (default) returns a 404 response. `:continue` does nothing an calls the next app. `Proc` (or something that responds to `call`) to customize the response. | `nil` (return 404)
 | `raise:` |`false`, `true` | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description. | `false` (don't raise an exception)
 
+## OpenapiFirst::RequestValidation
+
+This middleware returns a 400 status code with a body that describes the error if the request is not valid.
+
+```ruby
+use OpenapiFirst::RequestValidation
+```
+
+The error responses conform with [JSON:API](https://jsonapi.org).
+
+Here's an example response body for a missing query parameter "search":
+
+```json
+http-status: 400
+content-type: "application/vnd.api+json"
+
+{
+  "errors": [
+    {
+      "title": "is missing",
+      "source": {
+        "parameter": "search"
+      }
+    }
+  ]
+}
+```
+
+This middleware adds `env[OpenapiFirst::INBOX]` which holds the (filtered) path and query parameters and the parsed request body.
+
+### Parameter validation
+
+The middleware filteres all top-level query parameters and paths parameters and tries to convert numeric values. Meaning, if you have an `:something_id` path with `type: integer`, it will try convert the value to an integer.
+Note that is currently does not convert date, date-time or time formats and that conversion is currently done only for path and query parameters, but not for the request body. It just works with a parameter with `name: filter[age]`.
+
+If you want to forbid _nested_ query parameters you will need to use [`additionalProperties: false`](https://json-schema.org/understanding-json-schema/reference/object.html#properties) in your query parameter JSON schema.
+
+_OpenapiFirst always treats query parameters like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values), **but** it just works with nested objects (`filter[foo][bar]=baz`) (see [this discussion](https://github.com/OAI/OpenAPI-Specification/issues/1706))._
+
+### Request body validation
+
+The middleware will return a status `415` if the requests content type does not match or `400` if the request body is invalid.
+This will also add the parsed request body to `env[OpenapiFirst::REQUEST_BODY]`.
+
+### Header, Cookie, Path parameter validation
+
+tbd.
+
+## OpenapiFirst::Responder
+
+This Rack endpoint maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it. Responder also adds a content-type to the response.
+
+Currently there are no customization options for this part. Please [share your ideas](#contributing) on how to best meet your needs and preferred style.
+
+```ruby
+run OpenapiFirst::Responder, spec:
+```
+
+| Name | Description
+|:---|---|---|---|
+|`spec:`| The spec loaded via `OpenapiFirst.load`
+| `namespace:` | A class or module where to find the handler method.
+
+It works like this:
+
+- An operationId "create_pet" or "createPet" or "create pet" calls `MyApi.create_pet(params, response)`
+- "some_things.create" calls: `MyApi::SomeThings.create(params, response)`
+- "pets#create" calls: `MyApi::Pets::Create.new.call(params, response)` If `MyApi::Pets::Create.new` accepts an argument, it will pass the rack `env`.
+
+### Handlers
+
+These handler methods are called with two arguments:
+
+- `params` - Holds the parsed request body, filtered query params and path parameters (same as `env[OpenapiFirst::INBOX]`)
+- `res` - Holds a Rack::Response that you can modify if needed
+
+You can call `params.env` to access the Rack env (just like in [Hanami actions](https://guides.hanamirb.org/actions/parameters/))
+
+There are two ways to set the response body:
+
+- Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
+- Returning a value which will get converted to JSON
+
 ## OpenapiFirst::ResponseValidation
+This middleware is especially useful when testing. It raises an error if the response is not valid.
 
 ```ruby
 use OpenapiFirst::ResponseValidation if ENV['RACK_ENV'] == 'test'
 ```
 
-## Usage within your Rack webframework
-If you just want to use the request validation part without any handlers you can use the rack middlewares standalone:
-
-```ruby
-use OpenapiFirst::Router, spec: OpenapiFirst.load('./openapi/openapi.yaml')
-use OpenapiFirst::RequestValidation
-```
-
-### Rack env variables
-These variables will available in your rack env:
-
-- `env[OpenapiFirst::OPERATION]` - Holds an Operation object that responsed about `operation_id` and `path`. This is useful for introspection.
-- `env[OpenapiFirst::INBOX]`. Holds the (filtered) path and query parameters and the parsed request body.
-
-
 ## Standalone usage
-You can implement your API in conveniently with just OpenapiFirst.
+Instead of composing these middlewares yourself you can use `OpenapiFirst.app`.
 
 ```ruby
 module Pets
@@ -73,29 +153,7 @@ Handler functions (`find_pet`) are called with two arguments:
 - `res` - Holds a Rack::Response that you can modify if needed
   If you want to access to plain Rack env you can call `params.env`.
 
-### Handlers
-
-OpenapiFirst maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it via the `Responder` middleware.
-
-It works like this:
-
-- "create_pet" or "createPet" or "create pet" calls `MyApi.create_pet(params, response)`
-- "some_things.create" calls: `MyApi::SomeThings.create(params, response)`
-- "pets#create" calls: `MyApi::Pets::Create.new.call(params, response)` If `MyApi::Pets::Create.new` accepts an argument, it will pass the rack `env`.
-
-These handler methods are called with two arguments:
-
-- `params` - Holds the parsed request body, filtered query params and path parameters
-- `res` - Holds a Rack::Response that you can modify if needed
-
-You can call `params.env` to access the Rack env (just like in [Hanami actions](https://guides.hanamirb.org/actions/parameters/))
-
-There are two ways to set the response body:
-
-- Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
-- Returning a value from the function (see example above) (this will always converted to JSON)
-
-### If your API description does not contain all endpoints
+## If your API description does not contain all endpoints
 
 ```ruby
 run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
@@ -103,7 +161,7 @@ run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
 
 Here all requests that are not part of the API description will be passed to the next app.
 
-### Try it out
+## Try it out
 
 See [examples](examples).
 
@@ -117,49 +175,7 @@ gem 'openapi_first'
 
 OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
-## Request validation
-
-If the request is not valid, these middlewares return a 400 status code with a body that describes the error.
-
-The error responses conform with [JSON:API](https://jsonapi.org).
-
-Here's an example response body for a missing query parameter "search":
-
-```json
-http-status: 400
-content-type: "application/vnd.api+json"
-
-{
-  "errors": [
-    {
-      "title": "is missing",
-      "source": {
-        "parameter": "search"
-      }
-    }
-  ]
-}
-```
-
-### Parameter validation
-
-The middleware filteres all top-level query parameters and paths parameters and tries to convert numeric values. Meaning, if you have an `:something_id` path with `type: integer`, it will try convert the value to an integer.
-Note that is currently does not convert date, date-time or time formats and that conversion is currently on done for path and query parameters, but not for request bodies.
-
-If you want to forbid _nested_ query parameters you will need to use [`additionalProperties: false`](https://json-schema.org/understanding-json-schema/reference/object.html#properties) in your query parameter JSON schema.
-
-_OpenapiFirst always treats query parameters like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values), **but** it just works with nested objects (`filter[foo][bar]=baz`) (see [this discussion](https://github.com/OAI/OpenAPI-Specification/issues/1706))._
-
-### Request body validation
-
-The middleware will return a `415` if the requests content type does not match or `400` if the request body is invalid.
-This will add the parsed request body to `env[OpenapiFirst::REQUEST_BODY]`.
-
-### Header, Cookie, Path parameter validation
-
-tbd.
-
-## Response validation
+## Manual response validation
 
 Response validation is useful to make sure your app responds as described in your API description. You usually do this in your tests using [rack-test](https://github.com/rack-test/rack-test).
 
