@@ -29,7 +29,8 @@ module OpenapiFirst
 
   def self.app(spec, namespace:)
     spec = OpenapiFirst.load(spec) if spec.is_a?(String)
-    App.new(nil, spec, namespace: namespace, router_raise: true)
+    test = ENV['RACK_ENV'] == 'test'
+    App.new(nil, spec, namespace: namespace, router_raise: test)
   end
 
   def self.middleware(spec, namespace:)
