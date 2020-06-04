@@ -7,10 +7,6 @@ require 'multi_json'
 ENV['RACK_ENV'] = 'test'
 
 module OpenapiFirstSpecHelpers
-  def find_operation(spec, path, method)
-    spec.path_by_path(path).endpoint_by_method(method.to_s.downcase)
-  end
-
   def json_dump(data)
     MultiJson.dump(data)
   end

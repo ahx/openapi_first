@@ -3,31 +3,33 @@
 require 'json_schemer'
 require 'multi_json'
 require_relative 'validation'
+require_relative 'router'
 
 module OpenapiFirst
   class ResponseValidator
     def initialize(spec)
       @spec = spec
+      @router = Router.new(->(_env) {}, spec: spec, raise: true)
     end
 
     def validate(request, response)
       errors = validation_errors(request, response)
       Validation.new(errors || [])
-    rescue OasParser::ResponseCodeNotFound, OasParser::MethodNotFound => e
+    rescue OpenapiFirst::ResponseCodeNotFoundError, OpenapiFirst::NotFoundError => e
       Validation.new([e.message])
     end
 
     def validate_operation(request, response)
       errors = validation_errors(request, response)
       Validation.new(errors || [])
-    rescue OasParser::ResponseCodeNotFound, OasParser::MethodNotFound => e
+    rescue OpenapiFirst::ResponseCodeNotFoundError, OpenapiFirst::NotFoundError => e
       Validation.new([e.message])
     end
 
     private
 
     def validation_errors(request, response)
-      content = response_for(request, response)&.content
+      content = response_for(request, response)&.fetch('content', nil)
       return unless content
 
       content_type = content[response.content_type]
@@ -55,9 +57,10 @@ module OpenapiFirst
     end
 
     def response_for(request, response)
-      @spec
-        .find_operation!(request)
-        &.response_by_code(response.status.to_s, use_default: true)
+      env = request.env.dup
+      @router.call(env)
+      operation = env[OPERATION]
+      operation&.response_for(response.status)
     end
   end
 end

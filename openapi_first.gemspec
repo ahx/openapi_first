@@ -32,13 +32,13 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'deep_merge', '>= 1.2.1'
-  spec.add_dependency 'hanami-router', '~> 2.0.alpha3'
-  spec.add_dependency 'hanami-utils', '~> 2.0.alpha1'
-  spec.add_dependency 'json_schemer', '~> 0.2'
-  spec.add_dependency 'multi_json', '~> 1.14'
-  spec.add_dependency 'oas_parser', '~> 0.25.1'
-  spec.add_dependency 'rack', '~> 2.2'
+  spec.add_runtime_dependency 'deep_merge', '>= 1.2.1'
+  spec.add_runtime_dependency 'hanami-router', '~> 2.0.alpha3'
+  spec.add_runtime_dependency 'hanami-utils', '~> 2.0.alpha1'
+  spec.add_runtime_dependency 'json_schemer', '~> 0.2'
+  spec.add_runtime_dependency 'multi_json', '~> 1.14'
+  spec.add_runtime_dependency 'oas_parser', '~> 0.25.1'
+  spec.add_runtime_dependency 'rack', '~> 2.2'
 
   spec.add_development_dependency 'bundler', '~> 2'
   spec.add_development_dependency 'rack-test', '~> 1'

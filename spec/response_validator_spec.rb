@@ -49,17 +49,17 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     end
 
     it 'returns no errors if OAS file has no content' do
-      expect_any_instance_of(OasParser::Response).to receive(:content) { nil }
+      expect_any_instance_of(OpenapiFirst::Operation).to receive(:response_for) { {} }
       response = Rack::MockResponse.new(200, headers, 'body')
       result = subject.validate(request, response)
       expect(result.errors?).to be false
       expect(result.errors).to be_empty
     end
 
-    it 'returns no errors if OAS file has no content schema specified' do
+    it 'returns no errors if OAS file has no response_for schema specified' do
       empty_content = { 'application/json' => {} }
-      expect_any_instance_of(OasParser::Response)
-        .to receive(:content) { empty_content }
+      expect_any_instance_of(OpenapiFirst::Operation)
+        .to receive(:response_for) { { 'content' => empty_content } }
       response = Rack::MockResponse.new(200, headers, 'body')
       result = subject.validate(request, response)
       expect(result.errors?).to be false
@@ -77,7 +77,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       response = Rack::MockResponse.new(200, headers, response_body)
       result = subject.validate(request, response)
       expect(result.errors?).to be true
-      expect(result.errors.first).to eq "HTTP method not found: 'patch'"
+      expect(result.errors.first).to eq "Could not find definition for PATCH '/pets' in API description ./spec/data/petstore.yaml" # rubocop:disable Layout/LineLength
     end
 
     it 'fails on unknown status' do
@@ -87,7 +87,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       response = Rack::MockResponse.new(201, headers, response_body)
       result = subject.validate(request, response)
       expect(result.errors?).to be true
-      expect(result.errors.first).to eq "Response code not found: '201'"
+      expect(result.errors.first).to eq "Response status code or default not found: 201 for 'GET /pets/{petId}'"
     end
 
     it 'fails on wrong content type' do
