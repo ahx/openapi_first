@@ -10,6 +10,7 @@ module OpenapiFirst
         freeze_app
         use OpenapiFirst::Router, spec: spec, raise_error: raise_error, parent_app: parent_app
         use OpenapiFirst::RequestValidation, raise_error: raise_error
+        use OpenapiFirst::ResponseValidation if raise_error
         run OpenapiFirst::Responder.new(
           spec: spec,
           namespace: namespace

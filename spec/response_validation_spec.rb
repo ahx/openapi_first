@@ -88,8 +88,8 @@ RSpec.describe OpenapiFirst::ResponseValidation do
 
     specify do
       message = [
-        'is missing required properties: id at /0',
-        'should be a integer at /1/id'
+        'is missing required properties: id /0',
+        'should be a integer /1/id'
       ].join(', ')
       expect do
         get '/pets/42'

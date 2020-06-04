@@ -1,6 +1,7 @@
 # Changelog
 
-## Unreleased (0.12.x)
+## Unreleased
+- Add ResponseValidation to the default middlware stack of OpenapiFirst.app
 - Rename `raise` option to `raise_error`
 - Add `raise_error` option to RequestValidation middleware
 

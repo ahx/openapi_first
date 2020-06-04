@@ -71,7 +71,7 @@ RSpec.describe 'Parameter validation' do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'is not valid'
+      expect(error[:title]).to eq 'is not valid: "not-a-date"'
       expect(error[:source][:parameter]).to eq 'birthdate'
     end
 

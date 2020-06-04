@@ -14,11 +14,17 @@ RSpec.describe OpenapiFirst::Coverage do
   end
 
   let(:namespace) do
-    double(show_pet_by_id: 'hello')
+    double(show_pet_by_id: response_body)
   end
 
   let(:app) do
     described_class.new(OpenapiFirst.app(spec, namespace: namespace), spec)
+  end
+
+  let(:response_body) do
+    json_dump([
+                { id: 2, name: 'Hans' }
+              ])
   end
 
   describe '#to_be_called' do
@@ -32,7 +38,7 @@ RSpec.describe OpenapiFirst::Coverage do
       get '/pets/1'
 
       expect(app.to_be_called).to eq expected_endpoints
-      expect(last_response.body).to eq 'hello' # make we called the original app
+      expect(last_response.body).to eq response_body # make we called the original app
     end
   end
 end

@@ -5,6 +5,7 @@ module OpenapiFirst
     SIMPLE_TYPES = %w[string integer].freeze
 
     # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Metrics/AbcSize
     def self.error_details(error)
       if error['type'] == 'pattern'
         {
@@ -23,9 +24,10 @@ module OpenapiFirst
       elsif error['schema'] == false
         { title: 'unknown fields are not allowed' }
       else
-        { title: 'is not valid' }
+        { title: "is not valid: #{error['data'].inspect}" }
       end
     end
     # rubocop:enable Metrics/MethodLength
+    # rubocop:enable Metrics/AbcSize
   end
 end

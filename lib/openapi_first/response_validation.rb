@@ -46,16 +46,22 @@ module OpenapiFirst
     def validate_response_body(schema, response)
       full_body = +''
       response.each { |chunk| full_body << chunk }
-      data = full_body.empty? ? {} : MultiJson.load(full_body)
+      data = full_body.empty? ? {} : load_json(full_body)
       errors = JSONSchemer.schema(schema).validate(data).to_a.map do |error|
         format_error(error)
       end
       raise ResponseBodyInvalidError, errors.join(', ') if errors.any?
     end
 
+    def load_json(string)
+      MultiJson.load(string)
+    rescue MultiJson::ParseError
+      string
+    end
+
     def format_error(error)
       err = ValidationFormat.error_details(error)
-      [err[:title], 'at', error['data_pointer'], err[:detail]].compact.join(' ')
+      [err[:title], error['data_pointer'], err[:detail]].compact.join(' ')
     end
   end
 end
