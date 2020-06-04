@@ -25,8 +25,8 @@ module OpenapiFirst
 
     def call(env)
       env[OPERATION] = nil
-      endpoint = find_endpoint(env)
-      return endpoint.call(env) if endpoint
+      route = find_route(env)
+      return route.call(env) if route.routable?
 
       if @raise
         req = Rack::Request.new(env)
@@ -47,10 +47,10 @@ module OpenapiFirst
       option if option.respond_to?(:call)
     end
 
-    def find_endpoint(env)
+    def find_route(env)
       original_path_info = env[Rack::PATH_INFO]
       env[Rack::PATH_INFO] = Rack::Request.new(env).path
-      @router.recognize(env).endpoint
+      @router.recognize(env)
     ensure
       env[Rack::PATH_INFO] = original_path_info
     end
