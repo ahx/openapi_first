@@ -31,7 +31,7 @@ module OpenapiFirst
     Definition.new(parsed)
   end
 
-  def self.app(spec, namespace:, raise_error: OpenapiFirst.env == 'test')
+  def self.app(spec, namespace:, raise_error: false)
     spec = OpenapiFirst.load(spec) if spec.is_a?(String)
     App.new(nil, spec, namespace: namespace, raise_error: raise_error)
   end
