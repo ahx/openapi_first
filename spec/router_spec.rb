@@ -155,13 +155,13 @@ RSpec.describe OpenapiFirst::Router do
       end
     end
 
-    describe('raise option') do
+    describe('raise_error option') do
       let(:app) do
         val = option
         Rack::Builder.new do
           use OpenapiFirst::Router,
               spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
-              raise: val
+              raise_error: val
           run lambda { |_env|
             Rack::Response.new('hello', 200).finish
           }

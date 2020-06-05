@@ -11,8 +11,9 @@ module OpenapiFirst
   class RequestValidation # rubocop:disable Metrics/ClassLength
     prepend RouterRequired
 
-    def initialize(app)
+    def initialize(app, raise_error: false)
       @app = app
+      @raise = raise_error
     end
 
     def call(env) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
@@ -85,6 +86,8 @@ module OpenapiFirst
     end
 
     def error_response(status, errors = [default_error(status)])
+      raise RequestInvalidError, errors if @raise
+
       Rack::Response.new(
         MultiJson.dump(errors: errors),
         status,

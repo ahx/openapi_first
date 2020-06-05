@@ -13,11 +13,14 @@ RSpec.describe 'Request body validation' do
   describe '#call' do
     include Rack::Test::Methods
 
+    let(:raise_error_option) { false }
+
     let(:app) do
+      raise_error = raise_error_option
       Rack::Builder.new do
         spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
         use OpenapiFirst::Router, spec: spec
-        use OpenapiFirst::RequestValidation
+        use OpenapiFirst::RequestValidation, raise_error: raise_error
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
         }
@@ -143,6 +146,40 @@ RSpec.describe 'Request body validation' do
 
         expect(last_response.status).to eq(200), last_response.body
         expect(last_response.body).to eq 'hello'
+      end
+    end
+
+    describe 'raise_error: true' do
+      let(:raise_error_option) { true }
+
+      it 'raises error if request body is not valid' do
+        request_body['attributes']['name'] = 43
+        header Rack::CONTENT_TYPE, 'application/json'
+        expect do
+          post path, json_dump(request_body)
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: /attributes/name should be a string' # rubocop:disable Layout/LineLength
+      end
+
+      it 'raises error if required field is missing' do
+        request_body['attributes'].delete('name')
+        header Rack::CONTENT_TYPE, 'application/json'
+        expect do
+          post path, json_dump(request_body)
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: /attributes is missing required properties: name' # rubocop:disable Layout/LineLength
+      end
+
+      it 'raises error if request body is invalid JSON' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        expect do
+          post path, '{fo},'
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Failed to parse body as JSON'
+      end
+
+      it 'raises error if request content-type does not match' do
+        header Rack::CONTENT_TYPE, 'application/xml'
+        expect do
+          post path, '<xml />'
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Unsupported Media Type'
       end
     end
   end
