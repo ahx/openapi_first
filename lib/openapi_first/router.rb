@@ -9,16 +9,21 @@ module OpenapiFirst
     NOT_FOUND = Rack::Response.new('', 404).finish.freeze
     DEFAULT_NOT_FOUND_APP = ->(_env) { NOT_FOUND }
 
-    def initialize(app, options) # rubocop:disable Metrics/MethodLength
+    def initialize(
+      app,
+      spec:,
+      raise_error: false,
+      parent_app: nil,
+      not_found: nil
+    )
       @app = app
-      @parent_app = options.fetch(:parent_app, nil)
-      @raise = options.fetch(:raise, false)
-      @failure_app = find_failure_app(options[:not_found])
+      @parent_app = parent_app
+      @raise = raise_error
+      @failure_app = find_failure_app(not_found)
       if @failure_app.nil?
         raise ArgumentError,
               'not_found must be nil, :continue or must respond to call'
       end
-      spec = options.fetch(:spec)
       @filepath = spec.filepath
       @router = build_router(spec.operations)
     end

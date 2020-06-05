@@ -14,11 +14,14 @@ RSpec.describe 'Parameter validation' do
 
   let(:spec) { OpenapiFirst.load('./spec/data/search.yaml') }
 
+  let(:raise_error_option) { false }
+
   let(:app) do
     oas = spec
+    raise_error = raise_error_option
     Rack::Builder.app do
       use OpenapiFirst::Router, spec: oas
-      use OpenapiFirst::RequestValidation
+      use OpenapiFirst::RequestValidation, raise_error: raise_error
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
@@ -140,6 +143,26 @@ RSpec.describe 'Parameter validation' do
         get path, params
 
         expect(last_response.status).to eq 200
+      end
+    end
+
+    describe 'if raise_error: true' do
+      let(:raise_error_option) { true }
+
+      it 'raises an error if query parameter is missing' do
+        params.delete('term')
+        message = 'Query parameter invalid: is missing required properties: term'
+        expect do
+          get path, params
+        end.to raise_error OpenapiFirst::RequestInvalidError, message
+      end
+
+      it 'raises an error if query parameter is invalid' do
+        params[:include] = 'foo,bar'
+        message = 'Query parameter invalid: include is not valid'
+        expect do
+          get path, params
+        end.to raise_error OpenapiFirst::RequestInvalidError, message
       end
     end
 

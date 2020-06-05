@@ -19,6 +19,10 @@ module OpenapiFirst
   INBOX = 'openapi_first.inbox'
   HANDLER = 'openapi_first.handler'
 
+  def self.env
+    ENV['RACK_ENV'] || ENV['HANAMI_ENV'] || ENV['RAILS_ENV']
+  end
+
   def self.load(spec_path, only: nil)
     content = YAML.load_file(spec_path)
     raw = OasParser::Parser.new(spec_path, content).resolve
@@ -27,15 +31,14 @@ module OpenapiFirst
     Definition.new(parsed)
   end
 
-  def self.app(spec, namespace:)
+  def self.app(spec, namespace:, raise_error: OpenapiFirst.env == 'test')
     spec = OpenapiFirst.load(spec) if spec.is_a?(String)
-    test = ENV['RACK_ENV'] == 'test'
-    App.new(nil, spec, namespace: namespace, router_raise: test)
+    App.new(nil, spec, namespace: namespace, raise_error: raise_error)
   end
 
-  def self.middleware(spec, namespace:)
+  def self.middleware(spec, namespace:, raise_error: false)
     spec = OpenapiFirst.load(spec) if spec.is_a?(String)
-    AppWithOptions.new(spec, namespace: namespace, router_raise: false)
+    AppWithOptions.new(spec, namespace: namespace, raise_error: raise_error)
   end
 
   class AppWithOptions
@@ -54,4 +57,36 @@ module OpenapiFirst
   class ResponseCodeNotFoundError < Error; end
   class ResponseMediaTypeNotFoundError < Error; end
   class ResponseBodyInvalidError < Error; end
+
+  class RequestInvalidError < Error
+    def initialize(serialized_errors)
+      message = error_message(serialized_errors)
+      super message
+    end
+
+    private
+
+    def error_message(errors)
+      errors.map do |error|
+        [human_source(error), human_error(error)].compact.join(' ')
+      end.join(', ')
+    end
+
+    def human_source(error)
+      return unless error[:source]
+
+      source_key = error[:source].keys.first
+      source = {
+        pointer: 'Request body invalid:',
+        parameter: 'Query parameter invalid:'
+      }.fetch(source_key, source_key)
+      name = error[:source].values.first
+      source += " #{name}" unless name.nil? || name.empty?
+      source
+    end
+
+    def human_error(error)
+      error[:title]
+    end
+  end
 end

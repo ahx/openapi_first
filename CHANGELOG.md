@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased (0.12.x)
+- Rename `raise` option to `raise_error`
+- Add `raise_error` option to RequestValidation middleware
+
 ## 0.11.0
 - Raise error if you forgot to add the Router middleware
 - Make OpenapiFirst.app raise an error in test env when request path is not specified

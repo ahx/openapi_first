@@ -31,7 +31,7 @@ Options and their defaults:
 |:---|---|---|---|
 |`spec:`| | The spec loaded via `OpenapiFirst.load` ||
 | `not_found:` |`nil`, `:continue`, `Proc`| Specifies what to do if the path was not found in the API description. `nil` (default) returns a 404 response. `:continue` does nothing an calls the next app. `Proc` (or something that responds to `call`) to customize the response. | `nil` (return 404)
-| `raise:` |`false`, `true` | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description. | `false` (don't raise an exception)
+| `raise_error:` |`false`, `true` | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description. | `false` (don't raise an exception)
 
 ## OpenapiFirst::RequestValidation
 
@@ -40,6 +40,13 @@ This middleware returns a 400 status code with a body that describes the error i
 ```ruby
 use OpenapiFirst::RequestValidation
 ```
+
+
+Options and their defaults:
+
+| Name | Possible values | Description | Default
+|:---|---|---|---|
+| `raise_error:` |`false`, `true` | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` instead of returning 4xx. | `false` (don't raise an exception)
 
 The error responses conform with [JSON:API](https://jsonapi.org).
 
@@ -117,7 +124,7 @@ There are two ways to set the response body:
 - Returning a value which will get converted to JSON
 
 ## OpenapiFirst::ResponseValidation
-This middleware is especially useful when testing. It raises an error if the response is not valid.
+This middleware is especially useful when testing. It *always* raises an error if the response is not valid.
 
 ```ruby
 use OpenapiFirst::ResponseValidation if ENV['RACK_ENV'] == 'test'
