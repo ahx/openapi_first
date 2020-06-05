@@ -49,10 +49,9 @@ RSpec.describe OpenapiFirst do
       expect(last_response.status).to eq 200
     end
 
-    it 'raises OpenapiFirst::NotFoundError if path is unknown' do
-      expect do
-        patch '/unknown', json_dump(request_body)
-      end.to raise_error OpenapiFirst::NotFoundError
+    it 'returns 404 is path is unknown' do
+      patch '/unknown', json_dump(request_body)
+      expect(last_response.status).to eq 404
     end
 
     describe 'if RACK_ENV is production' do

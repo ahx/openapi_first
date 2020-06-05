@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
+ENV['RACK_ENV'] = 'test'
+
 require 'bundler/setup'
 require 'openapi_first'
 require 'multi_json'
-
-ENV['RACK_ENV'] = 'test'
 
 module OpenapiFirstSpecHelpers
   def json_dump(data)
