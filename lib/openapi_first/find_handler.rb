@@ -12,7 +12,7 @@ module OpenapiFirst
     def all
       @spec.operations.each_with_object({}) do |operation, hash|
         operation_id = operation.operation_id
-        handler = find_by_operation_id(operation_id)
+        handler = self[operation_id]
         if handler.nil?
           warn "#{self.class.name} cannot not find handler for '#{operation.operation_id}' (#{operation.method} #{operation.path}). This operation will be ignored." # rubocop:disable Layout/LineLength
           next
@@ -21,7 +21,7 @@ module OpenapiFirst
       end
     end
 
-    def find_by_operation_id(operation_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    def [](operation_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       name = operation_id.match(/:*(.*)/)&.to_a&.at(1)
       return if name.nil?
 
