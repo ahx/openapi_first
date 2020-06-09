@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    openapi_first (0.11.0)
+    openapi_first (0.12.0.alpha2)
       deep_merge (>= 1.2.1)
       hanami-router (~> 2.0.alpha3)
       hanami-utils (~> 2.0.alpha1)
@@ -108,7 +108,7 @@ GEM
       rack (>= 0.4)
     rack-protection (2.0.8.1)
       rack
-    regexp_parser (1.7.0)
+    regexp_parser (1.7.1)
     ruby2_keywords (0.0.2)
     seg (1.2.0)
     sinatra (2.0.8.1)
