@@ -5,14 +5,10 @@ require_relative 'utils'
 module OpenapiFirst
   class FindHandler
     def initialize(spec, namespace)
-      @spec = spec
       @namespace = namespace
-    end
-
-    def all
-      @spec.operations.each_with_object({}) do |operation, hash|
+      @handlers = spec.operations.each_with_object({}) do |operation, hash|
         operation_id = operation.operation_id
-        handler = self[operation_id]
+        handler = find_handler(operation_id)
         if handler.nil?
           warn "#{self.class.name} cannot not find handler for '#{operation.operation_id}' (#{operation.method} #{operation.path}). This operation will be ignored." # rubocop:disable Layout/LineLength
           next
@@ -22,6 +18,10 @@ module OpenapiFirst
     end
 
     def [](operation_id)
+      @handlers[operation_id]
+    end
+
+    def find_handler(operation_id)
       name = operation_id.match(/:*(.*)/)&.to_a&.at(1)
       return if name.nil?
 
@@ -34,8 +34,6 @@ module OpenapiFirst
 
       @namespace.method(method_name)
     end
-
-    private
 
     def find_class_method_handler(name)
       module_name, method_name = name.split('.')
