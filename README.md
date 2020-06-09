@@ -8,6 +8,12 @@ Start with writing an OpenAPI file that describes the API, which you are about t
 
 You can use OpenapiFirst via its [Rack middlewares](#rack-middlewares) or in [standalone mode](#standalone-usage).
 
+## Alternatives
+
+This gem is inspired by [committee](https://github.com/interagent/committee) (Ruby) and [connexion](https://github.com/zalando/connexion) (Python).
+
+Here's a [comparison between committee and openapi_first](https://gist.github.com/ahx/1538c31f0652f459861713b5259e366a).
+
 ## Rack middlewares
 OpenapiFirst consists of these Rack middlewares:
 
@@ -242,10 +248,6 @@ end
 ## Mocking
 
 Out of scope. Use [Prism](https://github.com/stoplightio/prism) or [fakeit](https://github.com/JustinFeng/fakeit).
-
-## Alternatives
-
-This gem is inspired by [committee](https://github.com/interagent/committee) (Ruby) and [connexion](https://github.com/zalando/connexion) (Python).
 
 ## Development
 
