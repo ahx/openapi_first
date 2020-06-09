@@ -36,7 +36,7 @@ module OpenapiFirst
 
       media_type = content[content_type]
       unless media_type
-        message = "Response media type found: '#{content_type}' for '#{operation_name}'"
+        message = "Response content type not found: '#{content_type}' for '#{name}'"
         raise ResponseMediaTypeNotFoundError, message
       end
       media_type['schema']
@@ -45,15 +45,15 @@ module OpenapiFirst
     def response_for(status)
       @operation.response_by_code(status.to_s, use_default: true).raw
     rescue OasParser::ResponseCodeNotFound
-      message = "Response status code or default not found: #{status} for '#{operation_name}'"
+      message = "Response status code or default not found: #{status} for '#{name}'"
       raise OpenapiFirst::ResponseCodeNotFoundError, message
     end
 
-    private
-
-    def operation_name
-      "#{method.upcase} #{path}"
+    def name
+      "#{method.upcase} #{path} (#{operation_id})"
     end
+
+    private
 
     def build_parameters_json_schema
       return unless @operation.parameters&.any?

@@ -19,6 +19,8 @@ RSpec.describe OpenapiFirst::FindHandler do
       'Web',
       Module.new do
         def self.some_method(_params, _res); end
+
+        def self.create_pets(_params, _res); end
       end
     )
     stub_const(
@@ -43,45 +45,34 @@ RSpec.describe OpenapiFirst::FindHandler do
     )
   end
 
-  describe '#all' do
-    let(:env) { double }
-    let(:params) { double(:params, env: env) }
-    let(:spec) do
-      operation = instance_double(
-        OpenapiFirst::Operation,
-        operation_id: 'some_method'
-      )
-      instance_double(OpenapiFirst::Definition, operations: [operation])
-    end
-
-    it 'returns a hash with operation_id and handler' do
-      expect(Web).to receive(:some_method)
-      hash = subject.all
-      hash['some_method'].call
+  describe '#[]' do
+    it 'finds createPets' do
+      expect(Web).to receive(:create_pets)
+      subject['createPets'].call
     end
   end
 
-  describe '#find_by_operation_id' do
+  describe '#find_handler' do
     let(:env) { double }
     let(:params) { double(:params, env: env) }
 
     it 'finds some_method' do
       expect(Web).to receive(:some_method)
-      subject.find_by_operation_id('some_method').call
+      subject.find_handler('some_method').call
     end
 
     it 'finds things.some_method' do
       expect(Web::Things).to receive(:some_class_method)
-      subject.find_by_operation_id('things.some_class_method').call
+      subject.find_handler('things.some_class_method').call
     end
 
     it 'finds things#index' do
       expect_any_instance_of(Web::Things::Index).to receive(:call)
-      subject.find_by_operation_id('things#index').call(params, double)
+      subject.find_handler('things#index').call(params, double)
     end
 
     it 'finds things#show with initializer' do
-      handler = subject.find_by_operation_id('things#show')
+      handler = subject.find_handler('things#show')
       response = double
       action = ->(params, res) {}
       expect(Web::Things::Show).to receive(:new).with(env) { action }
@@ -89,14 +80,18 @@ RSpec.describe OpenapiFirst::FindHandler do
       handler.call(params, response)
     end
 
+    it 'does not find unknown class' do
+      expect(subject.find_handler('things#mautz')).to be_nil
+    end
+
     it 'does not find inherited constants' do
-      expect(subject.find_by_operation_id('string.to_s')).to be_nil
-      expect(subject.find_by_operation_id('::string.to_s')).to be_nil
+      expect(subject.find_handler('string.to_s')).to be_nil
+      expect(subject.find_handler('::string.to_s')).to be_nil
     end
 
     it 'does not find nested constants' do
-      expect(subject.find_by_operation_id('foo.bar.to_s')).to be_nil
-      expect(subject.find_by_operation_id('::foo::baz.to_s')).to be_nil
+      expect(subject.find_handler('foo.bar.to_s')).to be_nil
+      expect(subject.find_handler('::foo::baz.to_s')).to be_nil
     end
   end
 end

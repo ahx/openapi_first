@@ -87,7 +87,8 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       response = Rack::MockResponse.new(201, headers, response_body)
       result = subject.validate(request, response)
       expect(result.errors?).to be true
-      expect(result.errors.first).to eq "Response status code or default not found: 201 for 'GET /pets/{petId}'"
+      operation_name = 'GET /pets/{petId} (showPetById)'
+      expect(result.errors.first).to eq "Response status code or default not found: 201 for '#{operation_name}'"
     end
 
     it 'fails on wrong content type' do
