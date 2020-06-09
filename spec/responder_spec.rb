@@ -91,6 +91,26 @@ RSpec.describe OpenapiFirst::Responder do
       expect(last_response[Rack::CONTENT_LENGTH]).to eq '3'
     end
 
+    describe 'when the handler method cannot be found' do
+      let(:app) do
+        Rack::Builder.new do
+          spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
+          use OpenapiFirst::Router, spec: spec
+          run OpenapiFirst::Responder.new(
+            spec: spec,
+            resolver: {},
+            namespace: MyApi
+          )
+        end
+      end
+
+      it 'raises an error' do
+        expect do
+          get '/pets'
+        end.to raise_error OpenapiFirst::NotImplementedError, 'Could not find handler for GET /pets (find_pets)'
+      end
+    end
+
     it 'allows to modify the response' do
       pet = {
         type: 'pet',

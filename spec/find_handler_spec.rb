@@ -89,6 +89,10 @@ RSpec.describe OpenapiFirst::FindHandler do
       handler.call(params, response)
     end
 
+    it 'does not find unknown class' do
+      expect(subject['things#mautz']).to be_nil
+    end
+
     it 'does not find inherited constants' do
       expect(subject['string.to_s']).to be_nil
       expect(subject['::string.to_s']).to be_nil

@@ -21,22 +21,13 @@ module OpenapiFirst
       end
     end
 
-    def [](operation_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    def [](operation_id)
       name = operation_id.match(/:*(.*)/)&.to_a&.at(1)
       return if name.nil?
 
-      if name.include?('.')
-        module_name, method_name = name.split('.')
-        klass = find_const(@namespace, module_name)
-        return klass&.method(Utils.underscore(method_name))
-      end
-      if name.include?('#')
-        module_name, klass_name = name.split('#')
-        const = find_const(@namespace, module_name)
-        klass = find_const(const, klass_name)
-        return ->(params, res) { klass.new.call(params, res) } if klass.instance_method(:initialize).arity.zero?
-
-        return ->(params, res) { klass.new(params.env).call(params, res) }
+      catch :halt do
+        return find_class_method_handler(name) if name.include?('.')
+        return find_instance_method_handler(name) if name.include?('#')
       end
       method_name = Utils.underscore(name)
       return unless @namespace.respond_to?(method_name)
@@ -46,9 +37,24 @@ module OpenapiFirst
 
     private
 
+    def find_class_method_handler(name)
+      module_name, method_name = name.split('.')
+      klass = find_const(@namespace, module_name)
+      klass.method(Utils.underscore(method_name))
+    end
+
+    def find_instance_method_handler(name)
+      module_name, klass_name = name.split('#')
+      const = find_const(@namespace, module_name)
+      klass = find_const(const, klass_name)
+      return ->(params, res) { klass.new.call(params, res) } if klass.instance_method(:initialize).arity.zero?
+
+      ->(params, res) { klass.new(params.env).call(params, res) }
+    end
+
     def find_const(parent, name)
       name = Utils.classify(name)
-      return unless parent.const_defined?(name, false)
+      throw :halt unless parent.const_defined?(name, false)
 
       parent.const_get(name, false)
     end
