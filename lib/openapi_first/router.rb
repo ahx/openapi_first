@@ -33,12 +33,13 @@ module OpenapiFirst
       route = find_route(env)
       return route.call(env) if route.routable?
 
+      return @parent_app.call(env) if @parent_app # This should only happen if used via OpenapiFirst.middlware
+
       if @raise
         req = Rack::Request.new(env)
         msg = "Could not find definition for #{req.request_method} '#{req.path}' in API description #{@filepath}"
         raise NotFoundError, msg
       end
-      return @parent_app.call(env) if @parent_app
 
       @failure_app.call(env)
     end
