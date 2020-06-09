@@ -5,6 +5,7 @@
 - Add ResponseValidation to OpenapiFirst.app if raise_error option is true
 - Rename `raise` option to `raise_error`
 - Add `raise_error` option to RequestValidation middleware
+- Add `Operation#name` that returns a human readable name for an operation
 
 ## 0.11.0
 - Raise error if you forgot to add the Router middleware

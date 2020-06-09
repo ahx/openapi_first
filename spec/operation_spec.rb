@@ -6,6 +6,20 @@ require 'openapi_first/operation'
 RSpec.describe OpenapiFirst::Operation do
   let(:spec) { OpenapiFirst.load('./spec/data/parameters.yaml') }
 
+  describe '#operation_id' do
+    it 'returns the operationId' do
+      operation = spec.operations.first
+      expect(operation.operation_id).to eq 'search'
+    end
+  end
+
+  describe '#name' do
+    it 'returns a human readable name' do
+      operation = spec.operations.first
+      expect(operation.name).to eq 'GET /search (search)'
+    end
+  end
+
   describe '#parameters_json_schema' do
     let(:schema) do
       described_class.new(spec.operations.first).parameters_json_schema
@@ -116,7 +130,7 @@ RSpec.describe OpenapiFirst::Operation do
 
       it 'raises an exception' do
         expected_msg =
-          "Response status code or default not found: 201 for 'GET /info'"
+          "Response status code or default not found: 201 for '#{operation.name}'"
         expect do
           operation.response_schema_for(201, 'application/json')
         end.to raise_error OpenapiFirst::ResponseCodeNotFoundError, expected_msg
@@ -126,7 +140,7 @@ RSpec.describe OpenapiFirst::Operation do
     describe 'when response object media type cannot be found' do
       it 'raises an exception' do
         expected_msg =
-          "Response media type found: 'application/xml' for 'GET /pets'"
+          "Response content type not found: 'application/xml' for '#{operation.name}'"
         expect do
           operation.response_schema_for(200, 'application/xml')
         end.to raise_error OpenapiFirst::ResponseMediaTypeNotFoundError,
@@ -191,7 +205,7 @@ RSpec.describe OpenapiFirst::Operation do
 
       it 'raises an exception' do
         expected_msg =
-          "Response status code or default not found: 201 for 'GET /info'"
+          "Response status code or default not found: 201 for '#{operation.name}'"
         expect do
           operation.response_for(201)
         end.to raise_error OpenapiFirst::ResponseCodeNotFoundError, expected_msg
@@ -210,7 +224,7 @@ RSpec.describe OpenapiFirst::Operation do
       it 'raises an exception' do
         operation = spec.operations[1]
         expected_msg =
-          "Response status code or default not found: 201 for 'GET /info'"
+          "Response status code or default not found: 201 for '#{operation.name}'"
         expect do
           operation.content_type_for(201)
         end.to raise_error OpenapiFirst::ResponseCodeNotFoundError, expected_msg
