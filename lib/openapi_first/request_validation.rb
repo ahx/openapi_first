@@ -50,7 +50,7 @@ module OpenapiFirst
 
       parsed_request_body = parse_request_body!(body)
       errors = validate_json_schema(schema, parsed_request_body)
-      halt(error_response(400, serialize_request_body_errors(errors))) if errors.any?
+      halt_with_error(400, serialize_request_body_errors(errors)) if errors.any?
       env[INBOX].merge! env[REQUEST_BODY] = parsed_request_body
     end
 
@@ -59,19 +59,19 @@ module OpenapiFirst
     rescue MultiJson::ParseError => e
       err = { title: 'Failed to parse body as JSON' }
       err[:detail] = e.cause unless ENV['RACK_ENV'] == 'production'
-      halt(error_response(400, [err]))
+      halt_with_error(400, [err])
     end
 
     def validate_request_content_type!(content_type, operation)
       return if operation.request_body.content[content_type]
 
-      halt(error_response(415))
+      halt_with_error(415)
     end
 
     def validate_request_body_presence!(body, operation)
       return unless operation.request_body.required && body.empty?
 
-      halt(error_response(415, 'Request body is required'))
+      halt_with_error(415, 'Request body is required')
     end
 
     def validate_json_schema(schema, object)
@@ -85,10 +85,10 @@ module OpenapiFirst
       }
     end
 
-    def error_response(status, errors = [default_error(status)])
+    def halt_with_error(status, errors = [default_error(status)])
       raise RequestInvalidError, errors if @raise
 
-      Rack::Response.new(
+      halt Rack::Response.new(
         MultiJson.dump(errors: errors),
         status,
         Rack::CONTENT_TYPE => 'application/vnd.api+json'
@@ -117,7 +117,7 @@ module OpenapiFirst
 
       params = filtered_params(json_schema, params)
       errors = JSONSchemer.schema(json_schema).validate(params)
-      halt error_response(400, serialize_query_parameter_errors(errors)) if errors.any?
+      halt_with_error(400, serialize_query_parameter_errors(errors)) if errors.any?
       env[PARAMETERS] = params
       env[INBOX].merge! params
     end
