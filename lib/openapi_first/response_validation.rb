@@ -27,28 +27,12 @@ module OpenapiFirst
 
     private
 
-    def halt(status, body = '')
-      throw :halt, [status, {}, body]
-    end
-
-    def error(message)
-      { title: message }
-    end
-
-    def error_response(status, errors)
-      Rack::Response.new(
-        MultiJson.dump(errors: errors),
-        status,
-        Rack::CONTENT_TYPE => 'application/vnd.api+json'
-      ).finish
-    end
-
     def validate_response_body(schema, response)
       full_body = +''
       response.each { |chunk| full_body << chunk }
       data = full_body.empty? ? {} : load_json(full_body)
       errors = JSONSchemer.schema(schema).validate(data).to_a.map do |error|
-        format_error(error)
+        error_message_for(error)
       end
       raise ResponseBodyInvalidError, errors.join(', ') if errors.any?
     end
@@ -59,7 +43,7 @@ module OpenapiFirst
       string
     end
 
-    def format_error(error)
+    def error_message_for(error)
       err = ValidationFormat.error_details(error)
       [err[:title], error['data_pointer'], err[:detail]].compact.join(' ')
     end
