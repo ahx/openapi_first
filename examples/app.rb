@@ -13,7 +13,7 @@ module Web
 end
 
 oas_path = File.absolute_path('./openapi.yaml', __dir__)
-pp OpenapiFirst.env == 'test'
+
 App = OpenapiFirst.app(
   oas_path,
   namespace: Web,

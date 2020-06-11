@@ -103,7 +103,7 @@ RSpec.describe OpenapiFirst::Router do
         get '/pets/1'
 
         params = last_request.env[OpenapiFirst::PARAMETERS]
-        expect(params).to eq('petId' => '1')
+        expect(params).to eq(petId: '1')
       end
 
       it 'does not add path parameters if not defined for operation' do
@@ -119,7 +119,7 @@ RSpec.describe OpenapiFirst::Router do
         get '/pets?limit=2'
 
         params = last_request.env[OpenapiFirst::PARAMETERS]
-        expect(params).to eq('limit' => '2')
+        expect(params).to eq(limit: '2')
       end
     end
 

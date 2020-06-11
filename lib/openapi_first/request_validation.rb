@@ -55,7 +55,7 @@ module OpenapiFirst
     end
 
     def parse_request_body!(body)
-      MultiJson.load(body)
+      MultiJson.load(body, symbolize_keys: true)
     rescue MultiJson::ParseError => e
       err = { title: 'Failed to parse body as JSON' }
       err[:detail] = e.cause unless ENV['RACK_ENV'] == 'production'
@@ -75,7 +75,7 @@ module OpenapiFirst
     end
 
     def validate_json_schema(schema, object)
-      JSONSchemer.schema(schema).validate(object)
+      JSONSchemer.schema(schema).validate(Utils.deep_stringify(object))
     end
 
     def default_error(status, title = Rack::Utils::HTTP_STATUS_CODES[status])
@@ -116,7 +116,10 @@ module OpenapiFirst
       return unless json_schema
 
       params = filtered_params(json_schema, params)
-      errors = JSONSchemer.schema(json_schema).validate(params)
+      errors = validate_json_schema(
+        json_schema,
+        params
+      )
       halt_with_error(400, serialize_query_parameter_errors(errors)) if errors.any?
       env[PARAMETERS] = params
       env[INBOX].merge! params
@@ -125,7 +128,8 @@ module OpenapiFirst
     def filtered_params(json_schema, params)
       json_schema['properties']
         .each_with_object({}) do |key_value, result|
-          parameter_name, schema = key_value
+          parameter_name = key_value[0].to_sym
+          schema = key_value[1]
           next unless params.key?(parameter_name)
 
           value = params[parameter_name]

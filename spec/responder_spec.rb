@@ -170,7 +170,7 @@ RSpec.describe OpenapiFirst::Responder do
 
       it 'has allowed query string parameters' do
         expected_params = {
-          'tags' => ['foo']
+          tags: ['foo']
         }
         expect(MyApi).to receive(:find_pets) do |params, _res|
           expect(params).to eq expected_params
@@ -181,12 +181,12 @@ RSpec.describe OpenapiFirst::Responder do
 
       it 'has path parameters and request body' do
         pet = {
-          'type' => 'pet',
-          'attributes' => { 'name' => 'Frido' }
+          type: 'pet',
+          attributes: { name: 'Frido' }
         }
 
         expected_params = {
-          'id' => 1
+          id: 1
         }.merge(pet)
 
         expect(MyApi).to receive(:update_pet) do |params, _res|

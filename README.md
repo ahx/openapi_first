@@ -142,7 +142,7 @@ Instead of composing these middlewares yourself you can use `OpenapiFirst.app`.
 module Pets
   def self.find_pet(params, res)
     {
-      id: params['id'],
+      id: params[:id],
       name: 'Oscar'
     }
   end

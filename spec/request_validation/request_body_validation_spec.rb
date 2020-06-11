@@ -29,9 +29,9 @@ RSpec.describe 'Request body validation' do
 
     let(:request_body) do
       {
-        'type' => 'people',
-        'attributes' => {
-          'name' => 'Oscar'
+        type: 'people',
+        attributes: {
+          name: 'Oscar'
         }
       }
     end
@@ -71,7 +71,7 @@ RSpec.describe 'Request body validation' do
     end
 
     it 'returns 400 if request body is not valid' do
-      request_body['attributes']['name'] = 43
+      request_body[:attributes][:name] = 43
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
@@ -82,7 +82,7 @@ RSpec.describe 'Request body validation' do
     end
 
     it 'returns 400 if required field is missing' do
-      request_body['attributes'].delete('name')
+      request_body[:attributes].delete(:name)
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
@@ -93,7 +93,7 @@ RSpec.describe 'Request body validation' do
     end
 
     it 'returns 400 if additional property is not allowed' do
-      request_body['attributes'].update(foo: 'bar')
+      request_body[:attributes].update(foo: :bar)
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
@@ -153,7 +153,7 @@ RSpec.describe 'Request body validation' do
       let(:raise_error_option) { true }
 
       it 'raises error if request body is not valid' do
-        request_body['attributes']['name'] = 43
+        request_body[:attributes][:name] = 43
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post path, json_dump(request_body)
@@ -161,7 +161,7 @@ RSpec.describe 'Request body validation' do
       end
 
       it 'raises error if required field is missing' do
-        request_body['attributes'].delete('name')
+        request_body[:attributes].delete(:name)
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post path, json_dump(request_body)

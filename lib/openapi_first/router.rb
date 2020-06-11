@@ -64,7 +64,7 @@ module OpenapiFirst
           normalized_path,
           to: lambda do |env|
             env[OPERATION] = operation
-            env[PARAMETERS] = Utils.deep_stringify(env['router.params'])
+            env[PARAMETERS] = env['router.params']
             env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH)
             @app.call(env)
           end
