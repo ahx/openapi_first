@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'forwardable'
+require 'json_schemer'
 require_relative 'utils'
 require_relative 'response_object'
 
@@ -23,6 +24,10 @@ module OpenapiFirst
 
     def parameters_json_schema
       @parameters_json_schema ||= build_parameters_json_schema
+    end
+
+    def parameters_schema
+      @parameters_schema ||= parameters_json_schema && JSONSchemer.schema(parameters_json_schema)
     end
 
     def content_type_for(status)

@@ -75,7 +75,7 @@ module OpenapiFirst
     end
 
     def validate_json_schema(schema, object)
-      JSONSchemer.schema(schema).validate(Utils.deep_stringify(object))
+      schema.validate(Utils.deep_stringify(object))
     end
 
     def default_error(status, title = Rack::Utils::HTTP_STATUS_CODES[status])
@@ -98,7 +98,8 @@ module OpenapiFirst
     def request_body_schema(content_type, operation)
       return unless operation
 
-      operation.request_body.content[content_type]&.fetch('schema')
+      schema = operation.request_body.content[content_type]&.fetch('schema')
+      JSONSchemer.schema(schema) if schema
     end
 
     def serialize_request_body_errors(validation_errors)
@@ -117,7 +118,7 @@ module OpenapiFirst
 
       params = filtered_params(json_schema, params)
       errors = validate_json_schema(
-        json_schema,
+        operation.parameters_schema,
         params
       )
       halt_with_error(400, serialize_query_parameter_errors(errors)) if errors.any?
