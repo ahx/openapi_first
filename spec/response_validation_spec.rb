@@ -55,16 +55,15 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   describe 'no operation found' do
     let(:app) do
       Rack::Builder.app do
-        spec = OpenapiFirst.load('./spec/data/petstore.yaml')
-        use OpenapiFirst::Router, spec: spec, not_found: :continue
         use OpenapiFirst::ResponseValidation
         run ->(_env) { [200, {}, ''] }
       end
     end
 
     specify do
-      get '/unknown'
-      expect(last_response.status).to eq 200
+      env = { OpenapiFirst::OPERATION => nil }
+      response = app.call(env)
+      expect(response[0]).to eq 200
     end
   end
 

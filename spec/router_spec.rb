@@ -29,22 +29,21 @@ RSpec.describe OpenapiFirst::Router do
       get '/unknown', query_params
 
       expect(last_response.status).to be 404
-      expect(last_response.body).to eq ''
-    end
-
-    it 'adds an empty operation if path is not found' do
-      get '/unknown', query_params
+      expect(last_response.body).to eq 'Not Found'
 
       operation = last_request.env.fetch(OpenapiFirst::OPERATION)
       expect(operation).to be_nil
     end
 
-    it 'returns 400 if method is not found' do
+    it 'returns 405 if method is not found' do
       query_params.delete('term')
       delete path, query_params
 
-      expect(last_response.status).to be 404
-      expect(last_response.body).to eq ''
+      expect(last_response.status).to be 405
+      expect(last_response.body).to eq 'Not Allowed'
+
+      operation = last_request.env.fetch(OpenapiFirst::OPERATION)
+      expect(operation).to be_nil
     end
 
     it 'adds the operation to env ' do
@@ -74,10 +73,7 @@ RSpec.describe OpenapiFirst::Router do
       it 'uses SCRIPT_NAME to build the whole path' do
         env = Rack::MockRequest.env_for('/42', script_name: '/pets')
 
-        expect(upstream_app).to receive(:call) do |cenv|
-          expect(cenv[Rack::SCRIPT_NAME]).to eq '/pets'
-          expect(cenv[Rack::PATH_INFO]).to eq '/42'
-        end
+        expect(upstream_app).to receive(:call).with(env)
 
         app.call(env)
         operation = env[OpenapiFirst::OPERATION]
@@ -124,34 +120,6 @@ RSpec.describe OpenapiFirst::Router do
 
         params = last_request.env[OpenapiFirst::PARAMETERS]
         expect(params).to eq('limit' => '2')
-      end
-    end
-
-    describe 'without namespace' do
-      let(:app) do
-        Rack::Builder.new do
-          use OpenapiFirst::Router,
-              spec: OpenapiFirst.load('./spec/data/petstore.yaml')
-          run ->(_env) { Rack::Response.new('hello', 200).finish }
-        end
-      end
-
-      it 'still adds operation and parameters to env' do
-        get '/pets?limit=2'
-
-        operation = last_request.env[OpenapiFirst::OPERATION]
-        expect(operation.operation_id).to eq 'listPets'
-
-        params = last_request.env[OpenapiFirst::PARAMETERS]
-        expect(params).to eq('limit' => '2')
-
-        expect(last_response.status).to eq 200
-      end
-
-      it 'returns 404 if path could not be found' do
-        get '/unknown'
-        expect(last_response.status).to eq 404
-        expect(last_response.body).to eq ''
       end
     end
 
@@ -203,64 +171,6 @@ RSpec.describe OpenapiFirst::Router do
           expect do
             delete '/pets'
           end.to raise_error OpenapiFirst::NotFoundError, msg
-        end
-      end
-    end
-
-    describe('not_found option') do
-      let(:app) do
-        val = option
-        Rack::Builder.new do
-          use OpenapiFirst::Router,
-              spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
-              not_found: val
-          run lambda { |_env|
-            Rack::Response.new('hello', 200).finish
-          }
-        end
-      end
-
-      describe('with :continue') do
-        let(:option) { :continue }
-
-        it 'calls the next app' do
-          get '/unknown'
-
-          expect(last_response.status).to be 200
-          expect(last_response.body).to eq 'hello'
-        end
-      end
-
-      describe('with nil') do
-        let(:option) { nil }
-
-        it 'calls the next app' do
-          get '/unknown'
-
-          expect(last_response.status).to be 404
-          expect(last_response.body).to eq ''
-        end
-      end
-
-      describe('with invalid option') do
-        let(:option) { :invalid }
-
-        it 'raises an error' do
-          msg = 'not_found must be nil, :continue or must respond to call'
-          expect { get path }.to raise_error ArgumentError, msg
-        end
-      end
-
-      describe('with custom rack endpoint') do
-        let(:option) do
-          ->(_env) { Rack::Response.new('hello', 412).finish }
-        end
-
-        it 'calls the endpoint' do
-          get '/unknown'
-
-          expect(last_response.status).to be 412
-          expect(last_response.body).to eq 'hello'
         end
       end
     end

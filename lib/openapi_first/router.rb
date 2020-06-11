@@ -6,59 +6,49 @@ require_relative 'utils'
 
 module OpenapiFirst
   class Router
-    NOT_FOUND = Rack::Response.new('', 404).finish.freeze
-    DEFAULT_NOT_FOUND_APP = ->(_env) { NOT_FOUND }
-
     def initialize(
       app,
       spec:,
       raise_error: false,
-      parent_app: nil,
-      not_found: nil
+      parent_app: nil
     )
       @app = app
       @parent_app = parent_app
       @raise = raise_error
-      @failure_app = find_failure_app(not_found)
-      if @failure_app.nil?
-        raise ArgumentError,
-              'not_found must be nil, :continue or must respond to call'
-      end
       @filepath = spec.filepath
       @router = build_router(spec.operations)
     end
 
     def call(env)
       env[OPERATION] = nil
-      route = find_route(env)
-      return route.call(env) if route.routable?
+      response = call_router(env)
+      status = response[0]
+      if UNKNOWN_ROUTE_STATUS.include?(status)
+        return @parent_app.call(env) if @parent_app # This should only happen if used via OpenapiFirst.middlware
 
-      return @parent_app.call(env) if @parent_app # This should only happen if used via OpenapiFirst.middlware
-
-      if @raise
-        req = Rack::Request.new(env)
-        msg = "Could not find definition for #{req.request_method} '#{req.path}' in API description #{@filepath}"
-        raise NotFoundError, msg
+        raise_error(env) if @raise
       end
-
-      @failure_app.call(env)
+      response
     end
+
+    UNKNOWN_ROUTE_STATUS = [404, 405].freeze
+    ORIGINAL_PATH = 'openapi_first.path_info'
 
     private
 
-    def find_failure_app(option)
-      return DEFAULT_NOT_FOUND_APP if option.nil?
-      return @app if option == :continue
-
-      option if option.respond_to?(:call)
+    def raise_error(env)
+      req = Rack::Request.new(env)
+      msg = "Could not find definition for #{req.request_method} '#{req.path}' in API description #{@filepath}"
+      raise NotFoundError, msg
     end
 
-    def find_route(env)
-      original_path_info = env[Rack::PATH_INFO]
+    def call_router(env)
+      # Changing and restoring PATH_INFO is needed, because Hanami::Router does not respect existing script_path
+      env[ORIGINAL_PATH] = env[Rack::PATH_INFO]
       env[Rack::PATH_INFO] = Rack::Request.new(env).path
-      @router.recognize(env)
+      @router.call(env)
     ensure
-      env[Rack::PATH_INFO] = original_path_info
+      env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH) if env[ORIGINAL_PATH]
     end
 
     def build_router(operations) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
@@ -75,6 +65,7 @@ module OpenapiFirst
           to: lambda do |env|
             env[OPERATION] = operation
             env[PARAMETERS] = Utils.deep_stringify(env['router.params'])
+            env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH)
             @app.call(env)
           end
         )

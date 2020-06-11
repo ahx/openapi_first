@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Remove `not_found` option from Router. Return 405 if HTTP verb is not allowed (via Hanami::Router)
 - Add `raise_error` option to OpenapiFirst.app (false by default)
 - Add ResponseValidation to OpenapiFirst.app if raise_error option is true
 - Rename `raise` option to `raise_error`
