@@ -140,10 +140,10 @@ RSpec.describe OpenapiFirst::Operation do
     describe 'when response object media type cannot be found' do
       it 'raises an exception' do
         expected_msg =
-          "Response content type not found: 'application/xml' for '#{operation.name}'"
+          "Response content type not found 'application/xml' for '#{operation.name}'"
         expect do
           operation.response_schema_for(200, 'application/xml')
-        end.to raise_error OpenapiFirst::ResponseMediaTypeNotFoundError,
+        end.to raise_error OpenapiFirst::ResponseContentTypeNotFoundError,
                            expected_msg
       end
     end

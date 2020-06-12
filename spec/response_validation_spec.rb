@@ -52,6 +52,18 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
+  describe 'without content-type header' do
+    let(:headers) do
+      { 'X-HEAD' => '/api/next-page' }
+    end
+
+    it 'returns an error' do
+      expect do
+        get path
+      end.to raise_error OpenapiFirst::ResponseInvalid, "Response has no content-type for 'GET /pets (listPets)'"
+    end
+  end
+
   describe 'no operation found' do
     let(:app) do
       Rack::Builder.app do

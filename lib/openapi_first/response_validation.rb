@@ -17,12 +17,18 @@ module OpenapiFirst
       operation = env[OPERATION]
       return @app.call(env) unless operation
 
-      status, headers, body = @app.call(env)
+      response = @app.call(env)
+      validate(response, operation)
+      response
+    end
+
+    def validate(response, operation)
+      status, headers, body = response.to_a
       content_type = headers[Rack::CONTENT_TYPE]
+      raise ResponseInvalid, "Response has no content-type for '#{operation.name}'" unless content_type
+
       response_schema = operation.response_schema_for(status, content_type)
       validate_response_body(response_schema, body) if response_schema
-
-      [status, headers, body]
     end
 
     private

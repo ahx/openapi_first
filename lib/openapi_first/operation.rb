@@ -41,8 +41,8 @@ module OpenapiFirst
 
       media_type = content[content_type]
       unless media_type
-        message = "Response content type not found: '#{content_type}' for '#{name}'"
-        raise ResponseMediaTypeNotFoundError, message
+        message = "Response content type not found '#{content_type}' for '#{name}'"
+        raise ResponseContentTypeNotFoundError, message
       end
       media_type['schema']
     end

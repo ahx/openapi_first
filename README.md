@@ -189,7 +189,7 @@ OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
 ## Manual response validation
 
-Response validation is useful to make sure your app responds as described in your API description. You usually do this in your tests using [rack-test](https://github.com/rack-test/rack-test).
+Instead of using the ResponseValidation middleware you can validate the response in your test manually via [rack-test](https://github.com/rack-test/rack-test) and ResponseValidator.
 
 ```ruby
 # In your test (rspec example):
@@ -197,7 +197,8 @@ require 'openapi_first'
 spec = OpenapiFirst.load('petstore.yaml')
 validator = OpenapiFirst::ResponseValidator.new(spec)
 
-expect(validator.validate(last_request, last_response).errors).to be_empty
+# This will raise an exception if it found an error
+validator.validate(last_request, last_response)
 ```
 
 ## Handling only certain paths

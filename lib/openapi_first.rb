@@ -55,9 +55,10 @@ module OpenapiFirst
   class Error < StandardError; end
   class NotFoundError < Error; end
   class NotImplementedError < RuntimeError; end
-  class ResponseCodeNotFoundError < Error; end
-  class ResponseMediaTypeNotFoundError < Error; end
-  class ResponseBodyInvalidError < Error; end
+  class ResponseInvalid < Error; end
+  class ResponseCodeNotFoundError < ResponseInvalid; end
+  class ResponseContentTypeNotFoundError < ResponseInvalid; end
+  class ResponseBodyInvalidError < ResponseInvalid; end
 
   class RequestInvalidError < Error
     def initialize(serialized_errors)
