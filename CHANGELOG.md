@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.12.0
 - Change `ResponseValidator` to raise an exception if it found a problem
 - Params have symbolized keys now
 - Remove `not_found` option from Router. Return 405 if HTTP verb is not allowed (via Hanami::Router)
