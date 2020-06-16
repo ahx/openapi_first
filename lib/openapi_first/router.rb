@@ -23,7 +23,7 @@ module OpenapiFirst
       env[OPERATION] = nil
       response = call_router(env)
       status = response[0]
-      if UNKNOWN_ROUTE_STATUS.include?(status)
+      if UNKNOWN_ROUTE_STATUS.include?(status) && env[OPERATION].nil?
         return @parent_app.call(env) if @parent_app # This should only happen if used via OpenapiFirst.middlware
 
         raise_error(env) if @raise
