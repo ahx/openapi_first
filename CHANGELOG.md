@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Don't validate the response content if status is 205 (no content)
+
 ## 0.12.0
 - Change `ResponseValidator` to raise an exception if it found a problem
 - Params have symbolized keys now

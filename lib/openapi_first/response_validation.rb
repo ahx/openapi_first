@@ -24,6 +24,8 @@ module OpenapiFirst
 
     def validate(response, operation)
       status, headers, body = response.to_a
+      return validate_status_only(operation, status) if status == 204
+
       content_type = headers[Rack::CONTENT_TYPE]
       raise ResponseInvalid, "Response has no content-type for '#{operation.name}'" unless content_type
 
@@ -32,6 +34,10 @@ module OpenapiFirst
     end
 
     private
+
+    def validate_status_only(operation, status)
+      operation.response_for(status)
+    end
 
     def validate_response_body(schema, response)
       full_body = +''

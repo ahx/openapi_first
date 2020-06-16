@@ -10,14 +10,15 @@ RSpec.describe OpenapiFirst::ResponseValidation do
 
   let(:app) do
     res = response
+    definition = spec
     Rack::Builder.app do
-      spec = OpenapiFirst.load('./spec/data/petstore.yaml')
-      use OpenapiFirst::Router, spec: spec
+      use OpenapiFirst::Router, spec: definition
       use OpenapiFirst::ResponseValidation
       run ->(_env) { res.finish }
     end
   end
 
+  let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
   let(:response_body) { json_dump([{ id: 42, name: 'hans' }]) }
   let(:status) { 200 }
   let(:headers) do
@@ -61,6 +62,26 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       expect do
         get path
       end.to raise_error OpenapiFirst::ResponseInvalid, "Response has no content-type for 'GET /pets (listPets)'"
+    end
+  end
+
+  describe 'with 204 no content response' do
+    let(:spec) { OpenapiFirst.load('./spec/data/no-content.yaml') }
+    let(:status) { 204 }
+
+    let(:headers) do
+      { 'X-HEAD' => '/api/next-page' }
+    end
+
+    it 'does not check the content or content-type' do
+      delete '/pets/12'
+      expect(last_response.status).to eq 204
+    end
+
+    it 'still checks if the status is defined' do
+      expect do
+        get '/pets/12'
+      end.to raise_error OpenapiFirst::ResponseCodeNotFoundError
     end
   end
 
