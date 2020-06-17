@@ -22,8 +22,7 @@ module OpenapiFirst
     def call(env)
       env[OPERATION] = nil
       response = call_router(env)
-      status = response[0]
-      if UNKNOWN_ROUTE_STATUS.include?(status) && env[OPERATION].nil?
+      if env[OPERATION].nil?
         return @parent_app.call(env) if @parent_app # This should only happen if used via OpenapiFirst.middlware
 
         raise_error(env) if @raise
@@ -31,7 +30,6 @@ module OpenapiFirst
       response
     end
 
-    UNKNOWN_ROUTE_STATUS = [404, 405].freeze
     ORIGINAL_PATH = 'openapi_first.path_info'
 
     private
