@@ -30,3 +30,5 @@ paths:
             application/json:
               schema:
                 type: object
+        '423':
+          description: 'Locked'

@@ -77,11 +77,32 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       delete '/pets/12'
       expect(last_response.status).to eq 204
     end
+  end
 
-    it 'still checks if the status is defined' do
-      expect do
+  describe 'operation does not specify content-type' do
+    let(:spec) { OpenapiFirst.load('./spec/data/no-content.yaml') }
+    let(:status) { 423 }
+
+    describe 'with any content-type' do
+      let(:headers) do
+        { Rack::CONTENT_TYPE => 'application/hal+json' }
+      end
+
+      it 'passes' do
         get '/pets/12'
-      end.to raise_error OpenapiFirst::ResponseCodeNotFoundError
+        expect(last_response.status).to eq status
+      end
+    end
+
+    describe 'with an empty content-type' do
+      let(:headers) do
+        { Rack::CONTENT_TYPE => nil }
+      end
+
+      it 'allows an empty content-type' do
+        get '/pets/12'
+        expect(last_response.status).to eq status
+      end
     end
   end
 

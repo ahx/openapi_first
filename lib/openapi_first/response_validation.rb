@@ -27,8 +27,6 @@ module OpenapiFirst
       return validate_status_only(operation, status) if status == 204
 
       content_type = headers[Rack::CONTENT_TYPE]
-      raise ResponseInvalid, "Response has no content-type for '#{operation.name}'" unless content_type
-
       response_schema = operation.response_schema_for(status, content_type)
       validate_response_body(response_schema, body) if response_schema
     end

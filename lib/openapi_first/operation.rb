@@ -39,6 +39,8 @@ module OpenapiFirst
       content = response_for(status)['content']
       return if content.nil? || content.empty?
 
+      raise ResponseInvalid, "Response has no content-type for '#{name}'" unless content_type
+
       media_type = content[content_type]
       unless media_type
         message = "Response content type not found '#{content_type}' for '#{name}'"
