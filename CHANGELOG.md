@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.12.2
+- Allow response to have no media type object specified
+
 ## 0.12.1
 - Fix response when handler returns 404 or 405
 - Don't validate the response content if status is 205 (no content)
