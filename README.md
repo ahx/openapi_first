@@ -159,6 +159,13 @@ The above will use the mentioned Rack middlewares to:
 - Map the request to a method call `Pets.find_pet` based on the `operationId` in the API description
 - Set the response content type according to your spec (here with the default status code `200`)
 
+### Options and their defaults:
+
+| Name | Possible values | Description | Default
+|:---|---|---|---|
+| `namespace:` || A class or module where to find the handler method.
+| `raise_error:` | `true`, `false` | If set to true the middleware raises an exception (subclass of `OpenapiFirst::Error` when a request is not specified or the request is not valid. This is useful during testing. | `false`
+
 Handler functions (`find_pet`) are called with two arguments:
 
 - `params` - Holds the parsed request body, filtered query params and path parameters
