@@ -5,12 +5,19 @@ require 'logger'
 
 module OpenapiFirst
   class App
-    def initialize(parent_app, spec, namespace:, raise_error:)
+    def initialize( # rubocop:disable Metrics/ParameterLists
+      parent_app,
+      spec,
+      namespace:,
+      router_raise_error: false,
+      request_validation_raise_error: false,
+      response_validation: false
+    )
       @stack = Rack::Builder.app do
         freeze_app
-        use OpenapiFirst::Router, spec: spec, raise_error: raise_error, parent_app: parent_app
-        use OpenapiFirst::RequestValidation, raise_error: raise_error
-        use OpenapiFirst::ResponseValidation if raise_error
+        use OpenapiFirst::Router, spec: spec, raise_error: router_raise_error, parent_app: parent_app
+        use OpenapiFirst::RequestValidation, raise_error: request_validation_raise_error
+        use OpenapiFirst::ResponseValidation if response_validation
         run OpenapiFirst::Responder.new(
           spec: spec,
           namespace: namespace
