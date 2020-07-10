@@ -150,7 +150,12 @@ end
 
 # In config.ru:
 require 'openapi_first'
-run OpenapiFirst.app('./openapi/openapi.yaml', namespace: Pets)
+run OpenapiFirst.app(
+  './openapi/openapi.yaml',
+  namespace: Pets,
+  response_validation: ENV['RACK_ENV'] == 'test',
+  router_raise_error:  ENV['RACK_ENV'] == 'test'
+)
 ```
 
 The above will use the mentioned Rack middlewares to:
@@ -163,8 +168,12 @@ The above will use the mentioned Rack middlewares to:
 
 | Name | Possible values | Description | Default
 |:---|---|---|---|
-| `namespace:` || A class or module where to find the handler method.
-| `raise_error:` | `true`, `false` | If set to true the middleware raises an exception (subclass of `OpenapiFirst::Error` when a request is not specified or the request is not valid. This is useful during testing. | `false`
+| `spec_path` || A filepath to an OpenAPI definition file. |
+| `namespace:` || A class or module where to find the handler methods.|
+| `response_validation:` | `true`, `false` | If set to true it raises an exception if the response is invalid. This is useful during testing. | `false`
+| `router_raise_error:` | `true`, `false` | If set to true it raises an exception (subclass of `OpenapiFirst::Error` when a request path/method is not specified. This is useful during testing. | `false`
+| `request_validation_raise_error:` | `true`, `false` | If set to true it raises an exception (subclass of `OpenapiFirst::Error` when a request is not valid. | `false`
+
 
 Handler functions (`find_pet`) are called with two arguments:
 

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.12.3
+- Add `response_validation:`, `router_raise_error` options to standalone mode.
+
 ## 0.12.2
 - Allow response to have no media type object specified
 

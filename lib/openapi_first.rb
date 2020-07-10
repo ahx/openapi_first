@@ -31,14 +31,39 @@ module OpenapiFirst
     Definition.new(parsed)
   end
 
-  def self.app(spec, namespace:, raise_error: false)
+  def self.app(
+    spec,
+    namespace:,
+    router_raise_error: false,
+    request_validation_raise_error: false,
+    response_validation: false
+  )
     spec = OpenapiFirst.load(spec) if spec.is_a?(String)
-    App.new(nil, spec, namespace: namespace, raise_error: raise_error)
+    App.new(
+      nil,
+      spec,
+      namespace: namespace,
+      router_raise_error: router_raise_error,
+      request_validation_raise_error: request_validation_raise_error,
+      response_validation: response_validation
+    )
   end
 
-  def self.middleware(spec, namespace:, raise_error: false)
+  def self.middleware(
+    spec,
+    namespace:,
+    router_raise_error: false,
+    request_validation_raise_error: false,
+    response_validation: false
+  )
     spec = OpenapiFirst.load(spec) if spec.is_a?(String)
-    AppWithOptions.new(spec, namespace: namespace, raise_error: raise_error)
+    AppWithOptions.new(
+      spec,
+      namespace: namespace,
+      router_raise_error: router_raise_error,
+      request_validation_raise_error: request_validation_raise_error,
+      response_validation: response_validation
+    )
   end
 
   class AppWithOptions
