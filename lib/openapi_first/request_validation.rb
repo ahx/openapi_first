@@ -98,7 +98,8 @@ module OpenapiFirst
     def request_body_schema(content_type, operation)
       return unless operation
 
-      schema = operation.request_body.content[content_type]&.fetch('schema')
+      schema = operation.request_body_schema_for(content_type)
+
       JSONSchemer.schema(schema) if schema
     end
 

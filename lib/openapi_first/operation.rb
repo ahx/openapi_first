@@ -49,11 +49,10 @@ module OpenapiFirst
       media_type['schema']
     end
 
-    def find_content_for_content_type(content, request_content_type)
-      content.fetch(request_content_type) do |_|
-        type = request_content_type.split(';')[0]
-        content[type] || content["#{type.split('/')[0]}/*"] || content['*/*']
-      end
+    def request_body_schema_for(request_content_type)
+      content = @operation.request_body.content
+      media_type = find_content_for_content_type(content, request_content_type)
+      media_type&.fetch('schema', nil)
     end
 
     def response_for(status)
@@ -68,6 +67,13 @@ module OpenapiFirst
     end
 
     private
+
+    def find_content_for_content_type(content, request_content_type)
+      content.fetch(request_content_type) do |_|
+        type = request_content_type.split(';')[0]
+        content[type] || content["#{type.split('/')[0]}/*"] || content['*/*']
+      end
+    end
 
     def build_parameters_json_schema
       return unless @operation.parameters&.any?

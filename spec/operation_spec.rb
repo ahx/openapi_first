@@ -211,6 +211,36 @@ RSpec.describe OpenapiFirst::Operation do
     end
   end
 
+  describe '#request_body_schema_for' do
+    let(:spec) { OpenapiFirst.load('./spec/data/content-types.yaml') }
+    let(:operation) { spec.operations[1] }
+
+    it 'finds an exact match without parameter' do
+      schema = operation.request_body_schema_for('application/json')
+      expect(schema['title']).to eq 'Without parameter'
+    end
+
+    it 'finds an exact match with parameter' do
+      schema = operation.request_body_schema_for('application/json; profile=custom')
+      expect(schema['title']).to eq 'With profile'
+    end
+
+    it 'finds a match while ignorign charset' do
+      schema = operation.request_body_schema_for('application/json; charset=UTF8')
+      expect(schema['title']).to eq 'Without parameter'
+    end
+
+    it 'finds text/* wildcard matcher' do
+      schema = operation.request_body_schema_for('text/markdown')
+      expect(schema['title']).to eq 'Text wildcard'
+    end
+
+    it 'finds */* wildcard matcher' do
+      schema = operation.request_body_schema_for('application/xml')
+      expect(schema['title']).to eq 'Accept everything'
+    end
+  end
+
   describe '#response_for' do
     let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
     let(:operation) { spec.operations.first }
