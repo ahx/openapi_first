@@ -14,6 +14,8 @@ Layout/SpaceAroundMethodCallOperator:
   Enabled: true
 Lint/DeprecatedOpenSSLConstant:
   Enabled: true
+Lint/DuplicateElsifCondition:
+  Enabled: true
 Lint/RaiseException:
   Enabled: true
 Lint/MixedRegexpCaptureTypes:
@@ -28,9 +30,25 @@ Lint/StructNewOverride:
   Enabled: true
 Style/HashEachMethods:
   Enabled: false
+Style/AccessorGrouping:
+  Enabled: true
+Style/ArrayCoercion:
+  Enabled: true
+Style/BisectedAttrAccessor:
+  Enabled: true
+Style/CaseLikeIf:
+  Enabled: true
+Style/HashAsLastArrayItem:
+  Enabled: true
+Style/HashLikeCase:
+  Enabled: true
 Style/HashTransformKeys:
   Enabled: true
 Style/HashTransformValues:
   Enabled: true
+Style/RedundantAssignment:
+  Enabled: true
 Style/RedundantFetchBlock:
+  Enabled: true
+Style/RedundantFileExtensionInRequire:
   Enabled: true

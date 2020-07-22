@@ -41,12 +41,18 @@ module OpenapiFirst
 
       raise ResponseInvalid, "Response has no content-type for '#{name}'" unless content_type
 
-      media_type = content[content_type]
+      media_type = find_content_for_content_type(content, content_type)
       unless media_type
         message = "Response content type not found '#{content_type}' for '#{name}'"
         raise ResponseContentTypeNotFoundError, message
       end
       media_type['schema']
+    end
+
+    def request_body_schema_for(request_content_type)
+      content = @operation.request_body.content
+      media_type = find_content_for_content_type(content, request_content_type)
+      media_type&.fetch('schema', nil)
     end
 
     def response_for(status)
@@ -61,6 +67,13 @@ module OpenapiFirst
     end
 
     private
+
+    def find_content_for_content_type(content, request_content_type)
+      content.fetch(request_content_type) do |_|
+        type = request_content_type.split(';')[0]
+        content[type] || content["#{type.split('/')[0]}/*"] || content['*/*']
+      end
+    end
 
     def build_parameters_json_schema
       return unless @operation.parameters&.any?

@@ -1,0 +1,72 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Swagger Petstore
+  license:
+    name: MIT
+servers:
+  - url: http://petstore.swagger.io/v1
+paths:
+  /pets/{petId}:
+    parameters:
+      - name: petId
+        in: path
+        required: true
+        description: The id of the pet to retrieve
+        schema:
+          type: string
+    get:
+      summary: Info for a specific pet
+      operationId: showPetById
+      tags:
+        - pets
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                title: 'Without parameter'
+                type: object
+            application/json; profile=custom:
+              schema:
+                title: 'With profile'
+                type: object
+            text/*:
+              schema:
+                title: 'Text wildcard'
+                type: string
+            '*/*':
+              schema:
+                title: 'Accept everything'
+                type: object
+    patch:
+      summary: Update for a specific pet
+      operationId: updatePetById
+      tags:
+        - pets
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: 'Without parameter'
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: 'Without parameter'
+              type: object
+          application/json; profile=custom:
+            schema:
+              title: 'With profile'
+              type: object
+          text/*:
+            schema:
+              title: 'Text wildcard'
+              type: string
+          '*/*':
+            schema:
+              title: 'Accept everything'
+              type: object
