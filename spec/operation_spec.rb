@@ -211,6 +211,44 @@ RSpec.describe OpenapiFirst::Operation do
     end
   end
 
+  describe '#method' do
+    let(:spec) { OpenapiFirst.load('./spec/data/petstore-expanded.yaml') }
+
+    it 'returns get' do
+      expect(spec.operations.first.method).to eq 'get'
+    end
+
+    it 'returns post' do
+      expect(spec.operations[1].method).to eq 'post'
+    end
+  end
+
+  describe '#read?' do
+    it 'returns true if write? returns false' do
+      operation = OpenapiFirst::Operation.new(double(method: 'get'))
+      expect(operation.read?).to be true
+    end
+
+    it 'returns false if write? returns true' do
+      operation = OpenapiFirst::Operation.new(double(method: 'post'))
+      expect(operation.read?).to be false
+    end
+  end
+
+  describe 'write?' do
+    %w[POST PUT PATCH DELETE].each do |http_method|
+      it "returns true for #{http_method}" do
+        operation = OpenapiFirst::Operation.new(double(method: http_method.downcase))
+        expect(operation.write?).to be true
+      end
+    end
+
+    it 'returns false for GET' do
+      operation = OpenapiFirst::Operation.new(double(method: 'get'))
+      expect(operation.write?).to be false
+    end
+  end
+
   describe '#request_body_schema_for' do
     let(:spec) { OpenapiFirst.load('./spec/data/content-types.yaml') }
     let(:operation) { spec.operations[1] }

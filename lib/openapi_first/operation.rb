@@ -14,12 +14,23 @@ module OpenapiFirst
                    :request_body,
                    :operation_id
 
+    WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
+    private_constant :WRITE_METHODS
+
     def initialize(parsed)
       @operation = parsed
     end
 
     def path
       @operation.path.path
+    end
+
+    def read?
+      !write?
+    end
+
+    def write?
+      WRITE_METHODS.include?(method)
     end
 
     def parameters_json_schema
