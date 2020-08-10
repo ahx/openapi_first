@@ -123,7 +123,7 @@ RSpec.describe OpenapiFirst::Router do
       end
     end
 
-    describe('raise_error option') do
+    describe 'raise_error option' do
       let(:app) do
         val = option
         Rack::Builder.new do
@@ -136,7 +136,7 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      describe('with nil') do
+      describe 'with nil' do
         let(:option) { nil }
 
         it 'returns 404' do
@@ -146,8 +146,8 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      describe('with false') do
-        let(:option) { nil }
+      describe 'with false' do
+        let(:option) { false }
 
         it 'returns 404' do
           get '/unknown'
@@ -156,8 +156,8 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      describe('with true') do
-        let(:option) { :raise }
+      describe 'with true' do
+        let(:option) { true }
 
         it 'raises an error if path was not found' do
           msg = "Could not find definition for GET '/unknown' in API description ./spec/data/petstore.yaml"
@@ -171,6 +171,72 @@ RSpec.describe OpenapiFirst::Router do
           expect do
             delete '/pets'
           end.to raise_error OpenapiFirst::NotFoundError, msg
+        end
+      end
+
+      describe 'not_found option' do
+        let(:app) do
+          val = option
+          Rack::Builder.new do
+            use OpenapiFirst::Router,
+                spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+                not_found: val
+            run lambda { |_env|
+              Rack::Response.new('hello', 200).finish
+            }
+          end
+        end
+
+        describe 'with nil' do
+          let(:option) { nil }
+
+          it 'returns 404' do
+            get '/unknown'
+
+            expect(last_response.status).to eq 404
+          end
+        end
+
+        describe 'with :halt' do
+          let(:option) { :halt }
+
+          it 'returns 404' do
+            get '/unknown'
+
+            expect(last_response.status).to eq 404
+          end
+        end
+
+        describe 'with :continue' do
+          let(:option) { :continue }
+
+          it 'calls the next app in the stack' do
+            get '/unknown'
+            expect(last_response.status).to eq 200
+            expect(last_request.env[OpenapiFirst::OPERATION]).to be_nil
+            expect(last_response.body).to eq 'hello'
+          end
+
+          describe 'when combined with raise_error: true' do
+            let(:app) do
+              Rack::Builder.new do
+                use OpenapiFirst::Router,
+                    spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+                    not_found: :continue,
+                    raise_error: true
+                run lambda { |_env|
+                  Rack::Response.new('hello', 200).finish
+                }
+              end
+            end
+
+            it 'raises an error if path was not found' do
+              msg = "Could not find definition for GET '/unknown' in API description ./spec/data/petstore.yaml"
+              expect do
+                get '/unknown'
+              end.to raise_error OpenapiFirst::NotFoundError, msg
+            end
+          end
         end
       end
     end

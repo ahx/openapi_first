@@ -37,6 +37,7 @@ Options and their defaults:
 |:---|---|---|---|
 |`spec:`| | The spec loaded via `OpenapiFirst.load` ||
 | `raise_error:` |`false`, `true` | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description. | `false` (don't raise an exception)
+| `not_found:` | `:continue`, `:halt`| If set to `:continue` the middleware will not return 404 (405, 415), but just pass handling the request to the next middleware or application in the Rack stack. If combined with `raise_error: true` `raise_error` gets preference and an exception is raised. | `:halt` (return 4xx response)
 
 ## OpenapiFirst::RequestValidation
 

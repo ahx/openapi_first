@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.12.5
+- Add `not_found: :continue` option to Router to make it do nothing if request is unknown
+
 ## 0.12.4
 - content-type is found while ignoring additional content-type parameters (`application/json` is found when request/response content-type is `application/json; charset=UTF8`)
 - Support wildcard mime-types when finding the content-type
