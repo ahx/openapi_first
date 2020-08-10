@@ -10,11 +10,13 @@ module OpenapiFirst
       app,
       spec:,
       raise_error: false,
+      not_found: :halt,
       parent_app: nil
     )
       @app = app
       @parent_app = parent_app
       @raise = raise_error
+      @not_found = not_found
       @filepath = spec.filepath
       @router = build_router(spec.operations)
     end
@@ -23,9 +25,11 @@ module OpenapiFirst
       env[OPERATION] = nil
       response = call_router(env)
       if env[OPERATION].nil?
-        return @parent_app.call(env) if @parent_app # This should only happen if used via OpenapiFirst.middlware
+        return @parent_app.call(env) if @parent_app # This should only happen if used via OpenapiFirst.middleware
 
         raise_error(env) if @raise
+
+        return @app.call(env) if @not_found == :continue
       end
       response
     end
