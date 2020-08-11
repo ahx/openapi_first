@@ -253,6 +253,15 @@ RSpec.describe OpenapiFirst::Operation do
     let(:spec) { OpenapiFirst.load('./spec/data/content-types.yaml') }
     let(:operation) { spec.operations[1] }
 
+    it 'returns the JSON schema' do
+      schema = operation.request_body_schema_for('application/json')
+      expected_schema = {
+        'title' => 'Without parameter',
+        'type' => 'object'
+      }
+      expect(schema).to eq expected_schema
+    end
+
     it 'finds an exact match without parameter' do
       schema = operation.request_body_schema_for('application/json')
       expect(schema['title']).to eq 'Without parameter'
@@ -276,6 +285,23 @@ RSpec.describe OpenapiFirst::Operation do
     it 'finds */* wildcard matcher' do
       schema = operation.request_body_schema_for('application/xml')
       expect(schema['title']).to eq 'Accept everything'
+    end
+
+    describe 'when a field is readOnly' do
+      let(:spec) { OpenapiFirst.load('./spec/data/readonly.yaml') }
+      let(:operation) { spec.operations[0] }
+
+      it 'removes the field from the schema' do
+        schema = operation.request_body_schema_for('application/json')
+        expected_schema = {
+          'type' => 'object',
+          'required' => ['name'],
+          'properties' => {
+            'name' => { 'type' => 'string' }
+          }
+        }
+        expect(schema).to eq expected_schema
+      end
     end
   end
 

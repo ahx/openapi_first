@@ -5,14 +5,11 @@ require_relative 'operation'
 module OpenapiFirst
   class Definition
     attr_reader :filepath
+    attr_reader :operations
 
     def initialize(parsed)
       @filepath = parsed.path
-      @spec = parsed
-    end
-
-    def operations
-      @spec.endpoints.map { |e| Operation.new(e) }
+      @operations = parsed.endpoints.map { |e| Operation.new(e) }
     end
   end
 end
