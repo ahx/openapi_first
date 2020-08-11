@@ -59,7 +59,6 @@ module OpenapiFirst
         normalized_path = operation.path.gsub('{', ':').gsub('}', '')
         if operation.operation_id.nil?
           warn "operationId is missing in '#{operation.method} #{operation.path}'. I am ignoring this operation."
-          next
         end
         router.public_send(
           operation.method,
