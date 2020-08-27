@@ -141,7 +141,7 @@ module OpenapiFirst
 
     def serialize_query_parameter_errors(validation_errors)
       validation_errors.map do |error|
-        pointer = error['data_pointer'][1..]
+        pointer = error['data_pointer'][1..].to_s
         {
           source: { parameter: pointer }
         }.update(ValidationFormat.error_details(error))

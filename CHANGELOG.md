@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.13.1
+## 0.13.2
 - Return indicator (`source: { parameter: 'list/1' }`) in error response body when array item in query parameter is invalid
 
 ## 0.13.0

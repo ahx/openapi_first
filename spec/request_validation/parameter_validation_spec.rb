@@ -63,6 +63,7 @@ RSpec.describe 'Parameter validation' do
       expect(last_response.status).to eq 400
       error = response_body[:errors][0]
       expect(error[:title]).to eq 'is missing required properties: term'
+      expect(error[:source][:parameter]).to eq ''
     end
 
     it 'returns 400 if query parameter is not valid' do
