@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.13.1
+- Return indicator (`source: { parameter: 'list/1' }`) in error response body when array item in query parameter is invalid
+
 ## 0.13.0
 - Add support for arrays in query parameters (style: form, explode: false)
 - Remove warning when handler is not implemented
