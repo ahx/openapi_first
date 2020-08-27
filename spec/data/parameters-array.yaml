@@ -28,6 +28,14 @@ paths:
             maxItems: 4
             items:
               type: integer
+        - name: nested[integers]
+          in: query
+          required: false
+          schema:
+            type: array
+            maxItems: 4
+            items:
+              type: integer
       responses:
         "200":
           description: ok

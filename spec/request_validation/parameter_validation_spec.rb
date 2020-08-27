@@ -135,6 +135,23 @@ RSpec.describe 'Parameter validation' do
           expect(parsed_parameters[:integers]).to eq [2, 3, 4]
         end
 
+        it 'parses nested array' do
+          params = {
+            nested: { integers: '2,3,4' }
+          }
+          get '/default-style', params
+          expect(last_response.status).to eq(200), last_response.body
+          parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
+          expect(parsed_parameters[:nested][:integers]).to eq [2, 3, 4]
+        end
+
+        it 'ignores empty query params' do
+          get '/default-style'
+          expect(last_response.status).to eq(200), last_response.body
+          parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
+          expect(parsed_parameters[:strings]).to be_nil
+        end
+
         it 'returns 400 if array maxItems is exceeded' do
           params = {
             integers: '2,3,4,5,6'
