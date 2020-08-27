@@ -9,10 +9,8 @@ module OpenapiFirst
       @handlers = spec.operations.each_with_object({}) do |operation, hash|
         operation_id = operation.operation_id
         handler = find_handler(operation_id)
-        if handler.nil?
-          warn "OpenapiFirst: No handler for '#{operation.operation_id}' (#{operation.method} #{operation.path}) is implemented in '#{@namespace}'. This operation will be ignored." # rubocop:disable Layout/LineLength
-          next
-        end
+        next if handler.nil?
+
         hash[operation_id] = handler
       end
     end
