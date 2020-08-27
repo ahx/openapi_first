@@ -10,7 +10,7 @@ module OpenapiFirst
         operation_id = operation.operation_id
         handler = find_handler(operation_id)
         if handler.nil?
-          warn "#{self.class.name} cannot not find handler for '#{operation.operation_id}' (#{operation.method} #{operation.path}). This operation will be ignored." # rubocop:disable Layout/LineLength
+          warn "OpenapiFirst: No handler for '#{operation.operation_id}' (#{operation.method} #{operation.path}) is implemented in '#{@namespace}'. This operation will be ignored." # rubocop:disable Layout/LineLength
           next
         end
         hash[operation_id] = handler
