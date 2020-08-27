@@ -119,6 +119,32 @@ RSpec.describe 'Parameter validation' do
       expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq params
     end
 
+    describe 'with array query parameters' do
+      let(:spec) { OpenapiFirst.load('./spec/data/parameters-array.yaml') }
+
+      describe 'with form style no explode parameters (default)' do
+        it 'parses the array' do
+          params = {
+            strings: 'a,b,c',
+            integers: '2,3,4'
+          }
+          get '/default-style', params
+          expect(last_response.status).to eq(200), last_response.body
+          parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
+          expect(parsed_parameters[:strings]).to eq %w[a b c]
+          expect(parsed_parameters[:integers]).to eq [2, 3, 4]
+        end
+
+        it 'returns 400 if array maxItems is exceeded' do
+          params = {
+            integers: '2,3,4,5,6'
+          }
+          get '/default-style', params
+          expect(last_response.status).to eq(400), last_response.body
+        end
+      end
+    end
+
     describe 'with nested[param]' do
       let(:spec) { OpenapiFirst.load('./spec/data/parameters-flat.yaml') }
 

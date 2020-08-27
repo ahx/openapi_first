@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Add support for arrays in query parameters (form style, explode: false only)
+
 ## 0.12.5
 - Add `not_found: :continue` option to Router to make it do nothing if request is unknown
 

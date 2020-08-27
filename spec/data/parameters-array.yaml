@@ -1,0 +1,33 @@
+openapi: "3.0.2"
+info:
+  version: 1.0.0
+servers:
+  - url: http://example.com
+tags:
+  - name: search
+    description: Search
+paths:
+  /default-style:
+    get:
+      summary: Get some info
+      operationId: info
+      parameters:
+        - name: strings
+          in: query
+          required: false
+          schema:
+            type: array
+            maxItems: 4
+            items:
+              type: string
+        - name: integers
+          in: query
+          required: false
+          schema:
+            type: array
+            maxItems: 4
+            items:
+              type: integer
+      responses:
+        "200":
+          description: ok
