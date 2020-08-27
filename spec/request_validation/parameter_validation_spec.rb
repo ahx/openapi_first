@@ -142,6 +142,17 @@ RSpec.describe 'Parameter validation' do
           get '/default-style', params
           expect(last_response.status).to eq(400), last_response.body
         end
+
+        it 'returns 400 if array item is invalid' do
+          params = {
+            integers: '2,foo,4'
+          }
+          get '/default-style', params
+          expect(last_response.status).to eq(400)
+          error = response_body[:errors][0]
+          expect(error[:source][:parameter]).to eq 'integers/1'
+          expect(error[:title]).to eq 'should be a integer'
+        end
       end
     end
 
