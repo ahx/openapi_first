@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    openapi_first (0.12.5)
+    openapi_first (0.13.0)
       deep_merge (>= 1.2.1)
       hanami-router (~> 2.0.alpha3)
       hanami-utils (~> 2.0.alpha1)
@@ -25,11 +25,11 @@ GEM
     benchmark-memory (0.1.2)
       memory_profiler (~> 0.9)
     builder (3.2.4)
-    committee (4.1.0)
+    committee (4.2.0)
       json_schema (~> 0.14, >= 0.14.3)
       openapi_parser (>= 0.11.1)
       rack (>= 1.5)
-    concurrent-ruby (1.1.6)
+    concurrent-ruby (1.1.7)
     deep_merge (1.2.1)
     dry-configurable (0.11.6)
       concurrent-ruby (~> 1.0)
@@ -42,7 +42,7 @@ GEM
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.3.0)
     dry-inflector (0.2.0)
-    dry-logic (1.0.6)
+    dry-logic (1.0.7)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.2)
       dry-equalizer (~> 0.2)
@@ -72,7 +72,7 @@ GEM
       transproc (~> 1.0)
     hansi (0.2.0)
     hash-deep-merge (0.1.1)
-    i18n (1.8.4)
+    i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     json_schema (0.20.9)
     json_schemer (0.2.13)
@@ -101,7 +101,7 @@ GEM
       hash-deep-merge
       mustermann-contrib (~> 1.1.1)
       nokogiri
-    openapi_parser (0.11.2)
+    openapi_parser (0.12.1)
     public_suffix (4.0.5)
     rack (2.2.3)
     rack-accept (0.4.5)

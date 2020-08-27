@@ -79,7 +79,12 @@ This middleware adds `env[OpenapiFirst::INBOX]` which holds the (filtered) path 
 ### Parameter validation
 
 The middleware filteres all top-level query parameters and paths parameters and tries to convert numeric values. Meaning, if you have an `:something_id` path with `type: integer`, it will try convert the value to an integer.
-Note that is currently does not convert date, date-time or time formats and that conversion is currently done only for path and query parameters, but not for the request body. It just works with a parameter with `name: filter[age]`.
+
+It just works with a parameter with `name: filter[age]`.
+
+OpenapiFirst also supports `type: array` for query parameters and will convert `items` just as described above. [`style`](http://spec.openapis.org/oas/v3.0.3#style-values) and `explode` attributes are not supported for query parameters. It will always act as if `style: form` and `explode: false` were used for query parameters.
+
+Conversion is currently done only for path and query parameters, but not for the request body. OpenapiFirst currently does not convert date, date-time or time formats.
 
 If you want to forbid _nested_ query parameters you will need to use [`additionalProperties: false`](https://json-schema.org/understanding-json-schema/reference/object.html#properties) in your query parameter JSON schema.
 
