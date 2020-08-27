@@ -150,14 +150,27 @@ module OpenapiFirst
     def parse_parameter(value, schema)
       return filtered_params(schema, value) if schema['properties']
 
+      return parse_array_parameter(value, schema) if schema['type'] == 'array'
+
+      parse_simple_value(value, schema)
+    end
+
+    def parse_array_parameter(value, schema)
+      array = value.is_a?(Array) ? value : value.split(',')
+      return array unless schema['items']
+
+      array.map! { |e| parse_simple_value(e, schema['items']) }
+    end
+
+    def parse_simple_value(value, schema)
+      return to_boolean(value) if schema['type'] == 'boolean'
+
       begin
         return Integer(value, 10) if schema['type'] == 'integer'
         return Float(value) if schema['type'] == 'number'
       rescue ArgumentError
         value
       end
-      return to_boolean(value) if schema['type'] == 'boolean'
-
       value
     end
 
