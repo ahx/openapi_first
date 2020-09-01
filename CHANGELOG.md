@@ -22,7 +22,7 @@
 
 ## 0.12.1
 - Fix response when handler returns 404 or 405
-- Don't validate the response content if status is 205 (no content)
+- Don't validate the response content if status is 204 (no content)
 
 ## 0.12.0
 - Change `ResponseValidator` to raise an exception if it found a problem
