@@ -199,6 +199,12 @@ RSpec.describe 'Parameter validation' do
 
         expect(last_response.status).to eq 200
       end
+
+      it 'works with URL encoded query parameter names' do
+        get "#{path}?filter%5Btag%5D=dogs&filter%5Bid%5D=1&term=foo"
+
+        expect(last_response.status).to eq(200), last_response.body
+      end
     end
 
     describe 'if raise_error: true' do
