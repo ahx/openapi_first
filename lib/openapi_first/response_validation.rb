@@ -41,7 +41,8 @@ module OpenapiFirst
       full_body = +''
       response.each { |chunk| full_body << chunk }
       data = full_body.empty? ? {} : load_json(full_body)
-      errors = JSONSchemer.schema(schema).validate(data).to_a.map do |error|
+      errors = schema.validate(data)
+      errors = errors.to_a.map! do |error|
         error_message_for(error)
       end
       raise ResponseBodyInvalidError, errors.join(', ') if errors.any?

@@ -45,11 +45,11 @@ module OpenapiFirst
       validate_request_body_presence!(body, operation)
       return if body.empty?
 
-      schema = request_body_schema(content_type, operation)
+      schema = operation&.request_body_schema(content_type)
       return unless schema
 
       parsed_request_body = parse_request_body!(body)
-      errors = validate_json_schema(schema, parsed_request_body)
+      errors = schema.validate(parsed_request_body)
       halt_with_error(400, serialize_request_body_errors(errors)) if errors.any?
       env[INBOX].merge! env[REQUEST_BODY] = Utils.deep_symbolize(parsed_request_body)
     end
@@ -74,10 +74,6 @@ module OpenapiFirst
       halt_with_error(415, 'Request body is required')
     end
 
-    def validate_json_schema(schema, object)
-      schema.validate(object)
-    end
-
     def default_error(status, title = Rack::Utils::HTTP_STATUS_CODES[status])
       {
         status: status.to_s,
@@ -95,25 +91,6 @@ module OpenapiFirst
       ).finish
     end
 
-    SKIP_READ_ONLY = lambda do |data, property, property_schema, schema|
-      return unless property_schema['readOnly']
-
-      schema['required']&.delete(property)
-      data.delete(property) if data.key?(property) && property_schema.is_a?(Hash)
-    end
-
-    def request_body_schema(content_type, operation)
-      return unless operation
-
-      schema = operation.request_body_schema_for(content_type)
-      return unless schema
-
-      JSONSchemer.schema(
-        schema,
-        before_property_validation: operation.write? ? [SKIP_READ_ONLY] : nil
-      )
-    end
-
     def serialize_request_body_errors(validation_errors)
       validation_errors.map do |error|
         {
@@ -125,14 +102,11 @@ module OpenapiFirst
     end
 
     def validate_query_parameters!(env, operation, params)
-      json_schema = operation.parameters_json_schema
-      return unless json_schema
+      schema = operation.parameters_schema
+      return unless schema
 
-      params = filtered_params(json_schema, params)
-      errors = validate_json_schema(
-        operation.parameters_schema,
-        Utils.deep_stringify(params)
-      )
+      params = filtered_params(schema.raw_schema, params)
+      errors = schema.validate(Utils.deep_stringify(params))
       halt_with_error(400, serialize_query_parameter_errors(errors)) if errors.any?
       env[PARAMETERS] = params
       env[INBOX].merge! params
