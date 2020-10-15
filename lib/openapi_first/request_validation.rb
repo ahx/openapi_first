@@ -51,11 +51,11 @@ module OpenapiFirst
       parsed_request_body = parse_request_body!(body)
       errors = validate_json_schema(schema, parsed_request_body)
       halt_with_error(400, serialize_request_body_errors(errors)) if errors.any?
-      env[INBOX].merge! env[REQUEST_BODY] = parsed_request_body
+      env[INBOX].merge! env[REQUEST_BODY] = Utils.deep_symbolize(parsed_request_body)
     end
 
     def parse_request_body!(body)
-      MultiJson.load(body, symbolize_keys: true)
+      MultiJson.load(body)
     rescue MultiJson::ParseError => e
       err = { title: 'Failed to parse body as JSON' }
       err[:detail] = e.cause unless ENV['RACK_ENV'] == 'production'
@@ -75,7 +75,7 @@ module OpenapiFirst
     end
 
     def validate_json_schema(schema, object)
-      schema.validate(Utils.deep_stringify(object))
+      schema.validate(object)
     end
 
     def default_error(status, title = Rack::Utils::HTTP_STATUS_CODES[status])
@@ -95,12 +95,23 @@ module OpenapiFirst
       ).finish
     end
 
+    SKIP_READ_ONLY = lambda do |data, property, property_schema, schema|
+      return unless property_schema['readOnly']
+
+      schema['required']&.delete(property)
+      data.delete(property) if data.key?(property) && property_schema.is_a?(Hash)
+    end
+
     def request_body_schema(content_type, operation)
       return unless operation
 
       schema = operation.request_body_schema_for(content_type)
+      return unless schema
 
-      JSONSchemer.schema(schema) if schema
+      JSONSchemer.schema(
+        schema,
+        before_property_validation: operation.write? ? [SKIP_READ_ONLY] : nil
+      )
     end
 
     def serialize_request_body_errors(validation_errors)
@@ -120,7 +131,7 @@ module OpenapiFirst
       params = filtered_params(json_schema, params)
       errors = validate_json_schema(
         operation.parameters_schema,
-        params
+        Utils.deep_stringify(params)
       )
       halt_with_error(400, serialize_query_parameter_errors(errors)) if errors.any?
       env[PARAMETERS] = params

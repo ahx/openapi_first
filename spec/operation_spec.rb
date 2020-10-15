@@ -286,23 +286,6 @@ RSpec.describe OpenapiFirst::Operation do
       schema = operation.request_body_schema_for('application/xml')
       expect(schema['title']).to eq 'Accept everything'
     end
-
-    describe 'when a field is readOnly' do
-      let(:spec) { OpenapiFirst.load('./spec/data/readonly.yaml') }
-      let(:operation) { spec.operations[0] }
-
-      it 'removes the field from the schema' do
-        schema = operation.request_body_schema_for('application/json')
-        expected_schema = {
-          'type' => 'object',
-          'required' => ['name'],
-          'properties' => {
-            'name' => { 'type' => 'string' }
-          }
-        }
-        expect(schema).to eq expected_schema
-      end
-    end
   end
 
   describe '#response_for' do

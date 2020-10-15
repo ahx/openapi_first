@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'hanami/utils/string'
+require 'hanami/utils/hash'
 require 'deep_merge/core'
 
 module OpenapiFirst
@@ -17,20 +18,12 @@ module OpenapiFirst
       Hanami::Utils::String.classify(string)
     end
 
-    def self.deep_stringify(params) # rubocop:disable Metrics/MethodLength
-      params.each_with_object({}) do |(key, value), output|
-        output[key.to_s] =
-          case value
-          when ::Hash
-            deep_stringify(value)
-          when Array
-            value.map do |item|
-              item.is_a?(::Hash) ? deep_stringify(item) : item
-            end
-          else
-            value
-          end
-      end
+    def self.deep_symbolize(hash)
+      Hanami::Utils::Hash.deep_symbolize(hash)
+    end
+
+    def self.deep_stringify(hash)
+      Hanami::Utils::Hash.deep_stringify(hash)
     end
   end
 end

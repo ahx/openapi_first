@@ -4,8 +4,7 @@ require_relative 'operation'
 
 module OpenapiFirst
   class Definition
-    attr_reader :filepath
-    attr_reader :operations
+    attr_reader :filepath, :operations
 
     def initialize(parsed)
       @filepath = parsed.path
