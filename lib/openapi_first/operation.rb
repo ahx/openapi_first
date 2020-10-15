@@ -2,6 +2,7 @@
 
 require 'forwardable'
 require 'json_schemer'
+require_relative 'schema_validation'
 require_relative 'utils'
 require_relative 'response_object'
 
@@ -14,6 +15,9 @@ module OpenapiFirst
                    :request_body,
                    :operation_id
 
+    WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
+    private_constant :WRITE_METHODS
+
     def initialize(parsed)
       @operation = parsed
     end
@@ -22,12 +26,19 @@ module OpenapiFirst
       @operation.path.path
     end
 
-    def parameters_json_schema
-      @parameters_json_schema ||= build_parameters_json_schema
+    def read?
+      !write?
+    end
+
+    def write?
+      WRITE_METHODS.include?(method)
     end
 
     def parameters_schema
-      @parameters_schema ||= parameters_json_schema && JSONSchemer.schema(parameters_json_schema)
+      @parameters_schema ||= begin
+        parameters_json_schema = build_parameters_json_schema
+        parameters_json_schema && SchemaValidation.new(parameters_json_schema)
+      end
     end
 
     def content_type_for(status)
@@ -46,13 +57,17 @@ module OpenapiFirst
         message = "Response content type not found '#{content_type}' for '#{name}'"
         raise ResponseContentTypeNotFoundError, message
       end
-      media_type['schema']
+      schema = media_type['schema']
+      SchemaValidation.new(schema, write: write?) if schema
     end
 
-    def request_body_schema_for(request_content_type)
+    def request_body_schema(request_content_type)
       content = @operation.request_body.content
       media_type = find_content_for_content_type(content, request_content_type)
-      media_type&.fetch('schema', nil)
+      schema = media_type&.fetch('schema', nil)
+      return unless schema
+
+      SchemaValidation.new(schema, write: write?)
     end
 
     def response_for(status)

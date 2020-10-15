@@ -150,6 +150,32 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
+  describe 'with a readOnly required field' do
+    let(:spec) { OpenapiFirst.load('./spec/data/readonly.yaml') }
+
+    let(:response_body) do
+      json_dump({ name: 'hans' })
+    end
+
+    it 'raises an error if the readOnly field is missing' do
+      message = 'is missing required properties: id '
+      expect do
+        get '/test/42'
+      end.to raise_error OpenapiFirst::ResponseBodyInvalidError, message
+    end
+
+    describe 'when the readOnly field is valid' do
+      let(:response_body) do
+        json_dump({ id: '42', name: 'hans' })
+      end
+
+      it 'does not raise an error' do
+        get '/test/42'
+        expect(last_response.status).to eq 200
+      end
+    end
+  end
+
   describe 'unknown content-type' do
   end
 end

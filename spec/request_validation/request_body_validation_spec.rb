@@ -149,6 +149,41 @@ RSpec.describe 'Request body validation' do
       end
     end
 
+    describe 'with a readOnly required field' do
+      let(:app) do
+        Rack::Builder.new do
+          spec = OpenapiFirst.load('./spec/data/readonly.yaml')
+          use OpenapiFirst::Router, spec: spec, raise_error: true
+          use OpenapiFirst::RequestValidation, raise_error: true
+          run lambda { |_env|
+            Rack::Response.new('hello', 200).finish
+          }
+        end
+      end
+
+      it 'skips validation of required readOnly fields for write requests' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        request_body = {
+          name: 'foo'
+        }
+        post '/test', json_dump(request_body)
+        expect(last_response.status).to be 200
+      end
+
+      it 'removes readOnly fields from request bodies for write requests' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        request_body = {
+          id: 'ignoreme',
+          name: 'foo'
+        }
+        post '/test', json_dump(request_body)
+
+        expect(last_response.status).to be 200
+        expected_req_body = { name: 'foo' }
+        expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq expected_req_body
+      end
+    end
+
     describe 'raise_error: true' do
       let(:raise_error_option) { true }
 

@@ -95,6 +95,9 @@ _OpenapiFirst always treats query parameters like [`style: deepObject`](https://
 The middleware will return a status `415` if the requests content type does not match or `400` if the request body is invalid.
 This will also add the parsed request body to `env[OpenapiFirst::REQUEST_BODY]`.
 
+#### readOnly attributes
+Properties marked with `readOnly: true` are ignored for all write requests (POST, PUT, PATCH, DELETE) and are removed from the request body.
+
 ### Header, Cookie, Path parameter validation
 
 tbd.
