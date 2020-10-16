@@ -150,7 +150,25 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'with a readOnly required field' do
+  describe 'with a writeOnly field' do
+    let(:spec) { OpenapiFirst.load('./spec/data/writeonly.yaml') }
+    let(:status) { 201 }
+
+    context 'when field is sent in the response body' do
+      let(:response_body) do
+        json_dump({ name: 'hans', password: 'admin' })
+      end
+
+      it 'raises an error' do
+        message = "write-only field 'password' appears in response body!"
+        expect do
+          post '/test', json_dump({ name: 'hans', password: 'admin' })
+        end.to raise_error OpenapiFirst::ResponseBodyInvalidError, message
+      end
+    end
+  end
+
+  describe 'with a required readOnly field' do
     let(:spec) { OpenapiFirst.load('./spec/data/readonly.yaml') }
 
     let(:response_body) do
