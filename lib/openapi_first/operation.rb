@@ -58,7 +58,7 @@ module OpenapiFirst
         raise ResponseContentTypeNotFoundError, message
       end
       schema = media_type['schema']
-      SchemaValidation.new(schema, write: write?) if schema
+      SchemaValidation.new(schema, write: false) if schema
     end
 
     def request_body_schema(request_content_type)

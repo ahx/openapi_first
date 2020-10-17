@@ -149,6 +149,31 @@ RSpec.describe 'Request body validation' do
       end
     end
 
+    describe 'with a required writeOnly field' do
+      let(:app) do
+        Rack::Builder.new do
+          spec = OpenapiFirst.load('./spec/data/writeonly.yaml')
+          use OpenapiFirst::Router, spec: spec, raise_error: true
+          use OpenapiFirst::RequestValidation
+          run lambda { |_env|
+            Rack::Response.new('hello', 201).finish
+          }
+        end
+      end
+
+      it 'returns 400 if field is missing' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        post '/test', json_dump({ name: 'Gunda' })
+        expect(last_response.status).to eq(400), last_response.body
+      end
+
+      it 'passes validation if field in request body is valid' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        post '/test', json_dump({ name: 'Gunda', password: 'admin' })
+        expect(last_response.status).to eq(201), last_response.body
+      end
+    end
+
     describe 'with a readOnly required field' do
       let(:app) do
         Rack::Builder.new do

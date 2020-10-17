@@ -1,0 +1,34 @@
+openapi: '3.0.2'
+info:
+  title: API Title
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /test:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Test'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Test'
+components:
+  schemas:
+    Test:
+      type: object
+      required:
+        - password
+        - name
+      properties:
+        password:
+          type: string
+          writeOnly: true
+        name:
+          type: string
