@@ -160,7 +160,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       end
 
       it 'raises an error' do
-        message = "write-only field 'password' appears in response body!"
+        message = 'write-only field appears in response: /password'
         expect do
           post '/test', json_dump({ name: 'hans', password: 'admin' })
         end.to raise_error OpenapiFirst::ResponseBodyInvalidError, message

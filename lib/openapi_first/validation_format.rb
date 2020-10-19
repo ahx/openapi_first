@@ -6,6 +6,7 @@ module OpenapiFirst
 
     # rubocop:disable Metrics/MethodLength
     # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.error_details(error)
       if error['type'] == 'pattern'
         {
@@ -16,6 +17,14 @@ module OpenapiFirst
         missing_keys = error['details']['missing_keys']
         {
           title: "is missing required properties: #{missing_keys.join(', ')}"
+        }
+      elsif error['type'] == 'readOnly'
+        {
+          title: 'appears in request, but is read-only'
+        }
+      elsif error['type'] == 'writeOnly'
+        {
+          title: 'write-only field appears in response:'
         }
       elsif SIMPLE_TYPES.include?(error['type'])
         {
@@ -29,5 +38,6 @@ module OpenapiFirst
     end
     # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/PerceivedComplexity
   end
 end

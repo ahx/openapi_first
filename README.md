@@ -101,9 +101,9 @@ tbd.
 
 ### readOnly / writeOnly properties
 
-Properties marked with `readOnly: true` are _ignored_ in all write requests (POST, PUT, PATCH, DELETE) during request validation and are removed from the request body.
+Request validation fails if request includes a property with `readOnly: true`.
 
-Properties marked with `writeOnly: true` are must not appear in response bodies and an error is raised during response validation if they do.
+Response validation fails if response body includes a property with `writeOnly: true`.
 
 ## OpenapiFirst::Responder
 
