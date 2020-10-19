@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Support nullable: true
 - Request validation fails if request includes a property with `readOnly: true`
 - Response validation fails if response body includes a property with `writeOnly: true`
 

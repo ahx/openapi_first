@@ -198,6 +198,35 @@ RSpec.describe 'Request body validation' do
       end
     end
 
+    describe 'with a required nullable field' do
+      let(:app) do
+        Rack::Builder.new do
+          spec = OpenapiFirst.load('./spec/data/nullable.yaml')
+          use OpenapiFirst::Router, spec: spec, raise_error: true
+          use OpenapiFirst::RequestValidation, raise_error: true
+          run lambda { |_env|
+            Rack::Response.new('hello', 201).finish
+          }
+        end
+      end
+
+      it 'fails if field is missing' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        expect do
+          post '/test', json_dump({})
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: is missing required properties: name' # rubocop:disable Layout/LineLength
+      end
+
+      it 'succeeds if field is nil' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        request_body = {
+          name: nil
+        }
+        post '/test', json_dump(request_body)
+        expect(last_response.status).to eq 201
+      end
+    end
+
     describe 'raise_error: true' do
       let(:raise_error_option) { true }
 

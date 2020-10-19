@@ -193,4 +193,32 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       end
     end
   end
+
+  describe 'with a required nullable field' do
+    let(:spec) { OpenapiFirst.load('./spec/data/nullable.yaml') }
+
+    describe 'when the field is missing' do
+      let(:response_body) do
+        json_dump({})
+      end
+
+      it 'raises an error' do
+        message = 'is missing required properties: name '
+        expect do
+          get '/test'
+        end.to raise_error OpenapiFirst::ResponseBodyInvalidError, message
+      end
+    end
+
+    describe 'when the field is nil' do
+      let(:response_body) do
+        json_dump({ name: nil })
+      end
+
+      it 'does not raise an error' do
+        get '/test'
+        expect(last_response.status).to eq 200
+      end
+    end
+  end
 end
