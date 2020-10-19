@@ -186,26 +186,15 @@ RSpec.describe 'Request body validation' do
         end
       end
 
-      it 'skips validation of required readOnly fields for write requests' do
+      it 'fails if request includes readOnly field' do
         header Rack::CONTENT_TYPE, 'application/json'
         request_body = {
-          name: 'foo'
+          name: 'foo',
+          id: '123'
         }
-        post '/test', json_dump(request_body)
-        expect(last_response.status).to be 200
-      end
-
-      it 'removes readOnly fields from request bodies for write requests' do
-        header Rack::CONTENT_TYPE, 'application/json'
-        request_body = {
-          id: 'ignoreme',
-          name: 'foo'
-        }
-        post '/test', json_dump(request_body)
-
-        expect(last_response.status).to be 200
-        expected_req_body = { name: 'foo' }
-        expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq expected_req_body
+        expect do
+          post '/test', json_dump(request_body)
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: /id appears in request, but is read-only' # rubocop:disable Layout/LineLength
       end
     end
 

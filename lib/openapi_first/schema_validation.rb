@@ -9,36 +9,17 @@ module OpenapiFirst
 
     def initialize(schema, write: true)
       @raw_schema = schema
-      before_validation_hooks = []
-      before_validation_hooks << SKIP_READ_ONLY if write
-      before_validation_hooks << RAISE_WRITE_ONLY unless write
+      custom_keywords = {}
+      custom_keywords['writeOnly'] = proc { |data| !data } unless write
+      custom_keywords['readOnly'] = proc { |data| !data } if write
       @schemer = JSONSchemer.schema(
         schema,
-        before_property_validation: before_validation_hooks
+        keywords: custom_keywords
       )
     end
 
     def validate(input)
       @schemer.validate(input)
     end
-
-    SKIP_READ_ONLY = lambda do |data, property, property_schema, schema|
-      return unless property_schema['readOnly']
-
-      schema['required']&.delete(property)
-      data.delete(property) if data.key?(property) && property_schema.is_a?(Hash)
-    end
-    private_constant :SKIP_READ_ONLY
-
-    RAISE_WRITE_ONLY = lambda do |data, property, property_schema, schema|
-      if property_schema['writeOnly']
-        schema['required']&.delete(property)
-        if data.key?(property)
-          message = "write-only field '#{property}' appears in response body!"
-          raise OpenapiFirst::ResponseBodyInvalidError, message
-        end
-      end
-    end
-    private_constant :RAISE_WRITE_ONLY
   end
 end

@@ -1,8 +1,8 @@
 # Changelog
 
 ## Unreleased
-- Properties with `readOnly: true` are remove from request bodies during request validation.
-- An error is raised if response body includes a property with `writeOnly: true`.
+- Request validation fails if request includes a property with `readOnly: true`
+- Response validation fails if response body includes a property with `writeOnly: true`
 
 ## 0.13.2
 - Return indicator (`source: { parameter: 'list/1' }`) in error response body when array item in query parameter is invalid
