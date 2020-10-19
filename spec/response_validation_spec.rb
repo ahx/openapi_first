@@ -193,7 +193,4 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       end
     end
   end
-
-  describe 'unknown content-type' do
-  end
 end
