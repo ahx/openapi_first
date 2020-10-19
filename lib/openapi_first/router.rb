@@ -53,7 +53,7 @@ module OpenapiFirst
       env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH) if env[ORIGINAL_PATH]
     end
 
-    def build_router(operations) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    def build_router(operations) # rubocop:disable Metrics/AbcSize
       router = Hanami::Router.new {}
       operations.each do |operation|
         normalized_path = operation.path.gsub('{', ':').gsub('}', '')
