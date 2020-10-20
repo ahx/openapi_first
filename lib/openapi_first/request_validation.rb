@@ -16,7 +16,7 @@ module OpenapiFirst
       @raise = raise_error
     end
 
-    def call(env) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    def call(env) # rubocop:disable Metrics/AbcSize
       operation = env[OpenapiFirst::OPERATION]
       return @app.call(env) unless operation
 

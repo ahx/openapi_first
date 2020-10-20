@@ -99,7 +99,7 @@ module OpenapiFirst
       end
     end
 
-    def generate_schema(schema, params, parameter) # rubocop:disable Metrics/MethodLength
+    def generate_schema(schema, params, parameter)
       required = Set.new(schema['required'])
       params.each do |key, value|
         required << key if parameter.required

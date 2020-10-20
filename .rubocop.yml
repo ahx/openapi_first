@@ -8,6 +8,8 @@ Metrics/BlockLength:
   Exclude:
   - 'spec/**/*.rb'
   - '*.gemspec'
+Metrics/MethodLength:
+  Max: 20
 Layout/EmptyLinesAroundAttributeAccessor:
   Enabled: true
 Layout/SpaceAroundMethodCallOperator:
