@@ -32,6 +32,8 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
   spec.require_paths = ['lib']
 
+  spec.required_ruby_version = '>= 2.6.0'
+
   spec.add_runtime_dependency 'deep_merge', '>= 1.2.1'
   spec.add_runtime_dependency 'hanami-router', '~> 2.0.alpha3'
   spec.add_runtime_dependency 'hanami-utils', '~> 2.0.alpha1'
