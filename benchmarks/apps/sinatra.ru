@@ -13,7 +13,7 @@ class SinatraExample < Sinatra::Base
 
   get '/hello' do
     content_type :json
-    [MultiJson.dump(hello: 'world')]
+    MultiJson.dump([{ hello: 'world' }])
   end
 
   post '/hello' do
