@@ -6,7 +6,6 @@ module OpenapiFirst
 
     # rubocop:disable Metrics/MethodLength
     # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/PerceivedComplexity
     def self.error_details(error)
       if error['type'] == 'pattern'
         {
@@ -38,6 +37,5 @@ module OpenapiFirst
     end
     # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metrics/PerceivedComplexity
   end
 end
