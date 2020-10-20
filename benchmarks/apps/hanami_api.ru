@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'multi_json'
-require 'committee'
 require 'hanami/api'
 
 app = Class.new(Hanami::API) do
@@ -18,7 +17,5 @@ app = Class.new(Hanami::API) do
     json(hello: 'world')
   end
 end.new
-
-use Committee::Middleware::RequestValidation, schema_path: './apps/openapi.yaml'
 
 run app
