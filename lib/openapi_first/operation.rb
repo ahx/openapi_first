@@ -11,15 +11,16 @@ module OpenapiFirst
     extend Forwardable
     def_delegators :@operation,
                    :parameters,
-                   :method,
                    :request_body,
                    :operation_id
 
-    WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
+    WRITE_METHODS = Set.new(%w[POST PUT PATCH DELETE]).freeze
     private_constant :WRITE_METHODS
+    attr_reader :request_method
 
     def initialize(parsed)
       @operation = parsed
+      @request_method = parsed.method.upcase
     end
 
     def path
@@ -31,7 +32,7 @@ module OpenapiFirst
     end
 
     def write?
-      WRITE_METHODS.include?(method)
+      WRITE_METHODS.include?(request_method)
     end
 
     def parameters_schema
@@ -78,7 +79,7 @@ module OpenapiFirst
     end
 
     def name
-      "#{method.upcase} #{path} (#{operation_id})"
+      "#{request_method} #{path} (#{operation_id})"
     end
 
     private

@@ -22,7 +22,7 @@ module OpenapiFirst
     private
 
     def endpoint_id(operation)
-      "#{operation.path}##{operation.method}"
+      "#{operation.path}##{operation.request_method.downcase}"
     end
   end
 end

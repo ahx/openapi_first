@@ -40,7 +40,7 @@ module OpenapiFirst
 
     def raise_error(env)
       req = Rack::Request.new(env)
-      msg = "Could not find definition for #{req.request_method} '#{req.path}' in API description #{@filepath}"
+      msg = "Could not find definition for #{req.request_method.upcase} '#{req.path}' in API description #{@filepath}"
       raise NotFoundError, msg
     end
 
@@ -58,10 +58,10 @@ module OpenapiFirst
       operations.each do |operation|
         normalized_path = operation.path.gsub('{', ':').gsub('}', '')
         if operation.operation_id.nil?
-          warn "operationId is missing in '#{operation.method} #{operation.path}'. I am ignoring this operation."
+          warn "operationId is missing in '#{operation.request_method} #{operation.path}'. I am ignoring this operation." # rubocop:disable Layout/LineLength
         end
         router.public_send(
-          operation.method,
+          operation.request_method.downcase,
           normalized_path,
           to: lambda do |env|
             env[OPERATION] = operation

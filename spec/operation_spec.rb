@@ -20,9 +20,23 @@ RSpec.describe OpenapiFirst::Operation do
     end
   end
 
+  describe '#request_method' do
+    it 'returns a capitalized request method' do
+      operation = spec.operations.first
+      expect(operation.request_method).to eq 'GET'
+    end
+  end
+
+  describe '#path' do
+    it 'returns the path' do
+      operation = spec.operations.first
+      expect(operation.path).to eq '/search'
+    end
+  end
+
   describe '#parameters_schema' do
     let(:schema) do
-      described_class.new(spec.operations.first).parameters_schema.raw_schema
+      spec.operations.first.parameters_schema.raw_schema
     end
 
     let(:expected_schema) do
@@ -211,26 +225,14 @@ RSpec.describe OpenapiFirst::Operation do
     end
   end
 
-  describe '#method' do
-    let(:spec) { OpenapiFirst.load('./spec/data/petstore-expanded.yaml') }
-
-    it 'returns get' do
-      expect(spec.operations.first.method).to eq 'get'
-    end
-
-    it 'returns post' do
-      expect(spec.operations[1].method).to eq 'post'
-    end
-  end
-
   describe '#read?' do
     it 'returns true if write? returns false' do
-      operation = OpenapiFirst::Operation.new(double(method: 'get'))
+      operation = OpenapiFirst::Operation.new(double(method: 'GET'))
       expect(operation.read?).to be true
     end
 
     it 'returns false if write? returns true' do
-      operation = OpenapiFirst::Operation.new(double(method: 'post'))
+      operation = OpenapiFirst::Operation.new(double(method: 'POST'))
       expect(operation.read?).to be false
     end
   end

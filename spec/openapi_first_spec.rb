@@ -79,9 +79,9 @@ RSpec.describe OpenapiFirst do
         expect(definition.operations.map(&:operation_id)).to eq expected
       end
 
-      specify 'filtering paths' do
-        definition = OpenapiFirst.load SPEC_PATH, only: '/pets'.method(:==)
-        expected = %w[find_pets create_pet]
+      it 'can be filtered by path and method' do
+        definition = OpenapiFirst.load SPEC_PATH, only: proc { |op| op.path == '/pets' && op.request_method == 'GET' }
+        expected = %w[find_pets]
         expect(definition.operations.map(&:operation_id)).to eq expected
       end
     end
