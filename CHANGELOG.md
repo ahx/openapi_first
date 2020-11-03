@@ -5,6 +5,9 @@
 - Request validation fails if request includes a property with `readOnly: true`
 - Response validation fails if response body includes a property with `writeOnly: true`
 
+## 0.14.0
+- Breaking change: The `only:` option of `OpenapiFirst.load` gets passed an Operation instance now.
+
 ## 0.13.2
 - Return indicator (`source: { parameter: 'list/1' }`) in error response body when array item in query parameter is invalid
 
