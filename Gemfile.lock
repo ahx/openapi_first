@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    openapi_first (0.13.2)
+    openapi_first (0.13.3)
       deep_merge (>= 1.2.1)
       hanami-router (~> 2.0.alpha3)
       hanami-utils (~> 2.0.alpha1)
@@ -107,11 +107,11 @@ GEM
     ruby2_keywords (0.0.2)
     thread_safe (0.3.6)
     transproc (1.1.1)
-    tzinfo (1.2.7)
+    tzinfo (1.2.8)
       thread_safe (~> 0.1)
     unicode-display_width (1.7.0)
     uri_template (0.7.0)
-    zeitwerk (2.4.0)
+    zeitwerk (2.4.1)
 
 PLATFORMS
   ruby

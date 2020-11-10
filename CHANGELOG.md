@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.13.3
+- Better error message if string does not match format
+
 ## 0.13.2
 - Return indicator (`source: { parameter: 'list/1' }`) in error response body when array item in query parameter is invalid
 
