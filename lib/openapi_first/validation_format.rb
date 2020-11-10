@@ -6,11 +6,18 @@ module OpenapiFirst
 
     # rubocop:disable Metrics/MethodLength
     # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.error_details(error)
       if error['type'] == 'pattern'
         {
           title: 'is not valid',
           detail: "does not match pattern '#{error['schema']['pattern']}'"
+        }
+      elsif error['type'] == 'format'
+        {
+          title: "has not a valid #{error.dig('schema', 'format')} format",
+          detail: "#{error['data'].inspect} is not a valid #{error.dig('schema', 'format')} format"
         }
       elsif error['type'] == 'required'
         missing_keys = error['details']['missing_keys']
@@ -37,5 +44,7 @@ module OpenapiFirst
     end
     # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
   end
 end
