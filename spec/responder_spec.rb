@@ -94,8 +94,15 @@ RSpec.describe OpenapiFirst::Responder do
       it 'finds the handler by passing the operationID to the resolver' do
         spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
         operation = spec.operations.find { |o| o.operation_id == 'find_pets' }
-        resolver = { 'find_pets' => proc {} }
-        app = described_class.new(resolver: resolver)
+        handler = double(:call)
+        app = described_class.new(resolver: proc { handler })
+        env = Rack::MockRequest.env_for('/pets')
+        env[OpenapiFirst::OPERATION] = operation
+        expect(handler).to receive(:call)
+        app.call(env)
+      end
+    end
+
         env = Rack::MockRequest.env_for('/pets')
         env[OpenapiFirst::OPERATION] = operation
         app.call(env)
@@ -108,7 +115,7 @@ RSpec.describe OpenapiFirst::Responder do
           spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
           use OpenapiFirst::Router, spec: spec
           run OpenapiFirst::Responder.new(
-            resolver: {},
+            resolver: proc {},
             namespace: MyApi
           )
         end

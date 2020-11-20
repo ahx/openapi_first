@@ -29,7 +29,7 @@ You always have to add this middleware first in order to make the other middlewa
 use OpenapiFirst::Router, spec: OpenapiFirst.load('./openapi/openapi.yaml')
 ```
 
-This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation object that responds to `operation_id` and `path`.
+This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation object that responds to `#operation_id`, `#path` (and `#[]` to access raw fields).
 
 Options and their defaults:
 
@@ -117,8 +117,8 @@ run OpenapiFirst::Responder, spec: OpenapiFirst.load('./openapi/openapi.yaml')
 
 | Name | Description
 |:---|---|
-|`spec:`| The spec loaded via `OpenapiFirst.load` |
-| `namespace:` | A class or module where to find the handler method. |
+| `namespace:` | Optional. A class or module where to find the handler method. |
+| `resolver:` | Optional. An object that responds to `#call` and returns a (handler)[#handler]. |
 
 It works like this:
 

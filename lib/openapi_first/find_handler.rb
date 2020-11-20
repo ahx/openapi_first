@@ -9,8 +9,8 @@ module OpenapiFirst
       @handlers = {}
     end
 
-    def [](operation_id)
-      @handlers[operation_id] ||= find_handler(operation_id)
+    def call(operation)
+      @handlers[operation.name] ||= find_handler(operation['x-handler'] || operation['operationId'])
     end
 
     def find_handler(operation_id)

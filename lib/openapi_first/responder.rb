@@ -24,7 +24,7 @@ module OpenapiFirst
     private
 
     def find_handler(operation)
-      handler = @resolver[operation.operation_id]
+      handler = @resolver.call(operation)
       raise NotImplementedError, "Could not find handler for #{operation.name}" unless handler
 
       handler

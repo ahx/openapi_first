@@ -40,10 +40,11 @@ RSpec.describe OpenapiFirst::FindHandler do
     )
   end
 
-  describe '#[]' do
-    it 'finds createPets' do
-      expect(Web).to receive(:create_pets)
-      subject['createPets'].call
+  describe '#call' do
+    it 'can be called with the operation' do
+      expect(Web).to receive(:list_pets)
+      operation = spec.operations.first
+      subject.call(operation).call
     end
   end
 
