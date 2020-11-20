@@ -7,12 +7,7 @@ require 'openapi_first/find_handler'
 RSpec.describe OpenapiFirst::FindHandler do
   let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
 
-  let(:subject) do
-    described_class.new(
-      spec,
-      Web
-    )
-  end
+  let(:subject) { described_class.new(Web) }
 
   before do
     stub_const(

@@ -6,7 +6,7 @@ require_relative 'find_handler'
 
 module OpenapiFirst
   class Responder
-    def initialize(spec:, namespace:, resolver: FindHandler.new(spec, namespace))
+    def initialize(namespace: nil, resolver: FindHandler.new(namespace))
       @resolver = resolver
       @namespace = namespace
     end

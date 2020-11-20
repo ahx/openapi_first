@@ -4,19 +4,13 @@ require_relative 'utils'
 
 module OpenapiFirst
   class FindHandler
-    def initialize(spec, namespace)
+    def initialize(namespace)
       @namespace = namespace
-      @handlers = spec.operations.each_with_object({}) do |operation, hash|
-        operation_id = operation.operation_id
-        handler = find_handler(operation_id)
-        next if handler.nil?
-
-        hash[operation_id] = handler
-      end
+      @handlers = {}
     end
 
     def [](operation_id)
-      @handlers[operation_id]
+      @handlers[operation_id] ||= find_handler(operation_id)
     end
 
     def find_handler(operation_id)

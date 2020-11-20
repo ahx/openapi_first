@@ -15,7 +15,6 @@ RSpec.describe OpenapiFirst::Responder do
         use OpenapiFirst::Router, spec: spec
         use OpenapiFirst::RequestValidation
         run OpenapiFirst::Responder.new(
-          spec: spec,
           namespace: MyApi
         )
       end
@@ -91,13 +90,24 @@ RSpec.describe OpenapiFirst::Responder do
       expect(last_response[Rack::CONTENT_LENGTH]).to eq '3'
     end
 
+    context 'with a custom resolver' do
+      it 'finds the handler by passing the operationID to the resolver' do
+        spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
+        operation = spec.operations.find { |o| o.operation_id == 'find_pets' }
+        resolver = { 'find_pets' => proc {} }
+        app = described_class.new(resolver: resolver)
+        env = Rack::MockRequest.env_for('/pets')
+        env[OpenapiFirst::OPERATION] = operation
+        app.call(env)
+      end
+    end
+
     describe 'when the handler method cannot be found' do
       let(:app) do
         Rack::Builder.new do
           spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
           use OpenapiFirst::Router, spec: spec
           run OpenapiFirst::Responder.new(
-            spec: spec,
             resolver: {},
             namespace: MyApi
           )
