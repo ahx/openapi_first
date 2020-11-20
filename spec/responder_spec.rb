@@ -103,9 +103,28 @@ RSpec.describe OpenapiFirst::Responder do
       end
     end
 
+    context 'with x-handler' do
+      it 'finds the handler based on x-handler field instead of operationId' do
+        spec = OpenapiFirst.load('./spec/data/x-handler.yaml')
+        operation = spec.operations.first
+        handler = double(:call)
+        app = described_class.new(resolver: proc { handler })
         env = Rack::MockRequest.env_for('/pets')
         env[OpenapiFirst::OPERATION] = operation
+        expect(handler).to receive(:call)
         app.call(env)
+      end
+
+      it 'raises an error if it does not find the handler' do
+        spec = OpenapiFirst.load('./spec/data/x-handler.yaml')
+        operation = spec.operations.first
+        resolver = proc {}
+        app = described_class.new(resolver: resolver)
+        env = Rack::MockRequest.env_for('/pets')
+        env[OpenapiFirst::OPERATION] = operation
+        expect do
+          app.call(env)
+        end.to raise_error OpenapiFirst::NotImplementedError, 'Could not find handler for GET / (things#index)'
       end
     end
 
