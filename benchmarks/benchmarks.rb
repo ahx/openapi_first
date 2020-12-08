@@ -19,28 +19,25 @@ apps = Dir['./apps/*.ru'].each_with_object({}) do |config, hash|
 end
 apps.freeze
 
+bench = ->(app) do
+  examples.each do |example|
+    env, expected_status = example
+    100.times { app.call(env) }
+    response = app.call(env)
+    raise unless response[0] == expected_status
+  end
+end
+
 Benchmark.ips do |x|
   apps.each do |config, app|
-    x.report(config) do
-      examples.each do |example|
-        env, expected_status = example
-        response = app.call(env)
-        raise unless response[0] == expected_status
-      end
-    end
+    x.report(config) { bench.call(app) }
   end
   x.compare!
 end
 
 Benchmark.memory do |x|
   apps.each do |config, app|
-    x.report(config) do
-      examples.each do |example|
-        env, expected_status = example
-        response = app.call(env)
-        raise unless response[0] == expected_status
-      end
-    end
+    x.report(config) { bench.call(app) }
   end
   x.compare!
 end
