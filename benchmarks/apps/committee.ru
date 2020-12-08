@@ -19,6 +19,8 @@ app = Class.new(Hanami::API) do
   end
 end.new
 
-use Committee::Middleware::RequestValidation, schema_path: './apps/openapi.yaml'
+use Committee::Middleware::RequestValidation,
+    schema_path: './apps/openapi.yaml',
+    parse_response_by_content_type: true
 
 run app
