@@ -40,7 +40,10 @@ module OpenapiFirst
 
     def raise_error(env)
       req = Rack::Request.new(env)
-      msg = "Could not find definition for #{req.request_method} '#{req.path}' in API description #{@filepath}"
+      msg =
+        "Could not find definition for #{req.request_method} '#{
+          req.path
+        }' in API description #{@filepath}"
       raise NotFoundError, msg
     end
 
@@ -54,7 +57,7 @@ module OpenapiFirst
     end
 
     def build_router(operations) # rubocop:disable Metrics/AbcSize
-      router = Hanami::Router.new {}
+      router = Hanami::Router.new
       operations.each do |operation|
         normalized_path = operation.path.gsub('{', ':').gsub('}', '')
         if operation.operation_id.nil?

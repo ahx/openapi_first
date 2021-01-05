@@ -1,13 +1,14 @@
 AllCops:
   TargetRubyVersion: 2.6
   NewCops: enable
+  SuggestExtensions: false
 Style/Documentation:
   Enabled: false
 Style/ExponentialNotation:
   Enabled: true
 Metrics/BlockLength:
   Exclude:
-  - 'spec/**/*.rb'
-  - '*.gemspec'
+    - "spec/**/*.rb"
+    - "*.gemspec"
 Metrics/MethodLength:
   Max: 20

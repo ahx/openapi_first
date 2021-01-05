@@ -78,11 +78,17 @@ module OpenapiFirst
   end
 
   class Error < StandardError; end
+
   class NotFoundError < Error; end
+
   class NotImplementedError < RuntimeError; end
+
   class ResponseInvalid < Error; end
+
   class ResponseCodeNotFoundError < ResponseInvalid; end
+
   class ResponseContentTypeNotFoundError < ResponseInvalid; end
+
   class ResponseBodyInvalidError < ResponseInvalid; end
 
   class RequestInvalidError < Error

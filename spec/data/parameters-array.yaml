@@ -31,6 +31,7 @@ paths:
         - name: nested[integers]
           in: query
           required: false
+          explode: false
           schema:
             type: array
             maxItems: 4
