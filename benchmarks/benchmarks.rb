@@ -19,7 +19,7 @@ apps = Dir['./apps/*.ru'].each_with_object({}) do |config, hash|
 end
 apps.freeze
 
-bench = lambda(app) do
+bench = lambda do |app|
   examples.each do |example|
     env, expected_status = example
     100.times { app.call(env) }
