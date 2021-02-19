@@ -131,6 +131,50 @@ RSpec.describe OpenapiFirst::Router do
         params = last_request.env[OpenapiFirst::PARAMETERS]
         expect(params).to be_empty
       end
+
+      describe 'path parameter patterns' do
+        let(:app) do
+          Rack::Builder.new do
+            use OpenapiFirst::Router,
+                spec: OpenapiFirst.load('./spec/data/parameters-path.yaml'),
+                raise_error: true
+            run ->(_env) { Rack::Response.new('hello', 200).finish }
+          end
+        end
+
+        it 'supports /{date}' do
+          get '/info/2020-01-01'
+          expect(last_response.status).to eq 200
+
+          operation = last_request.env[OpenapiFirst::OPERATION]
+          expect(operation.operation_id).to eq 'info_date'
+
+          params = last_request.env[OpenapiFirst::PARAMETERS]
+          expect(params).to eq(date: '2020-01-01')
+        end
+
+        it 'supports /{start_date}..{end_date}' do
+          get '/info/2020-01-01..2020-01-02'
+          expect(last_response.status).to eq 200
+
+          operation = last_request.env[OpenapiFirst::OPERATION]
+          expect(operation.operation_id).to eq 'info_date_range'
+
+          params = last_request.env[OpenapiFirst::PARAMETERS]
+          expect(params).to eq(start_date: '2020-01-01', end_date: '2020-01-02')
+        end
+
+        it 'still works without parameters' do
+          get '/info'
+          expect(last_response.status).to eq 200
+
+          operation = last_request.env[OpenapiFirst::OPERATION]
+          expect(operation.operation_id).to eq 'info'
+
+          params = last_request.env[OpenapiFirst::PARAMETERS]
+          expect(params).to be_empty
+        end
+      end
     end
 
     describe 'query parameters' do

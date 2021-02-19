@@ -1,0 +1,40 @@
+openapi: "3.0.2"
+paths:
+  /info:
+    get:
+      operationId: info
+      responses:
+        "200":
+          description: ok
+  /info/{start_date}..{end_date}:
+    parameters:
+      - name: start_date
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+    get:
+      operationId: info_date_range
+      responses:
+        "200":
+          description: ok
+  /info/{date}:
+    parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+    get:
+      operationId: info_date
+      responses:
+        "200":
+          description: ok
