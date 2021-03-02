@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.4
+- Ignore case and whitespace when parsing boolen query parameters ('True', 'true')
+
+
 ## 0.13.3
 - Better error message if string does not match format
 - readOnly and writeOnly just works when used inside allOf
