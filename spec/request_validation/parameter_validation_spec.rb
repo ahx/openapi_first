@@ -263,10 +263,6 @@ RSpec.describe 'Parameter validation' do
         expect(last_response.status).to eq(200), last_response.body
         expect(last_params[:starred]).to eq true
 
-        get path, params.merge(starred: 'true ')
-        expect(last_response.status).to eq(200), last_response.body
-        expect(last_params[:starred]).to eq true
-
         get path, params.merge(starred: 'false')
         expect(last_response.status).to eq(200), last_response.body
         expect(last_params[:starred]).to eq false
@@ -274,6 +270,22 @@ RSpec.describe 'Parameter validation' do
         get path, params.merge(starred: 'wrong')
         expect(last_response.status).to eq(400)
         expect(last_params[:starred]).to eq 'wrong'
+      end
+
+      it 'strips whitespace from booleans' do
+        get path, params.merge(starred: 'true ')
+        expect(last_response.status).to eq(200), last_response.body
+        expect(last_params[:starred]).to eq true
+      end
+
+      it 'parses booleans case insensitive' do
+        get path, params.merge(starred: 'True')
+        expect(last_response.status).to eq(200), last_response.body
+        expect(last_params[:starred]).to eq true
+
+        get path, params.merge(starred: 'fAlse')
+        expect(last_response.status).to eq(200), last_response.body
+        expect(last_params[:starred]).to eq false
       end
 
       it 'converts nested params' do
