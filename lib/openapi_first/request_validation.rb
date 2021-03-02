@@ -161,6 +161,7 @@ module OpenapiFirst
     end
 
     def to_boolean(value)
+      value = value.strip
       return true if value == 'true'
       return false if value == 'false'
 

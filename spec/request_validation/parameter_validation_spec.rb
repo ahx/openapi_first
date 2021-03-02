@@ -263,6 +263,10 @@ RSpec.describe 'Parameter validation' do
         expect(last_response.status).to eq(200), last_response.body
         expect(last_params[:starred]).to eq true
 
+        get path, params.merge(starred: 'true ')
+        expect(last_response.status).to eq(200), last_response.body
+        expect(last_params[:starred]).to eq true
+
         get path, params.merge(starred: 'false')
         expect(last_response.status).to eq(200), last_response.body
         expect(last_params[:starred]).to eq false
