@@ -25,10 +25,9 @@ module OpenapiFirst
 
   def self.load(spec_path, only: nil)
     content = YAML.load_file(spec_path)
-    raw = OasParser::Parser.new(spec_path, content).resolve
-    raw['paths'].filter!(&->(key, _) { only.call(key) }) if only
-    parsed = OasParser::Definition.new(raw, spec_path)
-    Definition.new(parsed)
+    resolved = OasParser::Parser.new(spec_path, content).resolve
+    resolved['paths'].filter!(&->(key, _) { only.call(key) }) if only
+    Definition.new(resolved, spec_path)
   end
 
   def self.app(
