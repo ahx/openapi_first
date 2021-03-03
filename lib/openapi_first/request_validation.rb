@@ -63,13 +63,13 @@ module OpenapiFirst
     end
 
     def validate_request_content_type!(content_type, operation)
-      return if operation.request_body.content[content_type]
+      return if operation.request_body.dig('content', content_type)
 
       halt_with_error(415)
     end
 
     def validate_request_body_presence!(body, operation)
-      return unless operation.request_body.required && body.empty?
+      return unless operation.request_body['required'] && body.empty?
 
       halt_with_error(415, 'Request body is required')
     end

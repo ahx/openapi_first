@@ -7,27 +7,25 @@ require_relative 'utils'
 require_relative 'response_object'
 
 module OpenapiFirst
-  class Operation
+  class Operation # rubocop:disable Metrics/ClassLength
     extend Forwardable
-    def_delegators :@operation,
-                   :parameters,
-                   :method,
-                   :request_body,
-                   :operation_id
-
-    def_delegators :raw_operation,
+    def_delegators :operation_object,
                    :[],
                    :dig
 
     WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
     private_constant :WRITE_METHODS
 
-    def initialize(parsed)
-      @operation = parsed
+    attr_reader :path, :method
+
+    def initialize(path, request_method, path_item_object)
+      @path = path
+      @method = request_method
+      @path_item_object = path_item_object
     end
 
-    def path
-      @operation.path.path
+    def operation_id
+      operation_object['operationId']
     end
 
     def read?
@@ -36,6 +34,10 @@ module OpenapiFirst
 
     def write?
       WRITE_METHODS.include?(method)
+    end
+
+    def request_body
+      operation_object['requestBody']
     end
 
     def parameters_schema
@@ -57,6 +59,7 @@ module OpenapiFirst
       raise ResponseInvalid, "Response has no content-type for '#{name}'" unless content_type
 
       media_type = find_content_for_content_type(content, content_type)
+
       unless media_type
         message = "Response content type not found '#{content_type}' for '#{name}'"
         raise ResponseContentTypeNotFoundError, message
@@ -66,7 +69,7 @@ module OpenapiFirst
     end
 
     def request_body_schema(request_content_type)
-      content = @operation.request_body.content
+      content = operation_object.dig('requestBody', 'content')
       media_type = find_content_for_content_type(content, request_content_type)
       schema = media_type&.fetch('schema', nil)
       return unless schema
@@ -75,8 +78,9 @@ module OpenapiFirst
     end
 
     def response_for(status)
-      @operation.response_by_code(status.to_s, use_default: true).raw
-    rescue OasParser::ResponseCodeNotFound
+      response_content = response_by_code(status)
+      return response_content if response_content
+
       message = "Response status code or default not found: #{status} for '#{name}'"
       raise OpenapiFirst::ResponseCodeNotFoundError, message
     end
@@ -87,8 +91,13 @@ module OpenapiFirst
 
     private
 
-    def raw_operation
-      @operation.raw
+    def response_by_code(status)
+      operation_object.dig('responses', status.to_s) ||
+        operation_object.dig('responses', 'default')
+    end
+
+    def operation_object
+      @path_item_object[method]
     end
 
     def find_content_for_content_type(content, request_content_type)
@@ -99,24 +108,32 @@ module OpenapiFirst
     end
 
     def build_parameters_json_schema
-      return unless @operation.parameters&.any?
+      parameters = all_parameters
+      return unless parameters&.any?
 
-      @operation.parameters.each_with_object(new_node) do |parameter, schema|
-        params = Rack::Utils.parse_nested_query(parameter.name)
+      parameters.each_with_object(new_node) do |parameter, schema|
+        params = Rack::Utils.parse_nested_query(parameter['name'])
         generate_schema(schema, params, parameter)
       end
+    end
+
+    def all_parameters
+      parameters = @path_item_object['parameters'] || []
+      parameters_on_operation = operation_object['parameters']
+      parameters.concat(parameters_on_operation) if parameters_on_operation
+      parameters
     end
 
     def generate_schema(schema, params, parameter)
       required = Set.new(schema['required'])
       params.each do |key, value|
-        required << key if parameter.required
+        required << key if parameter['required']
         if value.is_a? Hash
           property_schema = new_node
           generate_schema(property_schema, value, parameter)
           Utils.deep_merge!(schema['properties'], { key => property_schema })
         else
-          schema['properties'][key] = parameter.schema
+          schema['properties'][key] = parameter['schema']
         end
       end
       schema['required'] = required.to_a

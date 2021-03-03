@@ -75,7 +75,7 @@ RSpec.describe OpenapiFirst do
     describe 'only option' do
       specify 'with empty filter' do
         definition = OpenapiFirst.load(SPEC_PATH, only: nil)
-        expected = %w[find_pets create_pet find_pet delete_pet update_pet]
+        expected = %w[find_pets create_pet find_pet update_pet delete_pet]
         expect(definition.operations.map(&:operation_id)).to eq expected
       end
 

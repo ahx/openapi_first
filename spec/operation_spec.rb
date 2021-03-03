@@ -31,7 +31,7 @@ RSpec.describe OpenapiFirst::Operation do
 
   describe '#parameters_schema' do
     let(:schema) do
-      described_class.new(spec.operations.first).parameters_schema.raw_schema
+      spec.operations.first.parameters_schema.raw_schema
     end
 
     let(:expected_schema) do
@@ -161,7 +161,7 @@ RSpec.describe OpenapiFirst::Operation do
         expected_msg =
           "Response status code or default not found: 201 for '#{operation.name}'"
         expect do
-          operation.response_schema_for(201, 'application/json').raw_schema
+          operation.response_schema_for(201, 'application/json')
         end.to raise_error OpenapiFirst::ResponseCodeNotFoundError, expected_msg
       end
     end
@@ -174,7 +174,7 @@ RSpec.describe OpenapiFirst::Operation do
         expected_msg =
           "Response content type not found 'application/xml' for '#{operation.name}'"
         expect do
-          operation.response_schema_for(200, 'application/xml').raw_schema
+          operation.response_schema_for(200, 'application/xml')
         end.to raise_error OpenapiFirst::ResponseContentTypeNotFoundError,
                            expected_msg
       end
@@ -234,12 +234,12 @@ RSpec.describe OpenapiFirst::Operation do
 
   describe '#read?' do
     it 'returns true if write? returns false' do
-      operation = OpenapiFirst::Operation.new(double(method: 'get'))
+      operation = OpenapiFirst::Operation.new('/', 'get', {})
       expect(operation.read?).to be true
     end
 
     it 'returns false if write? returns true' do
-      operation = OpenapiFirst::Operation.new(double(method: 'post'))
+      operation = OpenapiFirst::Operation.new('/', 'post', {})
       expect(operation.read?).to be false
     end
   end
@@ -247,13 +247,13 @@ RSpec.describe OpenapiFirst::Operation do
   describe 'write?' do
     %w[POST PUT PATCH DELETE].each do |http_method|
       it "returns true for #{http_method}" do
-        operation = OpenapiFirst::Operation.new(double(method: http_method.downcase))
+        operation = OpenapiFirst::Operation.new('/', http_method.downcase, {})
         expect(operation.write?).to be true
       end
     end
 
     it 'returns false for GET' do
-      operation = OpenapiFirst::Operation.new(double(method: 'get'))
+      operation = OpenapiFirst::Operation.new('/', 'get', {})
       expect(operation.write?).to be false
     end
   end
