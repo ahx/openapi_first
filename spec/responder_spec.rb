@@ -15,7 +15,6 @@ RSpec.describe OpenapiFirst::Responder do
         use OpenapiFirst::Router, spec: spec
         use OpenapiFirst::RequestValidation
         run OpenapiFirst::Responder.new(
-          spec: spec,
           namespace: MyApi
         )
       end
@@ -91,14 +90,53 @@ RSpec.describe OpenapiFirst::Responder do
       expect(last_response[Rack::CONTENT_LENGTH]).to eq '3'
     end
 
+    context 'with a custom resolver' do
+      it 'finds the handler by passing the operation to the resolver' do
+        spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
+        operation = spec.operations.find { |o| o.operation_id == 'find_pets' }
+        handler = double(:call)
+        resolver = double(:call)
+        app = described_class.new(resolver: resolver)
+        env = Rack::MockRequest.env_for('/pets')
+        env[OpenapiFirst::OPERATION] = operation
+        expect(resolver).to receive(:call).with(operation) { handler }
+        expect(handler).to receive(:call)
+        app.call(env)
+      end
+    end
+
+    context 'with x-handler' do
+      it 'finds the handler based on x-handler field instead of operationId' do
+        spec = OpenapiFirst.load('./spec/data/x-handler.yaml')
+        operation = spec.operations.first
+        handler = double(:call)
+        app = described_class.new(resolver: proc { handler })
+        env = Rack::MockRequest.env_for('/pets')
+        env[OpenapiFirst::OPERATION] = operation
+        expect(handler).to receive(:call)
+        app.call(env)
+      end
+
+      it 'raises an error if it does not find the handler' do
+        spec = OpenapiFirst.load('./spec/data/x-handler.yaml')
+        operation = spec.operations.first
+        resolver = proc { nil }
+        app = described_class.new(resolver: resolver)
+        env = Rack::MockRequest.env_for('/pets')
+        env[OpenapiFirst::OPERATION] = operation
+        expect do
+          app.call(env)
+        end.to raise_error OpenapiFirst::NotImplementedError, 'Could not find handler for GET / (things#index)'
+      end
+    end
+
     describe 'when the handler method cannot be found' do
       let(:app) do
         Rack::Builder.new do
           spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
           use OpenapiFirst::Router, spec: spec
           run OpenapiFirst::Responder.new(
-            spec: spec,
-            resolver: {},
+            resolver: proc { nil },
             namespace: MyApi
           )
         end

@@ -18,10 +18,7 @@ module OpenapiFirst
         use OpenapiFirst::Router, spec: spec, raise_error: router_raise_error, parent_app: parent_app
         use OpenapiFirst::RequestValidation, raise_error: request_validation_raise_error
         use OpenapiFirst::ResponseValidation if response_validation
-        run OpenapiFirst::Responder.new(
-          spec: spec,
-          namespace: namespace
-        )
+        run OpenapiFirst::Responder.new(namespace: namespace)
       end
     end
 

@@ -15,6 +15,10 @@ module OpenapiFirst
                    :request_body,
                    :operation_id
 
+    def_delegators :raw_operation,
+                   :[],
+                   :dig
+
     WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
     private_constant :WRITE_METHODS
 
@@ -82,6 +86,10 @@ module OpenapiFirst
     end
 
     private
+
+    def raw_operation
+      @operation.raw
+    end
 
     def find_content_for_content_type(content, request_content_type)
       content.fetch(request_content_type) do |_|

@@ -2,17 +2,12 @@
 
 require 'spec_helper'
 require 'rack'
-require 'openapi_first/find_handler'
+require 'openapi_first/default_operation_resolver'
 
-RSpec.describe OpenapiFirst::FindHandler do
+RSpec.describe OpenapiFirst::DefaultOperationResolver do
   let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
 
-  let(:subject) do
-    described_class.new(
-      spec,
-      Web
-    )
-  end
+  let(:subject) { described_class.new(Web) }
 
   before do
     stub_const(
@@ -45,10 +40,11 @@ RSpec.describe OpenapiFirst::FindHandler do
     )
   end
 
-  describe '#[]' do
-    it 'finds createPets' do
-      expect(Web).to receive(:create_pets)
-      subject['createPets'].call
+  describe '#call' do
+    it 'finds the method in namespace' do
+      expect(Web).to receive(:list_pets)
+      operation = spec.operations.first
+      subject.call(operation).call
     end
   end
 

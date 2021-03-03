@@ -2,11 +2,11 @@
 
 require 'rack'
 require_relative 'inbox'
-require_relative 'find_handler'
+require_relative 'default_operation_resolver'
 
 module OpenapiFirst
   class Responder
-    def initialize(spec:, namespace:, resolver: FindHandler.new(spec, namespace))
+    def initialize(namespace: nil, resolver: DefaultOperationResolver.new(namespace))
       @resolver = resolver
       @namespace = namespace
     end
@@ -24,7 +24,7 @@ module OpenapiFirst
     private
 
     def find_handler(operation)
-      handler = @resolver[operation.operation_id]
+      handler = @resolver.call(operation)
       raise NotImplementedError, "Could not find handler for #{operation.name}" unless handler
 
       handler

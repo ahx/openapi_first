@@ -13,6 +13,15 @@ RSpec.describe OpenapiFirst::Operation do
     end
   end
 
+  describe '#[], #dig' do
+    it 'allows to access the resolved hash' do
+      operation = spec.operations.first
+      expect(operation['operationId']).to eq 'search'
+      expect(operation.dig('responses', '200', 'content', 'application/json', 'schema', 'type')).to eq 'array'
+      expect(operation.dig('responses', 'default', 'description')).to eq 'unexpected error'
+    end
+  end
+
   describe '#name' do
     it 'returns a human readable name' do
       operation = spec.operations.first

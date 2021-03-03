@@ -29,7 +29,7 @@ You always have to add this middleware first in order to make the other middlewa
 use OpenapiFirst::Router, spec: OpenapiFirst.load('./openapi/openapi.yaml')
 ```
 
-This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation object that responds to `operation_id` and `path`.
+This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation object that responds to `#operation_id`, `#path` (and `#[]` to access raw fields).
 
 Options and their defaults:
 
@@ -109,16 +109,18 @@ Response validation fails if response body includes a property with `writeOnly: 
 
 This Rack endpoint maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it. Responder also adds a content-type to the response.
 
-Currently there are no customization options for this part. Please [share your ideas](#contributing) on how to best meet your needs and preferred style.
-
 ```ruby
 run OpenapiFirst::Responder, spec: OpenapiFirst.load('./openapi/openapi.yaml')
 ```
 
 | Name | Description
 |:---|---|
-|`spec:`| The spec loaded via `OpenapiFirst.load` |
-| `namespace:` | A class or module where to find the handler method. |
+| `namespace:` | Optional. A class or module where to find the handler method. |
+| `resolver:` | Optional. An object that responds to `#call(operation)` and returns a (handler)[#handler]. By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
+
+
+### OpenapiFirst::DefaultOperationResolver
+This is the default way to look up a handler method for an operation. Handlers are always looked up in a namespace module that needs to be specified.
 
 It works like this:
 
