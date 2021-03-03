@@ -1,5 +1,9 @@
 # Changelog
 
+## unreleased
+- Handle custom x-handler field in the API description to find a handler method not based on operationId
+- Add option to provide a custom resolver to find a handler method
+
 ## 0.13.3
 - Better error message if string does not match format
 - readOnly and writeOnly just works when used inside allOf
