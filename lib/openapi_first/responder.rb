@@ -2,11 +2,11 @@
 
 require 'rack'
 require_relative 'inbox'
-require_relative 'find_handler'
+require_relative 'default_operation_resolver'
 
 module OpenapiFirst
   class Responder
-    def initialize(namespace: nil, resolver: FindHandler.new(namespace))
+    def initialize(namespace: nil, resolver: DefaultOperationResolver.new(namespace))
       @resolver = resolver
       @namespace = namespace
     end

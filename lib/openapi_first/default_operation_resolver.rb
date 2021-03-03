@@ -3,7 +3,7 @@
 require_relative 'utils'
 
 module OpenapiFirst
-  class FindHandler
+  class DefaultOperationResolver
     def initialize(namespace)
       @namespace = namespace
       @handlers = {}
