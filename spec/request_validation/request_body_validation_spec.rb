@@ -29,7 +29,7 @@ RSpec.describe 'Request body validation' do
 
     let(:request_body) do
       {
-        type: 'people',
+        type: 'pet',
         attributes: {
           name: 'Oscar'
         }
@@ -90,6 +90,18 @@ RSpec.describe 'Request body validation' do
       error = response_body[:errors][0]
       expect(error[:title]).to eq 'is missing required properties: name'
       expect(error[:source][:pointer]).to eq '/attributes'
+    end
+
+    it 'returns 400 if value is not defined in enum' do
+      request_body[:type] = 'unknown-type'
+      header Rack::CONTENT_TYPE, 'application/json'
+      post path, json_dump(request_body)
+
+      expect(last_response.status).to be 400
+      error = response_body[:errors][0]
+      expect(error[:title]).to eq 'value "unknown-type" is not defined in enum'
+      expect(error[:source][:pointer]).to eq '/type'
+      expect(error[:detail]).to eq 'value can be one of pet, plant'
     end
 
     it 'returns 400 if additional property is not allowed' do

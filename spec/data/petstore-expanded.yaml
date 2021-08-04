@@ -165,6 +165,9 @@ components:
       properties:
         type:
           type: string
+          enum:
+            - pet
+            - plant
         attributes:
           additionalProperties: false
           type: object
