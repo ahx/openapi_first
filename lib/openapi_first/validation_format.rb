@@ -19,6 +19,11 @@ module OpenapiFirst
           title: "has not a valid #{error.dig('schema', 'format')} format",
           detail: "#{error['data'].inspect} is not a valid #{error.dig('schema', 'format')} format"
         }
+      elsif error['type'] == 'enum'
+        {
+          title: "value #{error['data'].inspect} is not defined in enum",
+          detail: "value can be one of #{error.dig('schema', 'enum')&.join(', ')}"
+        }
       elsif error['type'] == 'required'
         missing_keys = error['details']['missing_keys']
         {
