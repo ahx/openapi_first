@@ -45,6 +45,22 @@ RSpec.describe OpenapiFirst::App do
       end
     end
 
+    describe 'option resolver' do
+      let(:my_resolver) { double(:custom_resolver) }
+
+      let(:options) do
+        { resolver: my_resolver }
+      end
+
+      it 'passes resolver option down to Responder' do
+        expect(OpenapiFirst::Responder).to receive(:new).with(
+          resolver: my_resolver,
+          namespace: anything
+        ).and_call_original
+        app
+      end
+    end
+
     describe 'option router_raise_error: true' do
       let(:options) do
         { router_raise_error: true }

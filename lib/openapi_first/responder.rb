@@ -6,8 +6,8 @@ require_relative 'default_operation_resolver'
 
 module OpenapiFirst
   class Responder
-    def initialize(namespace: nil, resolver: DefaultOperationResolver.new(namespace))
-      @resolver = resolver
+    def initialize(namespace: nil, resolver: nil)
+      @resolver = resolver || DefaultOperationResolver.new(namespace)
       @namespace = namespace
     end
 
