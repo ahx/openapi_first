@@ -120,7 +120,7 @@ RSpec.describe OpenapiFirst::Responder do
       it 'raises an error if it does not find the handler' do
         spec = OpenapiFirst.load('./spec/data/x-handler.yaml')
         operation = spec.operations.first
-        resolver = proc { nil }
+        resolver = proc {}
         app = described_class.new(resolver: resolver)
         env = Rack::MockRequest.env_for('/pets')
         env[OpenapiFirst::OPERATION] = operation
@@ -136,7 +136,7 @@ RSpec.describe OpenapiFirst::Responder do
           spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
           use OpenapiFirst::Router, spec: spec
           run OpenapiFirst::Responder.new(
-            resolver: proc { nil },
+            resolver: proc {},
             namespace: MyApi
           )
         end
