@@ -90,7 +90,7 @@ GEM
       mustermann (= 1.1.1)
     mustermann-grape (1.0.1)
       mustermann (>= 1.0.0)
-    nokogiri (1.12.2)
+    nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     oas_parser (0.25.4)
