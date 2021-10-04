@@ -117,7 +117,7 @@ run OpenapiFirst::Responder, spec: OpenapiFirst.load('./openapi/openapi.yaml')
 | Name | Description
 |:---|---|
 | `namespace:` | Optional. A class or module where to find the handler method. |
-| `resolver:` | Optional. An object that responds to `#call(operation)` and returns a (handler)[#handler]. By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
+| `resolver:` | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
 
 
 ### OpenapiFirst::DefaultOperationResolver
@@ -188,7 +188,7 @@ The above will use the mentioned Rack middlewares to:
 | `response_validation:` | `true`, `false` | If set to true it raises an exception if the response is invalid. This is useful during testing. | `false`
 | `router_raise_error:` | `true`, `false` | If set to true it raises an exception (subclass of `OpenapiFirst::Error` when a request path/method is not specified. This is useful during testing. | `false`
 | `request_validation_raise_error:` | `true`, `false` | If set to true it raises an exception (subclass of `OpenapiFirst::Error` when a request is not valid. | `false`
-| `resolver:` | | Option to customize finding the [handler](#handler) method for an operation. See [OpenapiFirst::Responder](#OpenapiFirst::Responder) for details.
+| `resolver:` | | Option to customize finding the [handler](#handlers) method for an operation. See [OpenapiFirst::Responder](#OpenapiFirst::Responder) for details.
 
 
 Handler functions (`find_pet`) are called with two arguments:
