@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.14.2
+- Empty query parameters are parsed and request validation returns 400 if an empty string is not allowed. Note that this does not look at `allowEmptyValue` in any way, because allowEmptyValue is deprecated.
 
 ## 0.14.1
 - Bugfix: Don't mix path- and operation-level parameters for request validation
