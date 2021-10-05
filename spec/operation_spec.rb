@@ -122,6 +122,30 @@ RSpec.describe OpenapiFirst::Operation do
         expect(schema).to eq expected_schema
       end
     end
+
+    describe 'with a mix of path- and operation-level path parameters' do
+      it 'does not mix requirements' do
+        definition = OpenapiFirst.load('./spec/data/parameters-mix-issue.yaml')
+        operation_params = Hash[*definition.operations.flat_map do |op|
+                                  [op.operation_id, op.parameters_schema
+                                                      .raw_schema]
+                                end                                 ]
+        expect(operation_params['values#index']['required']).to eq %w[tenant_id filter]
+        expect(operation_params['values#create']['required']).to eq ['tenant_id']
+        expect(operation_params['values#update']['required']).to eq ['tenant_id']
+      end
+
+      it 'does not mix properties' do
+        definition = OpenapiFirst.load('./spec/data/parameters-mix-issue.yaml')
+        operation_params = Hash[*definition.operations.flat_map do |op|
+                                  [op.operation_id, op.parameters_schema
+                                                      .raw_schema]
+                                end                                 ]
+        expect(operation_params['values#index']['properties'].keys).to eq %w[tenant_id filter]
+        expect(operation_params['values#create']['properties'].keys).to eq ['tenant_id']
+        expect(operation_params['values#update']['properties'].keys).to eq ['tenant_id']
+      end
+    end
   end
 
   describe '#response_schema_for' do

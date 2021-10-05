@@ -1,0 +1,65 @@
+openapi: "3.0.2"
+paths:
+  '/api/v1/{tenant_id}/values':
+    parameters:
+      - name: tenant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+      operationId: 'values#index'
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - activity
+              - employee
+          in: query
+          name: 'filter[resource_type]'
+          required: true
+        - schema:
+            type: array
+            items:
+              type: number
+          in: query
+          name: 'filter[attribute]'
+        - schema:
+            type: string
+          in: query
+          name: 'filter[value]'
+    post:
+      operationId: 'values#create'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      tags:
+        - Attributes
+    patch:
+      summary: ''
+      operationId: values#update
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object

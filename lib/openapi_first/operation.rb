@@ -118,7 +118,7 @@ module OpenapiFirst
     end
 
     def all_parameters
-      parameters = @path_item_object['parameters'] || []
+      parameters = @path_item_object['parameters']&.dup || []
       parameters_on_operation = operation_object['parameters']
       parameters.concat(parameters_on_operation) if parameters_on_operation
       parameters
