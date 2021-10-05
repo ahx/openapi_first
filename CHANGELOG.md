@@ -1,5 +1,9 @@
 # Changelog
 
+
+## 0.14.1
+- Bugfix: Don't mix path- and operation-level parameters for request validation
+
 ## 0.14.0
 - Handle custom x-handler field in the API description to find a handler method not based on operationId
 - Add `resolver` option to provide a custom resolver to find a handler method
