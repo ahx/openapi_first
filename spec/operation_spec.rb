@@ -90,10 +90,10 @@ RSpec.describe OpenapiFirst::Operation do
             },
             'filter' => {
               'type' => 'object',
-              'required' => %w[tag id],
+              'required' => %w[id],
               'properties' => {
                 'tag' => {
-                  'type' => 'string'
+                  'type' => 'array'
                 },
                 'id' => {
                   'type' => 'integer'

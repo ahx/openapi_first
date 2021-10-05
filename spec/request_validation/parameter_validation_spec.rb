@@ -76,6 +76,16 @@ RSpec.describe 'Parameter validation' do
       expect(error[:source][:parameter]).to eq 'birthdate'
     end
 
+    it 'returns 400 if query parameter is empty' do
+      params[:birthdate] = ''
+      get path, params
+
+      expect(last_response.status).to be 400
+      error = response_body[:errors][0]
+      expect(error[:title]).to eq 'has not a valid date format'
+      expect(error[:source][:parameter]).to eq 'birthdate'
+    end
+
     it 'returns 400 if query parameter does not match pattern' do
       params[:include] = 'foo,bar'
       get path, params
@@ -180,18 +190,33 @@ RSpec.describe 'Parameter validation' do
       let(:params) do
         {
           term: 'Oscar',
-          filter: { tag: 'dogs', id: '1', other: 'things' }
+          filter: { id: '1', other: 'things' }
         }
       end
 
       it 'returns 400 if nested[parameter] is missing' do
-        params[:filter].delete(:tag)
+        params[:filter].delete(:id)
         get path, params
 
         expect(last_response.status).to eq 400
         error = response_body[:errors][0]
         expect(error[:source][:parameter]).to eq 'filter'
-        expect(error[:title]).to eq 'is missing required properties: tag'
+        expect(error[:title]).to eq 'is missing required properties: id'
+      end
+
+      it 'returns 400 if non-required array parameter is nil' do
+        params[:filter][:tag] = nil
+        get path, params
+        expect(last_response.status).to eq 400
+        error = response_body[:errors][0]
+        expect(error[:title]).to eq 'is not valid: nil'
+      end
+
+      it 'returns 400 if non-required array parameter is empty' do
+        get "#{path}?term=Oscar&filter[id]=1&filter[tag]=&filter[other]=things"
+        expect(last_response.status).to eq 400
+        error = response_body[:errors][0]
+        expect(error[:title]).to eq 'is not valid: ""'
       end
 
       it 'passes if query parameters are valid' do

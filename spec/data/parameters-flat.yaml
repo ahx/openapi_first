@@ -27,9 +27,9 @@ paths:
             type: string
         - name: filter[tag]
           in: query
-          required: true
+          required: false
           schema:
-            type: string
+            type: array
         - name: filter[id]
           in: query
           required: true
