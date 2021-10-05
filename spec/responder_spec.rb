@@ -10,13 +10,14 @@ RSpec.describe OpenapiFirst::Responder do
     include Rack::Test::Methods
 
     let(:app) do
+      responder = OpenapiFirst::Responder.new(
+        namespace: namespace
+      )
       Rack::Builder.new do
         spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
         use OpenapiFirst::Router, spec: spec
         use OpenapiFirst::RequestValidation
-        run OpenapiFirst::Responder.new(
-          namespace: MyApi
-        )
+        run responder
       end
     end
 
@@ -33,8 +34,8 @@ RSpec.describe OpenapiFirst::Responder do
       json_load(last_response.body, symbolize_keys: true)
     end
 
-    before do
-      namespace = Module.new do
+    let(:namespace) do
+      Module.new do
         def self.find_pets(_params, _res); end
 
         def self.create_pet(_params, _res); end
@@ -45,12 +46,10 @@ RSpec.describe OpenapiFirst::Responder do
           res.status = 204
         end
       end
-
-      stub_const('MyApi', namespace)
     end
 
     it 'calls a method on the namespace module' do
-      expect(MyApi).to receive(:find_pets)
+      expect(namespace).to receive(:find_pets)
       get '/pets'
     end
 
@@ -58,7 +57,7 @@ RSpec.describe OpenapiFirst::Responder do
       pets = [
         { name: 'Frido' }
       ]
-      expect(MyApi).to receive(:find_pets) do |_params, _res|
+      expect(namespace).to receive(:find_pets) do |_params, _res|
         pets
       end
 
@@ -69,7 +68,7 @@ RSpec.describe OpenapiFirst::Responder do
 
     it 'allows to set the response body as a string via return value' do
       pets = 'text'
-      expect(MyApi).to receive(:find_pets) do |_params, _res|
+      expect(namespace).to receive(:find_pets) do |_params, _res|
         pets
       end
 
@@ -80,7 +79,7 @@ RSpec.describe OpenapiFirst::Responder do
 
     it 'allows to set the response body via res.write' do
       expected_body = 'Hi!'
-      expect(MyApi).to receive(:find_pets) do |_req, res|
+      expect(namespace).to receive(:find_pets) do |_req, res|
         res.write expected_body
         'ignored'
       end
@@ -132,13 +131,14 @@ RSpec.describe OpenapiFirst::Responder do
 
     describe 'when the handler method cannot be found' do
       let(:app) do
+        responder = OpenapiFirst::Responder.new(
+          resolver: proc {},
+          namespace: namespace
+        )
         Rack::Builder.new do
           spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
           use OpenapiFirst::Router, spec: spec
-          run OpenapiFirst::Responder.new(
-            resolver: proc {},
-            namespace: MyApi
-          )
+          run responder
         end
       end
 
@@ -154,7 +154,7 @@ RSpec.describe OpenapiFirst::Responder do
         type: 'pet',
         attributes: { name: 'Frido' }
       }
-      expect(MyApi).to receive(:create_pet) do |_params, res|
+      expect(namespace).to receive(:create_pet) do |_params, res|
         res.status = 201
         pet
       end
@@ -173,7 +173,7 @@ RSpec.describe OpenapiFirst::Responder do
       end
 
       it 'can be set by the app' do
-        expect(MyApi).to receive(:find_pets) do |_req, res|
+        expect(namespace).to receive(:find_pets) do |_req, res|
           res.headers[Rack::CONTENT_TYPE] = 'application/xml'
           '<xml>'
         end
@@ -191,7 +191,7 @@ RSpec.describe OpenapiFirst::Responder do
 
     describe 'params' do
       it 'uses INBOX from env' do
-        expect(MyApi).to receive(:find_pets) do |params, _res|
+        expect(namespace).to receive(:find_pets) do |params, _res|
           expect(params).to be params.env[OpenapiFirst::INBOX]
         end
 
@@ -199,7 +199,7 @@ RSpec.describe OpenapiFirst::Responder do
       end
 
       it 'is an instance of Inbox' do
-        expect(MyApi).to receive(:find_pets) do |params, _res|
+        expect(namespace).to receive(:find_pets) do |params, _res|
           expect(params).to be_a OpenapiFirst::Inbox
         end
 
@@ -210,7 +210,7 @@ RSpec.describe OpenapiFirst::Responder do
         expected_params = {
           tags: ['foo']
         }
-        expect(MyApi).to receive(:find_pets) do |params, _res|
+        expect(namespace).to receive(:find_pets) do |params, _res|
           expect(params).to eq expected_params
         end
 
@@ -227,7 +227,7 @@ RSpec.describe OpenapiFirst::Responder do
           id: 1
         }.merge(pet)
 
-        expect(MyApi).to receive(:update_pet) do |params, _res|
+        expect(namespace).to receive(:update_pet) do |params, _res|
           expect(params).to eq expected_params
         end
 
@@ -239,7 +239,7 @@ RSpec.describe OpenapiFirst::Responder do
 
     describe 'params.env' do
       it 'holds the Rack env' do
-        expect(MyApi).to receive(:find_pets) do |params, _res|
+        expect(namespace).to receive(:find_pets) do |params, _res|
           expect(params.env['PATH_INFO']).to eq '/pets'
           operation = params.env[OpenapiFirst::OPERATION]
           expect(operation.operation_id).to eq 'find_pets'
