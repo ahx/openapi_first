@@ -142,6 +142,8 @@ module OpenapiFirst
     end
 
     def parse_array_parameter(value, schema)
+      return value if value.nil? || value.empty?
+
       array = value.is_a?(Array) ? value : value.split(',')
       return array unless schema['items']
 
