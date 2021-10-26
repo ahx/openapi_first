@@ -14,6 +14,7 @@ module OpenapiFirst
       @schemer = JSONSchemer.schema(
         schema,
         keywords: custom_keywords,
+        insert_property_defaults: true,
         before_property_validation: proc do |data, property, property_schema, parent|
           convert_nullable(data, property, property_schema, parent)
         end
