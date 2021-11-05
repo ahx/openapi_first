@@ -163,6 +163,14 @@ RSpec.describe 'Parameter validation' do
           expect(parsed_parameters[:integers]).to eq [2, 3, 4]
         end
 
+        it 'interprets an empty value as an empty array' do
+          get '/default-style?strings=&integers='
+          expect(last_response.status).to eq(200), last_response.body
+          parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
+          expect(parsed_parameters[:strings]).to eq []
+          expect(parsed_parameters[:integers]).to eq []
+        end
+
         it 'parses nested array' do
           params = {
             nested: { integers: '2,3,4' }
@@ -255,11 +263,11 @@ RSpec.describe 'Parameter validation' do
         expect(error[:title]).to eq 'is not valid: nil'
       end
 
-      it 'returns 400 if non-required array parameter is empty' do
+      it 'returns 200 if non-required array parameter is empty' do
         get "#{path}?term=Oscar&filter[id]=1&filter[tag]=&filter[other]=things"
-        expect(last_response.status).to eq 400
-        error = response_body[:errors][0]
-        expect(error[:title]).to eq 'is not valid: ""'
+        expect(last_response.status).to eq 200
+        parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
+        expect(parsed_parameters.dig(:filter, :tag)).to eq []
       end
 
       it 'passes if query parameters are valid' do

@@ -113,7 +113,7 @@ module OpenapiFirst
       env[INBOX].merge! params
     end
 
-    def filtered_params(json_schema, params)
+    def filtered_and_parsed_params(json_schema, params)
       json_schema['properties']
         .each_with_object({}) do |key_value, result|
           parameter_name = key_value[0].to_sym
@@ -135,7 +135,7 @@ module OpenapiFirst
     end
 
     def parse_parameter(value, schema)
-      return filtered_params(schema, value) if schema['properties']
+      return filtered_and_parsed_params(schema, value) if schema['properties']
 
       return parse_array_parameter(value, schema) if schema['type'] == 'array'
 
@@ -143,7 +143,8 @@ module OpenapiFirst
     end
 
     def parse_array_parameter(value, schema)
-      return value if value.nil? || value.empty?
+      return if value.nil?
+      return [] if value.empty?
 
       array = value.is_a?(Array) ? value : value.split(',')
       return array unless schema['items']
