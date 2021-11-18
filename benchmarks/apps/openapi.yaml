@@ -28,15 +28,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  required: [hello, id]
-                  properties:
-                    hello:
-                      type: string
-                    id:
-                      type: string
+                type: object
+                required: [hello, id]
+                properties:
+                  hello:
+                    type: string
+                  id:
+                    type: string
   /hello:
     get:
       operationId: find_things
@@ -61,11 +59,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required: [hello]
-                properties:
-                  hello:
-                    type: string
+                type: array
+                items:
+                  type: object
+                  required: [hello]
+                  properties:
+                    hello:
+                      type: string
         default:
           description: Error response
 
