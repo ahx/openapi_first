@@ -2,7 +2,6 @@
 
 require 'rack'
 require 'hanami/router'
-require_relative 'utils'
 
 module OpenapiFirst
   class Router

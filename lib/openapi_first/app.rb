@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rack'
-require 'logger'
 
 module OpenapiFirst
   class App

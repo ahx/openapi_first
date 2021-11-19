@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-require 'json_schemer'
 require 'multi_json'
 require_relative 'router_required'
-require_relative 'validation'
+require_relative 'validation_format'
 
 module OpenapiFirst
   class ResponseValidation
