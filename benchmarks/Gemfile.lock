@@ -3,11 +3,11 @@ PATH
   specs:
     openapi_first (0.14.2)
       deep_merge (>= 1.2.1)
-      hanami-router (~> 2.0.alpha3)
+      hanami-router (~> 2.0.alpha4)
       hanami-utils (~> 2.0.alpha1)
+      json_refs (>= 0.1.7)
       json_schemer (~> 0.2.16)
       multi_json (~> 1.14)
-      oas_parser (~> 0.25.1)
       rack (~> 2.2)
 
 GEM
@@ -19,8 +19,6 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
-    addressable (2.8.0)
-      public_suffix (>= 2.0.2, < 5.0)
     benchmark-ips (2.9.2)
     benchmark-memory (0.2.0)
       memory_profiler (~> 1)
@@ -66,13 +64,14 @@ GEM
       mustermann (~> 1.0)
       mustermann-contrib (~> 1.0)
       rack (~> 2.0)
-    hanami-utils (2.0.0.alpha2)
+    hanami-utils (2.0.0.alpha3)
       concurrent-ruby (~> 1.0)
       dry-transformer (~> 0.1)
     hansi (0.2.0)
-    hash-deep-merge (0.1.1)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
+    json_refs (0.1.7)
+      hana
     json_schema (0.21.0)
     json_schemer (0.2.18)
       ecma-re-validator (~> 0.3)
@@ -80,7 +79,6 @@ GEM
       regexp_parser (~> 2.0)
       uri_template (~> 0.7)
     memory_profiler (1.0.0)
-    mini_portile2 (2.6.1)
     minitest (5.14.4)
     multi_json (1.15.0)
     mustermann (1.1.1)
@@ -90,20 +88,7 @@ GEM
       mustermann (= 1.1.1)
     mustermann-grape (1.0.1)
       mustermann (>= 1.0.0)
-    nokogiri (1.12.5)
-      mini_portile2 (~> 2.6.1)
-      racc (~> 1.4)
-    oas_parser (0.25.4)
-      activesupport (>= 4.0.0)
-      addressable (~> 2.3)
-      builder (~> 3.2.3)
-      deep_merge (~> 1.2.1)
-      hash-deep-merge
-      mustermann-contrib (~> 1.1.1)
-      nokogiri
     openapi_parser (0.15.0)
-    public_suffix (4.0.6)
-    racc (1.6.0)
     rack (2.2.3)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -127,7 +112,7 @@ GEM
     zeitwerk (2.5.1)
 
 PLATFORMS
-  ruby
+  x86_64-darwin-20
 
 DEPENDENCIES
   benchmark-ips

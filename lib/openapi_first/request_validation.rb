@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rack'
-require 'json_schemer'
 require 'multi_json'
 require_relative 'inbox'
 require_relative 'router_required'

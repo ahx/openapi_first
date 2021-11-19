@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require_relative 'utils'
 
 module OpenapiFirst
   # Represents an OpenAPI Response Object

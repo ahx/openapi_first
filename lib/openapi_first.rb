@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 require 'yaml'
-require 'oas_parser'
-require 'openapi_first/definition'
-require 'openapi_first/version'
-require 'openapi_first/inbox'
-require 'openapi_first/router'
-require 'openapi_first/request_validation'
-require 'openapi_first/response_validator'
-require 'openapi_first/response_validation'
-require 'openapi_first/responder'
-require 'openapi_first/app'
+require 'json_refs'
+require_relative 'openapi_first/definition'
+require_relative 'openapi_first/version'
+require_relative 'openapi_first/inbox'
+require_relative 'openapi_first/router'
+require_relative 'openapi_first/request_validation'
+require_relative 'openapi_first/response_validator'
+require_relative 'openapi_first/response_validation'
+require_relative 'openapi_first/responder'
+require_relative 'openapi_first/app'
 
 module OpenapiFirst
   OPERATION = 'openapi_first.operation'
@@ -24,8 +24,10 @@ module OpenapiFirst
   end
 
   def self.load(spec_path, only: nil)
-    content = YAML.load_file(spec_path)
-    resolved = OasParser::Parser.new(spec_path, content).resolve
+    resolved = Dir.chdir(File.dirname(spec_path)) do
+      content = YAML.load_file(File.basename(spec_path))
+      JsonRefs.call(content, resolve_local_ref: true, resolve_file_ref: true)
+    end
     resolved['paths'].filter!(&->(key, _) { only.call(key) }) if only
     Definition.new(resolved, spec_path)
   end

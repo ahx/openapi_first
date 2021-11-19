@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require 'json_schemer'
-require 'multi_json'
-require_relative 'validation'
+require_relative 'response_validation'
 require_relative 'router'
 
 module OpenapiFirst
