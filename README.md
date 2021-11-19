@@ -289,6 +289,10 @@ Run `bundle exec rspec` to run the tests.
 
 See `bundle exec rake -T` for rubygems related tasks.
 
+## Benchmarks
+
+[Results](https://gist.github.com/ahx/e6ffced58bd2e8d5baffb2f4d2c1f823)
+
 ### Run benchmarks
 
 ```sh
