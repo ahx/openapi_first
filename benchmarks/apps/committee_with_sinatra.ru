@@ -25,7 +25,7 @@ class SinatraWithCommiteeExample < Sinatra::Base
 end
 
 use Committee::Middleware::RequestValidation,
-    schema_path: './apps/openapi.yaml',
+    schema_path: File.absolute_path('./openapi.yaml', __dir__),
     parse_response_by_content_type: true
 
 run SinatraWithCommiteeExample
