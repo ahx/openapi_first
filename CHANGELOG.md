@@ -1,44 +1,60 @@
 # Changelog
 
+## 0.14.3
+
+- Use json_refs to resolve OpenAPI file. This removes oas_parser and ActiveSupport from list of dependencies
+
 ## 0.14.2
+
 - Empty query parameters are parsed and request validation returns 400 if an empty string is not allowed. Note that this does not look at `allowEmptyValue` in any way, because allowEmptyValue is deprecated.
 
 ## 0.14.1
+
 - Bugfix: Don't mix path- and operation-level parameters for request validation
 
 ## 0.14.0
+
 - Handle custom x-handler field in the API description to find a handler method not based on operationId
 - Add `resolver` option to provide a custom resolver to find a handler method
 
 ## 0.13.3
+
 - Better error message if string does not match format
 - readOnly and writeOnly just works when used inside allOf
 
 ## 0.13.2
+
 - Return indicator (`source: { parameter: 'list/1' }`) in error response body when array item in query parameter is invalid
 
 ## 0.13.0
+
 - Add support for arrays in query parameters (style: form, explode: false)
 - Remove warning when handler is not implemented
 
 ## 0.12.5
+
 - Add `not_found: :continue` option to Router to make it do nothing if request is unknown
 
 ## 0.12.4
+
 - content-type is found while ignoring additional content-type parameters (`application/json` is found when request/response content-type is `application/json; charset=UTF8`)
 - Support wildcard mime-types when finding the content-type
 
 ## 0.12.3
+
 - Add `response_validation:`, `router_raise_error` options to standalone mode.
 
 ## 0.12.2
+
 - Allow response to have no media type object specified
 
 ## 0.12.1
+
 - Fix response when handler returns 404 or 405
 - Don't validate the response content if status is 204 (no content)
 
 ## 0.12.0
+
 - Change `ResponseValidator` to raise an exception if it found a problem
 - Params have symbolized keys now
 - Remove `not_found` option from Router. Return 405 if HTTP verb is not allowed (via Hanami::Router)
@@ -50,6 +66,7 @@
 - Add `Operation#name` that returns a human readable name for an operation
 
 ## 0.11.0
+
 - Raise error if you forgot to add the Router middleware
 - Make OpenapiFirst.app raise an error in test env when request path is not specified
 - Rename OperationResolver to Responder
@@ -58,48 +75,60 @@
 - Move namespace option from Router to OperationResolver
 
 ## 0.10.2
+
 - Return 400 if request body has invalid JSON ([issue](https://github.com/ahx/openapi_first/issues/73)) thanks Thomas Frütel
 
 ## 0.10.1
+
 - Fix duplicated key in `required` when generating JSON schema for `some[thing]` parameters
 
 ## 0.10.0
+
 - Add support for query parameters named `"some[thing]"` ([issue](https://github.com/ahx/openapi_first/issues/40))
 
 ## 0.9.0
+
 - Make request validation usable standalone
 
 ## 0.8.0
+
 - Add merged parameter and request body available to env at `env[OpenapiFirst::INBOX]` in request validation
 - Path and query parameters with `type: boolean` now get converted to `true`/`false`
 - Rename `OpenapiFirst::PARAMS` to `OpenapiFirst::PARAMETERS`
 
 ## 0.7.1
+
 - Add missing `require` to work with new version of `oas_parser`
 
 ## 0.7.0
+
 - Make use of hanami-router, because it's fast
 - Remove option `allow_unknown_query_paramerters`
 - Move the namespace option to Router
-- Convert numeric path and query parameters  to `Integer` or `Float`
+- Convert numeric path and query parameters to `Integer` or `Float`
 - Pass the Rack env if your action class' initializers accepts an argument
 - Respec rack's `env['SCRIPT_NAME']` in router
 - Add MIT license
 
 ## 0.6.10
+
 - Bugfix: params.env['unknown'] now returns `nil` as expected. Thanks @tristandruyen.
 
 ## 0.6.9
+
 - Removed radix tree, because of a bug (https://github.com/namusyaka/r2ree-ruby/issues/2)
 
 ## 0.6.8
+
 - Performance: About 25% performance increase (i/s) with help of c++ based radix-tree and some optimizations
 - Update dependencies
 
 ## 0.6.7
+
 - Fix: version number of oas_parser
 
 ## 0.6.6
+
 - Remove warnings for Ruby 2.7
 
 ## 0.6.5
