@@ -76,6 +76,16 @@ RSpec.describe 'Parameter validation' do
       expect(error[:source][:parameter]).to eq 'birthdate'
     end
 
+    it 'returns 400 if query parameter has not valid date-time format' do
+      params[:date_time] = '2013-12-11T01:01:01'
+      get path, params
+
+      expect(last_response.status).to be 400
+      error = response_body[:errors][0]
+      expect(error[:title]).to eq 'has not a valid date-time format'
+      expect(error[:source][:parameter]).to eq 'date_time'
+    end
+
     it 'returns 400 if query parameter is empty' do
       params[:birthdate] = ''
       get path, params
