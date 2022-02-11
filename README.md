@@ -15,6 +15,7 @@ This gem is inspired by [committee](https://github.com/interagent/committee) (Ru
 Here's a [comparison between committee and openapi_first](https://gist.github.com/ahx/1538c31f0652f459861713b5259e366a).
 
 ## Rack middlewares
+
 OpenapiFirst consists of these Rack middlewares:
 
 - [`OpenapiFirst::Router`](#OpenapiFirst::Router) – Finds the OpenAPI operation for the current request or returns 404 if no operation was found. This can be customized.
@@ -23,6 +24,7 @@ OpenapiFirst consists of these Rack middlewares:
 - [`OpenapiFirst::ResponseValidation`](#OpenapiFirst::ResponseValidation) Validates the response and raises an exception if the response body is invalid.
 
 ## OpenapiFirst::Router
+
 You always have to add this middleware first in order to make the other middlewares work.
 
 ```ruby
@@ -33,11 +35,11 @@ This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation obj
 
 ### Options and defaults
 
-| Name | Possible values | Description | Default
-|:---|---|---|---|
-|`spec:`| | The spec loaded via `OpenapiFirst.load` ||
-| `raise_error:` |`false`, `true` | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description. | `false` (don't raise an exception)
-| `not_found:` | `:continue`, `:halt`| If set to `:continue` the middleware will not return 404 (405, 415), but just pass handling the request to the next middleware or application in the Rack stack. If combined with `raise_error: true` `raise_error` gets preference and an exception is raised. | `:halt` (return 4xx response)
+| Name           | Possible values      | Description                                                                                                                                                                                                                                                     | Default                            |
+| :------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `spec:`        |                      | The spec loaded via `OpenapiFirst.load`                                                                                                                                                                                                                         |                                    |
+| `raise_error:` | `false`, `true`      | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description.                                                             | `false` (don't raise an exception) |
+| `not_found:`   | `:continue`, `:halt` | If set to `:continue` the middleware will not return 404 (405, 415), but just pass handling the request to the next middleware or application in the Rack stack. If combined with `raise_error: true` `raise_error` gets preference and an exception is raised. | `:halt` (return 4xx response)      |
 
 ## OpenapiFirst::RequestValidation
 
@@ -47,12 +49,11 @@ This middleware returns a 400 status code with a body that describes the error i
 use OpenapiFirst::RequestValidation
 ```
 
-
 ### Options and defaults
 
-| Name | Possible values | Description | Default
-|:---|---|---|---|
-| `raise_error:` |`false`, `true` | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` instead of returning 4xx. | `false` (don't raise an exception)
+| Name           | Possible values | Description                                                                                        | Default                            |
+| :------------- | --------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `raise_error:` | `false`, `true` | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` instead of returning 4xx. | `false` (don't raise an exception) |
 
 The error responses conform with [JSON:API](https://jsonapi.org).
 
@@ -114,13 +115,14 @@ run OpenapiFirst::Responder
 ```
 
 ### Options
-| Name | Description
-|:---|---|
-| `namespace:` | Optional. A class or module where to find the handler method. |
-| `resolver:` | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
 
+| Name         | Description                                                                                                                                                                                       |
+| :----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `namespace:` | Optional. A class or module where to find the handler method.                                                                                                                                     |
+| `resolver:`  | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
 
 ### OpenapiFirst::DefaultOperationResolver
+
 This is the default way to look up a handler method for an operation. Handlers are always looked up in a namespace module that needs to be specified.
 
 It works like this:
@@ -144,13 +146,15 @@ There are two ways to set the response body:
 - Returning a value which will get converted to JSON
 
 ## OpenapiFirst::ResponseValidation
-This middleware is especially useful when testing. It *always* raises an error if the response is not valid.
+
+This middleware is especially useful when testing. It _always_ raises an error if the response is not valid.
 
 ```ruby
 use OpenapiFirst::ResponseValidation if ENV['RACK_ENV'] == 'test'
 ```
 
 ## Standalone usage
+
 Instead of composing these middlewares yourself you can use `OpenapiFirst.app`.
 
 ```ruby
@@ -181,15 +185,14 @@ The above will use the mentioned Rack middlewares to:
 
 ### Options and defaults
 
-| Name | Possible values | Description | Default
-|:---|---|---|---|
-| `spec_path` || A filepath to an OpenAPI definition file. |
-| `namespace:` || A class or module where to find the handler methods.|
-| `response_validation:` | `true`, `false` | If set to true it raises an exception if the response is invalid. This is useful during testing. | `false`
-| `router_raise_error:` | `true`, `false` | If set to true it raises an exception (subclass of `OpenapiFirst::Error` when a request path/method is not specified. This is useful during testing. | `false`
-| `request_validation_raise_error:` | `true`, `false` | If set to true it raises an exception (subclass of `OpenapiFirst::Error` when a request is not valid. | `false`
-| `resolver:` | | Option to customize finding the [handler](#handlers) method for an operation. See [OpenapiFirst::Responder](#OpenapiFirst::Responder) for details.
-
+| Name                              | Possible values | Description                                                                                                                                          | Default |
+| :-------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `spec_path`                       |                 | A filepath to an OpenAPI definition file.                                                                                                            |
+| `namespace:`                      |                 | A class or module where to find the handler methods.                                                                                                 |
+| `response_validation:`            | `true`, `false` | If set to true it raises an exception if the response is invalid. This is useful during testing.                                                     | `false` |
+| `router_raise_error:`             | `true`, `false` | If set to true it raises an exception (subclass of `OpenapiFirst::Error` when a request path/method is not specified. This is useful during testing. | `false` |
+| `request_validation_raise_error:` | `true`, `false` | If set to true it raises an exception (subclass of `OpenapiFirst::Error` when a request is not valid.                                                | `false` |
+| `resolver:`                       |                 | Option to customize finding the [handler](#handlers) method for an operation. See [OpenapiFirst::Responder](#OpenapiFirst::Responder) for details.   |
 
 Handler functions (`find_pet`) are called with two arguments:
 
