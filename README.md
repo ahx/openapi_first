@@ -110,7 +110,7 @@ Response validation fails if response body includes a property with `writeOnly: 
 This Rack endpoint maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it. Responder also adds a content-type to the response.
 
 ```ruby
-run OpenapiFirst::Responder, spec: OpenapiFirst.load('./openapi/openapi.yaml')
+run OpenapiFirst::Responder
 ```
 
 ### Options
