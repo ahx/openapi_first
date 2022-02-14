@@ -35,6 +35,13 @@ RSpec.describe 'Parameter validation' do
       }
     end
 
+    let(:params_with_defaults) do
+      {
+        term: 'Oscar',
+        limit: 10
+      }
+    end
+
     let(:response_body) do
       json_load(last_response.body, symbolize_keys: true)
     end
@@ -112,13 +119,13 @@ RSpec.describe 'Parameter validation' do
     it 'adds filtered query parameters to env ' do
       get path, params
 
-      expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq params
+      expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq params_with_defaults
     end
 
     it 'updates INBOX' do
       get path, params
 
-      expect(last_request.env[OpenapiFirst::INBOX]).to eq params
+      expect(last_request.env[OpenapiFirst::INBOX]).to eq params_with_defaults
     end
 
     it 'skips parameter validation if no parameters are defined' do
@@ -137,7 +144,7 @@ RSpec.describe 'Parameter validation' do
       get path, params.merge(foo: 'bar')
 
       expect(last_response.status).to eq 200
-      expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq params
+      expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq params_with_defaults
     end
 
     describe 'with array query parameters' do
