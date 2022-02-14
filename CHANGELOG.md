@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Populate default parameter values
+
 ## 0.14.3
 
 - Use json_refs to resolve OpenAPI file. This removes oas_parser and ActiveSupport from list of dependencies

@@ -1,11 +1,7 @@
 openapi: "3.0.2"
 info:
   version: 1.0.0
-  title: Search example
-  contact:
-    name: Contact Name
-    email: contact@example.com
-    url: https://example.com/
+  title: Parameter validation
 servers:
   - url: http://example.com
 tags:
@@ -105,6 +101,29 @@ paths:
       operationId: info
       tags:
         - search
+      responses:
+        "200":
+          description: ok
+  /with-default-query-param:
+    get:
+      parameters:
+        - name: has_default
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        "200":
+          description: ok
+  /with-default-query-nullable:
+    get:
+      parameters:
+        - name: has_default
+          in: query
+          required: false
+          schema:
+            type: boolean
       responses:
         "200":
           description: ok
