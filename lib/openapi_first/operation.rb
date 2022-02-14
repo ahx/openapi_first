@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'forwardable'
+require 'set'
 require_relative 'schema_validation'
 require_relative 'utils'
 require_relative 'response_object'

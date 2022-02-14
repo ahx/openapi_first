@@ -1,10 +1,10 @@
 PATH
   remote: ..
   specs:
-    openapi_first (0.14.2)
+    openapi_first (0.14.3)
       deep_merge (>= 1.2.1)
-      hanami-router (~> 2.0.alpha4)
-      hanami-utils (~> 2.0.alpha1)
+      hanami-router (~> 2.0.alpha5)
+      hanami-utils (~> 2.0.alpha3)
       json_refs (>= 0.1.7)
       json_schemer (~> 0.2.16)
       multi_json (~> 1.14)
@@ -13,13 +13,12 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (6.1.4.1)
+    activesupport (7.0.2.2)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-      zeitwerk (~> 2.3)
-    benchmark-ips (2.9.2)
+    benchmark-ips (2.9.3)
     benchmark-memory (0.2.0)
       memory_profiler (~> 1)
     builder (3.2.4)
@@ -28,8 +27,8 @@ GEM
       openapi_parser (>= 0.11.1, < 1.0)
       rack (>= 1.5)
     concurrent-ruby (1.1.9)
-    deep_merge (1.2.1)
-    dry-configurable (0.13.0)
+    deep_merge (1.2.2)
+    dry-configurable (0.14.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.6)
     dry-container (0.9.0)
@@ -48,9 +47,9 @@ GEM
       dry-core (~> 0.5, >= 0.5)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    ecma-re-validator (0.3.0)
-      regexp_parser (~> 2.0)
-    grape (1.6.0)
+    ecma-re-validator (0.4.0)
+      regexp_parser (~> 2.2)
+    grape (1.6.2)
       activesupport
       builder
       dry-types (>= 1.1)
@@ -64,11 +63,11 @@ GEM
       mustermann (~> 1.0)
       mustermann-contrib (~> 1.0)
       rack (~> 2.0)
-    hanami-utils (2.0.0.alpha3)
+    hanami-utils (2.0.0.alpha6)
       concurrent-ruby (~> 1.0)
       dry-transformer (~> 0.1)
     hansi (0.2.0)
-    i18n (1.8.11)
+    i18n (1.9.1)
       concurrent-ruby (~> 1.0)
     json_refs (0.1.7)
       hana
@@ -79,7 +78,7 @@ GEM
       regexp_parser (~> 2.0)
       uri_template (~> 0.7)
     memory_profiler (1.0.0)
-    minitest (5.14.4)
+    minitest (5.15.0)
     multi_json (1.15.0)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
@@ -94,7 +93,7 @@ GEM
       rack (>= 0.4)
     rack-protection (2.1.0)
       rack
-    regexp_parser (2.1.1)
+    regexp_parser (2.2.1)
     ruby2_keywords (0.0.5)
     seg (1.2.0)
     sinatra (2.1.0)
@@ -109,7 +108,6 @@ GEM
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     uri_template (0.7.0)
-    zeitwerk (2.5.1)
 
 PLATFORMS
   x86_64-darwin-20
@@ -120,7 +118,7 @@ DEPENDENCIES
   committee
   grape
   hanami-api
-  hanami-router (~> 2.0.0.alpha3)
+  hanami-router (~> 2.0.0.alpha5)
   multi_json
   openapi_first!
   sinatra
