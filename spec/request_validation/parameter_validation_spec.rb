@@ -12,7 +12,7 @@ RSpec.describe 'Parameter validation' do
     '/search'
   end
 
-  let(:spec) { OpenapiFirst.load('./spec/data/search.yaml') }
+  let(:spec) { OpenapiFirst.load('./spec/data/parameter-validation.yaml') }
 
   let(:raise_error_option) { false }
 
@@ -198,6 +198,32 @@ RSpec.describe 'Parameter validation' do
           expect(error[:source][:parameter]).to eq 'integers/1'
           expect(error[:title]).to eq 'should be a integer'
         end
+      end
+    end
+
+    describe 'with default values' do
+      it 'adds the default value if parameter is missing' do
+        params = {}
+        get '/with-default-query-param', params
+        expect(last_response.status).to eq(200)
+        parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
+        expect(parsed_parameters[:has_default]).to eq true
+      end
+
+      it 'still validates the parameter' do
+        params = {
+          has_default: 'not-a-boolean'
+        }
+        get '/with-default-query-param', params
+        expect(last_response.status).to eq(400)
+      end
+
+      it 'accepts the given value if parameter is given' do
+        params = { has_default: false }
+        get '/with-default-query-param', params
+        expect(last_response.status).to eq(200)
+        parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
+        expect(parsed_parameters[:has_default]).to eq false
       end
     end
 

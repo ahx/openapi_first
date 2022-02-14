@@ -18,7 +18,7 @@ RSpec.describe 'Request body validation' do
     let(:app) do
       raise_error = raise_error_option
       Rack::Builder.new do
-        spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
+        spec = OpenapiFirst.load('./spec/data/request-body-validation.yaml')
         use OpenapiFirst::Router, spec: spec
         use OpenapiFirst::RequestValidation, raise_error: raise_error
         run lambda { |_env|
@@ -125,6 +125,34 @@ RSpec.describe 'Request body validation' do
       expect(error[:detail]).to include "unexpected token at '{fo},'"
     end
 
+    describe 'with default values' do
+      before { header Rack::CONTENT_TYPE, 'application/json' }
+
+      it 'adds the default value if value is missing' do
+        params = {}
+        post '/with-default-body-value', json_dump(params)
+        expect(last_response.status).to eq(200)
+        values = last_request.env[OpenapiFirst::INBOX]
+        expect(values[:has_default]).to eq true
+      end
+
+      it 'still validates the value' do
+        params = {
+          has_default: 'not-a-boolean'
+        }
+        post '/with-default-body-value', json_dump(params)
+        expect(last_response.status).to eq(400)
+      end
+
+      it 'accepts the given value if value is given' do
+        params = { has_default: false }
+        post '/with-default-body-value', json_dump(params)
+        expect(last_response.status).to eq(200)
+        values = last_request.env[OpenapiFirst::INBOX]
+        expect(values[:has_default]).to eq false
+      end
+    end
+
     it 'returns 415 if required request body is missing' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path
@@ -144,7 +172,7 @@ RSpec.describe 'Request body validation' do
 
     describe 'when operation does not specify request body' do
       it 'skips request body validation' do
-        get '/pets'
+        post '/without-request-body'
 
         expect(last_response.status).to be 200
         expect(last_response.body).to eq 'hello'
