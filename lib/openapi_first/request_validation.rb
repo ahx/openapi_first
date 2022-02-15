@@ -10,9 +10,9 @@ module OpenapiFirst
   class RequestValidation # rubocop:disable Metrics/ClassLength
     prepend RouterRequired
 
-    def initialize(app, options = {})
+    def initialize(app, raise_error: false)
       @app = app
-      @raise = options.fetch(:raise_error, false)
+      @raise = raise_error
     end
 
     def call(env) # rubocop:disable Metrics/AbcSize
