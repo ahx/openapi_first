@@ -1,9 +1,5 @@
 # Changelog
 
-## Unreleased
-
-- Use a Hash instead of named arguments for middleware options for better compatibility
-
 ## 0.15.0
 
 - Populate default parameter values
