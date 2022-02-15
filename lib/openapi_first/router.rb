@@ -7,15 +7,13 @@ module OpenapiFirst
   class Router
     def initialize(
       app,
-      spec:,
-      raise_error: false,
-      not_found: :halt,
-      parent_app: nil
+      options
     )
       @app = app
-      @parent_app = parent_app
-      @raise = raise_error
-      @not_found = not_found
+      @parent_app = options.fetch(:parent_app, nil)
+      @raise = options.fetch(:raise_error, false)
+      @not_found = options.fetch(:not_found, :halt)
+      spec = options.fetch(:spec)
       @filepath = spec.filepath
       @router = build_router(spec.operations)
     end
