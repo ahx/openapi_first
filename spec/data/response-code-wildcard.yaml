@@ -1,0 +1,24 @@
+openapi: "3.0.2"
+info:
+  title: API Title
+  version: "1.0"
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /test:
+    post:
+      operationId: test
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: Success
+        4XX:
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object

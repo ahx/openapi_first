@@ -93,7 +93,8 @@ module OpenapiFirst
 
     def response_by_code(status)
       operation_object.dig('responses', status.to_s) ||
-        operation_object.dig('responses', 'default')
+        operation_object.dig('responses', 'default') ||
+          operation_object.dig('responses', "#{status / 100}XX")
     end
 
     def operation_object
