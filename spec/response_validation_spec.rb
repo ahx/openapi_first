@@ -131,6 +131,30 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
+  describe 'with a XX wildcard response status' do
+    let(:spec) { OpenapiFirst.load('./spec/data/response-code-wildcard.yaml') }
+    let(:response_body) { {} }
+
+    context 'when 4xx is expected and 404 is sent' do
+      let(:status) { 404 }
+
+      it 'does not raise an error' do
+        post '/test', json_dump({})
+        expect(last_response.status).to eq 404
+      end
+    end
+
+    context 'when 4xx is expected and 302 is sent' do
+      let(:status) { 302 }
+
+      it 'finds the "default" response and raises an error' do
+        expect do
+          post '/test', json_dump({})
+        end.to raise_error OpenapiFirst::ResponseBodyInvalidError
+      end
+    end
+  end
+
   describe 'response body invalid' do
     let(:response_body) do
       json_dump([
