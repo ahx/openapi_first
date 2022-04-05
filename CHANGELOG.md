@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.0
+
+- Support status code wildcards like "2XX", "4XX"
+
 ## 0.15.0
 
 - Populate default parameter values
