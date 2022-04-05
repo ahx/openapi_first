@@ -22,3 +22,9 @@ paths:
             application/json:
               schema:
                 type: object
+        default:
+          description: Something
+          content:
+            application/json:
+              schema:
+                type: array
