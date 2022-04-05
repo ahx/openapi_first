@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Use a Hash instead of named arguments for middleware options for better compatibility
+
 ## 0.16.1
 
 - Pin hanami-router version, because alpha6 is broken.
