@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.1
+
+- Pin hanami-router version, because alpha6 is broken.
+
 ## 0.16.0
 
 - Support status code wildcards like "2XX", "4XX"
