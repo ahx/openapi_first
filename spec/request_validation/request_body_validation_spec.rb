@@ -48,6 +48,20 @@ RSpec.describe 'Request body validation' do
       expect(last_response.status).to be 200
     end
 
+    it 'works with % in request body' do
+      request_body = {
+        type: 'pet',
+        attributes: {
+          name: 'Oscar 100%'
+        }
+      }
+      header Rack::CONTENT_TYPE, 'application/json'
+      io = StringIO.new(json_dump(request_body))
+      post path, io
+
+      expect(last_response.status).to be 200
+    end
+
     it 'succeeds if request body is valid' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
