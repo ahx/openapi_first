@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.17.0
 
-- Use a Hash instead of named arguments for middleware options for better compatibility
+- BREAKING CHANGE: Use a Hash instead of named arguments for middleware options for better compatibility
+  Using named arguments is actually not supported in Rack.
 
 ## 0.16.1
 
