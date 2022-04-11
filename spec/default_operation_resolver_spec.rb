@@ -33,8 +33,6 @@ RSpec.describe OpenapiFirst::DefaultOperationResolver do
     stub_const(
       'Web::Things::Show',
       Class.new do
-        def initialize(env); end
-
         def call(_params, _res); end
       end
     )
@@ -71,7 +69,7 @@ RSpec.describe OpenapiFirst::DefaultOperationResolver do
       handler = subject.find_handler('things#show')
       response = double
       action = ->(params, res) {}
-      expect(Web::Things::Show).to receive(:new).with(env) { action }
+      expect(Web::Things::Show).to receive(:new) { action }
       expect(action).to receive(:call).with(params, response)
       handler.call(params, response)
     end

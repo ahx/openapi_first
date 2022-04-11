@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.17.0
+
+- BREAKING CHANGE: Use a Hash instead of named arguments for middleware options for better compatibility
+  Using named arguments is actually not supported in Rack.
+
 ## 0.16.1
 
 - Pin hanami-router version, because alpha6 is broken.
