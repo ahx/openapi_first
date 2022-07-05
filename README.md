@@ -20,7 +20,7 @@ OpenapiFirst consists of these Rack middlewares:
 
 - [`OpenapiFirst::Router`](#OpenapiFirst::Router) – Finds the OpenAPI operation for the current request or returns 404 if no operation was found. This can be customized.
 - [`OpenapiFirst::RequestValidation`](#OpenapiFirst::RequestValidation) – Validates the request against the API description and returns 400 if the request is invalid.
-- [`OpenapiFirst::Responder`](#OpenapiFirst::Responder) calls the [handler](#handlers) found for the operation, sets the correct content-type and serialized the response body to json if needed.
+- [`OpenapiFirst::Responder`](#OpenapiFirst::Responder) calls the [handler](#handlers) found for the operation, sets the correct content-type and serializes the response body to json if needed.
 - [`OpenapiFirst::ResponseValidation`](#OpenapiFirst::ResponseValidation) Validates the response and raises an exception if the response body is invalid.
 
 ## OpenapiFirst::Router
