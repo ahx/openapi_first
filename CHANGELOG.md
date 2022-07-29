@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- BREAKING CHANGE: Handler classes are not instantiated only once and the same instance is called on each following call/request.
+
 ## 0.17.0
 
 - BREAKING CHANGE: Use a Hash instead of named arguments for middleware options for better compatibility

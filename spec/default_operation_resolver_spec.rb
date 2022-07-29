@@ -42,7 +42,7 @@ RSpec.describe OpenapiFirst::DefaultOperationResolver do
     it 'finds the method in namespace' do
       expect(Web).to receive(:list_pets)
       operation = spec.operations.first
-      subject.call(operation).call
+      subject.call(operation).call({})
     end
   end
 
@@ -52,26 +52,25 @@ RSpec.describe OpenapiFirst::DefaultOperationResolver do
 
     it 'finds some_method' do
       expect(Web).to receive(:some_method)
-      subject.find_handler('some_method').call
+      subject.find_handler('some_method').call({})
     end
 
     it 'finds things.some_method' do
       expect(Web::Things).to receive(:some_class_method)
-      subject.find_handler('things.some_class_method').call
+      subject.find_handler('things.some_class_method').call({})
     end
 
     it 'finds things#index' do
       expect_any_instance_of(Web::Things::Index).to receive(:call)
-      subject.find_handler('things#index').call(params, double)
+      subject.find_handler('things#index').call({})
     end
 
     it 'finds things#show with initializer' do
-      handler = subject.find_handler('things#show')
-      response = double
-      action = ->(params, res) {}
+      action = ->(_env) { 'foo' }
+      env = {}
       expect(Web::Things::Show).to receive(:new) { action }
-      expect(action).to receive(:call).with(params, response)
-      handler.call(params, response)
+      handler = subject.find_handler('things#show')
+      expect(handler.call(env)).to eq('foo')
     end
 
     it 'does not find unknown class' do

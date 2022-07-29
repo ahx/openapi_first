@@ -129,7 +129,7 @@ It works like this:
 
 - An operationId "create_pet" or "createPet" or "create pet" calls `MyApi.create_pet(params, response)`
 - "some_things.create" calls: `MyApi::SomeThings.create(params, response)`
-- "pets#create" calls: `MyApi::Pets::Create.new.call(params, response)` If `MyApi::Pets::Create.new` accepts an argument, it will pass the rack `env`.
+- "pets#create" instantiates the class once (`MyApi::Pets::Create.new) and calls it on every request(`instance.call(params, response)`).
 
 ### Handlers
 
