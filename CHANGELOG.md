@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.18.0
 
 - BREAKING CHANGE: Handler classes are not instantiated only once and the same instance is called on each following call/request.
 
