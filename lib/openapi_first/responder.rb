@@ -7,18 +7,19 @@ require_relative 'default_operation_resolver'
 
 module OpenapiFirst
   class Responder
-    def initialize(namespace: nil, resolver: nil)
+    def initialize(namespace: nil, resolver: nil, params_key: INBOX)
       @resolver = resolver || DefaultOperationResolver.new(namespace)
       @namespace = namespace
+      @params_key = params_key
     end
 
     def call(env)
       operation = env[OpenapiFirst::OPERATION]
       res = Rack::Response.new
       handler = find_handler(operation)
-      result = handler.call(env[INBOX], res)
+      result = handler.call(env[@params_key], res)
       res.write serialize(result) if result && res.body.empty?
-      res[Rack::CONTENT_TYPE] ||= operation.content_type_for(res.status)
+      res[Rack::CONTENT_TYPE] ||= operation.content_types_for(res.status)&.first
       res.finish
     end
 

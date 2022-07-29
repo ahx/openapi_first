@@ -120,6 +120,7 @@ run OpenapiFirst::Responder
 | :----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `namespace:` | Optional. A class or module where to find the handler method.                                                                                                                                     |
 | `resolver:`  | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
+| `params_key:` | Optional.  What value from the rack env will be passed to handlers as the first argument. This is OpenapiFirst::INBOX by default.
 
 ### OpenapiFirst::DefaultOperationResolver
 
@@ -129,7 +130,7 @@ It works like this:
 
 - An operationId "create_pet" or "createPet" or "create pet" calls `MyApi.create_pet(params, response)`
 - "some_things.create" calls: `MyApi::SomeThings.create(params, response)`
-- "pets#create" calls: `MyApi::Pets::Create.new.call(params, response)` If `MyApi::Pets::Create.new` accepts an argument, it will pass the rack `env`.
+- "pets#create" instantiates the class once (`MyApi::Pets::Create.new) and calls it on every request(`instance.call(params, response)`).
 
 ### Handlers
 

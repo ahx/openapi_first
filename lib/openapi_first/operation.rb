@@ -47,9 +47,8 @@ module OpenapiFirst
       end
     end
 
-    def content_type_for(status)
-      content = response_for(status)['content']
-      content.keys[0] if content
+    def content_types_for(status)
+      response_for(status)['content']&.keys
     end
 
     def response_schema_for(status, content_type)

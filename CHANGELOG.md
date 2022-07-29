@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.0
+
+- BREAKING CHANGE: Handler classes are not instantiated only once and the same instance is called on each following call/request.
+
+- Add params_key option to `Responder`
+
 ## 0.17.0
 
 - BREAKING CHANGE: Use a Hash instead of named arguments for middleware options for better compatibility

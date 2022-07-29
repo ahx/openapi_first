@@ -37,9 +37,7 @@ module OpenapiFirst
       module_name, klass_name = name.split('#')
       const = find_const(@namespace, module_name)
       klass = find_const(const, klass_name)
-      return ->(params, res) { klass.new.call(params, res) } if klass.instance_method(:initialize).arity.zero?
-
-      ->(params, res) { klass.new(params.env).call(params, res) }
+      klass.new
     end
 
     def find_const(parent, name)
