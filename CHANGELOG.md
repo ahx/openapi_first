@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- BREAKING CHANGE: Handler classes are not instantiated only once and the same instance is called on each following call/request.
+
 - Add params_key option to `Responder`
 
 ## 0.17.0
