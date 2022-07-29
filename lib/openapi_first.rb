@@ -20,7 +20,7 @@ module OpenapiFirst
   HANDLER = 'openapi_first.handler'
 
   def self.env
-    ENV['RACK_ENV'] || ENV['HANAMI_ENV'] || ENV['RAILS_ENV']
+    ENV['RACK_ENV'] || ENV['HANAMI_ENV'] || ENV.fetch('RAILS_ENV', nil)
   end
 
   def self.load(spec_path, only: nil)
