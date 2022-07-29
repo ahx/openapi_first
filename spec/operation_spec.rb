@@ -346,11 +346,11 @@ RSpec.describe OpenapiFirst::Operation do
     end
   end
 
-  describe '#content_type_for' do
+  describe '#content_types_for' do
     it 'finds the response content type for a request' do
       operation = spec.operations.first
-      content_type = operation.content_type_for(200)
-      expect(content_type).to eq 'application/json'
+      content_type = operation.content_types_for(200)
+      expect(content_type).to eq ['application/json']
     end
 
     describe 'when status code cannot be found' do
@@ -359,7 +359,7 @@ RSpec.describe OpenapiFirst::Operation do
         expected_msg =
           "Response status code or default not found: 201 for '#{operation.name}'"
         expect do
-          operation.content_type_for(201)
+          operation.content_types_for(201)
         end.to raise_error OpenapiFirst::ResponseCodeNotFoundError, expected_msg
       end
     end

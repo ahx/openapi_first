@@ -18,7 +18,7 @@ module OpenapiFirst
       handler = find_handler(operation)
       result = handler.call(env[INBOX], res)
       res.write serialize(result) if result && res.body.empty?
-      res[Rack::CONTENT_TYPE] ||= operation.content_type_for(res.status)
+      res[Rack::CONTENT_TYPE] ||= operation.content_types_for(res.status)&.first
       res.finish
     end
 
