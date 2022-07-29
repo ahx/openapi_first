@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add params_key option to `Responder`
+
 ## 0.17.0
 
 - BREAKING CHANGE: Use a Hash instead of named arguments for middleware options for better compatibility

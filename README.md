@@ -120,6 +120,7 @@ run OpenapiFirst::Responder
 | :----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `namespace:` | Optional. A class or module where to find the handler method.                                                                                                                                     |
 | `resolver:`  | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
+| `params_key:` | Optional.  What value from the rack env will be passed to handlers as the first argument. This is OpenapiFirst::INBOX by default.
 
 ### OpenapiFirst::DefaultOperationResolver
 

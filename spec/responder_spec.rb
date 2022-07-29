@@ -248,5 +248,28 @@ RSpec.describe OpenapiFirst::Responder do
         get '/pets'
       end
     end
+
+    describe 'with custom params_key' do
+      let(:app) do
+        responder = OpenapiFirst::Responder.new(
+          namespace: namespace,
+          params_key: 'PATH_INFO'
+        )
+        Rack::Builder.new do
+          spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
+          use OpenapiFirst::Router, spec: spec
+          use OpenapiFirst::RequestValidation
+          run responder
+        end
+      end
+
+      it 'passes the specified value' do
+        expect(namespace).to receive(:find_pets) do |params, _res|
+          expect(params).to eq '/pets'
+        end
+
+        get '/pets'
+      end
+    end
   end
 end
