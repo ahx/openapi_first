@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- BREAKING CHANGE: Handler classes are not instantiated only once and the same instance is called on each following call/request.
+- Add `RackResponder`
+
+- BREAKING CHANGE: Handler classes are now instantiated only once without any arguments and the same instance is called on each following call/request.
 
 ## 0.17.0
 

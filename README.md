@@ -21,6 +21,7 @@ OpenapiFirst consists of these Rack middlewares:
 - [`OpenapiFirst::Router`](#OpenapiFirst::Router) – Finds the OpenAPI operation for the current request or returns 404 if no operation was found. This can be customized.
 - [`OpenapiFirst::RequestValidation`](#OpenapiFirst::RequestValidation) – Validates the request against the API description and returns 400 if the request is invalid.
 - [`OpenapiFirst::Responder`](#OpenapiFirst::Responder) calls the [handler](#handlers) found for the operation, sets the correct content-type and serializes the response body to json if needed.
+- [`OpenapiFirst::RackResponder`](#OpenapiFirst::RackResponder) calls the [handler](#handlers) found for the operation as a normal Rack application (`call(env)`) and returns the result as is.
 - [`OpenapiFirst::ResponseValidation`](#OpenapiFirst::ResponseValidation) Validates the response and raises an exception if the response body is invalid.
 
 ## OpenapiFirst::Router
@@ -120,6 +121,24 @@ run OpenapiFirst::Responder
 | :----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `namespace:` | Optional. A class or module where to find the handler method.                                                                                                                                     |
 | `resolver:`  | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
+
+
+## OpenapiFirst::RackResponder
+
+This Rack endpoint maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it as a normal Rack application.
+It does not not serialize objects as JSON or adds a content-type.
+
+```ruby
+run OpenapiFirst::RackResponder
+```
+
+### Options
+
+| Name         | Description                                                                                                                                                                                       |
+| :----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `namespace:` | Optional. A class or module where to find the handler method.                                                                                                                                     |
+| `resolver:`  | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
+
 
 ### OpenapiFirst::DefaultOperationResolver
 
