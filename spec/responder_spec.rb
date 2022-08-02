@@ -17,6 +17,7 @@ RSpec.describe OpenapiFirst::Responder do
         spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
         use OpenapiFirst::Router, spec: spec
         use OpenapiFirst::RequestValidation
+        use Rack::Lint
         run responder
       end
     end
