@@ -165,8 +165,8 @@ RSpec.describe OpenapiFirst::ResponseValidation do
 
     specify do
       message = [
-        'is missing required properties: id /0',
-        'should be a integer /1/id'
+        "property '/0' is missing required keys: id",
+        "property '/1/id' is not of type: integer"
       ].join(', ')
       expect do
         get '/pets/42'
@@ -184,7 +184,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       end
 
       it 'raises an error' do
-        message = 'write-only field appears in response: /password'
+        message = 'Write-only field appears in response: /password'
         expect do
           post '/test', json_dump({ name: 'hans', password: 'admin' })
         end.to raise_error OpenapiFirst::ResponseBodyInvalidError, message
@@ -200,7 +200,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
 
     it 'raises an error if the readOnly field is missing' do
-      message = 'is missing required properties: id '
+      message = 'root is missing required keys: id'
       expect do
         get '/test/42'
       end.to raise_error OpenapiFirst::ResponseBodyInvalidError, message
@@ -227,7 +227,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       end
 
       it 'raises an error' do
-        message = 'is missing required properties: name '
+        message = 'root is missing required keys: name'
         expect do
           get '/test'
         end.to raise_error OpenapiFirst::ResponseBodyInvalidError, message

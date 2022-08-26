@@ -42,20 +42,21 @@ module OpenapiFirst
       data = full_body.empty? ? {} : load_json(full_body)
       errors = schema.validate(data)
       errors = errors.to_a.map! do |error|
-        error_message_for(error)
+        format_error(error)
       end
       raise ResponseBodyInvalidError, errors.join(', ') if errors.any?
+    end
+
+    def format_error(error)
+      return "Write-only field appears in response: #{error['data_pointer']}" if error['type'] == 'writeOnly'
+
+      JSONSchemer::Errors.pretty(error)
     end
 
     def load_json(string)
       MultiJson.load(string)
     rescue MultiJson::ParseError
       string
-    end
-
-    def error_message_for(error)
-      err = ValidationFormat.error_details(error)
-      [err[:title], error['data_pointer'], err[:detail]].compact.join(' ')
     end
   end
 end
