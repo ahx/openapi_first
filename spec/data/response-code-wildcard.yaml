@@ -14,10 +14,14 @@ paths:
             schema:
               type: object
       responses:
-        200:
-          description: Success
         4XX:
           description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+        2xx:
+          description: Success
           content:
             application/json:
               schema:

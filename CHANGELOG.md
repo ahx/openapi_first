@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- Support "4xx" and "4XX" response definitions.
+  (4XX is defined in the standard, but 2xx is used in the wild as well 🦁.)
+
 ## 0.19.0
 
 - Add `RackResponder`
