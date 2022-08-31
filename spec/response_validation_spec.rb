@@ -135,12 +135,21 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     let(:spec) { OpenapiFirst.load('./spec/data/response-code-wildcard.yaml') }
     let(:response_body) { {} }
 
-    context 'when 4xx is expected and 404 is sent' do
+    context 'when 4XX (upcase) is expected and 404 is sent' do
       let(:status) { 404 }
 
       it 'does not raise an error' do
         post '/test', json_dump({})
         expect(last_response.status).to eq 404
+      end
+    end
+
+    context 'when 2xx (downcase, non-default) is expected and 205 is sent' do
+      let(:status) { 205 }
+
+      it 'does not raise an error' do
+        post '/test', json_dump({})
+        expect(last_response.status).to eq 205
       end
     end
 
