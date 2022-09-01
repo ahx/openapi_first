@@ -73,6 +73,16 @@ paths:
       operationId: create_thing
       description: Create a thing
       tags: ["Metadata"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - say
+              properties:
+                say:
+                  type: string
       responses:
         "201":
           description: OK
