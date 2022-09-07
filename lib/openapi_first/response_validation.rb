@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require 'multi_json'
-require_relative 'router_required'
+require_relative 'use_router'
 require_relative 'validation_format'
 
 module OpenapiFirst
   class ResponseValidation
-    prepend RouterRequired
+    prepend UseRouter
 
-    def initialize(app)
+    def initialize(app, _options = {})
       @app = app
     end
 

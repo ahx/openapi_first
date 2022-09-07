@@ -19,8 +19,7 @@ RSpec.describe 'Request body validation' do
       raise_error = raise_error_option
       Rack::Builder.new do
         spec = OpenapiFirst.load('./spec/data/request-body-validation.yaml')
-        use OpenapiFirst::Router, spec: spec
-        use OpenapiFirst::RequestValidation, raise_error: raise_error
+        use OpenapiFirst::RequestValidation, spec: spec, raise_error: raise_error
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
         }

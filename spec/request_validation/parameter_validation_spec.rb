@@ -20,8 +20,7 @@ RSpec.describe 'Parameter validation' do
     oas = spec
     raise_error = raise_error_option
     Rack::Builder.app do
-      use OpenapiFirst::Router, spec: oas
-      use OpenapiFirst::RequestValidation, raise_error: raise_error
+      use OpenapiFirst::RequestValidation, spec: oas, raise_error: raise_error
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
@@ -44,23 +43,6 @@ RSpec.describe 'Parameter validation' do
 
     let(:response_body) do
       json_load(last_response.body, symbolize_keys: true)
-    end
-
-    describe 'if router is not used' do
-      let(:app) do
-        Rack::Builder.app do
-          use OpenapiFirst::RequestValidation
-          run lambda { |_env|
-            Rack::Response.new('hello', 200).finish
-          }
-        end
-      end
-
-      it 'raises an error' do
-        expect do
-          get path, params
-        end.to raise_error RuntimeError, 'OpenapiFirst::Router missing in middleware stack. Did you forget adding OpenapiFirst::Router?' # rubocop:disable Layout/LineLength
-      end
     end
 
     it 'returns 400 if query parameter is missing' do
@@ -118,7 +100,6 @@ RSpec.describe 'Parameter validation' do
 
     it 'adds filtered query parameters to env ' do
       get path, params
-
       expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq params_with_defaults
     end
 
@@ -268,6 +249,11 @@ RSpec.describe 'Parameter validation' do
         expect(last_response.status).to eq 200
       end
 
+      it 'returns 404 if path is unknown' do
+        get '/fooo'
+        expect(last_response.status).to eq(404), last_response.body
+      end
+
       it 'works with URL encoded query parameter names' do
         get "#{path}?filter%5Btag%5D=dogs&filter%5Bid%5D=1&term=foo"
 
@@ -292,6 +278,12 @@ RSpec.describe 'Parameter validation' do
         expect do
           get path, params
         end.to raise_error OpenapiFirst::RequestInvalidError, message
+      end
+
+      it 'raises an error if path is unknown' do
+        expect do
+          get '/unknown'
+        end.to raise_error OpenapiFirst::NotFoundError
       end
     end
 

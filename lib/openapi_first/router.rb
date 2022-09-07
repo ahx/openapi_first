@@ -14,6 +14,8 @@ module OpenapiFirst
       @raise = options.fetch(:raise_error, false)
       @not_found = options.fetch(:not_found, :halt)
       spec = options.fetch(:spec)
+      raise "You have to pass spec: when initializing #{self.class}" unless spec
+
       @filepath = spec.filepath
       @router = build_router(spec.operations)
     end
@@ -28,6 +30,7 @@ module OpenapiFirst
 
         return @app.call(env) if @not_found == :continue
       end
+
       response
     end
 
