@@ -11,8 +11,8 @@ module OpenapiFirst
     def call(env)
       return super if env.key?(OPERATION)
 
-      @router ||= Router.new(lambda { |env|
-                               super(env)
+      @router ||= Router.new(lambda { |e|
+                               super(e)
                              }, spec: @options.fetch(:spec), raise_error: @options.fetch(:raise_error, false))
       @router.call(env)
     end
