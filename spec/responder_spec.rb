@@ -14,8 +14,7 @@ RSpec.describe OpenapiFirst::Responder do
         namespace: namespace
       )
       Rack::Builder.new do
-        spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
-        use OpenapiFirst::Router, spec: spec
+        use OpenapiFirst::Router, spec: './spec/data/petstore-expanded.yaml'
         use OpenapiFirst::RequestValidation
         use Rack::Lint
         run responder
@@ -151,8 +150,7 @@ RSpec.describe OpenapiFirst::Responder do
           namespace: namespace
         )
         Rack::Builder.new do
-          spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
-          use OpenapiFirst::Router, spec: spec
+          use OpenapiFirst::Router, spec: './spec/data/petstore-expanded.yaml'
           run responder
         end
       end
