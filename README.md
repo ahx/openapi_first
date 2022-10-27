@@ -269,7 +269,7 @@ validator.validate(last_request, last_response)
 You can filter the URIs that should be handled by passing `only` to `OpenapiFirst.load`:
 
 ```ruby
-spec = OpenapiFirst.load('./openapi/openapi.yaml', only: '/pets'.method(:==))
+spec = OpenapiFirst.load('./openapi/openapi.yaml', only: { |path| path.starts_with? '/pets' })
 run OpenapiFirst.app(spec, namespace: Pets)
 ```
 
