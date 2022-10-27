@@ -19,8 +19,7 @@ RSpec.describe OpenapiFirst::App do
           res.status = 204
         end
       end
-      spec = OpenapiFirst.load('./spec/data/petstore-expanded.yaml')
-      described_class.new(nil, spec, namespace: namespace, **options)
+      described_class.new(nil, './spec/data/petstore-expanded.yaml', namespace: namespace, **options)
     end
 
     describe 'option request_validation_raise_error: true' do

@@ -5,10 +5,7 @@ require 'rack'
 require 'openapi_first/response_validator'
 
 RSpec.describe OpenapiFirst::ResponseValidator do
-  let(:spec) do
-    spec_path = './spec/data/petstore.yaml'
-    OpenapiFirst.load(spec_path)
-  end
+  let(:spec) { './spec/data/petstore.yaml' }
 
   let(:subject) do
     described_class.new(spec)

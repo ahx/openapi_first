@@ -12,7 +12,7 @@ RSpec.describe OpenapiFirst::Router do
     let(:app) do
       Rack::Builder.new do
         use OpenapiFirst::Router,
-            spec: OpenapiFirst.load('./spec/data/petstore.yaml')
+            spec: './spec/data/petstore.yaml'
         run ->(_env) { Rack::Response.new('hello', 200).finish }
       end
     end
@@ -53,6 +53,23 @@ RSpec.describe OpenapiFirst::Router do
       expect(operation.operation_id).to eq 'listPets'
     end
 
+    describe 'initialize with path to spec' do
+      let(:app) do
+        Rack::Builder.new do
+          use OpenapiFirst::Router,
+              spec: './spec/data/petstore.yaml'
+          run ->(_env) { Rack::Response.new('hello', 200).finish }
+        end
+      end
+
+      it 'works as expected ' do
+        get path, query_params
+
+        operation = last_request.env[OpenapiFirst::OPERATION]
+        expect(operation.operation_id).to eq 'listPets'
+      end
+    end
+
     describe 'respecting SCRIPT_NAME' do
       let(:failure_app) do
         ->(_env) { Rack::Response.new.finish  }
@@ -66,7 +83,7 @@ RSpec.describe OpenapiFirst::Router do
         OpenapiFirst::Router.new(
           upstream_app,
           parent_app: failure_app,
-          spec: OpenapiFirst.load('./spec/data/petstore.yaml')
+          spec: './spec/data/petstore.yaml'
         )
       end
 
@@ -102,7 +119,7 @@ RSpec.describe OpenapiFirst::Router do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::Router,
-              spec: OpenapiFirst.load('./spec/data/operation-id-missing.yaml'),
+              spec: './spec/data/operation-id-missing.yaml',
               raise_error: true
           run ->(_env) { Rack::Response.new('hello', 200).finish }
         end
@@ -136,7 +153,7 @@ RSpec.describe OpenapiFirst::Router do
         let(:app) do
           Rack::Builder.new do
             use OpenapiFirst::Router,
-                spec: OpenapiFirst.load('./spec/data/parameters-path.yaml'),
+                spec: './spec/data/parameters-path.yaml',
                 raise_error: true
             run ->(_env) { Rack::Response.new('hello', 200).finish }
           end
@@ -191,7 +208,7 @@ RSpec.describe OpenapiFirst::Router do
         val = option
         Rack::Builder.new do
           use OpenapiFirst::Router,
-              spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+              spec: './spec/data/petstore.yaml',
               raise_error: val
           run lambda { |_env|
             Rack::Response.new('hello', 200).finish
@@ -243,7 +260,7 @@ RSpec.describe OpenapiFirst::Router do
         val = option
         Rack::Builder.new do
           use OpenapiFirst::Router,
-              spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+              spec: './spec/data/petstore.yaml',
               not_found: val
           run lambda { |_env|
             Rack::Response.new('hello', 200).finish
@@ -285,7 +302,7 @@ RSpec.describe OpenapiFirst::Router do
           let(:app) do
             Rack::Builder.new do
               use OpenapiFirst::Router,
-                  spec: OpenapiFirst.load('./spec/data/petstore.yaml'),
+                  spec: './spec/data/petstore.yaml',
                   not_found: :continue,
                   raise_error: true
               run lambda { |_env|

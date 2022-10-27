@@ -40,7 +40,7 @@ module OpenapiFirst
     request_validation_raise_error: false,
     response_validation: false
   )
-    spec = OpenapiFirst.load(spec) if spec.is_a?(String)
+    spec = OpenapiFirst.load(spec) unless spec.is_a?(Definition)
     App.new(
       nil,
       spec,
@@ -58,7 +58,7 @@ module OpenapiFirst
     request_validation_raise_error: false,
     response_validation: false
   )
-    spec = OpenapiFirst.load(spec) if spec.is_a?(String)
+    spec = OpenapiFirst.load(spec) unless spec.is_a?(Definition)
     AppWithOptions.new(
       spec,
       namespace: namespace,

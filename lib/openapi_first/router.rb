@@ -16,6 +16,8 @@ module OpenapiFirst
       spec = options.fetch(:spec)
       raise "You have to pass spec: when initializing #{self.class}" unless spec
 
+      spec = OpenapiFirst.load(spec) unless spec.is_a?(Definition)
+
       @filepath = spec.filepath
       @router = build_router(spec.operations)
     end

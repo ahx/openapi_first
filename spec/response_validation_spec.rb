@@ -17,7 +17,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+  let(:spec) { './spec/data/petstore.yaml' }
   let(:response_body) { json_dump([{ id: 42, name: 'hans' }]) }
   let(:status) { 200 }
   let(:headers) do
@@ -48,7 +48,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   end
 
   describe 'with 204 no content response' do
-    let(:spec) { OpenapiFirst.load('./spec/data/no-content.yaml') }
+    let(:spec) { './spec/data/no-content.yaml' }
     let(:status) { 204 }
 
     let(:headers) do
@@ -62,7 +62,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   end
 
   describe 'operation does not specify content-type' do
-    let(:spec) { OpenapiFirst.load('./spec/data/no-content.yaml') }
+    let(:spec) { './spec/data/no-content.yaml' }
     let(:status) { 423 }
 
     describe 'with any content-type' do
@@ -115,7 +115,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   end
 
   describe 'with a XX wildcard response status' do
-    let(:spec) { OpenapiFirst.load('./spec/data/response-code-wildcard.yaml') }
+    let(:spec) { './spec/data/response-code-wildcard.yaml' }
     let(:response_body) { {} }
 
     context 'when 4XX (upcase) is expected and 404 is sent' do
@@ -167,7 +167,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   end
 
   describe 'with a writeOnly field' do
-    let(:spec) { OpenapiFirst.load('./spec/data/writeonly.yaml') }
+    let(:spec) { './spec/data/writeonly.yaml' }
     let(:status) { 201 }
 
     context 'when field is sent in the response body' do
@@ -185,7 +185,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   end
 
   describe 'with a required readOnly field' do
-    let(:spec) { OpenapiFirst.load('./spec/data/readonly.yaml') }
+    let(:spec) { './spec/data/readonly.yaml' }
 
     let(:response_body) do
       json_dump({ name: 'hans' })
@@ -211,7 +211,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   end
 
   describe 'with a required nullable field' do
-    let(:spec) { OpenapiFirst.load('./spec/data/nullable.yaml') }
+    let(:spec) { './spec/data/nullable.yaml' }
 
     describe 'when the field is missing' do
       let(:response_body) do

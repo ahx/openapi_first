@@ -18,7 +18,7 @@ RSpec.describe 'Request body validation' do
     let(:app) do
       raise_error = raise_error_option
       Rack::Builder.new do
-        spec = OpenapiFirst.load('./spec/data/request-body-validation.yaml')
+        spec = './spec/data/request-body-validation.yaml'
         use OpenapiFirst::RequestValidation, spec: spec, raise_error: raise_error
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
@@ -205,8 +205,7 @@ RSpec.describe 'Request body validation' do
     describe 'with a required writeOnly field' do
       let(:app) do
         Rack::Builder.new do
-          spec = OpenapiFirst.load('./spec/data/writeonly.yaml')
-          use OpenapiFirst::Router, spec: spec, raise_error: true
+          use OpenapiFirst::Router, spec: './spec/data/writeonly.yaml', raise_error: true
           use OpenapiFirst::RequestValidation
           run lambda { |_env|
             Rack::Response.new('hello', 201).finish
@@ -230,8 +229,7 @@ RSpec.describe 'Request body validation' do
     describe 'with a readOnly required field' do
       let(:app) do
         Rack::Builder.new do
-          spec = OpenapiFirst.load('./spec/data/readonly.yaml')
-          use OpenapiFirst::Router, spec: spec, raise_error: true
+          use OpenapiFirst::Router, spec: './spec/data/readonly.yaml', raise_error: true
           use OpenapiFirst::RequestValidation, raise_error: true
           run lambda { |_env|
             Rack::Response.new('hello', 200).finish
@@ -254,8 +252,7 @@ RSpec.describe 'Request body validation' do
     describe 'with a required nullable field' do
       let(:app) do
         Rack::Builder.new do
-          spec = OpenapiFirst.load('./spec/data/nullable.yaml')
-          use OpenapiFirst::Router, spec: spec, raise_error: true
+          use OpenapiFirst::Router, spec: './spec/data/nullable.yaml', raise_error: true
           use OpenapiFirst::RequestValidation, raise_error: true
           run lambda { |_env|
             Rack::Response.new('hello', 201).finish
