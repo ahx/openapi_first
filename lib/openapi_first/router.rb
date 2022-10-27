@@ -56,13 +56,10 @@ module OpenapiFirst
       env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH) if env[ORIGINAL_PATH]
     end
 
-    def build_router(operations) # rubocop:disable Metrics/AbcSize
+    def build_router(operations)
       router = Hanami::Router.new
       operations.each do |operation|
         normalized_path = operation.path.gsub('{', ':').gsub('}', '')
-        if operation.operation_id.nil?
-          warn "operationId is missing in '#{operation.method} #{operation.path}'. I am ignoring this operation."
-        end
         router.public_send(
           operation.method,
           normalized_path,

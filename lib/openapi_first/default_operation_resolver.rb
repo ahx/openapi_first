@@ -10,11 +10,14 @@ module OpenapiFirst
     end
 
     def call(operation)
-      @handlers[operation.name] ||= find_handler(operation['x-handler'] || operation['operationId'])
+      @handlers[operation.name] ||= begin
+        id = handler_id(operation)
+        find_handler(id) if id
+      end
     end
 
-    def find_handler(operation_id)
-      name = operation_id.match(/:*(.*)/)&.to_a&.at(1)
+    def find_handler(id)
+      name = id.match(/:*(.*)/)&.to_a&.at(1)
       return if name.nil?
 
       catch :halt do
@@ -25,6 +28,16 @@ module OpenapiFirst
       return unless @namespace.respond_to?(method_name)
 
       @namespace.method(method_name)
+    end
+
+    def handler_id(operation)
+      id = operation['x-handler'] || operation['operationId']
+      if id.nil?
+        raise HandlerNotFoundError,
+              "operationId or x-handler is missing in '#{operation.method} #{operation.path}' so I cannot find a handler for this operation." # rubocop:disable Layout/LineLength
+      end
+
+      id
     end
 
     def find_class_method_handler(name)
