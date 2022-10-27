@@ -105,6 +105,20 @@ RSpec.describe OpenapiFirst::Responder do
       end
     end
 
+    context 'with no operationId or x-handler defined' do
+      it 'raises an error' do
+        spec = OpenapiFirst.load('./spec/data/no-operation-name.yaml')
+        operation = spec.operations.first
+        app = described_class.new
+        env = Rack::MockRequest.env_for('/pets')
+        env[OpenapiFirst::OPERATION] = operation
+        expect do
+          app.call(env)
+        end.to raise_error OpenapiFirst::HandlerNotFoundError,
+                           "operationId or x-handler is missing in 'get /' so I cannot find a handler for this operation." # rubocop:disable Layout/LineLength
+      end
+    end
+
     context 'with x-handler' do
       it 'finds the handler based on x-handler field instead of operationId' do
         spec = OpenapiFirst.load('./spec/data/x-handler.yaml')

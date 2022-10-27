@@ -44,12 +44,18 @@ RSpec.describe OpenapiFirst::DefaultOperationResolver do
       operation = spec.operations.first
       subject.call(operation).call({})
     end
+
+    it 'raises an error if operation has no operationId defined' do
+      operation = instance_double(OpenapiFirst::Operation, name: 'get /me', path: '/pets', method: 'get')
+      allow(operation).to receive(:[]) { nil }
+      expect do
+        subject.call(operation)
+      end.to raise_error OpenapiFirst::HandlerNotFoundError,
+                         "operationId or x-handler is missing in 'get /pets' so I cannot find a handler for this operation." # rubocop:disable Layout/LineLength
+    end
   end
 
   describe '#find_handler' do
-    let(:env) { double }
-    let(:params) { double(:params, env: env) }
-
     it 'finds some_method' do
       expect(Web).to receive(:some_method)
       subject.find_handler('some_method').call({})
@@ -85,6 +91,10 @@ RSpec.describe OpenapiFirst::DefaultOperationResolver do
     it 'does not find nested constants' do
       expect(subject.find_handler('foo.bar.to_s')).to be_nil
       expect(subject.find_handler('::foo::baz.to_s')).to be_nil
+    end
+
+    it 'does not find unknown class' do
+      expect(subject.find_handler('things#mautz')).to be_nil
     end
   end
 end
