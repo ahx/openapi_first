@@ -93,63 +93,6 @@ Request validation fails if request includes a property with `readOnly: true`.
 
 Response validation fails if response body includes a property with `writeOnly: true`.
 
-## OpenapiFirst::Responder
-
-This Rack endpoint maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it. Responder also adds a content-type to the response.
-
-```ruby
-run OpenapiFirst::Responder
-```
-
-### Options
-
-| Name         | Description                                                                                                                                                                                       |
-| :----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `namespace:` | Optional. A class or module where to find the handler method.                                                                                                                                     |
-| `resolver:`  | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
-
-
-## OpenapiFirst::RackResponder
-
-This Rack endpoint maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it as a normal Rack application.
-It does not not serialize objects as JSON or adds a content-type.
-
-```ruby
-run OpenapiFirst::RackResponder
-```
-
-### Options
-
-| Name         | Description                                                                                                                                                                                       |
-| :----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `namespace:` | Optional. A class or module where to find the handler method.                                                                                                                                     |
-| `resolver:`  | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
-
-
-### OpenapiFirst::DefaultOperationResolver
-
-This is the default way to look up a handler method for an operation. Handlers are always looked up in a namespace module that needs to be specified.
-
-It works like this:
-
-- An operationId "create_pet" or "createPet" or "create pet" calls `MyApi.create_pet(params, response)`
-- "some_things.create" calls: `MyApi::SomeThings.create(params, response)`
-- "pets#create" instantiates the class once (`MyApi::Pets::Create.new) and calls it on every request(`instance.call(params, response)`).
-
-### Handlers
-
-These handler methods are called with two arguments:
-
-- `params` - Holds the parsed request body, filtered query params and path parameters (same as `env[OpenapiFirst::INBOX]`)
-- `res` - Holds a Rack::Response that you can modify if needed
-
-You can call `params.env` to access the Rack env (just like in [Hanami actions](https://guides.hanamirb.org/actions/parameters/))
-
-There are two ways to set the response body:
-
-- Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
-- Returning a value which will get converted to JSON
-
 ## OpenapiFirst::ResponseValidation
 
 This middleware is especially useful when testing. It _always_ raises an error if the response is not valid.
@@ -183,6 +126,61 @@ This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation obj
                                                                                                   |                                    |
 | `raise_error:` | `false`, `true`      | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description.                                                             | `false` (don't raise an exception) |
 | `not_found:`   | `:continue`, `:halt` | If set to `:continue` the middleware will not return 404 (405, 415), but just pass handling the request to the next middleware or application in the Rack stack. If combined with `raise_error: true` `raise_error` gets preference and an exception is raised. | `:halt` (return 4xx response)      |
+
+## OpenapiFirst::RackResponder
+
+This Rack endpoint maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it as a normal Rack application.
+It does not not serialize objects as JSON or adds a content-type.
+
+```ruby
+run OpenapiFirst::RackResponder
+```
+
+### Options
+
+| Name         | Description                                                                                                                                                                                       |
+| :----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `namespace:` | Optional. A class or module where to find the handler method.                                                                                                                                     |
+| `resolver:`  | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
+
+## OpenapiFirst::Responder
+
+This Rack endpoint maps the HTTP request to a method call based on the [operationId](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object) in your API description and calls it. Responder also adds a content-type to the response.
+
+```ruby
+run OpenapiFirst::Responder
+```
+
+### Options
+
+| Name         | Description                                                                                                                                                                                       |
+| :----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `namespace:` | Optional. A class or module where to find the handler method.                                                                                                                                     |
+| `resolver:`  | Optional. An object that responds to `#call(operation)` and returns a [handler](#handlers). By default this is an instance of [DefaultOperationResolver](#OpenapiFirst::DefaultOperationResolver) |
+
+### OpenapiFirst::DefaultOperationResolver
+
+This is the default way to look up a handler method for an operation. Handlers are always looked up in a namespace module that needs to be specified.
+
+It works like this:
+
+- An operationId "create_pet" or "createPet" or "create pet" calls `MyApi.create_pet(params, response)`
+- "some_things.create" calls: `MyApi::SomeThings.create(params, response)`
+- "pets#create" instantiates the class once (`MyApi::Pets::Create.new) and calls it on every request(`instance.call(params, response)`).
+
+### Handlers
+
+These handler methods are called with two arguments:
+
+- `params` - Holds the parsed request body, filtered query params and path parameters (same as `env[OpenapiFirst::INBOX]`)
+- `res` - Holds a Rack::Response that you can modify if needed
+
+You can call `params.env` to access the Rack env (just like in [Hanami actions](https://guides.hanamirb.org/actions/parameters/))
+
+There are two ways to set the response body:
+
+- Calling `res.write "things"` (see [Rack::Response](https://www.rubydoc.info/github/rack/rack/Rack/Response))
+- Returning a value which will get converted to JSON
 
 ## Standalone usage
 
