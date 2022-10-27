@@ -39,7 +39,7 @@ use OpenapiFirst::RequestValidation
 
 | Name           | Possible values | Description                                                                                        | Default                            |
 | :------------- | --------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `spec:`        |                      | The spec loaded via `OpenapiFirst.
+| `spec:`        |                      | The path to the spec file or spec loaded via `OpenapiFirst.load`
 | `raise_error:` | `false`, `true` | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` instead of returning 4xx. | `false` (don't raise an exception) |
 
 The error responses conform with [JSON:API](https://jsonapi.org).
@@ -163,14 +163,14 @@ use OpenapiFirst::ResponseValidation if ENV['RACK_ENV'] == 'test'
 
 | Name           | Possible values      | Description                                                                                                                                                                                                                                                     | Default                            |
 | :------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `spec:`        |                      | The spec loaded via `OpenapiFirst.load`
+| `spec:`        |                      | The path to the spec file or spec loaded via `OpenapiFirst.load`
 
 ## OpenapiFirst::Router
 
 This middleware first always used automatically, but you can add it to the top of your middleware stack if you want to change configuration.
 
 ```ruby
-use OpenapiFirst::Router, spec: OpenapiFirst.load('./openapi/openapi.yaml')
+use OpenapiFirst::Router, spec: './openapi/openapi.yaml'
 ```
 
 This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation object that responds to `#operation_id`, `#path` (and `#[]` to access raw fields).
@@ -179,7 +179,8 @@ This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation obj
 
 | Name           | Possible values      | Description                                                                                                                                                                                                                                                     | Default                            |
 | :------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `spec:`        |                      | The spec loaded via `OpenapiFirst.load`                                                                                                                                                                                                                         |                                    |
+| `spec:`        |                      | The path to the spec file or spec loaded via `OpenapiFirst.load`
+                                                                                                  |                                    |
 | `raise_error:` | `false`, `true`      | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description.                                                             | `false` (don't raise an exception) |
 | `not_found:`   | `:continue`, `:halt` | If set to `:continue` the middleware will not return 404 (405, 415), but just pass handling the request to the next middleware or application in the Rack stack. If combined with `raise_error: true` `raise_error` gets preference and an exception is raised. | `:halt` (return 4xx response)      |
 
@@ -259,8 +260,7 @@ Instead of using the ResponseValidation middleware you can validate the response
 ```ruby
 # In your test (rspec example):
 require 'openapi_first'
-spec = OpenapiFirst.load('petstore.yaml')
-validator = OpenapiFirst::ResponseValidator.new(spec)
+validator = OpenapiFirst::ResponseValidator.new('petstore.yaml')
 
 # This will raise an exception if it found an error
 validator.validate(last_request, last_response)
@@ -271,7 +271,7 @@ validator.validate(last_request, last_response)
 You can filter the URIs that should be handled by passing `only` to `OpenapiFirst.load`:
 
 ```ruby
-spec = OpenapiFirst.load './openapi/openapi.yaml', only: '/pets'.method(:==)
+spec = OpenapiFirst.load('./openapi/openapi.yaml', only: '/pets'.method(:==))
 run OpenapiFirst.app(spec, namespace: Pets)
 ```
 
@@ -289,8 +289,7 @@ describe MyApp do
   include Rack::Test::Methods
 
   before(:all) do
-    spec = OpenapiFirst.load('petstore.yaml')
-    @app_wrapper = OpenapiFirst::Coverage.new(MyApp, spec)
+    @app_wrapper = OpenapiFirst::Coverage.new(MyApp, 'petstore.yaml')
   end
 
   after(:all) do

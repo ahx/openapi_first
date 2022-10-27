@@ -53,6 +53,23 @@ RSpec.describe OpenapiFirst::Router do
       expect(operation.operation_id).to eq 'listPets'
     end
 
+    describe 'initialize with path to spec' do
+      let(:app) do
+        Rack::Builder.new do
+          use OpenapiFirst::Router,
+              spec: './spec/data/petstore.yaml'
+          run ->(_env) { Rack::Response.new('hello', 200).finish }
+        end
+      end
+
+      it 'works as expected ' do
+        get path, query_params
+
+        operation = last_request.env[OpenapiFirst::OPERATION]
+        expect(operation.operation_id).to eq 'listPets'
+      end
+    end
+
     describe 'respecting SCRIPT_NAME' do
       let(:failure_app) do
         ->(_env) { Rack::Response.new.finish  }

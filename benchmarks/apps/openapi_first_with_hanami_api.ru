@@ -19,8 +19,7 @@ app = Class.new(Hanami::API) do
   end
 end.new
 
-oas_path = File.absolute_path('./openapi.yaml', __dir__)
-use OpenapiFirst::Router, spec: OpenapiFirst.load(oas_path)
+use OpenapiFirst::Router, spec: File.absolute_path('./openapi.yaml', __dir__)
 use OpenapiFirst::RequestValidation
 
 run app
