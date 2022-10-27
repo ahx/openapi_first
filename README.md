@@ -20,7 +20,7 @@ OpenapiFirst consists of these Rack middlewares:
 
 - [`OpenapiFirst::ResponseValidation`](#OpenapiFirst::ResponseValidation) Validates the response and raises an exception if the response body is invalid.
 - [`OpenapiFirst::RequestValidation`](#OpenapiFirst::RequestValidation) – Validates the request against the API description and returns 400 if the request is invalid.
-- [`OpenapiFirst::Router`](#OpenapiFirst::Router) – This middleware is added automatically before request/response validation. Finds the OpenAPI operation for the current request or returns 404 if no operation was found. This can be customized by adding it yourself.
+- [`OpenapiFirst::Router`](#OpenapiFirst::Router) – This internal middleware is added automatically before request/response validation. Finds the OpenAPI operation for the current request or returns 404 if no operation was found. This can be customized by adding it yourself.
 
 
 And these Rack apps:
@@ -32,7 +32,7 @@ And these Rack apps:
 This middleware returns a 400 status code with a body that describes the error if the request is not valid.
 
 ```ruby
-use OpenapiFirst::RequestValidation
+use OpenapiFirst::RequestValidatio, spec: 'openapi.yaml'
 ```
 
 ### Options and defaults
@@ -156,7 +156,7 @@ This middleware is especially useful when testing. It _always_ raises an error i
 
 
 ```ruby
-use OpenapiFirst::ResponseValidation if ENV['RACK_ENV'] == 'test'
+use OpenapiFirst::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] == 'test'
 ```
 
 ### Options
