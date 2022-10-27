@@ -18,8 +18,8 @@ Here's a [comparison between committee and openapi_first](https://gist.github.co
 
 OpenapiFirst consists of these Rack middlewares:
 
-- [`OpenapiFirst::ResponseValidation`](#OpenapiFirst::ResponseValidation) Validates the response and raises an exception if the response body is invalid.
 - [`OpenapiFirst::RequestValidation`](#OpenapiFirst::RequestValidation) – Validates the request against the API description and returns 400 if the request is invalid.
+- [`OpenapiFirst::ResponseValidation`](#OpenapiFirst::ResponseValidation) Validates the response and raises an exception if the response body is invalid.
 - [`OpenapiFirst::Router`](#OpenapiFirst::Router) – This internal middleware is added automatically before request/response validation. Finds the OpenAPI operation for the current request or returns 404 if no operation was found. This can be customized by adding it yourself.
 
 
