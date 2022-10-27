@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-- The `spec:` option now just works with a path to the OpenApi file as well so you don't have to call `OpenapiFirst.load` anymore.
+- You can pass a filepath to `spec:` now so you no longer have to call `OpenapiFirst.load` anymore.
 - Router is optional now.
   You no longer have to add `Router` to your middleware stack. You still can add it to customize behaviour by setting options, but you no longer have to add it.
   If you don't add the Router, make sure you pass `spec:` to your request/response validation middleware.
