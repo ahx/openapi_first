@@ -7,6 +7,9 @@
 
 - Support "4xx" and "4XX" response definitions.
   (4XX is defined in the standard, but 2xx is used in the wild as well 🦁.)
+  
+- Removed warning about missing operationId, because operationId is not used until the Responder is used.
+- Raise HandlerNotFoundError when handler cannot be found
 
 ## 0.19.0
 
