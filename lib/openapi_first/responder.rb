@@ -16,13 +16,17 @@ module OpenapiFirst
       operation = env[OpenapiFirst::OPERATION]
       res = Rack::Response.new
       handler = find_handler(operation)
-      result = handler.call(env[INBOX], res)
+      result = handler.call(inbox(env), res)
       res.write serialize(result) if result && res.body.empty?
       res[Rack::CONTENT_TYPE] ||= operation.content_types_for(res.status)&.first
       res.finish
     end
 
     private
+
+    def inbox(env)
+      Inbox.new(env).tap { |i| i.merge!(env[INBOX]) if env[INBOX] }
+    end
 
     def find_handler(operation)
       handler = @resolver.call(operation)

@@ -19,7 +19,7 @@ module OpenapiFirst
       operation = env[OPERATION]
       return @app.call(env) unless operation
 
-      env[INBOX] = Inbox.new(env)
+      env[INBOX] = {}
       catch(:halt) do
         validate_query_parameters!(env, operation, env[PARAMETERS])
         req = Rack::Request.new(env)

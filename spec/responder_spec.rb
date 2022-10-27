@@ -207,7 +207,7 @@ RSpec.describe OpenapiFirst::Responder do
     describe 'params' do
       it 'uses INBOX from env' do
         expect(namespace).to receive(:find_pets) do |params, _res|
-          expect(params).to be params.env[OpenapiFirst::INBOX]
+          expect(params).to eq params.env[OpenapiFirst::INBOX]
         end
 
         get '/pets', 'tags[]' => 'foo', 'foo' => 'bar'
