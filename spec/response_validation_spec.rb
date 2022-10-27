@@ -12,8 +12,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     res = response
     definition = spec
     Rack::Builder.app do
-      use OpenapiFirst::Router, spec: definition
-      use OpenapiFirst::ResponseValidation
+      use OpenapiFirst::ResponseValidation, spec: definition
       run ->(_env) { res.finish }
     end
   end
@@ -26,23 +25,6 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   end
   let(:response) { Rack::Response.new(response_body, status, headers) }
   let(:path) { '/pets' }
-
-  describe 'if router is not used' do
-    let(:app) do
-      Rack::Builder.app do
-        use OpenapiFirst::ResponseValidation
-        run lambda { |_env|
-          Rack::Response.new('hello', 200).finish
-        }
-      end
-    end
-
-    it 'raises an error' do
-      expect do
-        get path
-      end.to raise_error RuntimeError, 'OpenapiFirst::Router missing in middleware stack. Did you forget adding OpenapiFirst::Router?' # rubocop:disable Layout/LineLength
-    end
-  end
 
   describe 'with a valid response' do
     it 'returns no errors' do
@@ -108,8 +90,9 @@ RSpec.describe OpenapiFirst::ResponseValidation do
 
   describe 'no operation found' do
     let(:app) do
+      definition = spec
       Rack::Builder.app do
-        use OpenapiFirst::ResponseValidation
+        use OpenapiFirst::ResponseValidation, spec: definition
         run ->(_env) { [200, {}, ''] }
       end
     end

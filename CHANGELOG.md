@@ -1,6 +1,10 @@
 # Changelog
 
 ## Unreleased
+- Router is optional now.
+  You no longer have to add `Router` to your middleware stack. You still can add it to customize behaviour by setting options, but you no longer have to add it.
+  If you don't add the Router, make sure you pass `spec:` to your request/response validation middleware.
+
 - Support "4xx" and "4XX" response definitions.
   (4XX is defined in the standard, but 2xx is used in the wild as well 🦁.)
 

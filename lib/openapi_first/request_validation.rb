@@ -3,12 +3,12 @@
 require 'rack'
 require 'multi_json'
 require_relative 'inbox'
-require_relative 'router_required'
+require_relative 'use_router'
 require_relative 'validation_format'
 
 module OpenapiFirst
   class RequestValidation # rubocop:disable Metrics/ClassLength
-    prepend RouterRequired
+    prepend UseRouter
 
     def initialize(app, options = {})
       @app = app
@@ -16,7 +16,7 @@ module OpenapiFirst
     end
 
     def call(env) # rubocop:disable Metrics/AbcSize
-      operation = env[OpenapiFirst::OPERATION]
+      operation = env[OPERATION]
       return @app.call(env) unless operation
 
       env[INBOX] = Inbox.new(env)
