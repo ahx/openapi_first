@@ -37,11 +37,4 @@ module OpenapiFirst
       MultiJson.dump(result)
     end
   end
-
-  class OperationResolver < Responder
-    def initialize(spec:, namespace:)
-      warn "#{self.class.name} was renamed to #{OpenapiFirst::Responder.name}"
-      super
-    end
-  end
 end
