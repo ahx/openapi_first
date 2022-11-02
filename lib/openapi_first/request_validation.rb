@@ -20,37 +20,40 @@ module OpenapiFirst
       return @app.call(env) unless operation
 
       env[INBOX] = {}
-      catch(:halt) do
-        validate_query_parameters!(env, operation, env[PARAMETERS])
+      error = catch(:error) do
+        params = validate_query_parameters!(operation, env[PARAMETERS])
+        env[INBOX].merge! env[PARAMETERS] = params if params
         req = Rack::Request.new(env)
-        content_type = req.content_type
         return @app.call(env) unless operation.request_body
 
-        validate_request_content_type!(content_type, operation)
-        body = req.body.read
-        req.body.rewind
-        parse_and_validate_request_body!(env, content_type, body, operation)
-        @app.call(env)
+        validate_request_content_type!(operation, req.content_type)
+        parsed_request_body = parse_and_validate_request_body!(operation, req)
+        env[INBOX].merge! env[REQUEST_BODY] = parsed_request_body if parsed_request_body
+        nil
       end
+      if error
+        raise RequestInvalidError, error[:errors] if @raise
+
+        return validation_error_response(error[:status], error[:errors])
+      end
+      @app.call(env)
     end
 
     private
 
-    def halt(response)
-      throw :halt, response
-    end
-
-    def parse_and_validate_request_body!(env, content_type, body, operation)
+    def parse_and_validate_request_body!(operation, request)
+      body = request.body.read
+      request.body.rewind
       validate_request_body_presence!(body, operation)
       return if body.empty?
 
-      schema = operation&.request_body_schema(content_type)
+      schema = operation&.request_body_schema(request.content_type)
       return unless schema
 
       parsed_request_body = parse_request_body!(body)
       errors = schema.validate(parsed_request_body)
-      halt_with_error(400, serialize_request_body_errors(errors)) if errors.any?
-      env[INBOX].merge! env[REQUEST_BODY] = Utils.deep_symbolize(parsed_request_body)
+      throw_error(400, serialize_request_body_errors(errors)) if errors.any?
+      Utils.deep_symbolize(parsed_request_body)
     end
 
     def parse_request_body!(body)
@@ -58,19 +61,19 @@ module OpenapiFirst
     rescue MultiJson::ParseError => e
       err = { title: 'Failed to parse body as JSON' }
       err[:detail] = e.cause unless ENV['RACK_ENV'] == 'production'
-      halt_with_error(400, [err])
+      throw_error(400, [err])
     end
 
-    def validate_request_content_type!(content_type, operation)
+    def validate_request_content_type!(operation, content_type)
       return if operation.request_body.dig('content', content_type)
 
-      halt_with_error(415)
+      throw_error(415)
     end
 
     def validate_request_body_presence!(body, operation)
       return unless operation.request_body['required'] && body.empty?
 
-      halt_with_error(415, 'Request body is required')
+      throw_error(415, 'Request body is required')
     end
 
     def default_error(status, title = Rack::Utils::HTTP_STATUS_CODES[status])
@@ -80,10 +83,15 @@ module OpenapiFirst
       }
     end
 
-    def halt_with_error(status, errors = [default_error(status)])
-      raise RequestInvalidError, errors if @raise
+    def throw_error(status, errors = [default_error(status)])
+      throw :error, {
+        status: status,
+        errors: errors
+      }
+    end
 
-      halt Rack::Response.new(
+    def validation_error_response(status, errors)
+      Rack::Response.new(
         MultiJson.dump(errors: errors),
         status,
         Rack::CONTENT_TYPE => 'application/vnd.api+json'
@@ -100,17 +108,15 @@ module OpenapiFirst
       end
     end
 
-    def validate_query_parameters!(env, operation, params)
+    def validate_query_parameters!(operation, params)
       schema = operation.parameters_schema
       return unless schema
 
       params = filtered_params(schema.raw_schema, params)
       params = Utils.deep_stringify(params)
       errors = schema.validate(params)
-      halt_with_error(400, serialize_query_parameter_errors(errors)) if errors.any?
-      params = Utils.deep_symbolize(params)
-      env[PARAMETERS] = params
-      env[INBOX].merge! params
+      throw_error(400, serialize_query_parameter_errors(errors)) if errors.any?
+      Utils.deep_symbolize(params)
     end
 
     def filtered_params(json_schema, params)
