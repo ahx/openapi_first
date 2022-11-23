@@ -18,7 +18,8 @@ examples = [
   [Rack::MockRequest.env_for('/hello?filter[id]=1,2'), 200]
 ]
 
-apps = Dir['./apps/*.ru'].each_with_object({}) do |config, hash|
+glob = ARGV[0] || './apps/*.ru'
+apps = Dir[glob].each_with_object({}) do |config, hash|
   hash[config] = Rack::Builder.parse_file(config).first
 end
 apps.freeze
