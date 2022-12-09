@@ -32,7 +32,7 @@ And these Rack apps:
 This middleware returns a 400 status code with a body that describes the error if the request is not valid.
 
 ```ruby
-use OpenapiFirst::RequestValidatio, spec: 'openapi.yaml'
+use OpenapiFirst::RequestValidation, spec: 'openapi.yaml'
 ```
 
 ### Options and defaults
@@ -110,7 +110,7 @@ use OpenapiFirst::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] ==
 
 ## OpenapiFirst::Router
 
-This middleware first always used automatically, but you can add it to the top of your middleware stack if you want to change configuration.
+This middleware is used automatically, but you can add it to the top of your middleware stack if you want to change configuration.
 
 ```ruby
 use OpenapiFirst::Router, spec: './openapi/openapi.yaml'
@@ -122,8 +122,7 @@ This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation obj
 
 | Name           | Possible values      | Description                                                                                                                                                                                                                                                     | Default                            |
 | :------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `spec:`        |                      | The path to the spec file or spec loaded via `OpenapiFirst.load`
-                                                                                                  |                                    |
+| `spec:`        |                      | The path to the spec file or spec loaded via `OpenapiFirst.load` |                                    |
 | `raise_error:` | `false`, `true`      | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description.                                                             | `false` (don't raise an exception) |
 | `not_found:`   | `:continue`, `:halt` | If set to `:continue` the middleware will not return 404 (405, 415), but just pass handling the request to the next middleware or application in the Rack stack. If combined with `raise_error: true` `raise_error` gets preference and an exception is raised. | `:halt` (return 4xx response)      |
 
