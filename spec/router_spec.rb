@@ -40,7 +40,7 @@ RSpec.describe OpenapiFirst::Router do
       delete path, query_params
 
       expect(last_response.status).to be 405
-      expect(last_response.body).to eq 'Not Allowed'
+      expect(last_response.body).to eq 'Method Not Allowed'
 
       operation = last_request.env.fetch(OpenapiFirst::OPERATION)
       expect(operation).to be_nil

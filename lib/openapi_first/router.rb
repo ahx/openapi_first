@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 require 'rack'
+require 'multi_json'
 require 'hanami/router'
+require 'hanami/middleware/body_parser'
+require_relative 'body_parser_middleware'
 
 module OpenapiFirst
   class Router
@@ -59,21 +62,30 @@ module OpenapiFirst
     end
 
     def build_router(operations)
-      router = Hanami::Router.new
-      operations.each do |operation|
-        normalized_path = operation.path.gsub('{', ':').gsub('}', '')
-        router.public_send(
-          operation.method,
-          normalized_path,
-          to: lambda do |env|
-            env[OPERATION] = operation
-            env[PARAMETERS] = env['router.params']
-            env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH)
-            @app.call(env)
-          end
-        )
+      router = Hanami::Router.new.tap do |r|
+        operations.each do |operation|
+          normalized_path = operation.path.gsub('{', ':').gsub('}', '')
+          r.public_send(
+            operation.method,
+            normalized_path,
+            to: build_route(operation)
+          )
+        end
       end
-      router
+      raise_error = @raise
+      Rack::Builder.app do
+        use BodyParserMiddleware, { raise_error: raise_error }
+        run router
+      end
+    end
+
+    def build_route(operation)
+      lambda do |env|
+        env[OPERATION] = operation
+        env[PARAMETERS] = env['router.params']
+        env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH)
+        @app.call(env)
+      end
     end
   end
 end
