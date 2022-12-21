@@ -41,10 +41,12 @@ module OpenapiFirst
 
     private
 
+
     def parse_and_validate_request_body!(operation, request)
       env = request.env
 
       body = env.delete(Hanami::Router::ROUTER_PARSED_BODY) if env.key?(Hanami::Router::ROUTER_PARSED_BODY)
+      body ||= request.POST if request.form_data?
 
       validate_request_body_presence!(body, operation)
       return if body.nil?
@@ -58,9 +60,7 @@ module OpenapiFirst
     end
 
     def validate_request_content_type!(operation, content_type)
-      return if operation.request_body.dig('content', content_type)
-
-      throw_error(415)
+      operation.valid_request_content_type?(content_type) || throw_error(415)
     end
 
     def validate_request_body_presence!(body, operation)

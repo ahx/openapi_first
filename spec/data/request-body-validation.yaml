@@ -89,6 +89,30 @@ paths:
       responses:
         200:
           description: Ok
+  /with-form-data:
+    post:
+      description: Creates a new pet in the store.  Duplicates are allowed
+      operationId: create_pet_form_data
+      requestBody:
+        description: Pet to add to the store
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/NewPet"
+      responses:
+        "200":
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     Pet:

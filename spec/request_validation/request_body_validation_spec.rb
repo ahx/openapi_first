@@ -166,6 +166,21 @@ RSpec.describe 'Request body validation' do
       end
     end
 
+    it 'ignores content type parameters' do
+      header Rack::CONTENT_TYPE, 'application/json; encoding=utf-8'
+      post '/pets', json_dump(request_body)
+
+      expect(last_response.status).to be 200
+    end
+
+    it 'succeeds with form data' do
+      header Rack::CONTENT_TYPE, 'multipart/form-data'
+      post '/with-form-data', request_body
+
+      expect(last_response.status).to be(200), last_response.body
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+    end
+
     it 'returns 415 if required request body is missing' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path
