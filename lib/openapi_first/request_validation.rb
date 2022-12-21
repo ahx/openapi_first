@@ -42,26 +42,19 @@ module OpenapiFirst
     private
 
     def parse_and_validate_request_body!(operation, request)
-      body = request.body.read
-      request.body.rewind
+      env = request.env
+
+      body = env.delete(Hanami::Router::ROUTER_PARSED_BODY) if env.key?(Hanami::Router::ROUTER_PARSED_BODY)
+
       validate_request_body_presence!(body, operation)
-      return if body.empty?
+      return if body.nil?
 
       schema = operation&.request_body_schema(request.content_type)
       return unless schema
 
-      parsed_request_body = parse_request_body!(body)
-      errors = schema.validate(parsed_request_body)
+      errors = schema.validate(body)
       throw_error(400, serialize_request_body_errors(errors)) if errors.any?
-      Utils.deep_symbolize(parsed_request_body)
-    end
-
-    def parse_request_body!(body)
-      MultiJson.load(body)
-    rescue MultiJson::ParseError => e
-      err = { title: 'Failed to parse body as JSON' }
-      err[:detail] = e.cause unless ENV['RACK_ENV'] == 'production'
-      throw_error(400, [err])
+      Utils.deep_symbolize(body)
     end
 
     def validate_request_content_type!(operation, content_type)
@@ -71,7 +64,7 @@ module OpenapiFirst
     end
 
     def validate_request_body_presence!(body, operation)
-      return unless operation.request_body['required'] && body.empty?
+      return unless operation.request_body['required'] && body.nil?
 
       throw_error(415, 'Request body is required')
     end

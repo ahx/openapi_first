@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update to hanami-router 2.0.0 stable. Use it's BodyParser middleware to parse the body.
+
 ## 0.20.0
 - You can pass a filepath to `spec:` now so you no longer have to call `OpenapiFirst.load` anymore.
 - Router is optional now.
