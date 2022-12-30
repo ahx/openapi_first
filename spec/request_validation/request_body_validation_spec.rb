@@ -68,6 +68,23 @@ RSpec.describe 'Request body validation' do
       expect(last_response.status).to be 200
     end
 
+    it 'works with json:api media type' do
+      header Rack::CONTENT_TYPE, 'application/vnd.api+json'
+      post '/json_api', json_dump(request_body)
+
+      expect(last_response.status).to be 200
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+    end
+
+    pending 'works with a custom json media type' do
+      header Rack::CONTENT_TYPE, 'application/vnd.my-custom+json'
+      post '/custom-json-type', json_dump(request_body)
+
+      expect(last_response.status).to be 200
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+    end
+
+
     it 'adds parsed request body to env' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
@@ -179,6 +196,26 @@ RSpec.describe 'Request body validation' do
 
       expect(last_response.status).to be(200), last_response.body
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+    end
+
+    it 'succeeds with form-urlencoded data' do
+      header Rack::CONTENT_TYPE, 'application/x-www-form-urlencoded'
+      post '/with-form-urlencoded', request_body
+
+      expect(last_response.status).to be(200), last_response.body
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+    end
+
+    it "handles file upload" do
+      filename = "foo.txt"
+      file = File.expand_path("../../data/#{filename}", __FILE__)
+      post "/with-multipart-file", file: Rack::Test::UploadedFile.new(file, "text/plain")
+
+      expect(last_response.status).to be(200), last_response.body
+      # uploaded_file = env["router.params"].fetch(:file)
+
+      expect(uploaded_file.fetch(:filename)).to eq(filename)
+      expect(uploaded_file.fetch(:tempfile).read).to eq(contents)
     end
 
     it 'returns 415 if required request body is missing' do

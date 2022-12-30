@@ -41,8 +41,7 @@ module OpenapiFirst
 
     private
 
-
-    def parse_and_validate_request_body!(operation, request)
+    def parse_and_validate_request_body!(operation, request) # rubocop:disable Metrics/CyclomaticComplexity
       env = request.env
 
       body = env.delete(Hanami::Router::ROUTER_PARSED_BODY) if env.key?(Hanami::Router::ROUTER_PARSED_BODY)
