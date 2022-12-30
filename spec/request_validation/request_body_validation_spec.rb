@@ -190,13 +190,14 @@ RSpec.describe 'Request body validation' do
       expect(last_response.status).to be 200
     end
 
-    it 'succeeds with form data' do
+    it 'succeeds with simple multipart form data' do
       header Rack::CONTENT_TYPE, 'multipart/form-data'
       post '/with-form-data', request_body
 
       expect(last_response.status).to be(200), last_response.body
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
+
 
     it 'succeeds with form-urlencoded data' do
       header Rack::CONTENT_TYPE, 'application/x-www-form-urlencoded'
@@ -206,17 +207,7 @@ RSpec.describe 'Request body validation' do
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
 
-    it "handles file upload" do
-      filename = "foo.txt"
-      file = File.expand_path("../../data/#{filename}", __FILE__)
-      post "/with-multipart-file", file: Rack::Test::UploadedFile.new(file, "text/plain")
-
-      expect(last_response.status).to be(200), last_response.body
-      # uploaded_file = env["router.params"].fetch(:file)
-
-      expect(uploaded_file.fetch(:filename)).to eq(filename)
-      expect(uploaded_file.fetch(:tempfile).read).to eq(contents)
-    end
+    it "handles file uploads"
 
     it 'returns 415 if required request body is missing' do
       header Rack::CONTENT_TYPE, 'application/json'
