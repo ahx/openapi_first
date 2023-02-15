@@ -68,6 +68,23 @@ RSpec.describe 'Request body validation' do
       expect(last_response.status).to be 200
     end
 
+    it 'works with json:api media type' do
+      header Rack::CONTENT_TYPE, 'application/vnd.api+json'
+      post '/json_api', json_dump(request_body)
+
+      expect(last_response.status).to be 200
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+    end
+
+    pending 'works with a custom json media type' do
+      header Rack::CONTENT_TYPE, 'application/vnd.my-custom+json'
+      post '/custom-json-type', json_dump(request_body)
+
+      expect(last_response.status).to be 200
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+    end
+
+
     it 'adds parsed request body to env' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
@@ -165,6 +182,32 @@ RSpec.describe 'Request body validation' do
         expect(values[:has_default]).to eq false
       end
     end
+
+    it 'ignores content type parameters' do
+      header Rack::CONTENT_TYPE, 'application/json; encoding=utf-8'
+      post '/pets', json_dump(request_body)
+
+      expect(last_response.status).to be 200
+    end
+
+    it 'succeeds with simple multipart form data' do
+      header Rack::CONTENT_TYPE, 'multipart/form-data'
+      post '/with-form-data', request_body
+
+      expect(last_response.status).to be(200), last_response.body
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+    end
+
+
+    it 'succeeds with form-urlencoded data' do
+      header Rack::CONTENT_TYPE, 'application/x-www-form-urlencoded'
+      post '/with-form-urlencoded', request_body
+
+      expect(last_response.status).to be(200), last_response.body
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+    end
+
+    it "handles file uploads"
 
     it 'returns 415 if required request body is missing' do
       header Rack::CONTENT_TYPE, 'application/json'

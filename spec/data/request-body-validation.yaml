@@ -38,6 +38,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /json_api:
+    post:
+      description: Creates a new pet in the store.  Duplicates are allowed
+      operationId: create_pet_json_api
+      requestBody:
+        description: Pet to add to the store
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/NewPet"
+      responses:
+        "200":
+          description: ok
+  /custom-json-type:
+    post:
+      description: Creates a new pet in the store.  Duplicates are allowed
+      operationId: create_pet_custom-json-type
+      requestBody:
+        description: Pet to add to the store
+        required: true
+        content:
+          application/prs.custom-json-type+json:
+            schema:
+              $ref: "#/components/schemas/NewPet"
+      responses:
+        "200":
+          description: ok
   /pets/{id}:
     parameters:
       - name: id
@@ -89,6 +117,44 @@ paths:
       responses:
         200:
           description: Ok
+  /with-form-data:
+    post:
+      requestBody:
+        description: Pet to add to the store
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/NewPet"
+      responses:
+        "200":
+          description: ok
+  /with-form-urlencoded:
+    post:
+      requestBody:
+        description: Pet to add to the store
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/NewPet"
+      responses:
+        "200":
+          description: ok
+  /with-multipart-file:
+    post:
+      requestBody:
+        description: Pet to add to the store
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                  file:
+                    description: The file
+      responses:
+        "200":
+          description: pet response
 components:
   schemas:
     Pet:

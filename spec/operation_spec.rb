@@ -364,4 +364,32 @@ RSpec.describe OpenapiFirst::Operation do
       end
     end
   end
+
+  describe '#valid_request_content_type?' do
+    it 'returns true for an exact match' do
+      operation = described_class.new('/', 'get',
+                                      { 'get' => { 'requestBody' => { 'content' => { 'application/json' => {} } } } })
+      valid = operation.valid_request_content_type?('application/json')
+      expect(valid).to be true
+    end
+
+    it 'ignores content type parameters' do
+      operation = described_class.new('/', 'get',
+                                      { 'get' => { 'requestBody' => { 'content' => { 'application/json' => {} } } } })
+      valid = operation.valid_request_content_type?('application/json; charset=UTF8')
+      expect(valid).to be true
+    end
+
+    it 'matches type/*' do
+      operation = described_class.new('/', 'get', { 'get' => { 'requestBody' => { 'content' => { 'text/*' => {} } } } })
+      valid = operation.valid_request_content_type?('text/plain')
+      expect(valid).to be true
+    end
+
+    it 'matches */*' do
+      operation = described_class.new('/', 'get', { 'get' => { 'requestBody' => { 'content' => { '*/*' => {} } } } })
+      valid = operation.valid_request_content_type?('application/json')
+      expect(valid).to be true
+    end
+  end
 end

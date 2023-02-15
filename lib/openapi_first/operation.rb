@@ -88,6 +88,13 @@ module OpenapiFirst
       "#{method.upcase} #{path} (#{operation_id})"
     end
 
+    def valid_request_content_type?(request_content_type)
+      content = operation_object.dig('requestBody', 'content')
+      return unless content
+
+      !!find_content_for_content_type(content, request_content_type)
+    end
+
     private
 
     def response_by_code(status)
