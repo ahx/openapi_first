@@ -84,7 +84,6 @@ RSpec.describe 'Request body validation' do
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
 
-
     it 'adds parsed request body to env' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
@@ -198,7 +197,6 @@ RSpec.describe 'Request body validation' do
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
 
-
     it 'succeeds with form-urlencoded data' do
       header Rack::CONTENT_TYPE, 'application/x-www-form-urlencoded'
       post '/with-form-urlencoded', request_body
@@ -207,7 +205,7 @@ RSpec.describe 'Request body validation' do
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
 
-    it "handles file uploads"
+    it 'handles file uploads'
 
     it 'returns 415 if required request body is missing' do
       header Rack::CONTENT_TYPE, 'application/json'
