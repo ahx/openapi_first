@@ -77,7 +77,7 @@ RSpec.describe 'Request body validation' do
     end
 
     pending 'works with a custom json media type' do
-      header Rack::CONTENT_TYPE, 'application/vnd.my-custom+json'
+      header Rack::CONTENT_TYPE, 'application/prs.custom-json-type+json'
       post '/custom-json-type', json_dump(request_body)
 
       expect(last_response.status).to be 200

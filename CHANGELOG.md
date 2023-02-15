@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Handle simple form-data in request bodies (see https://github.com/ahx/openapi_first/issues/149)
 - Update to hanami-router 2.0.0 stable. Use it's BodyParser middleware to parse the body.
 - Support simple form data requests. Still have to figure out file uploads.
 
