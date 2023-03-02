@@ -67,6 +67,131 @@ RSpec.describe OpenapiFirst::Operation do
           },
           'term' => {
             'type' => 'string'
+          },
+          'header' => {
+            'type' => 'string'
+          }
+        }
+      }
+    end
+
+    it 'returns the JSON Schema for the request' do
+      expect(schema).to eq expected_schema
+    end
+
+    describe 'with flat named nested[params]' do
+      let(:spec) { OpenapiFirst.load('./spec/data/parameters-flat.yaml') }
+
+      let(:expected_schema) do
+        {
+          'type' => 'object',
+          'required' => %w[term filter],
+          'properties' => {
+            'birthdate' => {
+              'format' => 'date',
+              'type' => 'string'
+            },
+            'filter' => {
+              'type' => 'object',
+              'required' => %w[id],
+              'properties' => {
+                'tag' => {
+                  'type' => 'array'
+                },
+                'id' => {
+                  'type' => 'integer'
+                },
+                'other' => {
+                  'type' => 'string'
+                }
+              }
+            },
+            'include' => {
+              'type' => 'string',
+              'pattern' => '(parents|children)+(,(parents|children))*'
+            },
+            'limit' => {
+              'type' => 'integer',
+              'format' => 'int32'
+            },
+            'term' => {
+              'type' => 'string'
+            },
+            'header' => {
+              'type' => 'string'
+            }
+          }
+        }
+      end
+
+      it 'converts it to a nested schema' do
+        expect(schema).to eq expected_schema
+      end
+    end
+
+    describe 'with a mix of path- and operation-level path parameters' do
+      it 'does not mix requirements' do
+        definition = OpenapiFirst.load('./spec/data/parameters-mix-issue.yaml')
+        operation_params = Hash[*definition.operations.flat_map do |op|
+                                  [op.operation_id, op.parameters_schema
+                                                      .raw_schema]
+                                end                                 ]
+        expect(operation_params['values#index']['required']).to eq %w[tenant_id filter]
+        expect(operation_params['values#create']['required']).to eq ['tenant_id']
+        expect(operation_params['values#update']['required']).to eq ['tenant_id']
+      end
+
+      it 'does not mix properties' do
+        definition = OpenapiFirst.load('./spec/data/parameters-mix-issue.yaml')
+        operation_params = Hash[*definition.operations.flat_map do |op|
+                                  [op.operation_id, op.parameters_schema
+                                                      .raw_schema]
+                                end                                 ]
+        expect(operation_params['values#index']['properties'].keys).to eq %w[tenant_id filter]
+        expect(operation_params['values#create']['properties'].keys).to eq ['tenant_id']
+        expect(operation_params['values#update']['properties'].keys).to eq ['tenant_id']
+      end
+    end
+  end
+
+  describe '#query_parameters_schema' do
+    let(:schema) do
+      spec.operations.first.query_parameters_schema.raw_schema
+    end
+
+    let(:expected_schema) do
+      {
+        'type' => 'object',
+        'required' => %w[
+          term
+        ],
+        'properties' => {
+          'birthdate' => {
+            'format' => 'date',
+            'type' => 'string'
+          },
+          'filter' => {
+            'type' => 'object',
+            'required' => ['tag'],
+            'properties' => {
+              'tag' => {
+                'type' => 'string'
+              },
+              'other' => {
+                'type' => 'object'
+              }
+            }
+          },
+          'include' => {
+            'type' => 'string',
+            'pattern' => '(parents|children)+(,(parents|children))*'
+          },
+          'limit' => {
+            'type' => 'integer',
+            'format' => 'int32'
+          },
+          'term' => {
+            'type' => 'string'
           }
         }
       }
