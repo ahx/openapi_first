@@ -25,6 +25,12 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/NewPet"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/NewPet"
+          text/plain:
+            schema:
+              type: string
       responses:
         "200":
           description: pet response
@@ -117,15 +123,21 @@ paths:
       responses:
         200:
           description: Ok
-  /with-form-data:
+  /multipart-with-file:
     post:
       requestBody:
-        description: Pet to add to the store
         required: true
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/NewPet"
+              type: object
+              properties:
+                petId:
+                  type: string
+                  pattern: "[0-9]+"
+                file:
+                  type: string
+                  format: binary
       responses:
         "200":
           description: ok
@@ -141,20 +153,6 @@ paths:
       responses:
         "200":
           description: ok
-  /with-multipart-file:
-    post:
-      requestBody:
-        description: Pet to add to the store
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              properties:
-                  file:
-                    description: The file
-      responses:
-        "200":
-          description: pet response
 components:
   schemas:
     Pet:

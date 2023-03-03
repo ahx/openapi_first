@@ -10,6 +10,25 @@ RSpec.describe 'Request body validation' do
     '/pets'
   end
 
+  def multipart_file_upload(url, http_method, filename, boundary = Rack::Multipart::MULTIPART_BOUNDARY)
+    path = fixture_path(filename)
+    file = Rack::Multipart::UploadedFile.new(path)
+    data = Rack::Multipart.build_multipart('file' => file)
+    env = Rack::MockRequest.env_for(
+      url,
+      'CONTENT_TYPE' => "multipart/form-data; boundary=#{boundary}",
+      'CONTENT_LENGTH' => data.length.to_s,
+      method: http_method,
+      input: StringIO.new(data)
+    )
+
+    [env, File.binread(path)]
+  end
+
+  def fixture_path(name)
+    Pathname.new(Dir.pwd).join('spec', 'data', name).realpath
+  end
+
   describe '#call' do
     include Rack::Test::Methods
 
@@ -47,6 +66,33 @@ RSpec.describe 'Request body validation' do
       expect(last_response.status).to be 200
     end
 
+    it 'succeeds with simple multipart form data' do
+      header Rack::CONTENT_TYPE, 'multipart/form-data'
+      post path, request_body
+
+      expect(last_response.status).to be(200), last_response.body
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+    end
+
+    it 'succeeds with multipart form data file binary upload' do
+      env, file_content = multipart_file_upload('/multipart-with-file', 'POST', 'foo.txt')
+      status, _headers, body = app.call(env)
+
+      expect(status).to eq(200), body
+      uploaded_file = env[OpenapiFirst::REQUEST_BODY][:file]
+      expect(uploaded_file[:type]).to eq 'text/plain'
+      expect(uploaded_file[:filename]).to eq 'foo.txt'
+      expect(uploaded_file[:tempfile].read).to eq file_content
+    end
+
+    it 'supports text/plain content type' do
+      header Rack::CONTENT_TYPE, 'text/plain'
+      post path, 'Cat!'
+
+      expect(last_response.status).to be(200), last_response.body
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq 'Cat!'
+    end
+
     it 'works with % in request body' do
       request_body = {
         type: 'pet',
@@ -65,7 +111,7 @@ RSpec.describe 'Request body validation' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
-      expect(last_response.status).to be 200
+      expect(last_response.status).to be(200), last_response.body
     end
 
     it 'works with json:api media type' do
@@ -76,7 +122,7 @@ RSpec.describe 'Request body validation' do
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
 
-    pending 'works with a custom json media type' do
+    it 'works with a custom json media type' do
       header Rack::CONTENT_TYPE, 'application/prs.custom-json-type+json'
       post '/custom-json-type', json_dump(request_body)
 
@@ -150,7 +196,7 @@ RSpec.describe 'Request body validation' do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'Failed to parse body as JSON'
+      expect(error[:title]).to eq 'Failed to parse body as application/json'
       expect(error[:detail]).to include "unexpected token at '{fo},'"
     end
 
@@ -189,14 +235,6 @@ RSpec.describe 'Request body validation' do
       expect(last_response.status).to be 200
     end
 
-    it 'succeeds with simple multipart form data' do
-      header Rack::CONTENT_TYPE, 'multipart/form-data'
-      post '/with-form-data', request_body
-
-      expect(last_response.status).to be(200), last_response.body
-      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
-    end
-
     it 'succeeds with form-urlencoded data' do
       header Rack::CONTENT_TYPE, 'application/x-www-form-urlencoded'
       post '/with-form-urlencoded', request_body
@@ -204,8 +242,6 @@ RSpec.describe 'Request body validation' do
       expect(last_response.status).to be(200), last_response.body
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
-
-    it 'handles file uploads'
 
     it 'returns 415 if required request body is missing' do
       header Rack::CONTENT_TYPE, 'application/json'
@@ -341,7 +377,7 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post path, '{fo},'
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Failed to parse body as JSON'
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Failed to parse body as application/json'
       end
 
       it 'raises error if request content-type does not match' do

@@ -17,6 +17,7 @@ module OpenapiFirst
         insert_property_defaults: true,
         before_property_validation: proc do |data, property, property_schema, parent|
           convert_nullable(data, property, property_schema, parent)
+          binary_format(data, property, property_schema, parent)
         end
       )
     end
@@ -26,6 +27,14 @@ module OpenapiFirst
     end
 
     private
+
+    def binary_format(data, property, property_schema, _parent)
+      return unless property_schema.is_a?(Hash) && property_schema['format'] == 'binary'
+
+      property_schema['type'] = 'object'
+      property_schema.delete('format')
+      data[property].transform_keys!(&:to_s)
+    end
 
     def convert_nullable(_data, _property, property_schema, _parent)
       return unless property_schema.is_a?(Hash) && property_schema['nullable'] && property_schema['type']

@@ -28,7 +28,8 @@ module OpenapiFirst
 
         validate_request_content_type!(operation, req.content_type)
         parsed_request_body = parse_and_validate_request_body!(operation, req)
-        env[INBOX].merge! env[REQUEST_BODY] = parsed_request_body if parsed_request_body
+        env[REQUEST_BODY] = parsed_request_body
+        env[INBOX].merge! parsed_request_body if parsed_request_body.is_a?(Hash)
         nil
       end
       if error
@@ -41,11 +42,12 @@ module OpenapiFirst
 
     private
 
-    def parse_and_validate_request_body!(operation, request) # rubocop:disable Metrics/CyclomaticComplexity
+    ROUTER_PARSED_BODY = 'router.parsed_body'
+
+    def parse_and_validate_request_body!(operation, request)
       env = request.env
 
-      body = env.delete(Hanami::Router::ROUTER_PARSED_BODY) if env.key?(Hanami::Router::ROUTER_PARSED_BODY)
-      body ||= request.POST if request.form_data?
+      body = env.delete(ROUTER_PARSED_BODY) if env.key?(ROUTER_PARSED_BODY)
 
       validate_request_body_presence!(body, operation)
       return if body.nil?
@@ -55,7 +57,9 @@ module OpenapiFirst
 
       errors = schema.validate(body)
       throw_error(400, serialize_request_body_errors(errors)) if errors.any?
-      Utils.deep_symbolize(body)
+      return Utils.deep_symbolize(body) if body.is_a?(Hash)
+
+      body
     end
 
     def validate_request_content_type!(operation, content_type)

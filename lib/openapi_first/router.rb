@@ -3,7 +3,7 @@
 require 'rack'
 require 'multi_json'
 require 'hanami/router'
-require 'hanami/middleware/body_parser'
+require_relative 'body_parser_middleware'
 
 module OpenapiFirst
   class Router
@@ -56,14 +56,14 @@ module OpenapiFirst
       env[ORIGINAL_PATH] = env[Rack::PATH_INFO]
       env[Rack::PATH_INFO] = Rack::Request.new(env).path
       @router.call(env)
-    rescue Hanami::Middleware::BodyParser::BodyParsingError => e
+    rescue BodyParsingError => e
       handle_body_parsing_error(e)
     ensure
       env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH) if env[ORIGINAL_PATH]
     end
 
     def handle_body_parsing_error(exception)
-      err = { title: 'Failed to parse body as JSON', status: '400' }
+      err = { title: 'Failed to parse body as application/json', status: '400' }
       err[:detail] = exception.cause unless ENV['RACK_ENV'] == 'production'
       errors = [err]
       raise RequestInvalidError, errors if @raise
@@ -86,8 +86,9 @@ module OpenapiFirst
           )
         end
       end
+      raise_error = @raise
       Rack::Builder.app do
-        use Hanami::Middleware::BodyParser, %i[json form]
+        use BodyParserMiddleware, raise_error: raise_error
         run router
       end
     end

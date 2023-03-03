@@ -22,6 +22,8 @@ module OpenapiFirst
 
   class ResponseBodyInvalidError < ResponseInvalid; end
 
+  class BodyParsingError < Error; end
+
   class RequestInvalidError < Error
     def initialize(serialized_errors)
       message = error_message(serialized_errors)
