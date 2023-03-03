@@ -47,6 +47,13 @@ module OpenapiFirst
       end
     end
 
+    def query_parameters_schema
+      @query_parameters_schema ||= begin
+        query_parameters_json_schema = build_query_parameters_json_schema
+        query_parameters_json_schema && SchemaValidation.new(query_parameters_json_schema)
+      end
+    end
+
     def content_types_for(status)
       response_for(status)['content']&.keys
     end
@@ -120,6 +127,16 @@ module OpenapiFirst
       return unless parameters&.any?
 
       parameters.each_with_object(new_node) do |parameter, schema|
+        params = Rack::Utils.parse_nested_query(parameter['name'])
+        generate_schema(schema, params, parameter)
+      end
+    end
+
+    def build_query_parameters_json_schema
+      query_parameters = all_parameters.reject { |field, _value| field['in'] == 'header' }
+      return unless query_parameters&.any?
+
+      query_parameters.each_with_object(new_node) do |parameter, schema|
         params = Rack::Utils.parse_nested_query(parameter['name'])
         generate_schema(schema, params, parameter)
       end

@@ -58,6 +58,11 @@ paths:
           schema:
             type: string
             pattern: (parents|children)+(,(parents|children))*
+        - name: header
+          in: header
+          description: A request header
+          schema:
+            type: string
       responses:
         "200":
           description: A paged array of pets

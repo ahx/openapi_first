@@ -101,7 +101,7 @@ module OpenapiFirst
     end
 
     def validate_query_parameters!(operation, params)
-      schema = operation.parameters_schema
+      schema = operation.query_parameters_schema
       return unless schema
 
       params = filtered_params(schema.raw_schema, params)
