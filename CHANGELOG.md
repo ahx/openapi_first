@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.21.0
+
 - Fix: Query parameter validation does not fail if header parameters are defined (Thanks to [JF Lalonde](https://github.com/JF-Lalonde))
 - Update Ruby dependency to >= 3.0.5
 - Handle simple form-data in request bodies (see https://github.com/ahx/openapi_first/issues/149)
