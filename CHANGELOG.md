@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: Query parameter validation does not fail if header parameters are defined (Thanks to [JF Lalonde](https://github.com/JF-Lalonde))
 - Update Ruby dependency to >= 3.0.5
 - Handle simple form-data in request bodies (see https://github.com/ahx/openapi_first/issues/149)
 - Update to hanami-router 2.0.0 stable
@@ -54,7 +55,7 @@ Yanked. No useful changes.
 
 ## 0.14.1
 
-- Bugfix: Don't mix path- and operation-level parameters for request validation
+- Fix: Don't mix path- and operation-level parameters for request validation
 
 ## 0.14.0
 
