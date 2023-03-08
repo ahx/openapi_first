@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Breaking change: Request body and parameters now use string keys instead of symbols!
+
 ## 0.21.0
 
 - Fix: Query parameter validation does not fail if header parameters are defined (Thanks to [JF Lalonde](https://github.com/JF-Lalonde))
