@@ -47,9 +47,9 @@ RSpec.describe 'Request body validation' do
 
     let(:request_body) do
       {
-        type: 'pet',
-        attributes: {
-          name: 'Oscar'
+        'type' => 'pet',
+        'attributes' => {
+          'name' => 'Oscar'
         }
       }
     end
@@ -79,10 +79,10 @@ RSpec.describe 'Request body validation' do
       status, _headers, body = app.call(env)
 
       expect(status).to eq(200), body
-      uploaded_file = env[OpenapiFirst::REQUEST_BODY][:file]
-      expect(uploaded_file[:type]).to eq 'text/plain'
-      expect(uploaded_file[:filename]).to eq 'foo.txt'
-      expect(uploaded_file[:tempfile].read).to eq file_content
+      uploaded_file = env[OpenapiFirst::REQUEST_BODY]['file']
+      expect(uploaded_file['type']).to eq 'text/plain'
+      expect(uploaded_file['filename']).to eq 'foo.txt'
+      expect(uploaded_file['tempfile'].read).to eq file_content
     end
 
     it 'supports text/plain content type' do
@@ -95,9 +95,9 @@ RSpec.describe 'Request body validation' do
 
     it 'works with % in request body' do
       request_body = {
-        type: 'pet',
-        attributes: {
-          name: 'Oscar 100%'
+        'type' => 'pet',
+        'attributes' => {
+          'name' => 'Oscar 100%'
         }
       }
       header Rack::CONTENT_TYPE, 'application/json'
@@ -146,7 +146,7 @@ RSpec.describe 'Request body validation' do
     end
 
     it 'returns 400 if request body is not valid' do
-      request_body[:attributes][:name] = 43
+      request_body['attributes']['name'] = 43
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
@@ -157,7 +157,7 @@ RSpec.describe 'Request body validation' do
     end
 
     it 'returns 400 if required field is missing' do
-      request_body[:attributes].delete(:name)
+      request_body['attributes'].delete('name')
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
@@ -168,7 +168,7 @@ RSpec.describe 'Request body validation' do
     end
 
     it 'returns 400 if value is not defined in enum' do
-      request_body[:type] = 'unknown-type'
+      request_body['type'] = 'unknown-type'
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
@@ -180,7 +180,7 @@ RSpec.describe 'Request body validation' do
     end
 
     it 'returns 400 if additional property is not allowed' do
-      request_body[:attributes].update(foo: :bar)
+      request_body['attributes'].update('foo' => :bar)
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
@@ -208,7 +208,7 @@ RSpec.describe 'Request body validation' do
         post '/with-default-body-value', json_dump(params)
         expect(last_response.status).to eq(200)
         values = last_request.env[OpenapiFirst::INBOX]
-        expect(values[:has_default]).to eq true
+        expect(values['has_default']).to eq true
       end
 
       it 'still validates the value' do
@@ -224,7 +224,7 @@ RSpec.describe 'Request body validation' do
         post '/with-default-body-value', json_dump(params)
         expect(last_response.status).to eq(200)
         values = last_request.env[OpenapiFirst::INBOX]
-        expect(values[:has_default]).to eq false
+        expect(values['has_default']).to eq false
       end
     end
 
@@ -317,8 +317,8 @@ RSpec.describe 'Request body validation' do
       it 'fails if request includes readOnly field' do
         header Rack::CONTENT_TYPE, 'application/json'
         request_body = {
-          name: 'foo',
-          id: '123'
+          'name' => 'foo',
+          'id' => '123'
         }
         expect do
           post '/test', json_dump(request_body)
@@ -358,7 +358,7 @@ RSpec.describe 'Request body validation' do
       let(:raise_error_option) { true }
 
       it 'raises error if request body is not valid' do
-        request_body[:attributes][:name] = 43
+        request_body['attributes']['name'] = 43
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post path, json_dump(request_body)
@@ -366,7 +366,7 @@ RSpec.describe 'Request body validation' do
       end
 
       it 'raises error if required field is missing' do
-        request_body[:attributes].delete(:name)
+        request_body['attributes'].delete('name')
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post path, json_dump(request_body)
