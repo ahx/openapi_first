@@ -107,7 +107,6 @@ module OpenapiFirst
       return unless schema
 
       params = filtered_params(schema.raw_schema, params)
-      params = Utils.deep_stringify(params)
       errors = schema.validate(params)
       throw_error(400, serialize_query_parameter_errors(errors)) if errors.any?
       params

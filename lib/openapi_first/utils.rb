@@ -17,9 +17,5 @@ module OpenapiFirst
     def self.classify(string)
       Hanami::Utils::String.classify(string)
     end
-
-    def self.deep_stringify(hash)
-      Hanami::Utils::Hash.deep_stringify(hash)
-    end
   end
 end
