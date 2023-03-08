@@ -272,44 +272,6 @@ spec = OpenapiFirst.load('./openapi/openapi.yaml', only: { |path| path.starts_wi
 run OpenapiFirst.app(spec, namespace: Pets)
 ```
 
-## Coverage
-
-(This is a bit experimental. Please try it out and give feedback.)
-
-`OpenapiFirst::Coverage` helps you make sure, that you have called all endpoints of your OAS file when running tests via `rack-test`.
-
-```ruby
-# In your test (rspec example):
-require 'openapi_first/coverage'
-
-describe MyApp do
-  include Rack::Test::Methods
-
-  before(:all) do
-    @app_wrapper = OpenapiFirst::Coverage.new(MyApp, 'petstore.yaml')
-  end
-
-  after(:all) do
-    message = "The following paths have not been called yet: #{@app_wrapper.to_be_called}"
-    expect(@app_wrapper.to_be_called).to be_empty
-  end
-
-  # Overwrite `#app` to make rack-test call the wrapped app
-  def app
-    @app_wrapper
-  end
-
-  it 'does things' do
-    get '/i/my/stuff'
-    # …
-  end
-end
-```
-
-## Mocking
-
-Out of scope. Use [Prism](https://github.com/stoplightio/prism) or [fakeit](https://github.com/JustinFeng/fakeit).
-
 ## Development
 
 Run `bin/setup` to install dependencies.
