@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Remove `OpenapiFirst::Coveragee`, beause it's out of scope for this gem.
 - Breaking change: Request body and parameters now use string keys instead of symbols!
 
 ## 0.21.0
