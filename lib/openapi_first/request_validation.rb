@@ -57,8 +57,6 @@ module OpenapiFirst
 
       errors = schema.validate(body)
       throw_error(400, serialize_request_body_errors(errors)) if errors.any?
-      return Utils.deep_symbolize(body) if body.is_a?(Hash)
-
       body
     end
 
@@ -109,20 +107,20 @@ module OpenapiFirst
       return unless schema
 
       params = filtered_params(schema.raw_schema, params)
-      params = Utils.deep_stringify(params)
       errors = schema.validate(params)
       throw_error(400, serialize_query_parameter_errors(errors)) if errors.any?
-      Utils.deep_symbolize(params)
+      params
     end
 
     def filtered_params(json_schema, params)
       json_schema['properties']
         .each_with_object({}) do |key_value, result|
-          parameter_name = key_value[0].to_sym
+          parameter_name = key_value[0]
+          parameter_name_symbol = parameter_name.to_sym
           schema = key_value[1]
-          next unless params.key?(parameter_name)
+          next unless params.key?(parameter_name_symbol)
 
-          value = params[parameter_name]
+          value = params[parameter_name_symbol]
           result[parameter_name] = parse_parameter(value, schema)
         end
     end

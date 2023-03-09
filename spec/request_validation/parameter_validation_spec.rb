@@ -34,10 +34,10 @@ RSpec.describe 'Parameter validation' do
       }
     end
 
-    let(:params_with_defaults) do
+    let(:expected_params) do
       {
-        term: 'Oscar',
-        limit: 10
+        'term' => 'Oscar',
+        'limit' => 10
       }
     end
 
@@ -100,13 +100,13 @@ RSpec.describe 'Parameter validation' do
 
     it 'adds filtered query parameters to env ' do
       get path, params
-      expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq params_with_defaults
+      expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq expected_params
     end
 
     it 'updates INBOX' do
       get path, params
 
-      expect(last_request.env[OpenapiFirst::INBOX]).to eq params_with_defaults
+      expect(last_request.env[OpenapiFirst::INBOX]).to eq expected_params
     end
 
     it 'skips parameter validation if no parameters are defined' do
@@ -125,7 +125,7 @@ RSpec.describe 'Parameter validation' do
       get path, params.merge(foo: 'bar')
 
       expect(last_response.status).to eq 200
-      expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq params_with_defaults
+      expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq expected_params
     end
 
     describe 'with array query parameters' do
@@ -140,8 +140,8 @@ RSpec.describe 'Parameter validation' do
           get '/default-style', params
           expect(last_response.status).to eq(200), last_response.body
           parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
-          expect(parsed_parameters[:strings]).to eq %w[a b c]
-          expect(parsed_parameters[:integers]).to eq [2, 3, 4]
+          expect(parsed_parameters['strings']).to eq %w[a b c]
+          expect(parsed_parameters['integers']).to eq [2, 3, 4]
         end
 
         it 'parses nested array' do
@@ -151,14 +151,14 @@ RSpec.describe 'Parameter validation' do
           get '/default-style', params
           expect(last_response.status).to eq(200), last_response.body
           parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
-          expect(parsed_parameters[:nested][:integers]).to eq [2, 3, 4]
+          expect(parsed_parameters.dig('nested', 'integers')).to eq [2, 3, 4]
         end
 
         it 'ignores empty query params' do
           get '/default-style'
           expect(last_response.status).to eq(200), last_response.body
           parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
-          expect(parsed_parameters[:strings]).to be_nil
+          expect(parsed_parameters['strings']).to be_nil
         end
 
         it 'returns 400 if array maxItems is exceeded' do
@@ -188,7 +188,7 @@ RSpec.describe 'Parameter validation' do
         get '/with-default-query-param', params
         expect(last_response.status).to eq(200)
         parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
-        expect(parsed_parameters[:has_default]).to eq true
+        expect(parsed_parameters['has_default']).to eq true
       end
 
       it 'still validates the parameter' do
@@ -204,7 +204,7 @@ RSpec.describe 'Parameter validation' do
         get '/with-default-query-param', params
         expect(last_response.status).to eq(200)
         parsed_parameters = last_request.env[OpenapiFirst::PARAMETERS]
-        expect(parsed_parameters[:has_default]).to eq false
+        expect(parsed_parameters['has_default']).to eq false
       end
     end
 
@@ -296,7 +296,7 @@ RSpec.describe 'Parameter validation' do
         get path, params.merge(limit: '100')
 
         expect(last_response.status).to eq(200), last_response.body
-        expect(last_params[:limit]).to eq 100
+        expect(last_params['limit']).to eq 100
 
         get path, params.merge(limit: 'invalid')
         expect(last_response.status).to eq(400)
@@ -309,7 +309,7 @@ RSpec.describe 'Parameter validation' do
         get path, params.merge(weight: '1.5')
 
         expect(last_response.status).to eq(200), last_response.body
-        expect(last_params[:weight]).to eq 1.5
+        expect(last_params['weight']).to eq 1.5
 
         get path, params.merge(limit: 'invalid')
         expect(last_response.status).to eq(400)
@@ -319,24 +319,31 @@ RSpec.describe 'Parameter validation' do
       end
 
       it 'converts to boolean' do
-        get path, params.merge(starred: 'true')
+        get path, { 'starred' => 'true', 'term' => 'search'}
         expect(last_response.status).to eq(200), last_response.body
-        expect(last_params[:starred]).to eq true
+        expect(last_params['starred']).to eq true
 
-        get path, params.merge(starred: 'false')
+        get path, { 'starred' => 'false', 'term' => 'search'}
         expect(last_response.status).to eq(200), last_response.body
-        expect(last_params[:starred]).to eq false
+        expect(last_params['starred']).to eq false
 
-        get path, params.merge(starred: 'wrong')
+        get path, { 'starred' => 'wrong', 'term' => 'search'}
         expect(last_response.status).to eq(400)
-        expect(last_params[:starred]).to eq 'wrong'
+      end
+
+      it 'works with symbol and string keys in test' do
+        get path, { :starred => 'true', :term => 'search'}
+        expect(last_response.status).to eq(200), last_response.body
+
+        get path, { 'starred' => 'false', 'term' => 'search'}
+        expect(last_response.status).to eq(200), last_response.body
       end
 
       it 'converts nested params' do
         get path, params.merge(filter: { id: '100', tag: 'foo' })
 
         expect(last_response.status).to eq(200), last_response.body
-        expect(last_params[:filter][:id]).to eq 100
+        expect(last_params.dig('filter','id')).to eq 100
       end
     end
   end
