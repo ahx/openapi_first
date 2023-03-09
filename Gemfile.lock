@@ -8,7 +8,7 @@ PATH
       json_refs (~> 0.1, >= 0.1.7)
       json_schemer (~> 0.2.16)
       multi_json (~> 1.14)
-      rack (~> 2.2)
+      rack (>= 2.2, < 4.0)
 
 GEM
   remote: https://rubygems.org/
@@ -56,7 +56,7 @@ GEM
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    rack (2.2.6.2)
+    rack (2.2.6.3)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rainbow (3.1.1)
