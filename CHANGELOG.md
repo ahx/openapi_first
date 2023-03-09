@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Remove `OpenapiFirst::Coveragee`, beause it's out of scope for this gem.
+
 ## 0.21.0
 
 - Fix: Query parameter validation does not fail if header parameters are defined (Thanks to [JF Lalonde](https://github.com/JF-Lalonde))
