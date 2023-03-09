@@ -5,7 +5,7 @@ require 'openapi_first'
 
 namespace = Module.new do
   def self.find_thing(params, _res)
-    { hello: 'world', id: params.fetch(:id) }
+    { hello: 'world', id: params.fetch('id') }
   end
 
   def self.find_things(_params, _res)
