@@ -8,12 +8,12 @@ PATH
       json_refs (~> 0.1, >= 0.1.7)
       json_schemer (~> 0.2.16)
       multi_json (~> 1.14)
-      rack (~> 2.2)
+      rack (>= 2.2, < 4.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (7.0.4.2)
+    activesupport (7.0.4.3)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -26,7 +26,7 @@ GEM
       json_schema (~> 0.14, >= 0.14.3)
       openapi_parser (~> 1.0)
       rack (>= 1.5)
-    concurrent-ruby (1.2.0)
+    concurrent-ruby (1.2.2)
     deep_merge (1.2.2)
     dry-core (1.0.0)
       concurrent-ruby (~> 1.0)
@@ -76,7 +76,7 @@ GEM
       regexp_parser (~> 2.0)
       uri_template (~> 0.7)
     memory_profiler (1.0.1)
-    minitest (5.17.0)
+    minitest (5.18.0)
     multi_json (1.15.0)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
