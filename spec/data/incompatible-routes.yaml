@@ -1,0 +1,25 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Incompatible routes
+  license:
+    name: MIT
+paths:
+  /foo/{fooId}:
+    get:
+      operationId: foo
+      parameters:
+        - name: fooId
+          in: path
+          required: true
+          schema:
+            type: string
+  /foo/{fooId}/bar:
+    get:
+      operationId: foo-bar
+      parameters:
+        - name: fooId
+          in: path
+          required: true
+          schema:
+            type: string

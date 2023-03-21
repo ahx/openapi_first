@@ -320,5 +320,26 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
     end
+
+    describe "GitHub issue #155" do
+      let(:app) do
+        Rack::Builder.new do
+          use OpenapiFirst::Router, spec: './spec/data/incompatible-routes.yaml'
+          run ->(_env) { Rack::Response.new('hello', 200).finish }
+        end
+      end
+
+      it 'adds the operation to env ' do
+        get 'foo/1'
+
+        operation = last_request.env[OpenapiFirst::OPERATION]
+        expect(operation.operation_id).to eq 'foo'
+
+        get 'foo/1/bar'
+
+        operation = last_request.env[OpenapiFirst::OPERATION]
+        expect(operation.operation_id).to eq 'foo-bar'
+      end
+    end
   end
 end
