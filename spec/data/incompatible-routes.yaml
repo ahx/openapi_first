@@ -14,11 +14,12 @@ paths:
           required: true
           schema:
             type: string
-  /foo/{fooId}/bar:
+  # NOTE: If we use {fooId} here the test passes,
+  /foo/{id}/bar:
     get:
       operationId: foo-bar
       parameters:
-        - name: fooId
+        - name: id
           in: path
           required: true
           schema:
