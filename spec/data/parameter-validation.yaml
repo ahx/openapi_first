@@ -25,6 +25,7 @@ paths:
           in: query
           description: Filter results
           example: "filter[tag]"
+          style: deepObject
           schema:
             type: object
             required: [tag]

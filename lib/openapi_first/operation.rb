@@ -102,6 +102,10 @@ module OpenapiFirst
       !!find_content_for_content_type(content, request_content_type)
     end
 
+    def query_parameters
+      @query_parameters ||= all_parameters.filter { |p| p['in'] == 'query'}
+    end
+
     private
 
     def response_by_code(status)
@@ -133,13 +137,9 @@ module OpenapiFirst
     end
 
     def build_query_parameters_json_schema
-      query_parameters = all_parameters.reject { |field, _value| field['in'] == 'header' }
       return unless query_parameters&.any?
 
-      query_parameters.each_with_object(new_node) do |parameter, schema|
-        params = Rack::Utils.parse_nested_query(parameter['name'])
-        generate_schema(schema, params, parameter)
-      end
+
     end
 
     def all_parameters

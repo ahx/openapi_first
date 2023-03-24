@@ -4,6 +4,7 @@
 
 - Remove `OpenapiFirst::Coveragee`, beause it's out of scope for this gem.
 - Breaking change: Request body and parameters now use string keys instead of symbols!
+- Breaking change: Parameters are now unpacked exactly like in the API description via the openapi_parameters gem.
 
 ## 0.21.0
 
