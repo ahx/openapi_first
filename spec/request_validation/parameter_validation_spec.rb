@@ -248,7 +248,7 @@ RSpec.describe 'Parameter validation' do
       end
 
       it 'works with URL encoded query parameter names' do
-        get "#{path}?filter%5Btag%5D=dogs&filter%5Bid%5D=1&term=foo"
+        get "/search?filter%5Btag%5D=dogs&filter%5Bid%5D=1&term=foo"
 
         expect(last_response.status).to eq(200), last_response.body
       end
@@ -308,7 +308,6 @@ RSpec.describe 'Parameter validation' do
         expect(last_response.status).to eq(400)
 
         get '/search', params.merge(limit: '0x23')
-        expect(last_params['weight']).to eq 35.0
         expect(last_response.status).to eq(400)
       end
 

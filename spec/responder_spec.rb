@@ -224,7 +224,7 @@ RSpec.describe OpenapiFirst::Responder do
           expect(params).to eq('tags' => ['foo'])
         end
 
-        get '/pets', 'tags[]' => 'foo', 'foo' => 'bar'
+        get '/pets', 'tags' => 'foo', 'foo' => 'bar'
       end
 
       it 'has path parameters and request body' do

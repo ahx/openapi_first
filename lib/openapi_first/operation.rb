@@ -106,6 +106,19 @@ module OpenapiFirst
       @query_parameters ||= all_parameters.filter { |p| p['in'] == 'query'}
     end
 
+    def path_parameters
+      @path_parameters ||= all_parameters.filter { |p| p['in'] == 'path'}
+    end
+
+    def all_parameters
+      @all_parameters ||= begin
+        parameters = @path_item_object['parameters']&.dup || []
+        parameters_on_operation = operation_object['parameters']
+        parameters.concat(parameters_on_operation) if parameters_on_operation
+        parameters
+      end
+    end
+
     private
 
     def response_by_code(status)
@@ -138,15 +151,6 @@ module OpenapiFirst
 
     def build_query_parameters_json_schema
       return unless query_parameters&.any?
-
-
-    end
-
-    def all_parameters
-      parameters = @path_item_object['parameters']&.dup || []
-      parameters_on_operation = operation_object['parameters']
-      parameters.concat(parameters_on_operation) if parameters_on_operation
-      parameters
     end
 
     def generate_schema(schema, params, parameter)
