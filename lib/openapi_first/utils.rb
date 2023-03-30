@@ -17,5 +17,19 @@ module OpenapiFirst
     def self.classify(string)
       Hanami::Utils::String.classify(string)
     end
+
+    class StringKeyedHash
+      def initialize(original)
+        @orig = original
+      end
+
+      def key?(key)
+        @orig.key?(key.to_sym)
+      end
+
+      def [](key)
+        @orig[key.to_sym]
+      end
+    end
   end
 end

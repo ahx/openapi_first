@@ -8,7 +8,7 @@ PATH
       json_refs (~> 0.1, >= 0.1.7)
       json_schemer (~> 0.2.16)
       multi_json (~> 1.14)
-      openapi_parameters (~> 0.1.0)
+      mustermann-contrib (~> 3.0.0)
       rack (>= 2.2, < 4.0)
 
 GEM
@@ -51,9 +51,8 @@ GEM
     mustermann-contrib (3.0.0)
       hansi (~> 0.2.0)
       mustermann (= 3.0.0)
-    openapi_parameters (0.1.0)
+    openapi_parameters (0.2.0)
       rack (>= 2.2)
-      uri_template (>= 0.7, < 2.0)
       zeitwerk (~> 2.6)
     parallel (1.22.1)
     parser (3.2.1.1)
@@ -77,7 +76,7 @@ GEM
     rspec-expectations (3.12.2)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
-    rspec-mocks (3.12.4)
+    rspec-mocks (3.12.5)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.0)
@@ -105,6 +104,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 2)
   openapi_first!
+  openapi_parameters (~> 0.2, <= 2.0.0)
   pry
   rack-test (~> 1)
   rake (~> 13)
