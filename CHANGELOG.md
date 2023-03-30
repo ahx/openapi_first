@@ -4,10 +4,11 @@
 
 - Remove `OpenapiFirst::Coverage`, beause it's out of scope for this gem.
 - Breaking: Request body and parameters now use string keys instead of symbols!
-- Breaking: Query parameters are now unpacked exactly like in the API description via the openapi_parameters gem. This means a couple of things:
+- Breaking: Query parameters are now parsed exactly like in the API description via the openapi_parameters gem. This means a couple of things:
   - Query parameters now support `explode: true` (default) and `explode: false` for array and object parameters.
   - Query parameters with brackets like 'filter[tag]' are no longer deconstructed into nested hashes, but accessible via the `filter[tag]` key.
   - Query parameters are no longer interpreted as `style: deepObject` by default. If you want to use `style: deepObject`, for example to pass a nested hash as a query parameter like `filter[tag]`, you have to set `style: deepObject` explicitly.
+- Path parameters are now parsed exactly as in the API description via the openapi_parameters gem.
 
 ## 0.21.0
 
