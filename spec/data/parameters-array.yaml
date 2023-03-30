@@ -15,6 +15,7 @@ paths:
         - name: strings
           in: query
           required: false
+          explode: false
           schema:
             type: array
             maxItems: 4
@@ -23,6 +24,7 @@ paths:
         - name: integers
           in: query
           required: false
+          explode: false
           schema:
             type: array
             maxItems: 4

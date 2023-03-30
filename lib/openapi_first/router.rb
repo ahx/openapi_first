@@ -96,8 +96,10 @@ module OpenapiFirst
     def build_route(operation)
       lambda do |env|
         env[OPERATION] = operation
-        env[PARAMETERS] = env['router.params']
-        env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH)
+        path_info = env.delete(ORIGINAL_PATH)
+        route_params = Utils::StringKeyedHash.new(env['router.params'])
+        env[PARAMETERS] = OpenapiParameters::Path.new(operation.path_parameters).unpack(route_params)
+        env[Rack::PATH_INFO] = path_info
         @app.call(env)
       end
     end
