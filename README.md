@@ -8,12 +8,6 @@ Start with writing an OpenAPI file that describes the API, which you are about t
 
 You can use OpenapiFirst via its [Rack middlewares](#rack-middlewares) or in [standalone mode](#standalone-usage).
 
-## Alternatives
-
-This gem is inspired by [committee](https://github.com/interagent/committee) (Ruby) and [connexion](https://github.com/zalando/connexion) (Python).
-
-Here's a [comparison between committee and openapi_first](https://gist.github.com/ahx/1538c31f0652f459861713b5259e366a).
-
 ## Rack middlewares
 
 OpenapiFirst consists of these Rack middlewares:
@@ -64,19 +58,27 @@ content-type: "application/vnd.api+json"
 
 This middleware adds `env[OpenapiFirst::INBOX]` which holds the (filtered) path and query parameters and the parsed request body.
 
-### Parameter validation
+### Parameters
 
 The middleware filteres all top-level query parameters and paths parameters and tries to convert numeric values. Meaning, if you have an `:something_id` path with `type: integer`, it will try convert the value to an integer.
 
 It just works with a parameter with `name: filter[age]`.
 
-OpenapiFirst also supports `type: array` for query parameters and will convert `items` just as described above. [`style`](http://spec.openapis.org/oas/v3.0.3#style-values) and `explode` attributes are not supported for query parameters. It will always act as if `style: form` and `explode: false` were used for query parameters.
+OpenapiFirst also supports `type: array` for query parameters and will convert `items` just as described above.
 
-Conversion is currently done only for path and query parameters, but not for the request body. OpenapiFirst currently does not convert date, date-time or time formats.
+The `RequestValidation` middleware adds `env['openapi.params']` or  with the converted query and path parameters. This only includes the parameters that are defined in the API description. It supports every [`style` and `explode` value as described](https://spec.openapis.org/oas/latest.html#style-examples) in the OpenAPI 3.0 and 3.1 specs. So you can do things these:
 
-If you want to forbid _nested_ query parameters you will need to use [`additionalProperties: false`](https://json-schema.org/understanding-json-schema/reference/object.html#properties) in your query parameter JSON schema.
+```ruby
+# GET /pets/filter[id]=1,2,3
+env[OpenapiFirst::PARAMS] # => { 'filter[id]' => [1,2,3] }
 
-_OpenapiFirst always treats query parameters like [`style: deepObject`](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values), **but** it just works with nested objects (`filter[foo][bar]=baz`) (see [this discussion](https://github.com/OAI/OpenAPI-Specification/issues/1706))._
+# GET /colors/.blue.black.brown?format=csv
+env[OpenapiFirst::PARAMS] # => { 'color_names' => ['blue', 'black', 'brown'], 'format' => 'csv' }
+
+# And a lot more.
+```
+
+Integration for specific webframeworks is ongoing. Don't hesitate to create an issue with you specific needs.
 
 ### Request body validation
 
@@ -235,6 +237,12 @@ run OpenapiFirst.middleware('./openapi/openapi.yaml', namespace: Pets)
 ```
 
 Here all requests that are not part of the API description will be passed to the next app.
+
+## Alternatives
+
+This gem is inspired by [committee](https://github.com/interagent/committee) (Ruby) and [connexion](https://github.com/zalando/connexion) (Python).
+
+Here's a [comparison between committee and openapi_first](https://gist.github.com/ahx/1538c31f0652f459861713b5259e366a).
 
 ## Try it out
 
