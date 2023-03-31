@@ -138,14 +138,14 @@ RSpec.describe OpenapiFirst::Router do
       it 'adds path parameters to env ' do
         get '/pets/1'
 
-        params = last_request.env[OpenapiFirst::PARAMETERS]
+        params = last_request.env[OpenapiFirst::PARAMS]
         expect(params).to eq('petId' => '1')
       end
 
       it 'does not add path parameters if not defined for operation' do
         get 'pets'
 
-        params = last_request.env[OpenapiFirst::PARAMETERS]
+        params = last_request.env[OpenapiFirst::PARAMS]
         expect(params).to be_empty
       end
 
@@ -166,7 +166,7 @@ RSpec.describe OpenapiFirst::Router do
           operation = last_request.env[OpenapiFirst::OPERATION]
           expect(operation.operation_id).to eq 'info_date'
 
-          params = last_request.env[OpenapiFirst::PARAMETERS]
+          params = last_request.env[OpenapiFirst::PARAMS]
           expect(params).to eq('date' => '2020-01-01')
         end
 
@@ -177,7 +177,7 @@ RSpec.describe OpenapiFirst::Router do
           operation = last_request.env[OpenapiFirst::OPERATION]
           expect(operation.operation_id).to eq 'info_date_range'
 
-          params = last_request.env[OpenapiFirst::PARAMETERS]
+          params = last_request.env[OpenapiFirst::PARAMS]
           expect(params).to eq('start_date' => '2020-01-01', 'end_date' => '2020-01-02')
         end
 
@@ -188,7 +188,7 @@ RSpec.describe OpenapiFirst::Router do
           operation = last_request.env[OpenapiFirst::OPERATION]
           expect(operation.operation_id).to eq 'info'
 
-          params = last_request.env[OpenapiFirst::PARAMETERS]
+          params = last_request.env[OpenapiFirst::PARAMS]
           expect(params).to be_empty
         end
       end

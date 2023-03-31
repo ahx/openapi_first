@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breaking: Parsed query and path parameters are available at `env[OpenapiFirst::PARAMS]`(or `env['openapi.params']`) instead of OpenapiFirst::PARAMETERS.
 - Remove `OpenapiFirst::Coverage`, beause it's out of scope for this gem.
 - Breaking: Request body and parameters now use string keys instead of symbols!
 - Breaking: Query parameters are now parsed exactly like in the API description via the openapi_parameters gem. This means a couple of things:

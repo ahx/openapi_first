@@ -14,9 +14,9 @@ require_relative 'openapi_first/responder'
 require_relative 'openapi_first/app'
 
 module OpenapiFirst
-  OPERATION = 'openapi_first.operation'
-  PARAMETERS = 'openapi_first.parameters'
-  REQUEST_BODY = 'openapi_first.parsed_request_body'
+  OPERATION = 'openapi.operation'
+  PARAMS = PARAMETERS = 'openapi.params'
+  REQUEST_BODY = 'openapi.parsed_request_body'
   INBOX = 'openapi_first.inbox'
   HANDLER = 'openapi_first.handler'
 
