@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breaking: `OpenapiFirst::Responder`, `OpenapiFirst::RackResponder` have been removed.
 - Breaking: `OpenapiFirst.app` and `OpenapiFirst.middlware` have been removed. Use the middlewares and `openapi_first/responder` directly instead.
 - Breaking: Parsed query and path parameters are available at `env[OpenapiFirst::PARAMS]`(or `env['openapi.params']`) instead of `OpenapiFirst::PARAMETERS`.
 - Remove `OpenapiFirst::Coverage`, beause it's out of scope for this gem.

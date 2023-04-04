@@ -5,18 +5,15 @@ require 'json_refs'
 require_relative 'openapi_first/definition'
 require_relative 'openapi_first/version'
 require_relative 'openapi_first/errors'
-require_relative 'openapi_first/inbox'
 require_relative 'openapi_first/router'
 require_relative 'openapi_first/request_validation'
 require_relative 'openapi_first/response_validator'
 require_relative 'openapi_first/response_validation'
-require_relative 'openapi_first/responder'
 
 module OpenapiFirst
   OPERATION = 'openapi.operation'
-  PARAMS = PARAMETERS = 'openapi.params'
+  PARAMS = 'openapi.params'
   REQUEST_BODY = 'openapi.parsed_request_body'
-  INBOX = 'openapi_first.inbox'
   HANDLER = 'openapi_first.handler'
 
   def self.env

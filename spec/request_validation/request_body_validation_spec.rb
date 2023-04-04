@@ -138,11 +138,11 @@ RSpec.describe 'Request body validation' do
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
 
-    it 'updates INBOX' do
+    it 'updates REQUEST_BODY' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
-      expect(last_request.env[OpenapiFirst::INBOX]).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
 
     it 'returns 400 if request body is not valid' do
@@ -207,7 +207,7 @@ RSpec.describe 'Request body validation' do
         params = {}
         post '/with-default-body-value', json_dump(params)
         expect(last_response.status).to eq(200)
-        values = last_request.env[OpenapiFirst::INBOX]
+        values = last_request.env[OpenapiFirst::REQUEST_BODY]
         expect(values['has_default']).to eq true
       end
 
@@ -223,7 +223,7 @@ RSpec.describe 'Request body validation' do
         params = { has_default: false }
         post '/with-default-body-value', json_dump(params)
         expect(last_response.status).to eq(200)
-        values = last_request.env[OpenapiFirst::INBOX]
+        values = last_request.env[OpenapiFirst::REQUEST_BODY]
         expect(values['has_default']).to eq false
       end
     end

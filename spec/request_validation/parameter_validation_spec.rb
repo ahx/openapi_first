@@ -99,17 +99,6 @@ RSpec.describe 'Parameter validation' do
       expect(last_request.env[OpenapiFirst::PARAMS]).to eq expected_params
     end
 
-    it 'still adds PARAMETERS to env ' do
-      get '/search', params
-      expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq expected_params
-    end
-
-    it 'updates INBOX' do
-      get '/search', params
-
-      expect(last_request.env[OpenapiFirst::INBOX]).to eq expected_params
-    end
-
     it 'skips parameter validation if no parameters are defined' do
       get '/info', params
 
