@@ -31,40 +31,6 @@ RSpec.describe OpenapiFirst do
     }
   end
 
-  describe '.app' do
-    let(:app) do
-      OpenapiFirst.app(spec_path, namespace: namespace)
-    end
-
-    before do
-      header Rack::CONTENT_TYPE, 'application/json'
-    end
-
-    it 'runs the app' do
-      patch '/pets/1', json_dump(request_body)
-
-      expect(last_response.body).to eq 'updated'
-      expect(last_response.status).to eq 200
-    end
-
-    it 'returns 404 is path is unknown' do
-      patch '/unknown', json_dump(request_body)
-      expect(last_response.status).to eq 404
-    end
-
-    describe 'if RACK_ENV is production' do
-      let(:app) do
-        stub_const('ENV', { 'RACK_ENV' => 'production' })
-        OpenapiFirst.app(spec_path, namespace: namespace)
-      end
-
-      it 'returns 404 if path is unknown and we are not testing' do
-        patch '/unknown', json_dump(request_body)
-        expect(last_response.status).to eq 404
-      end
-    end
-  end
-
   describe '.load' do
     it 'returns a Definition' do
       expect(OpenapiFirst.load(spec_path)).to be_a OpenapiFirst::Definition

@@ -2,21 +2,18 @@
 
 require 'openapi_first'
 
-module Web
-  module Things
-    class Index
-      def call(_params, _response)
-        { hello: 'world' }
+App = Rack::Builder.new do
+  use OpenapiFirst::RequestValidation, raise_error: true, spec: File.expand_path('./openapi.yaml', __dir__)
+  use OpenapiFirst::ResponseValidation
+
+  handlers = {
+    '/' => {
+      'GET' => lambda do |_env|
+        [200, { 'Content-Type' => 'application/json' }, ['{"hello": "world"}']]
       end
-    end
-  end
+    }
+  }
+  run(lambda do |env|
+    handlers[env['PATH_INFO']][env['REQUEST_METHOD']].call(env)
+  end)
 end
-
-oas_path = File.absolute_path('./openapi.yaml', __dir__)
-
-App = OpenapiFirst.app(
-  oas_path,
-  namespace: Web,
-  router_raise_error: OpenapiFirst.env == 'test',
-  response_validation: OpenapiFirst.env == 'test'
-)

@@ -6,10 +6,6 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.open
 
 Start with writing an OpenAPI file that describes the API, which you are about to implement. Use a [validator](https://github.com/stoplightio/spectral/) to make sure the file is valid.
 
-You can use OpenapiFirst via its [Rack middlewares](#rack-middlewares) or in [standalone mode](#standalone-usage).
-
-## Rack middlewares
-
 OpenapiFirst consists of these Rack middlewares:
 
 - [`OpenapiFirst::RequestValidation`](#OpenapiFirst::RequestValidation) – Validates the request against the API description and returns 400 if the request is invalid.
@@ -18,6 +14,7 @@ OpenapiFirst consists of these Rack middlewares:
 
 
 And these Rack apps:
+
 - [`OpenapiFirst::Responder`](#OpenapiFirst::Responder) calls the [handler](#handlers) found for the operation, sets the correct content-type and serializes the response body to json if needed.
 - [`OpenapiFirst::RackResponder`](#OpenapiFirst::RackResponder) calls the [handler](#handlers) found for the operation as a normal Rack application (`call(env)`) and returns the result as is.
 

@@ -71,18 +71,13 @@ RSpec.describe OpenapiFirst::Router do
     end
 
     describe 'respecting SCRIPT_NAME' do
-      let(:failure_app) do
-        ->(_env) { Rack::Response.new.finish  }
-      end
-
       let(:upstream_app) do
-        ->(_env) { Rack::Response.new.finish  }
+        ->(_env) { Rack::Response.new.finish }
       end
 
       let(:app) do
         OpenapiFirst::Router.new(
           upstream_app,
-          parent_app: failure_app,
           spec: './spec/data/petstore.yaml'
         )
       end
@@ -97,20 +92,6 @@ RSpec.describe OpenapiFirst::Router do
         expect(operation.operation_id).to eq 'showPetById'
 
         expect(env[Rack::SCRIPT_NAME]).to eq '/pets'
-        expect(env[Rack::PATH_INFO]).to eq '/42'
-      end
-
-      it 'calls parent app with original env if route was not found' do
-        env = Rack::MockRequest.env_for('/42', script_name: '/unknown')
-
-        expect(failure_app).to receive(:call) do |cenv|
-          expect(cenv[Rack::SCRIPT_NAME]).to eq '/unknown'
-          expect(cenv[Rack::PATH_INFO]).to eq '/42'
-        end
-
-        app.call(env)
-
-        expect(env[Rack::SCRIPT_NAME]).to eq '/unknown'
         expect(env[Rack::PATH_INFO]).to eq '/42'
       end
     end
@@ -312,7 +293,7 @@ RSpec.describe OpenapiFirst::Router do
       end
     end
 
-    describe "GitHub issue #155" do
+    describe 'GitHub issue #155' do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::Router, spec: './spec/data/incompatible-routes.yaml'
