@@ -12,7 +12,6 @@ module OpenapiFirst
       options
     )
       @app = app
-      @parent_app = options.fetch(:parent_app, nil)
       @raise = options.fetch(:raise_error, false)
       @not_found = options.fetch(:not_found, :halt)
       spec = options.fetch(:spec)
@@ -28,8 +27,6 @@ module OpenapiFirst
       env[OPERATION] = nil
       response = call_router(env)
       if env[OPERATION].nil?
-        return @parent_app.call(env) if @parent_app # This should only happen if used via OpenapiFirst.middleware
-
         raise_error(env) if @raise
 
         return @app.call(env) if @not_found == :continue
@@ -98,7 +95,7 @@ module OpenapiFirst
         env[OPERATION] = operation
         path_info = env.delete(ORIGINAL_PATH)
         route_params = Utils::StringKeyedHash.new(env['router.params'])
-        env[PARAMETERS] = OpenapiParameters::Path.new(operation.path_parameters).unpack(route_params)
+        env[PARAMS] = OpenapiParameters::Path.new(operation.path_parameters).unpack(route_params)
         env[Rack::PATH_INFO] = path_info
         @app.call(env)
       end

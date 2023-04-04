@@ -99,17 +99,6 @@ RSpec.describe 'Parameter validation' do
       expect(last_request.env[OpenapiFirst::PARAMS]).to eq expected_params
     end
 
-    it 'still adds PARAMETERS to env ' do
-      get '/search', params
-      expect(last_request.env[OpenapiFirst::PARAMETERS]).to eq expected_params
-    end
-
-    it 'updates INBOX' do
-      get '/search', params
-
-      expect(last_request.env[OpenapiFirst::INBOX]).to eq expected_params
-    end
-
     it 'skips parameter validation if no parameters are defined' do
       get '/info', params
 
@@ -235,7 +224,7 @@ RSpec.describe 'Parameter validation' do
       end
 
       it 'returns 400 if non-required array parameter is empty' do
-        get "/search?term=Oscar&filter[id]=1&filter[tag]=&filter[other]=things"
+        get '/search?term=Oscar&filter[id]=1&filter[tag]=&filter[other]=things'
         expect(last_response.status).to eq 400
         error = response_body[:errors][0]
         expect(error[:title]).to eq 'is not valid: ""'
@@ -253,7 +242,7 @@ RSpec.describe 'Parameter validation' do
       end
 
       it 'works with URL encoded query parameter names' do
-        get "/search?filter%5Btag%5D=dogs&filter%5Bid%5D=1&term=foo"
+        get '/search?filter%5Btag%5D=dogs&filter%5Bid%5D=1&term=foo'
 
         expect(last_response.status).to eq(200), last_response.body
       end
@@ -317,23 +306,23 @@ RSpec.describe 'Parameter validation' do
       end
 
       it 'converts to boolean' do
-        get '/search', { 'starred' => 'true', 'term' => 'search'}
+        get '/search', { 'starred' => 'true', 'term' => 'search' }
         expect(last_response.status).to eq(200), last_response.body
         expect(last_params['starred']).to eq true
 
-        get '/search', { 'starred' => 'false', 'term' => 'search'}
+        get '/search', { 'starred' => 'false', 'term' => 'search' }
         expect(last_response.status).to eq(200), last_response.body
         expect(last_params['starred']).to eq false
 
-        get '/search', { 'starred' => 'wrong', 'term' => 'search'}
+        get '/search', { 'starred' => 'wrong', 'term' => 'search' }
         expect(last_response.status).to eq(400)
       end
 
       it 'works with symbol and string keys in test' do
-        get '/search', { :starred => 'true', :term => 'search'}
+        get '/search', { starred: 'true', term: 'search' }
         expect(last_response.status).to eq(200), last_response.body
 
-        get '/search', { 'starred' => 'false', 'term' => 'search'}
+        get '/search', { 'starred' => 'false', 'term' => 'search' }
         expect(last_response.status).to eq(200), last_response.body
       end
 
@@ -341,7 +330,7 @@ RSpec.describe 'Parameter validation' do
         get '/search', params.merge(filter: { id: '100', tag: 'foo' })
 
         expect(last_response.status).to eq(200), last_response.body
-        expect(last_params.dig('filter','id')).to eq 100
+        expect(last_params.dig('filter', 'id')).to eq 100
       end
     end
   end

@@ -1,22 +1,18 @@
 # frozen_string_literal: true
 
 require 'openapi_first'
+require 'rack'
 
-module Web
-  module Things
-    class Index
-      def call(_params, _response)
-        { hello: 'world' }
-      end
-    end
-  end
+# This example is a bit contrived, but it shows what you could do with the middlewares
+
+App = Rack::Builder.new do
+  use OpenapiFirst::RequestValidation, raise_error: true, spec: File.expand_path('./openapi.yaml', __dir__)
+  use OpenapiFirst::ResponseValidation
+
+  handlers = {
+    'things#index' => ->(_env) { [200, { 'Content-Type' => 'application/json' }, ['{"hello": "world"}']] }
+  }
+  not_found = ->(_env) { [404, {}, []] }
+
+  run ->(env) { handlers.fetch(env[OpenapiFirst::OPERATION].operation_id, not_found).call(env) }
 end
-
-oas_path = File.absolute_path('./openapi.yaml', __dir__)
-
-App = OpenapiFirst.app(
-  oas_path,
-  namespace: Web,
-  router_raise_error: OpenapiFirst.env == 'test',
-  response_validation: OpenapiFirst.env == 'test'
-)

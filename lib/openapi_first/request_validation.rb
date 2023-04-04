@@ -2,13 +2,12 @@
 
 require 'rack'
 require 'multi_json'
-require_relative 'inbox'
 require_relative 'use_router'
 require_relative 'validation_format'
 require 'openapi_parameters'
 
 module OpenapiFirst
-  class RequestValidation # rubocop:disable Metrics/ClassLength
+  class RequestValidation
     prepend UseRouter
 
     def initialize(app, options = {})
@@ -20,19 +19,17 @@ module OpenapiFirst
       operation = env[OPERATION]
       return @app.call(env) unless operation
 
-      env[INBOX] = env[PARAMETERS]
       error = catch(:error) do
         query_params = OpenapiParameters::Query.new(operation.query_parameters).unpack(env['QUERY_STRING'])
         validate_query_parameters!(operation, query_params)
 
-        env[PARAMETERS].merge!(query_params)
+        env[PARAMS].merge!(query_params)
         req = Rack::Request.new(env)
         return @app.call(env) unless operation.request_body
 
         validate_request_content_type!(operation, req.content_type)
         parsed_request_body = parse_and_validate_request_body!(operation, req)
         env[REQUEST_BODY] = parsed_request_body
-        env[INBOX] = env[INBOX].merge parsed_request_body if parsed_request_body.is_a?(Hash)
         nil
       end
       if error
@@ -109,7 +106,7 @@ module OpenapiFirst
       init_schema = {
         'type' => 'object',
         'properties' => {},
-        'required' => [],
+        'required' => []
       }
       parameter_defs.each_with_object(init_schema) do |parameter_def, schema|
         parameter = OpenapiParameters::Parameter.new(parameter_def)
@@ -121,6 +118,7 @@ module OpenapiFirst
     def validate_query_parameters!(operation, params)
       parameter_defs = operation.query_parameters
       return unless parameter_defs&.any?
+
       json_schema = build_json_schema(parameter_defs)
       errors = SchemaValidation.new(json_schema).validate(params)
       throw_error(400, serialize_parameter_errors(errors)) if errors.any?
