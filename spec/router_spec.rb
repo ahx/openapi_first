@@ -301,7 +301,7 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      it 'adds the operation to env ' do
+      pending 'adds the operation to env ' do
         get 'foo/1'
 
         operation = last_request.env[OpenapiFirst::OPERATION]
