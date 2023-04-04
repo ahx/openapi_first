@@ -103,11 +103,11 @@ module OpenapiFirst
     end
 
     def query_parameters
-      @query_parameters ||= all_parameters.filter { |p| p['in'] == 'query'}
+      @query_parameters ||= all_parameters.filter { |p| p['in'] == 'query' }
     end
 
     def path_parameters
-      @path_parameters ||= all_parameters.filter { |p| p['in'] == 'path'}
+      @path_parameters ||= all_parameters.filter { |p| p['in'] == 'path' }
     end
 
     def all_parameters

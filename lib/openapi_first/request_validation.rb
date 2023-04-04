@@ -109,7 +109,7 @@ module OpenapiFirst
       init_schema = {
         'type' => 'object',
         'properties' => {},
-        'required' => [],
+        'required' => []
       }
       parameter_defs.each_with_object(init_schema) do |parameter_def, schema|
         parameter = OpenapiParameters::Parameter.new(parameter_def)
@@ -121,6 +121,7 @@ module OpenapiFirst
     def validate_query_parameters!(operation, params)
       parameter_defs = operation.query_parameters
       return unless parameter_defs&.any?
+
       json_schema = build_json_schema(parameter_defs)
       errors = SchemaValidation.new(json_schema).validate(params)
       throw_error(400, serialize_parameter_errors(errors)) if errors.any?
