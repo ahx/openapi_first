@@ -2,28 +2,26 @@
 
 [![Join the chat at https://gitter.im/openapi_first/community](https://badges.gitter.im/openapi_first/community.svg)](https://gitter.im/openapi_first/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-OpenapiFirst helps to implement HTTP APIs based on an [OpenApi](https://www.openapis.org/) API description. The idea is that you create an API description first, then add code that returns data and implements your business logic and be done.
+OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.openapis.org/) API description.
 
-Start with writing an OpenAPI file that describes the API, which you are about to implement. Use a [validator](https://github.com/stoplightio/spectral/) to make sure the file is valid.
+It provides these Rack middlewares:
 
-OpenapiFirst consists of these Rack middlewares:
+- [`OpenapiFirst::RequestValidation`](#request-validation) – Validates the request against the API description and returns 400 if the request is invalid.
+- [`OpenapiFirst::ResponseValidation`](#response-validation) Validates the response and raises an exception if the response body is invalid.
+- [`OpenapiFirst::Router`](#openapifirstrouter) – This internal middleware is added automatically when using request/response validation. It adds the OpenAPI operation for the current request to the Rack env.
 
-- [`OpenapiFirst::RequestValidation`](#OpenapiFirst::RequestValidation) – Validates the request against the API description and returns 400 if the request is invalid.
-- [`OpenapiFirst::ResponseValidation`](#OpenapiFirst::ResponseValidation) Validates the response and raises an exception if the response body is invalid.
-- [`OpenapiFirst::Router`](#OpenapiFirst::Router) – This internal middleware is added automatically when using request/response validation. It adds the OpenAPI operation for the current request to the Rack env or returns 404 if no operation was found.
+## Request Validation
 
-## OpenapiFirst::RequestValidation
-
-This middleware returns a 400 status code with a body that describes the error if the request is not valid.
+The `OpenapiFirst::RequestValidation` middleware returns a 400 status code with a body that describes the error if the request is not valid.
 
 ```ruby
 use OpenapiFirst::RequestValidation, spec: 'openapi.yaml'
 ```
 
-This will add these fields to the Rack env:
-- `env[OpenapiFirst::OPERATION]` – The Operation object for the current request. This is an instance of `OpenapiFirst::Operation`.
+It adds these fields to the Rack env:
 - `env[OpenapiFirst::PARAMS]` – The parsed parameters (query, path) for the current request (string keyed)
 - `env[OpenapiFirst::REQUEST_BODY]` – The parsed request body (string keyed)
+- `env[OpenapiFirst::OPERATION]` (Added via Router) – The Operation object for the current request. This is an instance of `OpenapiFirst::Operation`.
 
 ### Options and defaults
 
@@ -53,7 +51,6 @@ content-type: "application/vnd.api+json"
 ```
 
 ### Parameters
-
 
 The `RequestValidation` middleware adds `env[OpenapiFirst::PARAMS]` (or `env['openapi.params']` ) with the converted query and path parameters. This only includes the parameters that are defined in the API description. It supports every [`style` and `explode` value as described](https://spec.openapis.org/oas/latest.html#style-examples) in the OpenAPI 3.0 and 3.1 specs. So you can do things these:
 
@@ -85,10 +82,9 @@ Request validation fails if request includes a property with `readOnly: true`.
 
 Response validation fails if response body includes a property with `writeOnly: true`.
 
-## OpenapiFirst::ResponseValidation
+## Response validation
 
-This middleware is especially useful when testing. It _always_ raises an error if the response is not valid.
-
+The `OpenapiFirst::ResponseValidation` middleware is especially useful when testing. It _always_ raises an error if the response is not valid.
 
 ```ruby
 use OpenapiFirst::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] == 'test'
@@ -102,7 +98,7 @@ use OpenapiFirst::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] ==
 
 ## OpenapiFirst::Router
 
-This middleware is used automatically, but you can add it to the top of your middleware stack if you want to change configuration.
+This middleware is used automatically, but you can add it to the top of your middleware stack if you want to customize the behavior via options.
 
 ```ruby
 use OpenapiFirst::Router, spec: './openapi/openapi.yaml'
