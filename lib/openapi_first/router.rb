@@ -36,6 +36,10 @@ module OpenapiFirst
     end
 
     ORIGINAL_PATH = 'openapi_first.path_info'
+    private_constant :ORIGINAL_PATH
+
+    ROUTER_PARSED_BODY = 'router.parsed_body'
+    private_constant :ROUTER_PARSED_BODY
 
     private
 
@@ -94,6 +98,7 @@ module OpenapiFirst
       lambda do |env|
         env[OPERATION] = operation
         path_info = env.delete(ORIGINAL_PATH)
+        env[REQUEST_BODY] = env.delete(ROUTER_PARSED_BODY) if env.key?(ROUTER_PARSED_BODY)
         route_params = Utils::StringKeyedHash.new(env['router.params'])
         env[PARAMS] = OpenapiParameters::Path.new(operation.path_parameters).unpack(route_params)
         env[Rack::PATH_INFO] = path_info

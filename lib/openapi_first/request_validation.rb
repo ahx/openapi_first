@@ -22,14 +22,14 @@ module OpenapiFirst
       error = catch(:error) do
         query_params = OpenapiParameters::Query.new(operation.query_parameters).unpack(env['QUERY_STRING'])
         validate_query_parameters!(operation, query_params)
-
         env[PARAMS].merge!(query_params)
-        req = Rack::Request.new(env)
+
         return @app.call(env) unless operation.request_body
 
-        validate_request_content_type!(operation, req.content_type)
-        parsed_request_body = parse_and_validate_request_body!(operation, req)
-        env[REQUEST_BODY] = parsed_request_body
+        content_type = Rack::Request.new(env).content_type
+        validate_request_content_type!(operation, content_type)
+        parsed_request_body = env[REQUEST_BODY]
+        validate_request_body!(operation, parsed_request_body, content_type)
         nil
       end
       if error
@@ -42,17 +42,11 @@ module OpenapiFirst
 
     private
 
-    ROUTER_PARSED_BODY = 'router.parsed_body'
-
-    def parse_and_validate_request_body!(operation, request)
-      env = request.env
-
-      body = env.delete(ROUTER_PARSED_BODY) if env.key?(ROUTER_PARSED_BODY)
-
+    def validate_request_body!(operation, body, content_type)
       validate_request_body_presence!(body, operation)
-      return if body.nil?
+      return if content_type.nil?
 
-      schema = operation&.request_body_schema(request.content_type)
+      schema = operation&.request_body_schema(content_type)
       return unless schema
 
       errors = schema.validate(body)
