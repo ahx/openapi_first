@@ -1,11 +1,10 @@
 # Changelog
 
-## Unreleased
-
+## 1.0.0.beta1
 - Removed: `OpenapiFirst::Responder` and `OpenapiFirst::RackResponder`
 - Removed: `OpenapiFirst.app` and `OpenapiFirst.middleware`
+- Removed: `OpenapiFirst::Coverage`
 - Breaking: Parsed query and path parameters are available at `env[OpenapiFirst::PARAMS]`(or `env['openapi.params']`) instead of `OpenapiFirst::PARAMETERS`.
-- Removed: `OpenapiFirst::Coverage`, beause it's out of scope for this gem.
 - Breaking: Request body and parameters now use string keys instead of symbols!
 - Breaking: Query parameters are now parsed exactly like in the API description via the openapi_parameters gem. This means a couple of things:
   - Query parameters now support `explode: true` (default) and `explode: false` for array and object parameters.
