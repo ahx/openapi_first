@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.0.beta2
+- Fixed dependencies. Remove unused code.
+
 ## 1.0.0.beta1
 - Removed: `OpenapiFirst::Responder` and `OpenapiFirst::RackResponder`
 - Removed: `OpenapiFirst.app` and `OpenapiFirst.middleware`
