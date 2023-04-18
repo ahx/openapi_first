@@ -28,22 +28,4 @@ module OpenapiFirst
     resolved['paths'].filter!(&->(key, _) { only.call(key) }) if only
     Definition.new(resolved, spec_path)
   end
-
-  def self.app(
-    spec,
-    namespace:,
-    router_raise_error: false,
-    request_validation_raise_error: false,
-    response_validation: false
-  )
-    spec = OpenapiFirst.load(spec) unless spec.is_a?(Definition)
-    App.new(
-      nil,
-      spec,
-      namespace: namespace,
-      router_raise_error: router_raise_error,
-      request_validation_raise_error: request_validation_raise_error,
-      response_validation: response_validation
-    )
-  end
 end
