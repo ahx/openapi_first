@@ -36,7 +36,6 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'deep_merge', '>= 1.2.1'
   spec.add_runtime_dependency 'hanami-router', '~> 2.0.0'
-  spec.add_runtime_dependency 'hanami-utils', '~> 2.0.0'
   spec.add_runtime_dependency 'json_refs', '~> 0.1', '>= 0.1.7'
   spec.add_runtime_dependency 'json_schemer', '~> 0.2.16'
   spec.add_runtime_dependency 'multi_json', '~> 1.14'
