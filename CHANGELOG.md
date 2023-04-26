@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0.beta3
+
 - Remove obsolete dependency: deep_merge
 - Remove obsolete dependency: hanami-utils
 
