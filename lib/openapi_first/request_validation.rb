@@ -43,7 +43,7 @@ module OpenapiFirst
       parameter_defs = operation.path_parameters
       return if parameter_defs.empty?
 
-      unpacked_path_params = OpenapiParameters::Path.new(parameter_defs).unpack(env[RAW_PATH_PARAMS])
+      unpacked_path_params = OpenapiParameters::Path.new(parameter_defs).unpack(env[Router::RAW_PATH_PARAMS])
       Validators::ParametersValidator.call(parameter_defs, unpacked_path_params)
       env[PARAMS].merge!(unpacked_path_params)
     end

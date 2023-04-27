@@ -8,6 +8,8 @@ require 'openapi_first/router'
 RSpec.describe OpenapiFirst::Router do
   include Rack::Test::Methods
 
+  let(:env_key) { OpenapiFirst::Router::RAW_PATH_PARAMS }
+
   describe '#call' do
     let(:app) do
       Rack::Builder.new do
@@ -119,14 +121,14 @@ RSpec.describe OpenapiFirst::Router do
       it 'adds path parameters to env ' do
         get '/pets/1'
 
-        params = last_request.env[OpenapiFirst::RAW_PATH_PARAMS]
+        params = last_request.env[env_key]
         expect(params['petId']).to eq('1')
       end
 
       it 'does not add path parameters if not defined for operation' do
         get 'pets'
 
-        params = last_request.env[OpenapiFirst::RAW_PATH_PARAMS]
+        params = last_request.env[env_key]
         expect(params).to be_empty
       end
 
@@ -147,7 +149,7 @@ RSpec.describe OpenapiFirst::Router do
           operation = last_request.env[OpenapiFirst::OPERATION]
           expect(operation.operation_id).to eq 'info_date'
 
-          params = last_request.env[OpenapiFirst::RAW_PATH_PARAMS]
+          params = last_request.env[env_key]
           expect(params['date']).to eq('2020-01-01')
         end
 
@@ -158,7 +160,7 @@ RSpec.describe OpenapiFirst::Router do
           operation = last_request.env[OpenapiFirst::OPERATION]
           expect(operation.operation_id).to eq 'info_date_range'
 
-          params = last_request.env[OpenapiFirst::RAW_PATH_PARAMS]
+          params = last_request.env[env_key]
           expect(params['start_date']).to eq('2020-01-01')
           expect(params['end_date']).to eq('2020-01-02')
         end
@@ -170,7 +172,7 @@ RSpec.describe OpenapiFirst::Router do
           operation = last_request.env[OpenapiFirst::OPERATION]
           expect(operation.operation_id).to eq 'info'
 
-          params = last_request.env[OpenapiFirst::RAW_PATH_PARAMS]
+          params = last_request.env[env_key]
           expect(params).to be_empty
         end
       end

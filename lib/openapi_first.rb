@@ -11,13 +11,14 @@ require_relative 'openapi_first/response_validator'
 require_relative 'openapi_first/response_validation'
 
 module OpenapiFirst
+  # The OpenAPI operation for the current request
   OPERATION = 'openapi.operation'
-  # The unconverted path parameters before they are converted to the types defined in the API description
-  RAW_PATH_PARAMS = 'openapi.raw_path_params'
 
+  # Merged path and query parameters
   PARAMS = 'openapi.params'
+
+  # The parsed request body
   REQUEST_BODY = 'openapi.parsed_request_body'
-  HANDLER = 'openapi_first.handler'
 
   def self.env
     ENV['RACK_ENV'] || ENV['HANAMI_ENV'] || ENV.fetch('RAILS_ENV', nil)

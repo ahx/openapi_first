@@ -7,6 +7,9 @@ require_relative 'body_parser_middleware'
 
 module OpenapiFirst
   class Router
+    # The unconverted path parameters before they are converted to the types defined in the API description
+    RAW_PATH_PARAMS = 'openapi.raw_path_params'
+
     def initialize(
       app,
       options
