@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Remove OpenapiFirst.env method
+
 ## 1.0.0.beta3
 
 - Remove obsolete dependency: deep_merge

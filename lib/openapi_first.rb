@@ -20,10 +20,6 @@ module OpenapiFirst
   # The parsed request body
   REQUEST_BODY = 'openapi.parsed_request_body'
 
-  def self.env
-    ENV['RACK_ENV'] || ENV['HANAMI_ENV'] || ENV.fetch('RAILS_ENV', nil)
-  end
-
   def self.load(spec_path, only: nil)
     resolved = Dir.chdir(File.dirname(spec_path)) do
       content = YAML.load_file(File.basename(spec_path))
