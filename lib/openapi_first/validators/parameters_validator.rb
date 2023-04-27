@@ -20,7 +20,7 @@ module OpenapiFirst
             pointer = error['data_pointer'][1..].to_s
             {
               source: { parameter: pointer }
-            }.update(ValidationFormat.error_details(error))
+            }.update(ErrorFormat.error_details(error))
           end
         end
       end

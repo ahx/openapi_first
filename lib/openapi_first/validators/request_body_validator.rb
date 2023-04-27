@@ -42,7 +42,7 @@ module OpenapiFirst
               source: {
                 pointer: error['data_pointer']
               }
-            }.update(ValidationFormat.error_details(error))
+            }.update(ErrorFormat.error_details(error))
           end
         end
       end

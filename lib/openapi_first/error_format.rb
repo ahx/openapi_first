@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  module ValidationFormat
+  # This is about formatting errors that are currenty coming from the json_schemer gem.
+  module ErrorFormat
     SIMPLE_TYPES = %w[string integer].freeze
 
     # rubocop:disable Metrics/MethodLength

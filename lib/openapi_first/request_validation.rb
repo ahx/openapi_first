@@ -3,7 +3,7 @@
 require 'rack'
 require 'multi_json'
 require_relative 'use_router'
-require_relative 'validation_format'
+require_relative 'error_format'
 require_relative 'error_response'
 require_relative './validators/request_body_validator'
 require_relative './validators/parameters_validator'

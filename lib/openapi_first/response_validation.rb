@@ -2,7 +2,7 @@
 
 require 'multi_json'
 require_relative 'use_router'
-require_relative 'validation_format'
+require_relative 'error_format'
 
 module OpenapiFirst
   class ResponseValidation
