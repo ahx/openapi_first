@@ -160,9 +160,9 @@ run OpenapiFirst.app(spec, namespace: Pets)
 
 Run `bin/setup` to install dependencies.
 
-Run `bundle exec rspec` to run the tests.
+See `bundle exec rake` to run the linter and the tests.
 
-See `bundle exec rake -T` for rubygems related tasks.
+Run `bundle exec rspec` to run the tests only.
 
 ## Benchmarks
 
