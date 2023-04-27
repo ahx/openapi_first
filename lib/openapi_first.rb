@@ -12,6 +12,9 @@ require_relative 'openapi_first/response_validation'
 
 module OpenapiFirst
   OPERATION = 'openapi.operation'
+  # The unconverted path parameters before they are converted to the types defined in the API description
+  RAW_PATH_PARAMS = 'openapi.raw_path_params'
+
   PARAMS = 'openapi.params'
   REQUEST_BODY = 'openapi.parsed_request_body'
   HANDLER = 'openapi_first.handler'

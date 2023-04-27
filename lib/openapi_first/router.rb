@@ -99,8 +99,7 @@ module OpenapiFirst
         env[OPERATION] = operation
         path_info = env.delete(ORIGINAL_PATH)
         env[REQUEST_BODY] = env.delete(ROUTER_PARSED_BODY) if env.key?(ROUTER_PARSED_BODY)
-        route_params = Utils::StringKeyedHash.new(env['router.params'])
-        env[PARAMS] = OpenapiParameters::Path.new(operation.path_parameters).unpack(route_params)
+        env[RAW_PATH_PARAMS] = Utils::StringKeyedHash.new(env['router.params'])
         env[Rack::PATH_INFO] = path_info
         @app.call(env)
       end

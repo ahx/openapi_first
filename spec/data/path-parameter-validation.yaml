@@ -1,0 +1,19 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Path Parameter Validation
+paths:
+  /pets/{petId}:
+    parameters:
+      - name: petId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      summary: Find pet by ID
+      operationId: findPetById
+      responses:
+        '200':
+          description: successful

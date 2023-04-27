@@ -5,10 +5,10 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first'
 
-RSpec.describe 'Parameter validation' do
+RSpec.describe 'Query Parameter validation' do
   include Rack::Test::Methods
 
-  let(:spec) { OpenapiFirst.load('./spec/data/parameter-validation.yaml') }
+  let(:spec) { OpenapiFirst.load('./spec/data/query-parameter-validation.yaml') }
 
   let(:raise_error_option) { false }
 
@@ -94,7 +94,7 @@ RSpec.describe 'Parameter validation' do
       expect(error[:source][:parameter]).to eq 'include'
     end
 
-    it 'adds filtered query parameters to env ' do
+    it 'adds parsed query parameters to env ' do
       get '/search', params
       expect(last_request.env[OpenapiFirst::PARAMS]).to eq expected_params
     end

@@ -11,8 +11,8 @@ module OpenapiFirstSpecHelpers
     MultiJson.dump(data)
   end
 
-  def json_load(string, options = {})
-    MultiJson.load(string, options)
+  def json_load(string, symbolize_keys: false)
+    MultiJson.load(string, { symbolize_keys: symbolize_keys })
   end
 end
 
