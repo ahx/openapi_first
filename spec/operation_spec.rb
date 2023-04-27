@@ -29,32 +29,32 @@ RSpec.describe OpenapiFirst::Operation do
     end
   end
 
-  describe '#response_schema_for' do
+  describe '#response_body_schema' do
     let(:spec) { OpenapiFirst.load('./spec/data/content-types.yaml') }
     let(:operation) { spec.operations[0] }
 
     it 'finds an exact match without parameter' do
-      schema = operation.response_schema_for(200, 'application/json').raw_schema
+      schema = operation.response_body_schema(200, 'application/json').raw_schema
       expect(schema['title']).to eq 'Without parameter'
     end
 
     it 'finds an exact match with parameter' do
-      schema = operation.response_schema_for(200, 'application/json; profile=custom').raw_schema
+      schema = operation.response_body_schema(200, 'application/json; profile=custom').raw_schema
       expect(schema['title']).to eq 'With profile'
     end
 
     it 'finds a match while ignorign charset' do
-      schema = operation.response_schema_for(200, 'application/json; charset=UTF8').raw_schema
+      schema = operation.response_body_schema(200, 'application/json; charset=UTF8').raw_schema
       expect(schema['title']).to eq 'Without parameter'
     end
 
     it 'finds text/* wildcard matcher' do
-      schema = operation.response_schema_for(200, 'text/markdown').raw_schema
+      schema = operation.response_body_schema(200, 'text/markdown').raw_schema
       expect(schema['title']).to eq 'Text wildcard'
     end
 
     it 'finds */* wildcard matcher' do
-      schema = operation.response_schema_for(200, 'application/xml').raw_schema
+      schema = operation.response_body_schema(200, 'application/xml').raw_schema
       expect(schema['title']).to eq 'Accept everything'
     end
 
@@ -66,7 +66,7 @@ RSpec.describe OpenapiFirst::Operation do
         expected_msg =
           "Response status code or default not found: 201 for '#{operation.name}'"
         expect do
-          operation.response_schema_for(201, 'application/json')
+          operation.response_body_schema(201, 'application/json')
         end.to raise_error OpenapiFirst::ResponseCodeNotFoundError, expected_msg
       end
     end
@@ -79,7 +79,7 @@ RSpec.describe OpenapiFirst::Operation do
         expected_msg =
           "Response content type not found 'application/xml' for '#{operation.name}'"
         expect do
-          operation.response_schema_for(200, 'application/xml')
+          operation.response_body_schema(200, 'application/xml')
         end.to raise_error OpenapiFirst::ResponseContentTypeNotFoundError,
                            expected_msg
       end
@@ -93,7 +93,7 @@ RSpec.describe OpenapiFirst::Operation do
       end
 
       it 'returns nil' do
-        schema = operation.response_schema_for(200, 'application/json')
+        schema = operation.response_body_schema(200, 'application/json')
         expect(schema).to be_nil
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe OpenapiFirst::Operation do
       end
 
       it 'returns nil' do
-        schema = operation.response_schema_for(200, 'application/json')
+        schema = operation.response_body_schema(200, 'application/json')
         expect(schema).to be_nil
       end
     end
@@ -119,7 +119,7 @@ RSpec.describe OpenapiFirst::Operation do
       end
 
       it 'returns nil' do
-        schema = operation.response_schema_for(200, 'application/json')
+        schema = operation.response_body_schema(200, 'application/json')
         expect(schema).to be_nil
       end
     end

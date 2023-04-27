@@ -6,10 +6,8 @@ module OpenapiFirst
   module Validators
     module ParametersValidator
       class << self
-        def call(json_schema, unpacked_params)
-          return if json_schema.empty?
-
-          errors = SchemaValidation.new(json_schema).validate(unpacked_params)
+        def call(schema_validation, unpacked_params)
+          errors = schema_validation.validate(unpacked_params)
           ErrorResponse.throw_error(400, serialize_parameter_errors(errors)) if errors.any?
         end
 

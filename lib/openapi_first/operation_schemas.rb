@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'openapi_parameters/parameter'
+require_relative 'schema_validation'
 
 module OpenapiFirst
   # This class is basically a cache for JSON Schemas of parameters
@@ -32,11 +33,13 @@ module OpenapiFirst
         'properties' => {},
         'required' => []
       }
-      parameter_defs.each_with_object(init_schema) do |parameter_def, schema|
-        parameter = OpenapiParameters::Parameter.new(parameter_def)
-        schema['properties'][parameter.name] = parameter.schema if parameter.schema
-        schema['required'] << parameter.name if parameter.required?
-      end
+      SchemaValidation.new(
+        parameter_defs.each_with_object(init_schema) do |parameter_def, schema|
+          parameter = OpenapiParameters::Parameter.new(parameter_def)
+          schema['properties'][parameter.name] = parameter.schema if parameter.schema
+          schema['required'] << parameter.name if parameter.required?
+        end
+      )
     end
   end
 end

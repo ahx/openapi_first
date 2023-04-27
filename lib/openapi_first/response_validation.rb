@@ -26,7 +26,7 @@ module OpenapiFirst
       return validate_status_only(operation, status) if status == 204
 
       content_type = headers[Rack::CONTENT_TYPE]
-      response_schema = operation.response_schema_for(status, content_type)
+      response_schema = operation.response_body_schema(status, content_type)
       validate_response_body(response_schema, body) if response_schema
     end
 
