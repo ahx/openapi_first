@@ -41,19 +41,8 @@ module OpenapiFirst
     end
 
     def response_body_schema(status, content_type)
-      content = response_for(status)['content']
-      return if content.nil? || content.empty?
-
-      raise ResponseInvalid, "Response has no content-type for '#{name}'" unless content_type
-
-      media_type = find_content_for_content_type(content, content_type)
-
-      unless media_type
-        message = "Response content type not found '#{content_type}' for '#{name}'"
-        raise ResponseContentTypeNotFoundError, message
-      end
-      schema = media_type['schema']
-      SchemaValidation.new(schema, write: false) if schema
+      @response_body_schema ||= {}
+      (@response_body_schema[status] ||= {})[content_type] ||= find_response_body_schema(status, content_type)
     end
 
     def request_body_schema(request_content_type)
@@ -106,17 +95,33 @@ module OpenapiFirst
       @schemas ||= OperationSchemas.new(self)
     end
 
+    def operation_object
+      @path_item_object[method]
+    end
+
     private
+
+    def find_response_body_schema(status, content_type)
+      content = response_for(status)['content']
+      return if content.nil? || content.empty?
+
+      raise ResponseInvalid, "Response has no content-type for '#{name}'" unless content_type
+
+      media_type = find_content_for_content_type(content, content_type)
+
+      unless media_type
+        message = "Response content type not found '#{content_type}' for '#{name}'"
+        raise ResponseContentTypeNotFoundError, message
+      end
+      schema = media_type['schema']
+      SchemaValidation.new(schema, write: false) if schema
+    end
 
     def response_by_code(status)
       operation_object.dig('responses', status.to_s) ||
         operation_object.dig('responses', "#{status / 100}XX") ||
         operation_object.dig('responses', "#{status / 100}xx") ||
         operation_object.dig('responses', 'default')
-    end
-
-    def operation_object
-      @path_item_object[method]
     end
 
     def find_content_for_content_type(content, request_content_type)
