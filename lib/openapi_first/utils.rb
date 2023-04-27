@@ -3,6 +3,9 @@
 module OpenapiFirst
   module Utils
     class StringKeyedHash
+      extend Forwardable
+      def_delegators :@orig, :empty?
+
       def initialize(original)
         @orig = original
       end

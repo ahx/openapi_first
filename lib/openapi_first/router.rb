@@ -7,6 +7,9 @@ require_relative 'body_parser_middleware'
 
 module OpenapiFirst
   class Router
+    # The unconverted path parameters before they are converted to the types defined in the API description
+    RAW_PATH_PARAMS = 'openapi.raw_path_params'
+
     def initialize(
       app,
       options
@@ -99,8 +102,7 @@ module OpenapiFirst
         env[OPERATION] = operation
         path_info = env.delete(ORIGINAL_PATH)
         env[REQUEST_BODY] = env.delete(ROUTER_PARSED_BODY) if env.key?(ROUTER_PARSED_BODY)
-        route_params = Utils::StringKeyedHash.new(env['router.params'])
-        env[PARAMS] = OpenapiParameters::Path.new(operation.path_parameters).unpack(route_params)
+        env[RAW_PATH_PARAMS] = Utils::StringKeyedHash.new(env['router.params'])
         env[Rack::PATH_INFO] = path_info
         @app.call(env)
       end
