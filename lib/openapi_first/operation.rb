@@ -40,7 +40,7 @@ module OpenapiFirst
       operation_object['requestBody']
     end
 
-    def response_schema_for(status, content_type)
+    def response_body_schema(status, content_type)
       content = response_for(status)['content']
       return if content.nil? || content.empty?
 
@@ -57,12 +57,12 @@ module OpenapiFirst
     end
 
     def request_body_schema(request_content_type)
-      content = operation_object.dig('requestBody', 'content')
-      media_type = find_content_for_content_type(content, request_content_type)
-      schema = media_type&.fetch('schema', nil)
-      return unless schema
-
-      SchemaValidation.new(schema, write: write?)
+      (@request_body_schema ||= {})[request_content_type] ||= begin
+        content = operation_object.dig('requestBody', 'content')
+        media_type = find_content_for_content_type(content, request_content_type)
+        schema = media_type&.fetch('schema', nil)
+        SchemaValidation.new(schema, write: write?) if schema
+      end
     end
 
     def response_for(status)
