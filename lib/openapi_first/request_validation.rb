@@ -40,20 +40,21 @@ module OpenapiFirst
     private
 
     def validate_and_merge_path_params!(operation, env)
-      parameter_defs = operation.path_parameters
-      return if parameter_defs.empty?
+      path_parameters = operation.path_parameters
+      return if path_parameters.empty?
 
-      unpacked_path_params = OpenapiParameters::Path.new(parameter_defs).unpack(env[Router::RAW_PATH_PARAMS])
-      Validators::ParametersValidator.call(parameter_defs, unpacked_path_params)
+      hashy = Utils::StringKeyedHash.new(env[Router::RAW_PATH_PARAMS])
+      unpacked_path_params = OpenapiParameters::Path.new(path_parameters).unpack(hashy)
+      Validators::ParametersValidator.call(operation.schemas.path_parameters_schema, unpacked_path_params)
       env[PARAMS].merge!(unpacked_path_params)
     end
 
     def validate_and_merge_query_params!(operation, env)
-      parameter_defs = operation.query_parameters
-      return if parameter_defs.empty?
+      query_parameters = operation.query_parameters
+      return if operation.query_parameters.empty?
 
-      unpacked_query_params = OpenapiParameters::Query.new(parameter_defs).unpack(env['QUERY_STRING'])
-      Validators::ParametersValidator.call(parameter_defs, unpacked_query_params)
+      unpacked_query_params = OpenapiParameters::Query.new(query_parameters).unpack(env['QUERY_STRING'])
+      Validators::ParametersValidator.call(operation.schemas.query_parameters_schema, unpacked_query_params)
       env[PARAMS].merge!(unpacked_query_params)
     end
   end

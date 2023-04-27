@@ -4,6 +4,7 @@ require 'forwardable'
 require 'set'
 require_relative 'schema_validation'
 require_relative 'utils'
+require_relative 'operation_schemas'
 
 module OpenapiFirst
   class Operation
@@ -73,7 +74,7 @@ module OpenapiFirst
     end
 
     def name
-      "#{method.upcase} #{path} (#{operation_id})"
+      @name ||= "#{method.upcase} #{path} (#{operation_id})"
     end
 
     def valid_request_content_type?(request_content_type)
@@ -98,6 +99,11 @@ module OpenapiFirst
         parameters.concat(parameters_on_operation) if parameters_on_operation
         parameters
       end
+    end
+
+    # visibility: private
+    def schemas
+      @schemas ||= OperationSchemas.new(self)
     end
 
     private
