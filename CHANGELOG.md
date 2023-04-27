@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add path parameter validation to RequestValidation
 - Remove OpenapiFirst.env method
 
 ## 1.0.0.beta3
