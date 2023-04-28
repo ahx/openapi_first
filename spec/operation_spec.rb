@@ -4,19 +4,79 @@ require_relative 'spec_helper'
 require 'openapi_first/operation'
 
 RSpec.describe OpenapiFirst::Operation do
-  let(:spec) { OpenapiFirst.load('./spec/data/parameters.yaml') }
+  let(:operation) do
+    path_item = {
+      'parameters' => [
+        { 'name' => 'Accept-Version', 'in' => 'header', 'schema' => { 'type' => 'integer' } },
+        { 'name' => 'utm', 'in' => 'query', 'schema' => { 'type' => 'string' } },
+        { 'name' => 'pet_id', 'in' => 'path', 'schema' => { 'type' => 'string' } }
+      ],
+      'get' => {
+        'operationId' => 'get_pet',
+        'parameters' => [
+          { 'name' => 'limit', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
+        ],
+        'responses' => {
+          '200' => {
+            'content' => {
+              'application/json' => {
+                'schema' => { 'type' => 'array' }
+              }
+            }
+          },
+          'default' => {
+            'description' => 'unexpected error'
+          }
+        }
+      }
+    }
+    described_class.new('/pets/{pet_id}', 'get', path_item)
+  end
 
   describe '#operation_id' do
     it 'returns the operationId' do
-      operation = spec.operations.first
-      expect(operation.operation_id).to eq 'search'
+      expect(operation.operation_id).to eq 'get_pet'
+    end
+  end
+
+  describe '#query_parameters' do
+    it 'returns the query parameters on path and operation level' do
+      expect(operation.query_parameters.map {|p| p['name'] }).to eq %w[utm limit]
+    end
+  end
+
+  describe '#path_parameters' do
+    it 'returns the path parameters on path and operation level' do
+      expect(operation.path_parameters.map { |p| p['name'] }).to eq %w[pet_id]
+    end
+  end
+
+
+  describe '#header_parameters' do
+    it 'returns the header parameters' do
+      expect(operation.header_parameters.map { |p| p['name'] }).to eq %w[Accept-Version]
+    end
+
+    describe 'ignored headers' do
+      # These are ignored, as described in the OpenAPI spec: (https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#fixed-fields-10).
+      %w[Content-Type Accept Accept-Encoding].each do |header|
+        it "excludes the #{header} header" do
+          path_item = {
+            'parameters' => [
+              { 'name' => header, 'in' => 'header', 'schema' => { 'type' => 'integer' } },
+            ],
+            'get' => {}
+          }
+          operation = described_class.new('/pets/{pet_id}', 'get', path_item)
+          expect(operation.header_parameters.map { |p| p['name'] }).to_not include header
+        end
+      end
     end
   end
 
   describe '#[], #dig' do
     it 'allows to access the resolved hash' do
-      operation = spec.operations.first
-      expect(operation['operationId']).to eq 'search'
+      expect(operation['operationId']).to eq 'get_pet'
       expect(operation.dig('responses', '200', 'content', 'application/json', 'schema', 'type')).to eq 'array'
       expect(operation.dig('responses', 'default', 'description')).to eq 'unexpected error'
     end
@@ -24,8 +84,7 @@ RSpec.describe OpenapiFirst::Operation do
 
   describe '#name' do
     it 'returns a human readable name' do
-      operation = spec.operations.first
-      expect(operation.name).to eq 'GET /search (search)'
+      expect(operation.name).to eq 'GET /pets/{pet_id} (get_pet)'
     end
   end
 
