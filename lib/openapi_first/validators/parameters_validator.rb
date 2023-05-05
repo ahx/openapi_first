@@ -4,22 +4,28 @@ require 'openapi_parameters'
 
 module OpenapiFirst
   module Validators
-    module ParametersValidator
-      class << self
-        def call(schema_validation, unpacked_params)
-          errors = schema_validation.validate(unpacked_params)
-          ErrorResponse.throw_error(400, serialize_parameter_errors(errors)) if errors.any?
-        end
+    class ParametersValidator
+      def initialize(schema_validation)
+        @schema_validation = schema_validation
+      end
 
-        private
+      def call(unpacked_params)
+        errors = @schema_validation.validate(unpacked_params)
+        ErrorResponse.throw_error(400, serialize_validation_errors(errors)) if errors.any?
+      end
 
-        def serialize_parameter_errors(validation_errors)
-          validation_errors.map do |error|
-            pointer = error['data_pointer'][1..].to_s
-            {
-              source: { parameter: pointer }
-            }.update(ErrorFormat.error_details(error))
-          end
+      def source_name
+        :parameter
+      end
+
+      private
+
+      def serialize_validation_errors(validation_errors)
+        validation_errors.map do |error|
+          name = error['data_pointer'][1..].to_s
+          {
+            source: { source_name => name }
+          }.update(ErrorFormat.error_details(error))
         end
       end
     end

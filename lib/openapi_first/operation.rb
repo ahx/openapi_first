@@ -92,7 +92,7 @@ module OpenapiFirst
       @path_parameters ||= all_parameters.filter { |p| p['in'] == 'path' }
     end
 
-    IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Accept-Encoding'].freeze
+    IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
     private_constant :IGNORED_HEADERS
 
     def header_parameters

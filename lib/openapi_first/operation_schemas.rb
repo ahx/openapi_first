@@ -23,6 +23,10 @@ module OpenapiFirst
       @path_parameters_schema ||= build_json_schema(operation.path_parameters)
     end
 
+    def header_parameters_schema
+      @header_parameters_schema ||= build_json_schema(operation.header_parameters)
+    end
+
     private
 
     # Build JSON Schema for given parameter definitions

@@ -41,7 +41,7 @@ RSpec.describe OpenapiFirst::Operation do
 
   describe '#query_parameters' do
     it 'returns the query parameters on path and operation level' do
-      expect(operation.query_parameters.map {|p| p['name'] }).to eq %w[utm limit]
+      expect(operation.query_parameters.map { |p| p['name'] }).to eq %w[utm limit]
     end
   end
 
@@ -51,19 +51,18 @@ RSpec.describe OpenapiFirst::Operation do
     end
   end
 
-
   describe '#header_parameters' do
     it 'returns the header parameters' do
       expect(operation.header_parameters.map { |p| p['name'] }).to eq %w[Accept-Version]
     end
 
     describe 'ignored headers' do
-      # These are ignored, as described in the OpenAPI spec: (https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#fixed-fields-10).
-      %w[Content-Type Accept Accept-Encoding].each do |header|
+      # These are ignored, as described in the OpenAPI spec.
+      %w[Content-Type Accept Authorization].each do |header|
         it "excludes the #{header} header" do
           path_item = {
             'parameters' => [
-              { 'name' => header, 'in' => 'header', 'schema' => { 'type' => 'integer' } },
+              { 'name' => header, 'in' => 'header', 'schema' => { 'type' => 'integer' } }
             ],
             'get' => {}
           }

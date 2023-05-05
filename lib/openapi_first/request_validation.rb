@@ -7,6 +7,7 @@ require_relative 'error_format'
 require_relative 'error_response'
 require_relative './validators/request_body_validator'
 require_relative './validators/parameters_validator'
+require_relative './validators/headers_validator'
 require 'openapi_parameters'
 
 module OpenapiFirst
@@ -26,7 +27,8 @@ module OpenapiFirst
         env[PARAMS] = {}
         validate_and_merge_query_params!(operation, env)
         validate_and_merge_path_params!(operation, env)
-        Validators::RequestBodyValidator.call(operation, env, env[REQUEST_BODY]) if operation.request_body
+        validate_header_params!(operation, env)
+        Validators::RequestBodyValidator.new(operation, env).call(env[REQUEST_BODY]) if operation.request_body
         nil
       end
       if error
@@ -45,7 +47,7 @@ module OpenapiFirst
 
       hashy = Utils::StringKeyedHash.new(env[Router::RAW_PATH_PARAMS])
       unpacked_path_params = OpenapiParameters::Path.new(path_parameters).unpack(hashy)
-      Validators::ParametersValidator.call(operation.schemas.path_parameters_schema, unpacked_path_params)
+      Validators::ParametersValidator.new(operation.schemas.path_parameters_schema).call(unpacked_path_params)
       env[PARAMS].merge!(unpacked_path_params)
     end
 
@@ -54,8 +56,17 @@ module OpenapiFirst
       return if operation.query_parameters.empty?
 
       unpacked_query_params = OpenapiParameters::Query.new(query_parameters).unpack(env['QUERY_STRING'])
-      Validators::ParametersValidator.call(operation.schemas.query_parameters_schema, unpacked_query_params)
+      Validators::ParametersValidator.new(operation.schemas.query_parameters_schema).call(unpacked_query_params)
       env[PARAMS].merge!(unpacked_query_params)
+    end
+
+    def validate_header_params!(operation, env)
+      header_parameters = operation.header_parameters
+      return if header_parameters.empty?
+
+      unpacked_header_params = OpenapiParameters::Header.new(header_parameters).unpack_env(env)
+      Validators::HeadersValidator.new(operation.schemas.header_parameters_schema).call(unpacked_header_params)
+      env[HEADERS] = unpacked_header_params
     end
   end
 end

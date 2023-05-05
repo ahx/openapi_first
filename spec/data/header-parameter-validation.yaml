@@ -1,0 +1,24 @@
+openapi: 3.1.0
+info:
+paths:
+  '/pets':
+    parameters:
+      - name: Accept-Version
+        in: header
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 2
+      - # The Authorization header should be ignored
+        name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+          const: '123'
+    get:
+      responses:
+        200:
+          description: Ok
+
