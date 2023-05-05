@@ -17,6 +17,9 @@ module OpenapiFirst
   # Merged path and query parameters
   PARAMS = 'openapi.params'
 
+  # Parsed header parameters, except for Content-Type, Accept and Authorization
+  HEADERS = 'openapi.headers'
+
   # The parsed request body
   REQUEST_BODY = 'openapi.parsed_request_body'
 

@@ -92,6 +92,13 @@ module OpenapiFirst
       @path_parameters ||= all_parameters.filter { |p| p['in'] == 'path' }
     end
 
+    IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
+    private_constant :IGNORED_HEADERS
+
+    def header_parameters
+      @header_parameters ||= all_parameters.filter { |p| p['in'] == 'header' && !IGNORED_HEADERS.include?(p['name']) }
+    end
+
     def all_parameters
       @all_parameters ||= begin
         parameters = @path_item_object['parameters']&.dup || []
