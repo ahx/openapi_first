@@ -14,14 +14,20 @@ module OpenapiFirst
   # The OpenAPI operation for the current request
   OPERATION = 'openapi.operation'
 
-  # Merged path and query parameters
+  # Merged parsed path and query parameters
   PARAMS = 'openapi.params'
 
+  # Parsed query parameters
+  QUERY_PARAMS = 'openapi.query'
+
+  # Parsed path parameters
+  PATH_PARAMS = 'openapi.path_params'
+
   # Parsed header parameters, except for Content-Type, Accept and Authorization
-  HEADERS = 'openapi.headers'
+  HEADER_PARAMS = 'openapi.headers'
 
   # Parsed cookie parameter values
-  COOKIES = 'openapi.cookies'
+  COOKIE_PARAMS = 'openapi.cookies'
 
   # The parsed request body
   REQUEST_BODY = 'openapi.parsed_request_body'

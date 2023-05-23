@@ -35,7 +35,7 @@ RSpec.describe 'Cookie Parameter validation' do
     it 'adds the converted cookie to env ' do
       set_cookie 'knusper=42'
       get '/'
-      expect(last_request.env[OpenapiFirst::COOKIES]['knusper']).to eq 42
+      expect(last_request.env[OpenapiFirst::COOKIE_PARAMS]['knusper']).to eq 42
     end
 
     it 'succeeds if cookie is valid' do
