@@ -24,17 +24,7 @@ module OpenapiFirst
       operation = env[OPERATION]
       return @app.call(env) unless operation
 
-      error = catch(:error) do
-        env[PARAMS] = {}
-        validate_query_params!(operation, env)
-        env[PARAMS].merge!(env[QUERY_PARAMS]) if env[QUERY_PARAMS]
-        validate_path_params!(operation, env)
-        env[PARAMS].merge!(env[PATH_PARAMS]) if env[PATH_PARAMS]
-        validate_cookie_params!(operation, env)
-        validate_header_params!(operation, env)
-        Validators::RequestBodyValidator.new(operation, env).call(env[REQUEST_BODY]) if operation.request_body
-        nil
-      end
+      error = validate_request(operation, env)
       if error
         raise RequestInvalidError, error[:errors] if @raise
 
@@ -45,6 +35,18 @@ module OpenapiFirst
 
     private
 
+    def validate_request(operation, env)
+      catch(:error) do
+        env[PARAMS] = {}
+        validate_query_params!(operation, env)
+        validate_path_params!(operation, env)
+        validate_cookie_params!(operation, env)
+        validate_header_params!(operation, env)
+        Validators::RequestBodyValidator.new(operation, env).call(env[REQUEST_BODY]) if operation.request_body
+        nil
+      end
+    end
+
     def validate_path_params!(operation, env)
       path_parameters = operation.path_parameters
       return if path_parameters.empty?
@@ -53,6 +55,7 @@ module OpenapiFirst
       unpacked_path_params = OpenapiParameters::Path.new(path_parameters).unpack(hashy)
       Validators::ParametersValidator.new(operation.schemas.path_parameters_schema).call(unpacked_path_params)
       env[PATH_PARAMS] = unpacked_path_params
+      env[PARAMS].merge!(unpacked_path_params)
     end
 
     def validate_query_params!(operation, env)
@@ -62,6 +65,7 @@ module OpenapiFirst
       unpacked_query_params = OpenapiParameters::Query.new(query_parameters).unpack(env['QUERY_STRING'])
       Validators::ParametersValidator.new(operation.schemas.query_parameters_schema).call(unpacked_query_params)
       env[QUERY_PARAMS] = unpacked_query_params
+      env[PARAMS].merge!(unpacked_query_params)
     end
 
     def validate_cookie_params!(operation, env)
