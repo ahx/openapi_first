@@ -85,6 +85,38 @@ paths:
       responses:
         "200":
           description: ok
+  /stuff/{id}:
+    parameters:
+      - name: version
+        in: query
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      responses:
+        "200":
+          description: ok
+  /same-name-params/{id}:
+    parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      responses:
+        "200":
+          description: ok
 
 components:
   schemas:

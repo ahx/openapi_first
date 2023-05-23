@@ -72,9 +72,11 @@ This middleware adds the parsed request body to `env[OpenapiFirst::REQUEST_BODY]
 
 The middleware will return a status `415` if the requests content type does not match or `400` if the request body is invalid.
 
-### Header, Cookie, Path parameter validation
+### Header, Cookie, Query and Path parameter validation
 
-tbd.
+The `RequestValidation` middleware validates the request headers, cookies and path parameters as defined in you API description. It returns a `400` status code if the request is invalid. It adds the parsed merged path and query parameters to `env[OpenapiFirst::PARAMS]`.
+Seperate parsed parameters are made available by location at `env[OpenapiFirst::PATH_PARAMS]`, `env[OpenapiFirst::QUERY_PARAMS]`, `env[OpenapiFirst::HEADER_PARAMS]`, `env[OpenapiFirst::COOKIE_PARAMS]` as well if you need to access them separately.
+
 
 ### readOnly / writeOnly properties
 
