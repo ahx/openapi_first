@@ -8,6 +8,7 @@ require_relative 'error_response'
 require_relative './validators/request_body_validator'
 require_relative './validators/parameters_validator'
 require_relative './validators/headers_validator'
+require_relative './validators/cookies_validator'
 require 'openapi_parameters'
 
 module OpenapiFirst
@@ -27,6 +28,7 @@ module OpenapiFirst
         env[PARAMS] = {}
         validate_and_merge_query_params!(operation, env)
         validate_and_merge_path_params!(operation, env)
+        validate_and_merge_cookie_params!(operation, env)
         validate_header_params!(operation, env)
         Validators::RequestBodyValidator.new(operation, env).call(env[REQUEST_BODY]) if operation.request_body
         nil
@@ -58,6 +60,15 @@ module OpenapiFirst
       unpacked_query_params = OpenapiParameters::Query.new(query_parameters).unpack(env['QUERY_STRING'])
       Validators::ParametersValidator.new(operation.schemas.query_parameters_schema).call(unpacked_query_params)
       env[PARAMS].merge!(unpacked_query_params)
+    end
+
+    def validate_and_merge_cookie_params!(operation, env)
+      cookie_parameters = operation.cookie_parameters
+      return unless cookie_parameters&.any?
+
+      unpacked_params = OpenapiParameters::Cookie.new(cookie_parameters).unpack(env['HTTP_COOKIE'])
+      Validators::CookiesValidator.new(operation.schemas.cookie_parameters_schema).call(unpacked_params)
+      env[COOKIES] = unpacked_params
     end
 
     def validate_header_params!(operation, env)

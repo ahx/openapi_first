@@ -99,6 +99,10 @@ module OpenapiFirst
       @header_parameters ||= all_parameters.filter { |p| p['in'] == 'header' && !IGNORED_HEADERS.include?(p['name']) }
     end
 
+    def cookie_parameters
+      @cookie_parameters ||= all_parameters.filter { |p| p['in'] == 'cookie' }
+    end
+
     def all_parameters
       @all_parameters ||= begin
         parameters = @path_item_object['parameters']&.dup || []

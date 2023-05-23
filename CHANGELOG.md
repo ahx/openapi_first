@@ -2,8 +2,9 @@
 
 ## Unreleased
 
+- Add cookie parameter validation to RequestValidation
 - Add path parameter validation to RequestValidation
-- Add request header parameter validation to RequestValidation
+- Add header parameter validation to RequestValidation
 - Remove OpenapiFirst.env method
 
 ## 1.0.0.beta3

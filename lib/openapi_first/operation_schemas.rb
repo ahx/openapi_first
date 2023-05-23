@@ -27,6 +27,10 @@ module OpenapiFirst
       @header_parameters_schema ||= build_json_schema(operation.header_parameters)
     end
 
+    def cookie_parameters_schema
+      @cookie_parameters_schema ||= build_json_schema(operation.cookie_parameters)
+    end
+
     private
 
     # Build JSON Schema for given parameter definitions
