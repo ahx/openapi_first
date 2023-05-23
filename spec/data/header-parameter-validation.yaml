@@ -17,6 +17,20 @@ paths:
         schema:
           type: string
           const: '123'
+      - # The Accept header should be ignored
+          name: Accept
+          in: header
+          required: true
+          schema:
+            type: string
+            const: '123'
+      - # The Content-Type header should be ignored
+        name: Content-Type
+        in: header
+        required: true
+        schema:
+          type: string
+          const: '123'
     get:
       responses:
         200:
