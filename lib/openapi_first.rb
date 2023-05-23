@@ -20,6 +20,9 @@ module OpenapiFirst
   # Parsed header parameters, except for Content-Type, Accept and Authorization
   HEADERS = 'openapi.headers'
 
+  # Parsed cookie parameter values
+  COOKIES = 'openapi.cookies'
+
   # The parsed request body
   REQUEST_BODY = 'openapi.parsed_request_body'
 

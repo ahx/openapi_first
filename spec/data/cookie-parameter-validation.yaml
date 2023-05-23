@@ -1,0 +1,17 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Cookie Parameter Validation
+paths:
+  /:
+    parameters:
+      - name: knusper
+        in: cookie
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      responses:
+        '200':
+          description: successful
