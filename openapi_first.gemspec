@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['andreas.haller@posteo.de']
   spec.licenses      = ['MIT']
 
-  spec.summary       = 'Implement REST APIs based on OpenApi.'
+  spec.summary       = 'Implement REST APIs based on OpenApi 3.x'
   spec.homepage      = 'https://github.com/ahx/openapi_first'
 
   if spec.respond_to?(:metadata)
@@ -38,13 +38,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'json_refs', '~> 0.1', '>= 0.1.7'
   spec.add_runtime_dependency 'json_schemer', '~> 0.2.16'
   spec.add_runtime_dependency 'multi_json', '~> 1.14'
-  spec.add_runtime_dependency 'openapi_parameters', '~> 0.2'
+  spec.add_runtime_dependency 'openapi_parameters', '~> 0.2.2'
   spec.add_runtime_dependency 'rack', '>= 2.2', '< 4.0'
-
-  spec.add_development_dependency 'bundler', '~> 2'
-  spec.add_development_dependency 'rack-test', '~> 1'
-  spec.add_development_dependency 'rake', '~> 13'
-  spec.add_development_dependency 'rspec', '~> 3'
   spec.metadata = {
     'rubygems_mfa_required' => 'true'
   }

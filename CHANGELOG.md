@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add response header validation to ResponseValidation
 - Make parameters available at `env[OpenapiFirst::PATH_PARAMS]`, `env[OpenapiFirst::QUERY_PARAMS]`, `env[OpenapiFirst::HEADER_PARAMS]`, `env[OpenapiFirst::COOKIE_PARAMS]` in case you need to access them separately.
   Merged path and query parameters are still available at `env[OpenapiFirst::PARAMS]`
 - Add cookie parameter validation to RequestValidation

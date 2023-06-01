@@ -1,0 +1,31 @@
+openapi: 3.1.0
+info:
+paths:
+  '/echo':
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Ok
+          headers:
+            OptionalWithoutSchema:
+              description: 'optonal'
+            'Content-Type':
+              required: true
+              schema:
+                type: string
+                const: 'this should be ignored'
+            Location:
+              required: true
+              schema:
+                type: string
+                format: uri-reference
+            X-Id:
+              schema:
+                type: integer
+
