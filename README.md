@@ -2,13 +2,15 @@
 
 [![Join the chat at https://gitter.im/openapi_first/community](https://badges.gitter.im/openapi_first/community.svg)](https://gitter.im/openapi_first/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.openapis.org/) API description.
+OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.openapis.org/) API description. It supports OpenAPI 3.0 and 3.1.
 
 It provides these Rack middlewares:
 
 - [`OpenapiFirst::RequestValidation`](#request-validation) – Validates the request against the API description and returns 400 if the request is invalid.
 - [`OpenapiFirst::ResponseValidation`](#response-validation) Validates the response and raises an exception if the response body is invalid.
 - [`OpenapiFirst::Router`](#openapifirstrouter) – This internal middleware is added automatically when using request/response validation. It adds the OpenAPI operation for the current request to the Rack env.
+
+Using Request and Response validation together ensures that your implementation follows exactly the API description. This enables you to use the API description as a single source of truth for your API, reason about details and use various tooling.
 
 ## Request Validation
 

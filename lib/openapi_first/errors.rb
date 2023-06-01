@@ -22,6 +22,8 @@ module OpenapiFirst
 
   class ResponseBodyInvalidError < ResponseInvalid; end
 
+  class ResponseHeaderInvalidError < ResponseInvalid; end
+
   class BodyParsingError < Error; end
 
   class RequestInvalidError < Error

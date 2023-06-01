@@ -40,18 +40,20 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       subject.validate(request, response)
     end
 
-    it 'returns no errors if OAS file has no content' do
-      expect_any_instance_of(OpenapiFirst::Operation).to receive(:response_for) { {} }
-      response = Rack::MockResponse.new(200, headers, 'body')
-      subject.validate(request, response)
-    end
+    describe 'when operation response has has no content defined' do
+      let(:spec) { './spec/data/no-response-content.yaml' }
 
-    it 'returns no errors if OAS file has no response_for schema specified' do
-      empty_content = { 'application/json' => {} }
-      expect_any_instance_of(OpenapiFirst::Operation)
-        .to receive(:response_for) { { 'content' => empty_content } }
-      response = Rack::MockResponse.new(200, headers, 'body')
-      subject.validate(request, response)
+      it 'returns no errors' do
+        request = Rack::Request.new(Rack::MockRequest.env_for('/'))
+        response = Rack::MockResponse.new(200, headers, 'body')
+        subject.validate(request, response)
+      end
+
+      it 'returns no errors when content type is empty' do
+        request = Rack::Request.new(Rack::MockRequest.env_for('/empty-content'))
+        response = Rack::MockResponse.new(200, headers, 'body')
+        subject.validate(request, response)
+      end
     end
   end
 

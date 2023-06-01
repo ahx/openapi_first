@@ -24,11 +24,10 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     { Rack::CONTENT_TYPE => 'application/json', 'X-HEAD' => '/api/next-page' }
   end
   let(:response) { Rack::Response.new(response_body, status, headers) }
-  let(:path) { '/pets' }
 
   describe 'with a valid response' do
     it 'returns no errors' do
-      get path
+      get '/pets'
 
       expect(last_response.status).to eq 200
       expect(last_response.body).to eq response_body
@@ -42,7 +41,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
 
     it 'returns an error' do
       expect do
-        get path
+        get '/pets'
       end.to raise_error OpenapiFirst::ResponseInvalid, "Response has no content-type for 'GET /pets (listPets)'"
     end
   end
@@ -235,6 +234,48 @@ RSpec.describe OpenapiFirst::ResponseValidation do
         get '/test'
         expect(last_response.status).to eq 200
       end
+    end
+  end
+
+  describe 'response header validation' do
+    let(:app) do
+      Rack::Builder.app do
+        use OpenapiFirst::ResponseValidation, spec: './spec/data/response-header.yaml'
+        run(lambda do |env|
+          res = Rack::Response.new
+          res.status = 201
+          res.headers.merge!(env[OpenapiFirst::REQUEST_BODY])
+          res.finish
+        end)
+      end
+    end
+
+    before do
+      header Rack::CONTENT_TYPE, 'application/json'
+    end
+
+    it 'succeeds with a valid header' do
+      post '/echo', json_dump({ 'Location' => '/echos/42', 'X-Id' => '42', 'OptionalWithoutSchema' => '432' })
+      expect(last_response.status).to eq 201
+      expect(last_response.headers['Location']).to eq '/echos/42'
+      expect(last_response.headers['X-Id']).to eq '42'
+    end
+
+    it 'fails with an invalid header' do
+      expect do
+        post '/echo', json_dump({ 'Location' => '/echos/42', 'X-Id' => 'not-an-integer' })
+      end.to raise_error OpenapiFirst::ResponseHeaderInvalidError
+    end
+
+    it 'ignores "Content-Type" header' do
+      post '/echo', json_dump({ 'Location' => '/echos/42', 'Content-Type' => 'unknown' })
+      expect(last_response.status).to eq 201
+    end
+
+    it 'fails with a missing header' do
+      expect do
+        post '/echo', json_dump({ 'X-Id' => '42' })
+      end.to raise_error OpenapiFirst::ResponseHeaderInvalidError
     end
   end
 end
