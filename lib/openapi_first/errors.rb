@@ -5,15 +5,6 @@ module OpenapiFirst
 
   class NotFoundError < Error; end
 
-  class HandlerNotFoundError < Error; end
-
-  class NotImplementedError < Error
-    def initialize(message)
-      warn 'NotImplementedError is deprecated. Handle HandlerNotFoundError instead'
-      super
-    end
-  end
-
   class ResponseInvalid < Error; end
 
   class ResponseCodeNotFoundError < ResponseInvalid; end
