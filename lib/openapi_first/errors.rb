@@ -18,34 +18,44 @@ module OpenapiFirst
   class BodyParsingError < Error; end
 
   class RequestInvalidError < Error
-    def initialize(serialized_errors)
-      message = error_message(serialized_errors)
-      super message
+    def initialize(error)
+      @location = error[:location]
+      title, validation_errors = error.values_at(:title, :validation_errors)
+      if validation_errors
+        super build_error_message(validation_errors)
+      else
+        super title
+      end
     end
 
     private
 
-    def error_message(errors)
-      errors.map do |error|
-        [human_source(error), human_error(error)].compact.join(' ')
+    attr_reader :location
+
+    def build_error_message(validation_errors)
+      validation_errors.map do |error|
+        [
+          TOPICS[location],
+          pointer(error['data_pointer']),
+          ErrorFormat.error_details(error)[:title]
+        ].compact.join(' ')
       end.join(', ')
     end
 
-    def human_source(error)
-      return unless error[:source]
+    TOPICS = {
+      content: 'Request body invalid:',
+      query: 'Query parameter invalid:',
+      header: 'Header parameter invalid:',
+      path: 'Path segment invalid:',
+      cookie: 'Cookie value invalid:'
+    }.freeze
+    private_constant :TOPICS
 
-      source_key = error[:source].keys.first
-      source = {
-        pointer: 'Request body invalid:',
-        parameter: 'Query parameter invalid:'
-      }.fetch(source_key, source_key)
-      name = error[:source].values.first
-      source += " #{name}" unless name.nil? || name.empty?
-      source
-    end
+    def pointer(data_pointer)
+      return if data_pointer.nil? || data_pointer.empty?
+      return data_pointer if location == :content
 
-    def human_error(error)
-      error[:title]
+      data_pointer&.delete_prefix('/')
     end
   end
 end

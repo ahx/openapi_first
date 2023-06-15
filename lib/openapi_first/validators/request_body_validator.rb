@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../error_response'
-
 module OpenapiFirst
   module Validators
     class RequestBodyValidator
@@ -19,7 +17,7 @@ module OpenapiFirst
       private
 
       def validate_request_content_type!(operation, content_type)
-        operation.valid_request_content_type?(content_type) || ErrorResponse.throw_error(415)
+        operation.valid_request_content_type?(content_type) || OpenapiFirst.error!(415, :content)
       end
 
       def validate_request_body!(operation, body, content_type)
@@ -30,24 +28,14 @@ module OpenapiFirst
         return unless schema
 
         errors = schema.validate(body)
-        ErrorResponse.throw_error(400, serialize_request_body_errors(errors)) if errors.any?
+        OpenapiFirst.error!(400, :content, validation_errors: errors) if errors.any?
         body
       end
 
       def validate_request_body_presence!(body, operation)
         return unless operation.request_body['required'] && body.nil?
 
-        ErrorResponse.throw_error(415, 'Request body is required')
-      end
-
-      def serialize_request_body_errors(validation_errors)
-        validation_errors.map do |error|
-          {
-            source: {
-              pointer: error['data_pointer']
-            }
-          }.update(ErrorFormat.error_details(error))
-        end
+        OpenapiFirst.error!(415, :content, title: 'Request body is required')
       end
     end
   end

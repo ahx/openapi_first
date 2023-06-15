@@ -66,17 +66,14 @@ module OpenapiFirst
       env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH) if env[ORIGINAL_PATH]
     end
 
-    def handle_body_parsing_error(exception)
-      err = { title: 'Failed to parse body as application/json', status: '400' }
-      err[:detail] = exception.cause unless ENV['RACK_ENV'] == 'production'
-      errors = [err]
-      raise RequestInvalidError, errors if @raise
+    def handle_body_parsing_error(_exception)
+      error = {
+        status: 400,
+        title: 'Failed to parse body as application/json'
+      }
+      raise RequestInvalidError, error if @raise
 
-      Rack::Response.new(
-        MultiJson.dump(errors: errors),
-        400,
-        Rack::CONTENT_TYPE => 'application/vnd.api+json'
-      ).finish
+      ErrorResponse::Default.new(**error).finish
     end
 
     def build_router(operations)

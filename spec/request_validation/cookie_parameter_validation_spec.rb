@@ -48,5 +48,25 @@ RSpec.describe 'Cookie Parameter validation' do
       get '/'
       expect(last_response.status).to be 400
     end
+
+    describe 'when raising' do
+      let(:app) do
+        Rack::Builder.app do
+          spec_file = File.expand_path('../data/cookie-parameter-validation.yaml', __dir__)
+          use OpenapiFirst::RequestValidation, raise_error: true,
+                                               spec: spec_file
+          run lambda { |_env|
+            Rack::Response.new('hello', 200).finish
+          }
+        end
+      end
+
+      it 'returns 400 if cookie parameter is invalid' do
+        expect do
+          get '/'
+        end.to raise_error OpenapiFirst::RequestInvalidError,
+                           'Cookie value invalid: is missing required properties: knusper'
+      end
+    end
   end
 end

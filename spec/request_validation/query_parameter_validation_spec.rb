@@ -77,6 +77,7 @@ RSpec.describe 'Query Parameter validation' do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
+      pp response_body
       expect(error[:title]).to eq 'has not a valid date format'
       expect(error[:source][:parameter]).to eq 'birthdate'
     end
