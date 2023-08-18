@@ -83,7 +83,7 @@ GEM
       rack (>= 2.2)
       zeitwerk (~> 2.6)
     openapi_parser (1.0.0)
-    puma (6.3.0)
+    puma (6.3.1)
       nio4r (~> 2.0)
     rack (2.2.7)
     rack-accept (0.4.5)
