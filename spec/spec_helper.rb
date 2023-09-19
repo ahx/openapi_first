@@ -12,7 +12,7 @@ module OpenapiFirstSpecHelpers
   end
 
   def json_load(string, symbolize_keys: false)
-    MultiJson.load(string, { symbolize_keys: symbolize_keys })
+    MultiJson.load(string, { symbolize_keys: })
   end
 end
 

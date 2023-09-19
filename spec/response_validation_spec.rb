@@ -154,10 +154,11 @@ RSpec.describe OpenapiFirst::ResponseValidation do
                 ])
     end
 
-    specify do
+    it 'raises ResponseBodyInvalidError' do
       message = [
         "property '/0' is missing required keys: id",
-        "property '/1/id' is not of type: integer"
+        "property '/1/id' is not of type: integer",
+        "property '/1/id' does not match format: int64"
       ].join(', ')
       expect do
         get '/pets/42'

@@ -16,12 +16,13 @@ module OpenapiFirst
     WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
     private_constant :WRITE_METHODS
 
-    attr_reader :path, :method
+    attr_reader :path, :method, :openapi_version
 
-    def initialize(path, request_method, path_item_object)
+    def initialize(path, request_method, path_item_object, openapi_version:)
       @path = path
       @method = request_method
       @path_item_object = path_item_object
+      @openapi_version = openapi_version
     end
 
     def operation_id
@@ -53,7 +54,7 @@ module OpenapiFirst
         raise ResponseContentTypeNotFoundError, message
       end
       schema = media_type['schema']
-      SchemaValidation.new(schema, write: false) if schema
+      build_schema(schema, write: false) if schema
     end
 
     def request_body_schema(request_content_type)
@@ -61,7 +62,8 @@ module OpenapiFirst
         content = operation_object.dig('requestBody', 'content')
         media_type = find_content_for_content_type(content, request_content_type)
         schema = media_type&.fetch('schema', nil)
-        SchemaValidation.new(schema, write: write?) if schema
+
+        build_schema(schema, write: write?) if schema
       end
     end
 
@@ -79,7 +81,7 @@ module OpenapiFirst
 
     def valid_request_content_type?(request_content_type)
       content = operation_object.dig('requestBody', 'content')
-      return unless content
+      return false unless content
 
       !!find_content_for_content_type(content, request_content_type)
     end
@@ -118,6 +120,10 @@ module OpenapiFirst
     end
 
     private
+
+    def build_schema(schema, write:)
+      SchemaValidation.new(schema, write:, openapi_version:)
+    end
 
     def response_by_code(status)
       operation_object.dig('responses', status.to_s) ||

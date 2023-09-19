@@ -5,8 +5,8 @@ require 'multi_json'
 require_relative 'use_router'
 require_relative 'error_format'
 require_relative 'error_response/default'
-require_relative './validators/request_body_validator'
-require_relative './validators/parameters_validator'
+require_relative 'validators/request_body_validator'
+require_relative 'validators/parameters_validator'
 require 'openapi_parameters'
 
 module OpenapiFirst

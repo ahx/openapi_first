@@ -89,7 +89,7 @@ module OpenapiFirst
       end
       raise_error = @raise
       Rack::Builder.app do
-        use BodyParserMiddleware, raise_error: raise_error
+        use(BodyParserMiddleware, raise_error:)
         run router
       end
     end
