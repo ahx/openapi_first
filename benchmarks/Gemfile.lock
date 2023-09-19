@@ -12,7 +12,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (7.0.5)
+    activesupport (7.0.8)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -55,7 +55,7 @@ GEM
       mustermann-contrib (~> 3.0)
       rack (~> 2.0)
     hansi (0.2.1)
-    i18n (1.13.0)
+    i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     json_refs (0.1.8)
       hana
@@ -65,7 +65,7 @@ GEM
       regexp_parser (~> 2.0)
       simpleidn (~> 0.2)
     memory_profiler (1.0.1)
-    minitest (5.18.0)
+    minitest (5.20.0)
     multi_json (1.15.0)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
