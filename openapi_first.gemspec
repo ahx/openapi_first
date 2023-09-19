@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '>= 3.0.5'
+  spec.required_ruby_version = '>= 3.1.1'
 
   spec.add_runtime_dependency 'hanami-router', '~> 2.0.0'
   spec.add_runtime_dependency 'json_refs', '~> 0.1', '>= 0.1.7'
