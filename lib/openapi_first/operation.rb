@@ -7,7 +7,7 @@ require_relative 'utils'
 require_relative 'operation_schemas'
 
 module OpenapiFirst
-  class Operation
+  class Operation # rubocop:disable Metrics/ClassLength
     extend Forwardable
     def_delegators :operation_object,
                    :[],
