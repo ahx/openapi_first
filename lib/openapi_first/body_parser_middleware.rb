@@ -23,7 +23,7 @@ module OpenapiFirst
       errors = [err]
 
       Rack::Response.new(
-        MultiJson.dump(errors: errors),
+        MultiJson.dump(errors:),
         400,
         Rack::CONTENT_TYPE => 'application/vnd.api+json'
       ).finish

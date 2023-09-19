@@ -2,13 +2,13 @@
 
 ## Unreleased
 
-- Add response header validation to ResponseValidation
-- Make parameters available at `env[OpenapiFirst::PATH_PARAMS]`, `env[OpenapiFirst::QUERY_PARAMS]`, `env[OpenapiFirst::HEADER_PARAMS]`, `env[OpenapiFirst::COOKIE_PARAMS]` in case you need to access them separately.
-  Merged path and query parameters are still available at `env[OpenapiFirst::PARAMS]`
-- Add cookie parameter validation to RequestValidation
-- Add path parameter validation to RequestValidation
-- Add header parameter validation to RequestValidation
-- Remove OpenapiFirst.env method
+- Update json_schemer to version 2.0
+- Breaking: Requires Ruby 3.1 or later
+- Added: Parameters are available at `env[OpenapiFirst::PATH_PARAMS]`, `env[OpenapiFirst::QUERY_PARAMS]`, `env[OpenapiFirst::HEADER_PARAMS]`, `env[OpenapiFirst::COOKIE_PARAMS]` in case you need to access them separately. Merged path and query parameters are still available at `env[OpenapiFirst::PARAMS]`
+- Breaking / Added: ResponseValidation now validates response headers
+- Breaking / Added: RequestValidation now validates cookie, path and header parameters
+- Breaking: multipart File uploads are now read and then validated
+- Breaking: Remove OpenapiFirst.env method
 
 ## 1.0.0.beta3
 
@@ -16,9 +16,11 @@
 - Remove obsolete dependency: hanami-utils
 
 ## 1.0.0.beta2
+
 - Fixed dependencies. Remove unused code.
 
 ## 1.0.0.beta1
+
 - Removed: `OpenapiFirst::Responder` and `OpenapiFirst::RackResponder`
 - Removed: `OpenapiFirst.app` and `OpenapiFirst.middleware`
 - Removed: `OpenapiFirst::Coverage`

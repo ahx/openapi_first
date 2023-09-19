@@ -56,11 +56,11 @@ module OpenapiFirst
       response_header_definitions.each do |name, definition|
         next if name == 'Content-Type'
 
-        validate_response_header(name, definition, unpacked_headers)
+        validate_response_header(name, definition, unpacked_headers, openapi_version: operation.openapi_version)
       end
     end
 
-    def validate_response_header(name, definition, unpacked_headers)
+    def validate_response_header(name, definition, unpacked_headers, openapi_version:)
       unless unpacked_headers.key?(name)
         raise ResponseHeaderInvalidError, "Required response header '#{name}' is missing" if definition['required']
 
@@ -69,7 +69,7 @@ module OpenapiFirst
 
       return unless definition.key?('schema')
 
-      validation = SchemaValidation.new(definition['schema'])
+      validation = SchemaValidation.new(definition['schema'], openapi_version:)
       value = unpacked_headers[name]
       errors = validation.validate(value).to_a.map! { |error| format_header_error(error, name) }
       raise ResponseHeaderInvalidError, errors.join(', ') if errors.any?

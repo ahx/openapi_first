@@ -7,7 +7,7 @@ module OpenapiFirst
   class ResponseValidator
     def initialize(spec)
       @spec = spec
-      @router = Router.new(->(_env) {}, spec: spec, raise_error: true)
+      @router = Router.new(->(_env) {}, spec:, raise_error: true)
       @response_validation = ResponseValidation.new(->(response) { response.to_a })
     end
 

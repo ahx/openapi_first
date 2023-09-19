@@ -38,7 +38,7 @@ RSpec.describe 'Request body validation' do
       raise_error = raise_error_option
       Rack::Builder.new do
         spec = './spec/data/request-body-validation.yaml'
-        use OpenapiFirst::RequestValidation, spec: spec, raise_error: raise_error
+        use(OpenapiFirst::RequestValidation, spec:, raise_error:)
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
         }
@@ -80,9 +80,7 @@ RSpec.describe 'Request body validation' do
 
       expect(status).to eq(200), body
       uploaded_file = env[OpenapiFirst::REQUEST_BODY]['file']
-      expect(uploaded_file['type']).to eq 'text/plain'
-      expect(uploaded_file['filename']).to eq 'foo.txt'
-      expect(uploaded_file['tempfile'].read).to eq file_content
+      expect(uploaded_file).to eq file_content
     end
 
     it 'supports text/plain content type' do

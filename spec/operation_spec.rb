@@ -4,6 +4,8 @@ require_relative 'spec_helper'
 require 'openapi_first/operation'
 
 RSpec.describe OpenapiFirst::Operation do
+  let(:openapi_version) { '3.1' }
+
   let(:operation) do
     path_item = {
       'parameters' => [
@@ -30,7 +32,7 @@ RSpec.describe OpenapiFirst::Operation do
         }
       }
     }
-    described_class.new('/pets/{pet_id}', 'get', path_item)
+    described_class.new('/pets/{pet_id}', 'get', path_item, openapi_version:)
   end
 
   describe '#operation_id' do
@@ -66,7 +68,7 @@ RSpec.describe OpenapiFirst::Operation do
             ],
             'get' => {}
           }
-          operation = described_class.new('/pets/{pet_id}', 'get', path_item)
+          operation = described_class.new('/pets/{pet_id}', 'get', path_item, openapi_version:)
           expect(operation.header_parameters.map { |p| p['name'] }).to_not include header
         end
       end
@@ -197,12 +199,12 @@ RSpec.describe OpenapiFirst::Operation do
 
   describe '#read?' do
     it 'returns true if write? returns false' do
-      operation = OpenapiFirst::Operation.new('/', 'get', {})
+      operation = OpenapiFirst::Operation.new('/', 'get', {}, openapi_version:)
       expect(operation.read?).to be true
     end
 
     it 'returns false if write? returns true' do
-      operation = OpenapiFirst::Operation.new('/', 'post', {})
+      operation = OpenapiFirst::Operation.new('/', 'post', {}, openapi_version:)
       expect(operation.read?).to be false
     end
   end
@@ -210,13 +212,13 @@ RSpec.describe OpenapiFirst::Operation do
   describe 'write?' do
     %w[POST PUT PATCH DELETE].each do |http_method|
       it "returns true for #{http_method}" do
-        operation = OpenapiFirst::Operation.new('/', http_method.downcase, {})
+        operation = OpenapiFirst::Operation.new('/', http_method.downcase, {}, openapi_version:)
         expect(operation.write?).to be true
       end
     end
 
     it 'returns false for GET' do
-      operation = OpenapiFirst::Operation.new('/', 'get', {})
+      operation = OpenapiFirst::Operation.new('/', 'get', {}, openapi_version:)
       expect(operation.write?).to be false
     end
   end
@@ -286,28 +288,30 @@ RSpec.describe OpenapiFirst::Operation do
   end
 
   describe '#valid_request_content_type?' do
+    def build_operation(content)
+      described_class.new('/', 'get', content, openapi_version:)
+    end
+
     it 'returns true for an exact match' do
-      operation = described_class.new('/', 'get',
-                                      { 'get' => { 'requestBody' => { 'content' => { 'application/json' => {} } } } })
+      operation = build_operation({ 'get' => { 'requestBody' => { 'content' => { 'application/json' => {} } } } })
       valid = operation.valid_request_content_type?('application/json')
       expect(valid).to be true
     end
 
     it 'ignores content type parameters' do
-      operation = described_class.new('/', 'get',
-                                      { 'get' => { 'requestBody' => { 'content' => { 'application/json' => {} } } } })
+      operation = build_operation({ 'get' => { 'requestBody' => { 'content' => { 'application/json' => {} } } } })
       valid = operation.valid_request_content_type?('application/json; charset=UTF8')
       expect(valid).to be true
     end
 
     it 'matches type/*' do
-      operation = described_class.new('/', 'get', { 'get' => { 'requestBody' => { 'content' => { 'text/*' => {} } } } })
+      operation = build_operation({ 'get' => { 'requestBody' => { 'content' => { 'text/*' => {} } } } })
       valid = operation.valid_request_content_type?('text/plain')
       expect(valid).to be true
     end
 
     it 'matches */*' do
-      operation = described_class.new('/', 'get', { 'get' => { 'requestBody' => { 'content' => { '*/*' => {} } } } })
+      operation = build_operation({ 'get' => { 'requestBody' => { 'content' => { '*/*' => {} } } } })
       valid = operation.valid_request_content_type?('application/json')
       expect(valid).to be true
     end

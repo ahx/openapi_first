@@ -41,13 +41,12 @@ module OpenapiFirst
         'properties' => {},
         'required' => []
       }
-      SchemaValidation.new(
-        parameter_defs.each_with_object(init_schema) do |parameter_def, schema|
-          parameter = OpenapiParameters::Parameter.new(parameter_def)
-          schema['properties'][parameter.name] = parameter.schema if parameter.schema
-          schema['required'] << parameter.name if parameter.required?
-        end
-      )
+      schema = parameter_defs.each_with_object(init_schema) do |parameter_def, result|
+        parameter = OpenapiParameters::Parameter.new(parameter_def)
+        result['properties'][parameter.name] = parameter.schema if parameter.schema
+        result['required'] << parameter.name if parameter.required?
+      end
+      SchemaValidation.new(schema, openapi_version: operation.openapi_version)
     end
   end
 end
