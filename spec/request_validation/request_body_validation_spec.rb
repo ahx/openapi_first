@@ -150,7 +150,7 @@ RSpec.describe 'Request body validation' do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'should be a string'
+      expect(error[:title]).to eq 'value at `/attributes/name` is not a string'
       expect(error[:source][:pointer]).to eq '/attributes/name'
     end
 
@@ -161,7 +161,7 @@ RSpec.describe 'Request body validation' do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'is missing required properties: name'
+      expect(error[:title]).to eq 'object at `/attributes` is missing required properties: name'
       expect(error[:source][:pointer]).to eq '/attributes'
     end
 
@@ -172,9 +172,8 @@ RSpec.describe 'Request body validation' do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'value "unknown-type" is not defined in enum'
+      expect(error[:title]).to eq 'value at `/type` is not one of: ["pet", "plant"]'
       expect(error[:source][:pointer]).to eq '/type'
-      expect(error[:detail]).to eq 'value can be one of pet, plant'
     end
 
     it 'returns 400 if additional property is not allowed' do
@@ -184,7 +183,8 @@ RSpec.describe 'Request body validation' do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'unknown fields are not allowed'
+      message = 'object property at `/attributes/foo` is not defined and schema does not allow additional properties'
+      expect(error[:title]).to eq message
       expect(error[:source][:pointer]).to eq '/attributes/foo'
     end
 
@@ -320,7 +320,7 @@ RSpec.describe 'Request body validation' do
         }
         expect do
           post '/test', json_dump(request_body)
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: /id appears in request, but is read-only' # rubocop:disable Layout/LineLength
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: value at `/id` is `readOnly`'
       end
     end
 
@@ -339,7 +339,7 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post '/test', json_dump({})
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: is missing required properties: name' # rubocop:disable Layout/LineLength
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: object at root is missing required properties: name' # rubocop:disable Layout/LineLength
       end
 
       it 'succeeds if field is nil' do
@@ -360,7 +360,7 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post path, json_dump(request_body)
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: /attributes/name should be a string' # rubocop:disable Layout/LineLength
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: value at `/attributes/name` is not a string' # rubocop:disable Layout/LineLength
       end
 
       it 'raises error if required field is missing' do
@@ -368,7 +368,7 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post path, json_dump(request_body)
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: /attributes is missing required properties: name' # rubocop:disable Layout/LineLength
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: object at `/attributes` is missing required properties: name' # rubocop:disable Layout/LineLength
       end
 
       it 'raises error if request body is invalid JSON' do

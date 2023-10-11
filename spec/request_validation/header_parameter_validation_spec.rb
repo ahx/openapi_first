@@ -23,7 +23,7 @@ RSpec.describe 'Header Parameter validation' do
       get '/pets'
       expect(last_response.status).to eq 400
       error = json_load(last_response.body, symbolize_keys: true)[:errors][0]
-      expect(error[:title]).to eq 'should be a integer'
+      expect(error[:title]).to eq 'value at `/Accept-Version` is not an integer'
       expect(error[:source][:header]).to eq 'Accept-Version'
     end
 
@@ -63,7 +63,7 @@ RSpec.describe 'Header Parameter validation' do
         expect do
           get '/pets'
         end.to raise_error OpenapiFirst::RequestInvalidError,
-                           'Header parameter invalid: Accept-Version should be a integer'
+                           'Header parameter invalid: value at `/Accept-Version` is not an integer'
       end
     end
   end

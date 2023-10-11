@@ -28,7 +28,7 @@ RSpec.describe 'Cookie Parameter validation' do
 
       expect(last_response.status).to eq 400
       error = json_load(last_response.body, symbolize_keys: true)[:errors][0]
-      expect(error[:title]).to eq 'should be a integer'
+      expect(error[:title]).to eq 'value at `/knusper` is not an integer'
       expect(error[:source][:cookie]).to eq 'knusper'
     end
 
@@ -64,8 +64,7 @@ RSpec.describe 'Cookie Parameter validation' do
       it 'returns 400 if cookie parameter is invalid' do
         expect do
           get '/'
-        end.to raise_error OpenapiFirst::RequestInvalidError,
-                           'Cookie value invalid: is missing required properties: knusper'
+        end.to raise_error OpenapiFirst::RequestInvalidError, /^Cookie value invalid: \w+/
       end
     end
   end

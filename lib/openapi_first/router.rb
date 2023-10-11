@@ -67,11 +67,13 @@ module OpenapiFirst
     end
 
     def handle_body_parsing_error(_exception)
+      message = 'Failed to parse body as application/json'
+      raise RequestInvalidError, message if @raise
+
       error = {
         status: 400,
-        title: 'Failed to parse body as application/json'
+        title: message
       }
-      raise RequestInvalidError, error if @raise
 
       ErrorResponse::Default.new(**error).finish
     end
