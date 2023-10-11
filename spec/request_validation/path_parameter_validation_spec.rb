@@ -8,9 +8,13 @@ require 'openapi_first'
 RSpec.describe 'Path Parameter validation' do
   include Rack::Test::Methods
 
+  let(:raise_error_option) { false }
+
   let(:app) do
+    raise_error = raise_error_option
     Rack::Builder.app do
-      use OpenapiFirst::RequestValidation, spec: File.expand_path('../data/path-parameter-validation.yaml', __dir__)
+      use(OpenapiFirst::RequestValidation, spec: File.expand_path('../data/path-parameter-validation.yaml', __dir__),
+                                           raise_error:)
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
@@ -23,7 +27,7 @@ RSpec.describe 'Path Parameter validation' do
 
       expect(last_response.status).to eq 400
       error = json_load(last_response.body, symbolize_keys: true)[:errors][0]
-      expect(error[:title]).to eq 'should be a integer'
+      expect(error[:title]).to eq 'value at `/petId` is not an integer'
       expect(error[:source][:parameter]).to eq 'petId'
     end
 
@@ -40,6 +44,17 @@ RSpec.describe 'Path Parameter validation' do
     it 'returns 404 if path parameter is empty' do
       get '/pets//'
       expect(last_response.status).to be 404
+    end
+
+    describe 'when raise_error: true' do
+      let(:raise_error_option) { true }
+
+      it 'raises an error if query parameter is missing' do
+        message = 'Path segment invalid: value at `/petId` is not an integer'
+        expect do
+          get '/pets/not-an-integer'
+        end.to raise_error OpenapiFirst::RequestInvalidError, message
+      end
     end
   end
 end

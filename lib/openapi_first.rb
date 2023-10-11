@@ -34,12 +34,12 @@ module OpenapiFirst
 
   class << self
     # Throws an error in the middle of the request validation to stop validation and send a response.
-    def error!(status, location, title: Rack::Utils::HTTP_STATUS_CODES[status], validation_errors: nil)
+    def error!(status, location = nil, title: nil, validation_result: nil)
       throw :error, {
         status:,
         location:,
-        title:,
-        validation_errors:
+        title: title || validation_result&.result&.fetch('error') || Rack::Utils::HTTP_STATUS_CODES[status],
+        validation_result:
       }
     end
   end

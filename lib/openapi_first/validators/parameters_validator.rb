@@ -11,8 +11,8 @@ module OpenapiFirst
       end
 
       def call(unpacked_params)
-        errors = @schema_validation.validate(unpacked_params)
-        OpenapiFirst.error!(400, @location, validation_errors: errors) if errors.any?
+        validation_result = @schema_validation.validate(unpacked_params)
+        OpenapiFirst.error!(400, @location, validation_result:) if validation_result.error?
       end
     end
   end

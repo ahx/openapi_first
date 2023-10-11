@@ -3,7 +3,6 @@
 require 'rack'
 require 'multi_json'
 require_relative 'use_router'
-require_relative 'error_format'
 require_relative 'error_response/default'
 require_relative 'validators/request_body_validator'
 require_relative 'validators/parameters_validator'
@@ -16,7 +15,7 @@ module OpenapiFirst
     def initialize(app, options = {})
       @app = app
       @raise = options.fetch(:raise_error, false)
-      @error_format_class = options[:error_resoponse] || ErrorResponse::Default
+      @error_response_class = options[:error_response] || ErrorResponse::Default
     end
 
     def call(env)
@@ -25,7 +24,8 @@ module OpenapiFirst
 
       error = validate_request(operation, env)
       if error
-        raise RequestInvalidError, error if @raise
+        location, title = error.values_at(:location, :title)
+        raise RequestInvalidError, error_message(title, location) if @raise
 
         return error_response(error).render
       end
@@ -34,8 +34,23 @@ module OpenapiFirst
 
     private
 
+    def error_message(title, location)
+      return title unless location
+
+      "#{TOPICS.fetch(location)} #{title}"
+    end
+
+    TOPICS = {
+      content: 'Request body invalid:',
+      query: 'Query parameter invalid:',
+      header: 'Header parameter invalid:',
+      path: 'Path segment invalid:',
+      cookie: 'Cookie value invalid:'
+    }.freeze
+    private_constant :TOPICS
+
     def error_response(error_object)
-      @error_format_class.new(**error_object)
+      @error_response_class.new(**error_object)
     end
 
     def validate_request(operation, env)

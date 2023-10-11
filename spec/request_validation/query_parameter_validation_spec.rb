@@ -47,7 +47,7 @@ RSpec.describe 'Query Parameter validation' do
 
       expect(last_response.status).to eq 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'is missing required properties: term'
+      expect(error[:title]).to eq 'object at root is missing required properties: term'
       expect(error[:source][:parameter]).to eq ''
     end
 
@@ -57,7 +57,7 @@ RSpec.describe 'Query Parameter validation' do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'has not a valid date format'
+      expect(error[:title]).to eq 'value at `/birthdate` does not match format: date'
       expect(error[:source][:parameter]).to eq 'birthdate'
     end
 
@@ -67,7 +67,7 @@ RSpec.describe 'Query Parameter validation' do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'has not a valid date-time format'
+      expect(error[:title]).to eq 'value at `/date_time` does not match format: date-time'
       expect(error[:source][:parameter]).to eq 'date_time'
     end
 
@@ -78,7 +78,7 @@ RSpec.describe 'Query Parameter validation' do
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
       pp response_body
-      expect(error[:title]).to eq 'has not a valid date format'
+      expect(error[:title]).to eq 'value at `/birthdate` does not match format: date'
       expect(error[:source][:parameter]).to eq 'birthdate'
     end
 
@@ -88,10 +88,8 @@ RSpec.describe 'Query Parameter validation' do
 
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
-      expect(error[:title]).to eq 'is not valid'
-      expect(error[:detail]).to eq(
-        "does not match pattern '(parents|children)+(,(parents|children))*'"
-      )
+      message = 'string at `/include` does not match pattern: (parents|children)+(,(parents|children))*'
+      expect(error[:title]).to eq message
       expect(error[:source][:parameter]).to eq 'include'
     end
 
@@ -165,7 +163,7 @@ RSpec.describe 'Query Parameter validation' do
           expect(last_response.status).to eq(400)
           error = response_body[:errors][0]
           expect(error[:source][:parameter]).to eq 'integers/1'
-          expect(error[:title]).to eq 'should be a integer'
+          expect(error[:title]).to eq 'value at `/integers/1` is not an integer'
         end
       end
     end
@@ -213,7 +211,7 @@ RSpec.describe 'Query Parameter validation' do
 
         expect(last_response.status).to eq 400
         error = response_body[:errors][0]
-        expect(error[:title]).to eq 'is missing required properties: filter[id]'
+        expect(error[:title]).to eq 'object at root is missing required properties: filter[id]'
       end
 
       it 'returns 400 if non-required array parameter is nil' do
@@ -221,14 +219,14 @@ RSpec.describe 'Query Parameter validation' do
         get '/search', params
         expect(last_response.status).to eq 400
         error = response_body[:errors][0]
-        expect(error[:title]).to eq 'is not valid: nil'
+        expect(error[:title]).to eq 'value at `/filter[tag]` is not an array'
       end
 
       it 'returns 400 if non-required array parameter is empty' do
         get '/search?term=Oscar&filter[id]=1&filter[tag]=&filter[other]=things'
         expect(last_response.status).to eq 400
         error = response_body[:errors][0]
-        expect(error[:title]).to eq 'is not valid: ""'
+        expect(error[:title]).to eq 'value at `/filter[tag]` is not an array'
       end
 
       it 'passes if query parameters are valid' do
@@ -254,7 +252,7 @@ RSpec.describe 'Query Parameter validation' do
 
       it 'raises an error if query parameter is missing' do
         params.delete(:term)
-        message = 'Query parameter invalid: is missing required properties: term'
+        message = 'Query parameter invalid: object at root is missing required properties: term'
         expect do
           get '/search', params
         end.to raise_error OpenapiFirst::RequestInvalidError, message
@@ -262,7 +260,7 @@ RSpec.describe 'Query Parameter validation' do
 
       it 'raises an error if query parameter is invalid' do
         params[:include] = 'foo,bar'
-        message = 'Query parameter invalid: include is not valid'
+        message = %r{Query parameter invalid: string at `/include` does not match pattern}
         expect do
           get '/search', params
         end.to raise_error OpenapiFirst::RequestInvalidError, message

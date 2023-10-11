@@ -2,7 +2,6 @@
 
 require 'multi_json'
 require_relative 'use_router'
-require_relative 'error_format'
 
 module OpenapiFirst
   class ResponseValidation
@@ -41,11 +40,8 @@ module OpenapiFirst
       full_body = +''
       response.each { |chunk| full_body << chunk }
       data = full_body.empty? ? {} : load_json(full_body)
-      errors = schema.validate(data)
-      errors = errors.to_a.map! do |error|
-        format_response_error(error)
-      end
-      raise ResponseBodyInvalidError, errors.join(', ') if errors.any?
+      validation = schema.validate(data)
+      raise ResponseBodyInvalidError, validation.message if validation.error?
     end
 
     def validate_response_headers(operation, status, response_headers)
@@ -71,8 +67,8 @@ module OpenapiFirst
 
       validation = SchemaValidation.new(definition['schema'], openapi_version:)
       value = unpacked_headers[name]
-      errors = validation.validate(value).to_a.map! { |error| format_header_error(error, name) }
-      raise ResponseHeaderInvalidError, errors.join(', ') if errors.any?
+      validation = validation.validate(value)
+      raise ResponseHeaderInvalidError, validation.result['error'] if validation.error?
     end
 
     def unpack_response_headers(response_header_definitions, response_headers)
@@ -86,10 +82,6 @@ module OpenapiFirst
       return "Write-only field appears in response: #{error['data_pointer']}" if error['type'] == 'writeOnly'
 
       JSONSchemer::Errors.pretty(error)
-    end
-
-    def format_header_error(error, name)
-      "Response header '#{name}' #{ErrorFormat.error_details(error)[:title]}"
     end
 
     def load_json(string)
