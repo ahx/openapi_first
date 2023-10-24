@@ -4,8 +4,7 @@ require 'rack'
 require 'multi_json'
 require_relative 'use_router'
 require_relative 'error_response/default'
-require_relative 'validators/request_body_validator'
-require_relative 'validators/parameters_validator'
+require_relative 'request_body_validator'
 require 'openapi_parameters'
 
 module OpenapiFirst
@@ -60,7 +59,7 @@ module OpenapiFirst
         validate_path_params!(operation, env)
         validate_cookie_params!(operation, env)
         validate_header_params!(operation, env)
-        Validators::RequestBodyValidator.new(operation, env).call(env[REQUEST_BODY]) if operation.request_body
+        RequestBodyValidator.new(operation, env).validate! if operation.request_body
         nil
       end
     end
@@ -71,7 +70,8 @@ module OpenapiFirst
 
       hashy = Utils::StringKeyedHash.new(env[Router::RAW_PATH_PARAMS])
       unpacked_path_params = OpenapiParameters::Path.new(path_parameters).unpack(hashy)
-      Validators::ParametersValidator.new(:path, operation.schemas.path_parameters_schema).call(unpacked_path_params)
+      validation_result = operation.schemas.path_parameters_schema.validate(unpacked_path_params)
+      OpenapiFirst.error!(400, :path, validation_result:) if validation_result.error?
       env[PATH_PARAMS] = unpacked_path_params
       env[PARAMS].merge!(unpacked_path_params)
     end
@@ -81,7 +81,8 @@ module OpenapiFirst
       return if operation.query_parameters.empty?
 
       unpacked_query_params = OpenapiParameters::Query.new(query_parameters).unpack(env['QUERY_STRING'])
-      Validators::ParametersValidator.new(:query, operation.schemas.query_parameters_schema).call(unpacked_query_params)
+      validation_result = operation.schemas.query_parameters_schema.validate(unpacked_query_params)
+      OpenapiFirst.error!(400, :query, validation_result:) if validation_result.error?
       env[QUERY_PARAMS] = unpacked_query_params
       env[PARAMS].merge!(unpacked_query_params)
     end
@@ -91,7 +92,8 @@ module OpenapiFirst
       return unless cookie_parameters&.any?
 
       unpacked_params = OpenapiParameters::Cookie.new(cookie_parameters).unpack(env['HTTP_COOKIE'])
-      Validators::ParametersValidator.new(:cookie, operation.schemas.cookie_parameters_schema).call(unpacked_params)
+      validation_result = operation.schemas.cookie_parameters_schema.validate(unpacked_params)
+      OpenapiFirst.error!(400, :cookie, validation_result:) if validation_result.error?
       env[COOKIE_PARAMS] = unpacked_params
     end
 
@@ -100,8 +102,8 @@ module OpenapiFirst
       return if header_parameters.empty?
 
       unpacked_header_params = OpenapiParameters::Header.new(header_parameters).unpack_env(env)
-      Validators::ParametersValidator.new(:header,
-                                          operation.schemas.header_parameters_schema).call(unpacked_header_params)
+      validation_result = operation.schemas.header_parameters_schema.validate(unpacked_header_params)
+      OpenapiFirst.error!(400, :header, validation_result:) if validation_result.error?
       env[HEADER_PARAMS] = unpacked_header_params
     end
   end

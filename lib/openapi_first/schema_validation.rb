@@ -1,22 +1,11 @@
 # frozen_string_literal: true
 
 require 'json_schemer'
+require_relative 'validation_result'
 
 module OpenapiFirst
   class SchemaValidation
     attr_reader :raw_schema
-
-    Result = Struct.new(:result, :schema, :data, keyword_init: true) do
-      def valid? = result['valid']
-      def error? = !result['valid']
-
-      # Returns a message that is used in exception messages.
-      def message
-        return if valid?
-
-        (result['errors']&.map { |e| e['error'] }&.join('. ') || result['error'])&.concat('.')
-      end
-    end
 
     SCHEMAS = {
       '3.1' => 'https://spec.openapis.org/oas/3.1/dialect/base',
@@ -36,7 +25,7 @@ module OpenapiFirst
     end
 
     def validate(data)
-      Result.new(
+      ValidationResult.new(
         result: @schemer.validate(data),
         schema: raw_schema,
         data:

@@ -6,7 +6,7 @@ module OpenapiFirst
       ## @param status [Integer] The HTTP status code.
       ## @param title [String] The title of the error. Usually the name of the HTTP status code.
       ## @param location [Symbol] The location of the error (:request_body, :query, :header, :cookie, :path).
-      ## @param validation_result [SchemaValidation::Result]
+      ## @param validation_result [ValidationResult]
       def initialize(status:, location:, title:, validation_result:)
         @status = status
         @title = title
@@ -14,13 +14,15 @@ module OpenapiFirst
         @validation = validation_result
       end
 
+      attr_reader :status, :location, :title, :validation
+
       def render
         Rack::Response.new(body, status, Rack::CONTENT_TYPE => content_type).finish
       end
 
-      private
-
-      attr_reader :status, :location, :title, :validation
+      def content_type
+        'application/json'
+      end
 
       def body
         MultiJson.dump({ errors: serialized_errors })
@@ -60,10 +62,6 @@ module OpenapiFirst
         return data_pointer if location == :request_body
 
         data_pointer.delete_prefix('/')
-      end
-
-      def content_type
-        'application/json'
       end
     end
   end

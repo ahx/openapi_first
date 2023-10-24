@@ -3,6 +3,7 @@
 require_relative 'operation'
 
 module OpenapiFirst
+  # Represents an OpenAPI API Description document
   class Definition
     attr_reader :filepath, :operations
 
