@@ -5,7 +5,7 @@ module OpenapiFirst
     class Default
       ## @param status [Integer] The HTTP status code.
       ## @param title [String] The title of the error. Usually the name of the HTTP status code.
-      ## @param location [Symbol] The location of the error (:content, :query, :header, :cookie, :path).
+      ## @param location [Symbol] The location of the error (:request_body, :query, :header, :cookie, :path).
       ## @param validation_result [SchemaValidation::Result]
       def initialize(status:, location:, title:, validation_result:)
         @status = status
@@ -47,7 +47,7 @@ module OpenapiFirst
 
       def pointer_key
         case location
-        when :content
+        when :request_body
           :pointer
         when :query, :path
           :parameter
@@ -57,7 +57,7 @@ module OpenapiFirst
       end
 
       def pointer(data_pointer)
-        return data_pointer if location == :content
+        return data_pointer if location == :request_body
 
         data_pointer.delete_prefix('/')
       end

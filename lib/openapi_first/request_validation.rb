@@ -41,7 +41,7 @@ module OpenapiFirst
     end
 
     TOPICS = {
-      content: 'Request body invalid:',
+      request_body: 'Request body invalid:',
       query: 'Query parameter invalid:',
       header: 'Header parameter invalid:',
       path: 'Path segment invalid:',

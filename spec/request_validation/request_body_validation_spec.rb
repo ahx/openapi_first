@@ -241,11 +241,11 @@ RSpec.describe 'Request body validation' do
       expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
     end
 
-    it 'returns 415 if required request body is missing' do
+    it 'returns 400 if required request body is missing' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path
 
-      expect(last_response.status).to be 415
+      expect(last_response.status).to be 400
     end
 
     it 'returns 415 if request content-type does not match' do

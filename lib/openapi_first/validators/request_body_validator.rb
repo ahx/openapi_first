@@ -28,14 +28,14 @@ module OpenapiFirst
         return unless schema
 
         validation_result = schema.validate(body)
-        OpenapiFirst.error!(400, :content, validation_result:) if validation_result.error?
+        OpenapiFirst.error!(400, :request_body, validation_result:) if validation_result.error?
         body
       end
 
       def validate_request_body_presence!(body, operation)
         return unless operation.request_body['required'] && body.nil?
 
-        OpenapiFirst.error!(415, :content, title: 'Request body is required')
+        OpenapiFirst.error!(400, :request_body, title: 'Request body is required')
       end
     end
   end

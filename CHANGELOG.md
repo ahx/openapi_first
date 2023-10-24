@@ -9,6 +9,7 @@
 - Breaking / Added: RequestValidation now validates cookie, path and header parameters
 - Breaking: multipart File uploads are now read and then validated
 - Breaking: Remove OpenapiFirst.env method
+- Breaking: Request validation returns 400 instead of 415 if request body is required, but empty
 
 ## 1.0.0.beta3
 
