@@ -21,6 +21,7 @@ use OpenapiFirst::RequestValidation, spec: 'openapi.yaml'
 ```
 
 It adds these fields to the Rack env:
+
 - `env[OpenapiFirst::PARAMS]` – The parsed parameters (query, path) for the current request (string keyed)
 - `env[OpenapiFirst::REQUEST_BODY]` – The parsed request body (string keyed)
 - `env[OpenapiFirst::OPERATION]` (Added via Router) – The Operation object for the current request. This is an instance of `OpenapiFirst::Operation`.
@@ -29,7 +30,7 @@ It adds these fields to the Rack env:
 
 | Name           | Possible values | Description                                                                                        | Default                            |
 | :------------- | --------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `spec:`        |                      | The path to the spec file or spec loaded via `OpenapiFirst.load`
+| `spec:`        |                 | The path to the spec file or spec loaded via `OpenapiFirst.load`                                   |
 | `raise_error:` | `false`, `true` | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` instead of returning 4xx. | `false` (don't raise an exception) |
 
 The error responses conform with [JSON:API](https://jsonapi.org).
@@ -76,9 +77,8 @@ The middleware will return a status `415` if the requests content type does not 
 
 ### Header, Cookie, Query and Path parameter validation
 
-The `RequestValidation` middleware validates the request headers, cookies and path parameters as defined in you API description. It returns a `400` status code if the request is invalid. It adds the parsed merged path and query parameters to `env[OpenapiFirst::PARAMS]`.
-Seperate parsed parameters are made available by location at `env[OpenapiFirst::PATH_PARAMS]`, `env[OpenapiFirst::QUERY_PARAMS]`, `env[OpenapiFirst::HEADER_PARAMS]`, `env[OpenapiFirst::COOKIE_PARAMS]` as well if you need to access them separately.
-
+The `RequestValidation` middleware validates the request headers, cookies and path parameters as defined in you API description. It returns a `400` status code if the request is invalid. It adds the parsed merged _path_ and _query_ parameters to `env['openapi.params']`.
+Separate parsed parameters are made available by location at `env['openapi.path_params']`, `env['openapi.query']`, `env['openapi.headers']`, `env['openapi.cookies']` as well if you need to access them separately.
 
 ### readOnly / writeOnly properties
 
@@ -96,9 +96,9 @@ use OpenapiFirst::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] ==
 
 ### Options
 
-| Name           | Possible values      | Description                                                                                                                                                                                                                                                     | Default                            |
-| :------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `spec:`        |                      | The path to the spec file or spec loaded via `OpenapiFirst.load`
+| Name    | Possible values | Description                                                      | Default |
+| :------ | --------------- | ---------------------------------------------------------------- | ------- |
+| `spec:` |                 | The path to the spec file or spec loaded via `OpenapiFirst.load` |
 
 ## OpenapiFirst::Router
 
@@ -108,13 +108,13 @@ This middleware is used automatically, but you can add it to the top of your mid
 use OpenapiFirst::Router, spec: './openapi/openapi.yaml'
 ```
 
-This middleware adds `env[OpenapiFirst::OPERATION]` which holds an Operation object that responds to `#operation_id`, `#path` (and `#[string]` to access raw fields).
+This middleware adds `env['openapi.operation']` which holds an instance of `OpenapiFirst::Operation` that responds to `#operation_id`, `#path` (and `#[]` to access raw fields).
 
 ### Options and defaults
 
 | Name           | Possible values      | Description                                                                                                                                                                                                                                                     | Default                            |
 | :------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `spec:`        |                      | The path to the spec file or spec loaded via `OpenapiFirst.load` |                                    |
+| `spec:`        |                      | The path to the spec file or spec loaded via `OpenapiFirst.load`                                                                                                                                                                                                |                                    |
 | `raise_error:` | `false`, `true`      | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description.                                                             | `false` (don't raise an exception) |
 | `not_found:`   | `:continue`, `:halt` | If set to `:continue` the middleware will not return 404 (405, 415), but just pass handling the request to the next middleware or application in the Rack stack. If combined with `raise_error: true` `raise_error` gets preference and an exception is raised. | `:halt` (return 4xx response)      |
 
