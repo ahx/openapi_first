@@ -26,7 +26,7 @@ module OpenapiFirst
 
     def validate(data)
       ValidationResult.new(
-        result: @schemer.validate(data),
+        output: @schemer.validate(data),
         schema: raw_schema,
         data:
       )

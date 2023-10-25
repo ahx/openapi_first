@@ -2,6 +2,8 @@
 
 require 'yaml'
 require 'json_refs'
+require_relative 'openapi_first/config'
+require_relative 'openapi_first/plugins'
 require_relative 'openapi_first/definition'
 require_relative 'openapi_first/version'
 require_relative 'openapi_first/errors'
@@ -9,6 +11,7 @@ require_relative 'openapi_first/router'
 require_relative 'openapi_first/request_validation'
 require_relative 'openapi_first/response_validator'
 require_relative 'openapi_first/response_validation'
+require_relative 'openapi_first/default_error_response'
 
 module OpenapiFirst
   # The OpenAPI operation for the current request
@@ -38,7 +41,7 @@ module OpenapiFirst
       throw :error, {
         status:,
         location:,
-        title: title || validation_result&.result&.fetch('error') || Rack::Utils::HTTP_STATUS_CODES[status],
+        title: title || validation_result&.output&.fetch('error') || Rack::Utils::HTTP_STATUS_CODES[status],
         validation_result:
       }
     end

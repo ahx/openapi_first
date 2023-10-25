@@ -45,9 +45,9 @@ RSpec.describe OpenapiFirst::SchemaValidation do
     end
   end
 
-  describe 'validate.result' do
-    it 'returns the validation result' do
-      expect(validate(data).result['valid']).to be true
+  describe 'validate.output' do
+    it 'returns the validation output' do
+      expect(validate(data).output['valid']).to be true
     end
   end
 

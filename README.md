@@ -32,6 +32,7 @@ It adds these fields to the Rack env:
 | :------------- | --------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------- |
 | `spec:`        |                 | The path to the spec file or spec loaded via `OpenapiFirst.load`                                   |
 | `raise_error:` | `false`, `true` | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` instead of returning 4xx. | `false` (don't raise an exception) |
+| `error_response:`| `:default`, Your implementation of `ErrorResponse` | :default
 
 The error responses conform with [JSON:API](https://jsonapi.org).
 
@@ -52,6 +53,7 @@ content-type: "application/vnd.api+json"
   ]
 }
 ```
+
 
 ### Parameters
 

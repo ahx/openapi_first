@@ -67,8 +67,8 @@ module OpenapiFirst
 
       validation = SchemaValidation.new(definition['schema'], openapi_version:)
       value = unpacked_headers[name]
-      validation = validation.validate(value)
-      raise ResponseHeaderInvalidError, validation.result['error'] if validation.error?
+      validation_result = validation.validate(value)
+      raise ResponseHeaderInvalidError, validation_result.message if validation_result.error?
     end
 
     def unpack_response_headers(response_header_definitions, response_headers)

@@ -3,7 +3,7 @@
 require 'rack'
 require 'multi_json'
 require_relative 'use_router'
-require_relative 'error_response/default'
+require_relative 'error_response'
 require_relative 'request_body_validator'
 require_relative 'string_keyed_hash'
 require 'openapi_parameters'
@@ -15,7 +15,8 @@ module OpenapiFirst
     def initialize(app, options = {})
       @app = app
       @raise = options.fetch(:raise_error, false)
-      @error_response_class = options[:error_response] || ErrorResponse::Default
+      @error_response_class =
+        Plugins.find_error_response(options.fetch(:error_response, Config.default_options.error_response))
     end
 
     def call(env)
