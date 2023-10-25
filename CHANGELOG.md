@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0.beta4
+
 - Update json_schemer to version 2.0
 - Breaking: Requires Ruby 3.1 or later
 - Added: Parameters are available at `env[OpenapiFirst::PATH_PARAMS]`, `env[OpenapiFirst::QUERY_PARAMS]`, `env[OpenapiFirst::HEADER_PARAMS]`, `env[OpenapiFirst::COOKIE_PARAMS]` in case you need to access them separately. Merged path and query parameters are still available at `env[OpenapiFirst::PARAMS]`
