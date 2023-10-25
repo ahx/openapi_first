@@ -5,6 +5,7 @@ require 'multi_json'
 require_relative 'use_router'
 require_relative 'error_response/default'
 require_relative 'request_body_validator'
+require_relative 'string_keyed_hash'
 require 'openapi_parameters'
 
 module OpenapiFirst
@@ -68,7 +69,7 @@ module OpenapiFirst
       path_parameters = operation.path_parameters
       return if path_parameters.empty?
 
-      hashy = Utils::StringKeyedHash.new(env[Router::RAW_PATH_PARAMS])
+      hashy = StringKeyedHash.new(env[Router::RAW_PATH_PARAMS])
       unpacked_path_params = OpenapiParameters::Path.new(path_parameters).unpack(hashy)
       validation_result = operation.schemas.path_parameters_schema.validate(unpacked_path_params)
       OpenapiFirst.error!(400, :path, validation_result:) if validation_result.error?

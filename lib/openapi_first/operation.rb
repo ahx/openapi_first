@@ -3,7 +3,6 @@
 require 'forwardable'
 require 'set'
 require_relative 'schema_validation'
-require_relative 'utils'
 require_relative 'operation_schemas'
 
 module OpenapiFirst
