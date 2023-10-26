@@ -72,7 +72,7 @@ module OpenapiFirst
 
       hashy = StringKeyedHash.new(env[Router::RAW_PATH_PARAMS])
       unpacked_path_params = OpenapiParameters::Path.new(path_parameters).unpack(hashy)
-      validation_result = operation.schemas.path_parameters_schema.validate(unpacked_path_params)
+      validation_result = operation.path_parameters_schema.validate(unpacked_path_params)
       OpenapiFirst.error!(400, :path, validation_result:) if validation_result.error?
       env[PATH_PARAMS] = unpacked_path_params
       env[PARAMS].merge!(unpacked_path_params)
@@ -83,7 +83,7 @@ module OpenapiFirst
       return if operation.query_parameters.empty?
 
       unpacked_query_params = OpenapiParameters::Query.new(query_parameters).unpack(env['QUERY_STRING'])
-      validation_result = operation.schemas.query_parameters_schema.validate(unpacked_query_params)
+      validation_result = operation.query_parameters_schema.validate(unpacked_query_params)
       OpenapiFirst.error!(400, :query, validation_result:) if validation_result.error?
       env[QUERY_PARAMS] = unpacked_query_params
       env[PARAMS].merge!(unpacked_query_params)
@@ -94,7 +94,7 @@ module OpenapiFirst
       return unless cookie_parameters&.any?
 
       unpacked_params = OpenapiParameters::Cookie.new(cookie_parameters).unpack(env['HTTP_COOKIE'])
-      validation_result = operation.schemas.cookie_parameters_schema.validate(unpacked_params)
+      validation_result = operation.cookie_parameters_schema.validate(unpacked_params)
       OpenapiFirst.error!(400, :cookie, validation_result:) if validation_result.error?
       env[COOKIE_PARAMS] = unpacked_params
     end
@@ -104,7 +104,7 @@ module OpenapiFirst
       return if header_parameters.empty?
 
       unpacked_header_params = OpenapiParameters::Header.new(header_parameters).unpack_env(env)
-      validation_result = operation.schemas.header_parameters_schema.validate(unpacked_header_params)
+      validation_result = operation.header_parameters_schema.validate(unpacked_header_params)
       OpenapiFirst.error!(400, :header, validation_result:) if validation_result.error?
       env[HEADER_PARAMS] = unpacked_header_params
     end

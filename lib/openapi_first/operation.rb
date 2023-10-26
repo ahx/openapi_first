@@ -3,7 +3,6 @@
 require 'forwardable'
 require 'set'
 require_relative 'schema_validation'
-require_relative 'operation_schemas'
 
 module OpenapiFirst
   class Operation # rubocop:disable Metrics/ClassLength
@@ -114,12 +113,41 @@ module OpenapiFirst
       end
     end
 
-    # visibility: private
-    def schemas
-      @schemas ||= OperationSchemas.new(self)
+    # Return JSON Schema of for all query parameters
+    def query_parameters_schema
+      @query_parameters_schema ||= build_json_schema(query_parameters)
+    end
+
+    # Return JSON Schema of for all path parameters
+    def path_parameters_schema
+      @path_parameters_schema ||= build_json_schema(path_parameters)
+    end
+
+    def header_parameters_schema
+      @header_parameters_schema ||= build_json_schema(header_parameters)
+    end
+
+    def cookie_parameters_schema
+      @cookie_parameters_schema ||= build_json_schema(cookie_parameters)
     end
 
     private
+
+    # Build JSON Schema for given parameter definitions
+    # @parameter_defs [Array<Hash>] Parameter definitions
+    def build_json_schema(parameter_defs)
+      init_schema = {
+        'type' => 'object',
+        'properties' => {},
+        'required' => []
+      }
+      schema = parameter_defs.each_with_object(init_schema) do |parameter_def, result|
+        parameter = OpenapiParameters::Parameter.new(parameter_def)
+        result['properties'][parameter.name] = parameter.schema if parameter.schema
+        result['required'] << parameter.name if parameter.required?
+      end
+      SchemaValidation.new(schema, openapi_version:)
+    end
 
     def response_by_code(status)
       operation_object.dig('responses', status.to_s) ||
