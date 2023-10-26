@@ -35,18 +35,6 @@ module OpenapiFirst
   # The parsed request body
   REQUEST_BODY = 'openapi.parsed_request_body'
 
-  class << self
-    # Throws an error in the middle of the request validation to stop validation and send a response.
-    def error!(status, location = nil, title: nil, validation_result: nil)
-      throw :error, {
-        status:,
-        location:,
-        title: title || validation_result&.output&.fetch('error') || Rack::Utils::HTTP_STATUS_CODES[status],
-        validation_result:
-      }
-    end
-  end
-
   def self.load(spec_path, only: nil)
     resolved = Dir.chdir(File.dirname(spec_path)) do
       content = YAML.load_file(File.basename(spec_path))

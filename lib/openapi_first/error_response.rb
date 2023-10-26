@@ -3,6 +3,15 @@
 module OpenapiFirst
   # This is the base class for error responses
   class ErrorResponse
+    def self.throw!(status, location = nil, title: nil, validation_result: nil)
+      throw :error, {
+        status:,
+        location:,
+        title: title || validation_result&.output&.fetch('error') || Rack::Utils::HTTP_STATUS_CODES[status],
+        validation_result:
+      }
+    end
+
     ## @param status [Integer] The HTTP status code.
     ## @param title [String] The title of the error. Usually the name of the HTTP status code.
     ## @param location [Symbol] The location of the error (:request_body, :query, :header, :cookie, :path).
