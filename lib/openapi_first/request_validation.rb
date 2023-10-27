@@ -6,6 +6,7 @@ require_relative 'use_router'
 require_relative 'error_response'
 require_relative 'request_body_validator'
 require_relative 'string_keyed_hash'
+require_relative 'request_validation_error_message'
 require 'openapi_parameters'
 
 module OpenapiFirst
@@ -20,7 +21,9 @@ module OpenapiFirst
       throw FAIL, {
         status:,
         location:,
-        title: title || validation_result&.message || Rack::Utils::HTTP_STATUS_CODES[status],
+        title: RequestValidationErrorMessage.build(
+          title || validation_result&.message || Rack::Utils::HTTP_STATUS_CODES[status], location
+        ),
         validation_result:
       }
     end
@@ -38,8 +41,7 @@ module OpenapiFirst
 
       error = validate_request(operation, env)
       if error
-        location, title = error.values_at(:location, :title)
-        raise RequestInvalidError, error_message(title, location) if @raise
+        raise RequestInvalidError, error[:title] if @raise
 
         return error_response(error).render
       end
@@ -47,21 +49,6 @@ module OpenapiFirst
     end
 
     private
-
-    def error_message(title, location)
-      return title unless location
-
-      "#{TOPICS.fetch(location)} #{title}"
-    end
-
-    TOPICS = {
-      body: 'Request body invalid:',
-      query: 'Query parameter invalid:',
-      header: 'Header parameter invalid:',
-      path: 'Path segment invalid:',
-      cookie: 'Cookie value invalid:'
-    }.freeze
-    private_constant :TOPICS
 
     def error_response(error_object)
       @error_response_class.new(**error_object)
