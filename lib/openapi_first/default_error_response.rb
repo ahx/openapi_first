@@ -23,13 +23,13 @@ module OpenapiFirst
     def default_errors
       [{
         status: status.to_s,
-        title:
+        title: message
       }]
     end
 
     def pointer_key
       case location
-      when :request_body
+      when :body
         :pointer
       when :query, :path
         :parameter
@@ -39,7 +39,7 @@ module OpenapiFirst
     end
 
     def pointer(data_pointer)
-      return data_pointer if location == :request_body
+      return data_pointer if location == :body
 
       data_pointer.delete_prefix('/')
     end

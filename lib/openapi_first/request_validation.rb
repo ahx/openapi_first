@@ -6,11 +6,27 @@ require_relative 'use_router'
 require_relative 'error_response'
 require_relative 'request_body_validator'
 require_relative 'string_keyed_hash'
+require_relative 'request_validation_error_message'
 require 'openapi_parameters'
 
 module OpenapiFirst
   class RequestValidation
     prepend UseRouter
+
+    FAIL = :request_validation_failed
+    private_constant :FAIL
+
+    # @param location [Symbol] one of :body, :header, :cookie, :query, :path
+    def self.fail!(status = 400, location = nil, message: nil, validation_result: nil)
+      throw FAIL, {
+        status:,
+        location:,
+        message: RequestValidationErrorMessage.build(
+          message || validation_result&.message || Rack::Utils::HTTP_STATUS_CODES[status], location
+        ),
+        validation_result:
+      }
+    end
 
     def initialize(app, options = {})
       @app = app
@@ -25,8 +41,7 @@ module OpenapiFirst
 
       error = validate_request(operation, env)
       if error
-        location, title = error.values_at(:location, :title)
-        raise RequestInvalidError, error_message(title, location) if @raise
+        raise RequestInvalidError, error[:message] if @raise
 
         return error_response(error).render
       end
@@ -35,27 +50,12 @@ module OpenapiFirst
 
     private
 
-    def error_message(title, location)
-      return title unless location
-
-      "#{TOPICS.fetch(location)} #{title}"
-    end
-
-    TOPICS = {
-      request_body: 'Request body invalid:',
-      query: 'Query parameter invalid:',
-      header: 'Header parameter invalid:',
-      path: 'Path segment invalid:',
-      cookie: 'Cookie value invalid:'
-    }.freeze
-    private_constant :TOPICS
-
     def error_response(error_object)
       @error_response_class.new(**error_object)
     end
 
     def validate_request(operation, env)
-      catch(:error) do
+      catch(FAIL) do
         env[PARAMS] = {}
         validate_query_params!(operation, env)
         validate_path_params!(operation, env)
@@ -72,8 +72,8 @@ module OpenapiFirst
 
       hashy = StringKeyedHash.new(env[Router::RAW_PATH_PARAMS])
       unpacked_path_params = OpenapiParameters::Path.new(path_parameters).unpack(hashy)
-      validation_result = operation.schemas.path_parameters_schema.validate(unpacked_path_params)
-      OpenapiFirst.error!(400, :path, validation_result:) if validation_result.error?
+      validation_result = operation.path_parameters_schema.validate(unpacked_path_params)
+      RequestValidation.fail!(400, :path, validation_result:) if validation_result.error?
       env[PATH_PARAMS] = unpacked_path_params
       env[PARAMS].merge!(unpacked_path_params)
     end
@@ -83,8 +83,8 @@ module OpenapiFirst
       return if operation.query_parameters.empty?
 
       unpacked_query_params = OpenapiParameters::Query.new(query_parameters).unpack(env['QUERY_STRING'])
-      validation_result = operation.schemas.query_parameters_schema.validate(unpacked_query_params)
-      OpenapiFirst.error!(400, :query, validation_result:) if validation_result.error?
+      validation_result = operation.query_parameters_schema.validate(unpacked_query_params)
+      RequestValidation.fail!(400, :query, validation_result:) if validation_result.error?
       env[QUERY_PARAMS] = unpacked_query_params
       env[PARAMS].merge!(unpacked_query_params)
     end
@@ -94,8 +94,8 @@ module OpenapiFirst
       return unless cookie_parameters&.any?
 
       unpacked_params = OpenapiParameters::Cookie.new(cookie_parameters).unpack(env['HTTP_COOKIE'])
-      validation_result = operation.schemas.cookie_parameters_schema.validate(unpacked_params)
-      OpenapiFirst.error!(400, :cookie, validation_result:) if validation_result.error?
+      validation_result = operation.cookie_parameters_schema.validate(unpacked_params)
+      RequestValidation.fail!(400, :cookie, validation_result:) if validation_result.error?
       env[COOKIE_PARAMS] = unpacked_params
     end
 
@@ -104,8 +104,8 @@ module OpenapiFirst
       return if header_parameters.empty?
 
       unpacked_header_params = OpenapiParameters::Header.new(header_parameters).unpack_env(env)
-      validation_result = operation.schemas.header_parameters_schema.validate(unpacked_header_params)
-      OpenapiFirst.error!(400, :header, validation_result:) if validation_result.error?
+      validation_result = operation.header_parameters_schema.validate(unpacked_header_params)
+      RequestValidation.fail!(400, :header, validation_result:) if validation_result.error?
       env[HEADER_PARAMS] = unpacked_header_params
     end
   end

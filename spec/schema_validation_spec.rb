@@ -57,7 +57,7 @@ RSpec.describe OpenapiFirst::SchemaValidation do
     end
 
     it 'returns a message if data is invalid' do
-      expect(validate({}).message).to eq 'object at root is missing required properties: count.'
+      expect(validate({}).message).to eq 'object at root is missing required properties: count'
     end
 
     it 'returns a longer message with nested errors' do
@@ -82,10 +82,10 @@ RSpec.describe OpenapiFirst::SchemaValidation do
       }
       validator = described_class.new(schema, openapi_version: '3.1')
       validation = validator.validate({ 'count' => 'a', 'pets' => [{ name: 12 }] })
-      expect(validation.message).to eq 'value at `/count` is not an integer. value at `/pets/0/name` is not a string.'
+      expect(validation.message).to eq 'value at `/count` is not an integer. value at `/pets/0/name` is not a string'
 
       validation = validator.validate({})
-      expect(validation.message).to eq 'object at root is missing required properties: pets.'
+      expect(validation.message).to eq 'object at root is missing required properties: pets'
     end
   end
 
