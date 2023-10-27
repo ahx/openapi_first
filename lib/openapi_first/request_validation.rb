@@ -17,12 +17,12 @@ module OpenapiFirst
     private_constant :FAIL
 
     # @param location [Symbol] one of :body, :header, :cookie, :query, :path
-    def self.fail!(status = 400, location = nil, title: nil, validation_result: nil)
+    def self.fail!(status = 400, location = nil, message: nil, validation_result: nil)
       throw FAIL, {
         status:,
         location:,
-        title: RequestValidationErrorMessage.build(
-          title || validation_result&.message || Rack::Utils::HTTP_STATUS_CODES[status], location
+        message: RequestValidationErrorMessage.build(
+          message || validation_result&.message || Rack::Utils::HTTP_STATUS_CODES[status], location
         ),
         validation_result:
       }
@@ -41,7 +41,7 @@ module OpenapiFirst
 
       error = validate_request(operation, env)
       if error
-        raise RequestInvalidError, error[:title] if @raise
+        raise RequestInvalidError, error[:message] if @raise
 
         return error_response(error).render
       end

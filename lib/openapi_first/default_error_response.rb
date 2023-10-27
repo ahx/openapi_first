@@ -23,7 +23,7 @@ module OpenapiFirst
     def default_errors
       [{
         status: status.to_s,
-        title:
+        title: message
       }]
     end
 

@@ -35,7 +35,7 @@ module OpenapiFirst
     def validate_request_body_presence!(body, operation)
       return unless operation.request_body['required'] && body.nil?
 
-      RequestValidation.fail!(400, :body, title: 'Request body is required')
+      RequestValidation.fail!(400, :body, message: 'Request body is required')
     end
   end
 end
