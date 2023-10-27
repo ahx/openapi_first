@@ -3,8 +3,8 @@
 module OpenapiFirst
   # This is the base class for error responses
   class ErrorResponse
-    ## @param status [Integer] The HTTP status code.
-    ## @param title [String] The title of the error. Usually the name of the HTTP status code.
+    ## @param status [Integer] The intended HTTP status code.
+    ## @param title [String] A descriptive title for the error.
     ## @param location [Symbol] The location of the error (:body, :query, :header, :cookie, :path).
     ## @param validation_result [ValidationResult]
     def initialize(status:, location:, title:, validation_result:)

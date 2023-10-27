@@ -20,7 +20,7 @@ module OpenapiFirst
       throw FAIL, {
         status:,
         location:,
-        title: title || validation_result&.output&.fetch('error') || Rack::Utils::HTTP_STATUS_CODES[status],
+        title: title || validation_result&.message || Rack::Utils::HTTP_STATUS_CODES[status],
         validation_result:
       }
     end

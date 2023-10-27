@@ -9,7 +9,7 @@ module OpenapiFirst
     def message
       return if valid?
 
-      (output['errors']&.map { |e| e['error'] }&.join('. ') || output['error'])&.concat('.')
+      (output['errors']&.map { |e| e['error'] }&.join('. ') || output['error'])
     end
   end
 end
