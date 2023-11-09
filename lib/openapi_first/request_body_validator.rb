@@ -17,7 +17,7 @@ module OpenapiFirst
     private
 
     def validate_request_content_type!(operation, content_type)
-      operation.valid_request_content_type?(content_type) || RequestValidation.fail!(415)
+      operation.valid_request_content_type?(content_type) || RequestValidation.fail!(415, :header)
     end
 
     def validate_request_body!(operation, body, content_type)
@@ -27,15 +27,15 @@ module OpenapiFirst
       schema = operation&.request_body_schema(content_type)
       return unless schema
 
-      validation_result = schema.validate(body)
-      RequestValidation.fail!(400, :body, validation_result:) if validation_result.error?
+      schema_validation = schema.validate(body)
+      RequestValidation.fail!(400, :body, schema_validation:) if schema_validation.error?
       body
     end
 
     def validate_request_body_presence!(body, operation)
       return unless operation.request_body['required'] && body.nil?
 
-      RequestValidation.fail!(400, :body, message: 'Request body is required')
+      RequestValidation.fail!(400, :body)
     end
   end
 end

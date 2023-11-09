@@ -3,20 +3,32 @@
 module OpenapiFirst
   # This is the base class for error responses
   class ErrorResponse
-    ## @param status [Integer] The intended HTTP status code.
-    ## @param message [String] A descriptive error message.
-    ## @param location [Symbol] The location of the error (:body, :query, :header, :cookie, :path).
-    ## @param validation_result [ValidationResult]
-    def initialize(status:, location:, message:, validation_result:)
-      @status = status
-      @message = message
-      @location = location
-      @validation_output = validation_result&.output
-      @schema = validation_result&.schema
-      @data = validation_result&.data
+    ## @param request_validation_error [OpenapiFirst::RequestValidationError]
+    def initialize(request_validation_error)
+      @request_validation_error = request_validation_error
     end
 
-    attr_reader :status, :location, :message, :schema, :data, :validation_output
+    extend Forwardable
+
+    attr_reader :request_validation_error
+
+    def_delegators :@request_validation_error, :status, :location, :schema_validation
+
+    def validation_output
+      schema_validation&.output
+    end
+
+    def schema
+      schema_validation&.schema
+    end
+
+    def data
+      schema_validation&.data
+    end
+
+    def message
+      request_validation_error.message
+    end
 
     def render
       Rack::Response.new(body, status, Rack::CONTENT_TYPE => content_type).finish

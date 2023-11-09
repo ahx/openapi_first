@@ -94,27 +94,27 @@ RSpec.describe OpenapiFirst::Operation do
     let(:operation) { spec.operations[0] }
 
     it 'finds an exact match without parameter' do
-      schema = operation.response_body_schema(200, 'application/json').raw_schema
+      schema = operation.response_body_schema(200, 'application/json').schema
       expect(schema['title']).to eq 'Without parameter'
     end
 
     it 'finds an exact match with parameter' do
-      schema = operation.response_body_schema(200, 'application/json; profile=custom').raw_schema
+      schema = operation.response_body_schema(200, 'application/json; profile=custom').schema
       expect(schema['title']).to eq 'With profile'
     end
 
     it 'finds a match while ignorign charset' do
-      schema = operation.response_body_schema(200, 'application/json; charset=UTF8').raw_schema
+      schema = operation.response_body_schema(200, 'application/json; charset=UTF8').schema
       expect(schema['title']).to eq 'Without parameter'
     end
 
     it 'finds text/* wildcard matcher' do
-      schema = operation.response_body_schema(200, 'text/markdown').raw_schema
+      schema = operation.response_body_schema(200, 'text/markdown').schema
       expect(schema['title']).to eq 'Text wildcard'
     end
 
     it 'finds */* wildcard matcher' do
-      schema = operation.response_body_schema(200, 'application/xml').raw_schema
+      schema = operation.response_body_schema(200, 'application/xml').schema
       expect(schema['title']).to eq 'Accept everything'
     end
 
@@ -228,7 +228,7 @@ RSpec.describe OpenapiFirst::Operation do
     let(:operation) { spec.operations[1] }
 
     it 'returns the JSON schema' do
-      schema = operation.request_body_schema('application/json').raw_schema
+      schema = operation.request_body_schema('application/json').schema
       expected_schema = {
         'title' => 'Without parameter',
         'type' => 'object'
@@ -237,27 +237,27 @@ RSpec.describe OpenapiFirst::Operation do
     end
 
     it 'finds an exact match without parameter' do
-      schema = operation.request_body_schema('application/json').raw_schema
+      schema = operation.request_body_schema('application/json').schema
       expect(schema['title']).to eq 'Without parameter'
     end
 
     it 'finds an exact match with parameter' do
-      schema = operation.request_body_schema('application/json; profile=custom').raw_schema
+      schema = operation.request_body_schema('application/json; profile=custom').schema
       expect(schema['title']).to eq 'With profile'
     end
 
     it 'finds a match while ignorign charset' do
-      schema = operation.request_body_schema('application/json; charset=UTF8').raw_schema
+      schema = operation.request_body_schema('application/json; charset=UTF8').schema
       expect(schema['title']).to eq 'Without parameter'
     end
 
     it 'finds text/* wildcard matcher' do
-      schema = operation.request_body_schema('text/markdown').raw_schema
+      schema = operation.request_body_schema('text/markdown').schema
       expect(schema['title']).to eq 'Text wildcard'
     end
 
     it 'finds */* wildcard matcher' do
-      schema = operation.request_body_schema('application/xml').raw_schema
+      schema = operation.request_body_schema('application/xml').schema
       expect(schema['title']).to eq 'Accept everything'
     end
   end

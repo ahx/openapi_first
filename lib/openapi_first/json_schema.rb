@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require 'json_schemer'
-require_relative 'validation_result'
+require_relative 'json_schema/result'
 
 module OpenapiFirst
-  class SchemaValidation
-    attr_reader :raw_schema
+  class JsonSchema
+    attr_reader :schema
 
     SCHEMAS = {
       '3.1' => 'https://spec.openapis.org/oas/3.1/dialect/base',
@@ -13,7 +13,7 @@ module OpenapiFirst
     }.freeze
 
     def initialize(schema, openapi_version:, write: true)
-      @raw_schema = schema
+      @schema = schema
       @schemer = JSONSchemer.schema(
         schema,
         access_mode: write ? 'write' : 'read',
@@ -25,9 +25,9 @@ module OpenapiFirst
     end
 
     def validate(data)
-      ValidationResult.new(
+      Result.new(
         output: @schemer.validate(data),
-        schema: raw_schema,
+        schema:,
         data:
       )
     end

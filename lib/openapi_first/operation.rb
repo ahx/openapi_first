@@ -2,7 +2,7 @@
 
 require 'forwardable'
 require 'set'
-require_relative 'schema_validation'
+require_relative 'json_schema'
 
 module OpenapiFirst
   class Operation # rubocop:disable Metrics/ClassLength
@@ -54,7 +54,7 @@ module OpenapiFirst
       schema = media_type['schema']
       return unless schema
 
-      SchemaValidation.new(schema, write: false, openapi_version:)
+      JsonSchema.new(schema, write: false, openapi_version:)
     end
 
     def request_body_schema(request_content_type)
@@ -62,7 +62,7 @@ module OpenapiFirst
         content = operation_object.dig('requestBody', 'content')
         media_type = find_content_for_content_type(content, request_content_type)
         schema = media_type&.fetch('schema', nil)
-        SchemaValidation.new(schema, write: write?, openapi_version:) if schema
+        JsonSchema.new(schema, write: write?, openapi_version:) if schema
       end
     end
 
@@ -146,7 +146,7 @@ module OpenapiFirst
         result['properties'][parameter.name] = parameter.schema if parameter.schema
         result['required'] << parameter.name if parameter.required?
       end
-      SchemaValidation.new(schema, openapi_version:)
+      JsonSchema.new(schema, openapi_version:)
     end
 
     def response_by_code(status)

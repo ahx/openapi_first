@@ -382,7 +382,7 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/xml'
         expect do
           post path, '<xml />'
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Unsupported Media Type'
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Header parameter invalid: Unsupported Media Type'
       end
     end
   end
