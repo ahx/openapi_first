@@ -11,7 +11,8 @@ require_relative 'openapi_first/router'
 require_relative 'openapi_first/request_validation'
 require_relative 'openapi_first/response_validator'
 require_relative 'openapi_first/response_validation'
-require_relative 'openapi_first/default_error_response'
+require_relative 'openapi_first/error_responses/default'
+require_relative 'openapi_first/error_responses/json_api'
 
 module OpenapiFirst
   # The OpenAPI operation for the current request
