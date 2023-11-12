@@ -42,16 +42,12 @@ module OpenapiFirst
       if error
         raise RequestInvalidError, error.error_message if @raise
 
-        return error_response(error).render
+        return @error_response_class.new(env, error).render
       end
       @app.call(env)
     end
 
     private
-
-    def error_response(validation_error)
-      @error_response_class.new(validation_error)
-    end
 
     def validate_request(operation, env)
       catch(FAIL) do
