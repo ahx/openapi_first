@@ -195,7 +195,6 @@ RSpec.describe 'Request body validation' do
       expect(last_response.status).to be 400
       error = response_body[:errors][0]
       expect(error[:title]).to eq 'Failed to parse body as application/json'
-      expect(error[:detail]).to include "unexpected token at '{fo},'"
     end
 
     describe 'with default values' do

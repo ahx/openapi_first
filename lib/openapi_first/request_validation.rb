@@ -10,6 +10,7 @@ require_relative 'request_validation_error'
 require 'openapi_parameters'
 
 module OpenapiFirst
+  # A Rack middleware to validate requests against an OpenAPI API description
   class RequestValidation
     prepend UseRouter
 

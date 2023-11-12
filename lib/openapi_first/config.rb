@@ -3,7 +3,7 @@
 module OpenapiFirst
   class Config
     def initialize(error_response: :default, request_validation_raise_error: false)
-      @error_response = error_response
+      @error_response = Plugins.find_error_response(error_response)
       @request_validation_raise_error = request_validation_raise_error
     end
 

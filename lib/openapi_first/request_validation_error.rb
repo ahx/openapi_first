@@ -2,16 +2,17 @@
 
 module OpenapiFirst
   class RequestValidationError
-    def initialize(status:, location:, schema_validation: nil)
+    def initialize(status:, location:, message: nil, schema_validation: nil)
       @status = status
       @location = location
+      @message = message
       @schema_validation = schema_validation
     end
 
     attr_reader :status, :request, :location, :schema_validation
 
     def message
-      schema_validation&.message || Rack::Utils::HTTP_STATUS_CODES[status]
+      @message || schema_validation&.message || Rack::Utils::HTTP_STATUS_CODES[status]
     end
 
     def error_message

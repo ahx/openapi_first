@@ -4,29 +4,16 @@ require 'multi_json'
 
 module OpenapiFirst
   class BodyParserMiddleware
-    def initialize(app, options = {})
+    def initialize(app)
       @app = app
-      @raise = options.fetch(:raise_error, false)
     end
 
-    RACK_INPUT = 'rack.input'
     ROUTER_PARSED_BODY = 'router.parsed_body'
+    private_constant :ROUTER_PARSED_BODY
 
     def call(env)
       env[ROUTER_PARSED_BODY] = parse_body(env)
       @app.call(env)
-    rescue BodyParsingError => e
-      raise if @raise
-
-      err = { title: "Failed to parse body as #{env['CONTENT_TYPE']}", status: '400' }
-      err[:detail] = e.cause unless ENV['RACK_ENV'] == 'production'
-      errors = [err]
-
-      Rack::Response.new(
-        MultiJson.dump(errors:),
-        400,
-        Rack::CONTENT_TYPE => 'application/vnd.api+json'
-      ).finish
     end
 
     private
@@ -40,8 +27,8 @@ module OpenapiFirst
       return request.POST if request.form_data?
 
       body
-    rescue MultiJson::ParseError => e
-      raise BodyParsingError, e
+    rescue MultiJson::ParseError
+      raise BodyParsingError, 'Failed to parse body as application/json'
     end
 
     def read_body(request)

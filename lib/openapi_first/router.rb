@@ -17,6 +17,7 @@ module OpenapiFirst
       @app = app
       @raise = options.fetch(:raise_error, false)
       @not_found = options.fetch(:not_found, :halt)
+      @error_response_class = options.fetch(:error_response, Config.default_options.error_response)
       spec = options.fetch(:spec)
       raise "You have to pass spec: when initializing #{self.class}" unless spec
 
@@ -61,21 +62,13 @@ module OpenapiFirst
       env[Rack::PATH_INFO] = Rack::Request.new(env).path
       @router.call(env)
     rescue BodyParsingError => e
-      handle_body_parsing_error(e)
-    ensure
-      env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH) if env[ORIGINAL_PATH]
-    end
-
-    def handle_body_parsing_error(_exception)
-      message = 'Failed to parse body as application/json'
+      message = e.message
       raise RequestInvalidError, message if @raise
 
-      error = {
-        status: 400,
-        title: message
-      }
-
-      ErrorResponse::Default.new(**error).finish
+      error = RequestValidationError.new(status: 400, location: :body, message:)
+      @error_response_class.new(env, error).render
+    ensure
+      env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH) if env[ORIGINAL_PATH]
     end
 
     def build_router(operations)
@@ -89,9 +82,8 @@ module OpenapiFirst
           )
         end
       end
-      raise_error = @raise
       Rack::Builder.app do
-        use(BodyParserMiddleware, raise_error:)
+        use(BodyParserMiddleware)
         run router
       end
     end

@@ -4,6 +4,7 @@ require_relative 'response_validation'
 require_relative 'router'
 
 module OpenapiFirst
+  # A class to run manual response validation
   class ResponseValidator
     def initialize(spec)
       @spec = spec
