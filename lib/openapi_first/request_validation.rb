@@ -27,9 +27,15 @@ module OpenapiFirst
       )
     end
 
+    # @param app The parent Rack application
+    # @param options An optional Hash of configuration options to override defaults
+    #   :error_response A Boolean indicating whether to raise an error if validation fails.
+    #                   default: OpenapiFirst::ErrorResponses::Default (Config.default_options.error_response)
+    #   :raise_error    The Class to use for error responses.
+    #                   default: false (Config.default_options.request_validation_raise_error)
     def initialize(app, options = {})
       @app = app
-      @raise = options.fetch(:raise_error, false)
+      @raise = options.fetch(:raise_error, Config.default_options.request_validation_raise_error)
       @error_response_class =
         Plugins.find_error_response(options.fetch(:error_response, Config.default_options.error_response))
     end

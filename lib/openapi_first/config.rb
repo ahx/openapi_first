@@ -2,11 +2,12 @@
 
 module OpenapiFirst
   class Config
-    def initialize(error_response: :default)
+    def initialize(error_response: :default, request_validation_raise_error: false)
       @error_response = error_response
+      @request_validation_raise_error = request_validation_raise_error
     end
 
-    attr_reader :error_response
+    attr_reader :error_response, :request_validation_raise_error
 
     def self.default_options
       @default_options ||= new
