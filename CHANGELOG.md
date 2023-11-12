@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added: You can define custom error responses by subclassing `OpenapiFirst::ErrorResponse` and register it via `OpenapiFirst::Plugins.register_error_response(name, MyCustomErrorResponse)`
+
 ## 1.0.0.beta4
 
 - Update json_schemer to version 2.0
