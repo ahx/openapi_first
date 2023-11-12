@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0.beta5
+
 - Added: `OpenapiFirst::Config.default_options=` to set default options globally
 - Added: You can define custom error responses by subclassing `OpenapiFirst::ErrorResponse` and register it via `OpenapiFirst::Plugins.register_error_response(name, MyCustomErrorResponse)`
 
