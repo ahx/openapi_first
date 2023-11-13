@@ -26,8 +26,8 @@ Gem::Specification.new do |spec|
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     `git ls-files -z`
       .split("\x0")
-      .reject { |f| f.match(%r{^(test|spec|features)/}) }
-      .reject { |f| %w[Dockerfile Jenkinsfile .tool-versions].include?(f) }
+      .reject { |f| f.match(%r{^(test|spec|features|benchmarks|examples|bin)/}) }
+      .reject { |f| %w[Dockerfile Jenkinsfile .tool-versions CODEOWNERS .rspec .rubocop.yml .tool-versions Rakefile].include?(f) }
   end
   spec.bindir        = 'exe'
   spec.require_paths = ['lib']
