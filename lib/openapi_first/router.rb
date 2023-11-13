@@ -2,13 +2,16 @@
 
 require 'rack'
 require 'multi_json'
-require 'hanami/router'
-require_relative 'body_parser_middleware'
+require 'mustermann'
+require_relative 'body_parser'
 
 module OpenapiFirst
   class Router
     # The unconverted path parameters before they are converted to the types defined in the API description
     RAW_PATH_PARAMS = 'openapi.raw_path_params'
+
+    NOT_FOUND = Rack::Response.new('Not Found', 404).finish.freeze
+    METHOD_NOT_ALLOWED = Rack::Response.new('Method Not Allowed', 405).finish.freeze
 
     def initialize(
       app,
@@ -21,22 +24,28 @@ module OpenapiFirst
       spec = options.fetch(:spec)
       raise "You have to pass spec: when initializing #{self.class}" unless spec
 
-      spec = OpenapiFirst.load(spec) unless spec.is_a?(Definition)
-
-      @filepath = spec.filepath
-      @router = build_router(spec.operations)
+      @definition = spec.is_a?(Definition) ? spec : OpenapiFirst.load(spec)
+      @filepath = @definition.filepath
     end
 
     def call(env)
       env[OPERATION] = nil
-      response = call_router(env)
-      if env[OPERATION].nil?
-        raise_error(env) if @raise
+      request = Rack::Request.new(env)
+      path_item, path_params = @definition.find_path_item_and_params(request.path)
+      operation = path_item&.find_operation(request.request_method.downcase)
 
+      env[OPERATION] = operation
+      env[RAW_PATH_PARAMS] = path_params
+
+      if operation.nil?
+        raise_error(env) if @raise
         return @app.call(env) if @not_found == :continue
       end
 
-      response
+      return NOT_FOUND unless path_item
+      return METHOD_NOT_ALLOWED unless operation
+
+      @app.call(env)
     end
 
     ORIGINAL_PATH = 'openapi_first.path_info'
@@ -54,49 +63,6 @@ module OpenapiFirst
           req.path
         }' in API description #{@filepath}"
       raise NotFoundError, msg
-    end
-
-    def call_router(env)
-      # Changing and restoring PATH_INFO is needed, because Hanami::Router does not respect existing script_path
-      env[ORIGINAL_PATH] = env[Rack::PATH_INFO]
-      env[Rack::PATH_INFO] = Rack::Request.new(env).path
-      @router.call(env)
-    rescue BodyParsingError => e
-      message = e.message
-      raise RequestInvalidError, message if @raise
-
-      error = RequestValidationError.new(status: 400, location: :body, message:)
-      @error_response_class.new(env, error).render
-    ensure
-      env[Rack::PATH_INFO] = env.delete(ORIGINAL_PATH) if env[ORIGINAL_PATH]
-    end
-
-    def build_router(operations)
-      router = Hanami::Router.new.tap do |r|
-        operations.each do |operation|
-          normalized_path = operation.path.gsub('{', ':').gsub('}', '')
-          r.public_send(
-            operation.method,
-            normalized_path,
-            to: build_route(operation)
-          )
-        end
-      end
-      Rack::Builder.app do
-        use(BodyParserMiddleware)
-        run router
-      end
-    end
-
-    def build_route(operation)
-      lambda do |env|
-        env[OPERATION] = operation
-        path_info = env.delete(ORIGINAL_PATH)
-        env[REQUEST_BODY] = env.delete(ROUTER_PARSED_BODY) if env.key?(ROUTER_PARSED_BODY)
-        env[RAW_PATH_PARAMS] = env['router.params']
-        env[Rack::PATH_INFO] = path_info
-        @app.call(env)
-      end
     end
   end
 end

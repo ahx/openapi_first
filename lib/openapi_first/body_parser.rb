@@ -3,21 +3,7 @@
 require 'multi_json'
 
 module OpenapiFirst
-  class BodyParserMiddleware
-    def initialize(app)
-      @app = app
-    end
-
-    ROUTER_PARSED_BODY = 'router.parsed_body'
-    private_constant :ROUTER_PARSED_BODY
-
-    def call(env)
-      env[ROUTER_PARSED_BODY] = parse_body(env)
-      @app.call(env)
-    end
-
-    private
-
+  class BodyParser
     def parse_body(env)
       request = Rack::Request.new(env)
       body = read_body(request)
@@ -30,6 +16,8 @@ module OpenapiFirst
     rescue MultiJson::ParseError
       raise BodyParsingError, 'Failed to parse body as application/json'
     end
+
+    private
 
     def read_body(request)
       body = request.body.read

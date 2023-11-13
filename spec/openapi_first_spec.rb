@@ -39,14 +39,14 @@ RSpec.describe OpenapiFirst do
     describe 'only option' do
       specify 'with empty filter' do
         definition = OpenapiFirst.load(spec_path, only: nil)
-        expected = %w[find_pets create_pet find_pet update_pet delete_pet]
-        expect(definition.operations.map(&:operation_id)).to eq expected
+        expected = %w[/pets /pets/{id}]
+        expect(definition.paths.keys).to eq expected
       end
 
       specify 'filtering paths' do
         definition = OpenapiFirst.load spec_path, only: ->(path) { path == '/pets' }
-        expected = %w[find_pets create_pet]
-        expect(definition.operations.map(&:operation_id)).to eq expected
+        expected = %w[/pets]
+        expect(definition.paths.keys).to eq expected
       end
     end
   end

@@ -5,7 +5,6 @@ require 'multi_json'
 require_relative 'use_router'
 require_relative 'error_response'
 require_relative 'request_body_validator'
-require_relative 'string_keyed_hash'
 require_relative 'request_validation_error'
 require 'openapi_parameters'
 
@@ -20,10 +19,11 @@ module OpenapiFirst
     # @param status [Integer] The intended HTTP status code (usually 400)
     # @param location [Symbol] One of :body, :header, :cookie, :query, :path
     # @param schema_validation [OpenapiFirst::JsonSchema::Result]
-    def self.fail!(status, location, schema_validation: nil)
+    def self.fail!(status, location, message: nil, schema_validation: nil)
       throw FAIL, RequestValidationError.new(
         status:,
         location:,
+        message:,
         schema_validation:
       )
     end
@@ -72,7 +72,7 @@ module OpenapiFirst
       path_parameters = operation.path_parameters
       return if path_parameters.empty?
 
-      hashy = StringKeyedHash.new(env[Router::RAW_PATH_PARAMS])
+      hashy = env[Router::RAW_PATH_PARAMS]
       unpacked_path_params = OpenapiParameters::Path.new(path_parameters).unpack(hashy)
       schema_validation = operation.path_parameters_schema.validate(unpacked_path_params)
       RequestValidation.fail!(400, :path, schema_validation:) if schema_validation.error?
@@ -112,7 +112,7 @@ module OpenapiFirst
     end
 
     def validate_request_body!(operation, env)
-      RequestBodyValidator.new(operation, env).validate! if operation.request_body
+      env[REQUEST_BODY] = RequestBodyValidator.new(operation, env).validate!
     end
   end
 end

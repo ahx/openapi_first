@@ -374,7 +374,8 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post path, '{fo},'
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Failed to parse body as application/json'
+        end.to raise_error OpenapiFirst::RequestInvalidError,
+                           'Request body invalid: Failed to parse body as application/json'
       end
 
       it 'raises error if request content-type does not match' do
