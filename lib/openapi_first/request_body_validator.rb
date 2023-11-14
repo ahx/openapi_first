@@ -8,12 +8,17 @@ module OpenapiFirst
     end
 
     def validate!
-      return unless @operation.request_body
+      request_body = @operation.request_body
+      return unless request_body
 
-      content_type = Rack::Request.new(@env).content_type
-      validate_request_content_type!(@operation, content_type)
+      request_content_type = Rack::Request.new(@env).content_type
+      media_type = request_body.content_for(request_content_type)
+      RequestValidation.fail!(415, :header) unless media_type
+
       parsed_request_body = BodyParser.new.parse_body(@env)
-      validate_request_body!(@operation, parsed_request_body, content_type)
+      RequestValidation.fail!(400, :body) if request_body.required? && parsed_request_body.nil?
+
+      validate_body!(parsed_request_body, media_type.schema)
       parsed_request_body
     rescue BodyParsingError => e
       RequestValidation.fail!(400, :body, message: e.message)
@@ -21,25 +26,12 @@ module OpenapiFirst
 
     private
 
-    def validate_request_content_type!(operation, content_type)
-      operation.valid_request_content_type?(content_type) || RequestValidation.fail!(415, :header)
-    end
+    def validate_body!(parsed_request_body, schema)
+      request_body_schema = schema
+      return unless request_body_schema
 
-    def validate_request_body!(operation, body, content_type)
-      validate_request_body_presence!(body, operation)
-      return if content_type.nil?
-
-      schema = operation&.request_body_schema(content_type)
-      return unless schema
-
-      schema_validation = schema.validate(body)
+      schema_validation = request_body_schema.validate(parsed_request_body)
       RequestValidation.fail!(400, :body, schema_validation:) if schema_validation.error?
-    end
-
-    def validate_request_body_presence!(body, operation)
-      return unless operation.request_body['required'] && body.nil?
-
-      RequestValidation.fail!(400, :body)
     end
   end
 end

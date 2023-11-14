@@ -69,46 +69,45 @@ module OpenapiFirst
     end
 
     def validate_path_params!(operation, env)
-      path_parameters = operation.path_parameters
-      return if path_parameters.empty?
+      parameters = operation.path_parameters
+      return unless parameters
 
-      hashy = env[Router::RAW_PATH_PARAMS]
-      unpacked_path_params = OpenapiParameters::Path.new(path_parameters).unpack(hashy)
-      schema_validation = operation.path_parameters_schema.validate(unpacked_path_params)
+      unpacked_params = parameters.unpack(env)
+      schema_validation = parameters.schema.validate(unpacked_params)
       RequestValidation.fail!(400, :path, schema_validation:) if schema_validation.error?
-      env[PATH_PARAMS] = unpacked_path_params
-      env[PARAMS].merge!(unpacked_path_params)
+      env[PATH_PARAMS] = unpacked_params
+      env[PARAMS].merge!(unpacked_params)
     end
 
     def validate_query_params!(operation, env)
-      query_parameters = operation.query_parameters
-      return if operation.query_parameters.empty?
+      parameters = operation.query_parameters
+      return unless parameters
 
-      unpacked_query_params = OpenapiParameters::Query.new(query_parameters).unpack(env['QUERY_STRING'])
-      schema_validation = operation.query_parameters_schema.validate(unpacked_query_params)
+      unpacked_params = parameters.unpack(env)
+      schema_validation = parameters.schema.validate(unpacked_params)
       RequestValidation.fail!(400, :query, schema_validation:) if schema_validation.error?
-      env[QUERY_PARAMS] = unpacked_query_params
-      env[PARAMS].merge!(unpacked_query_params)
+      env[QUERY_PARAMS] = unpacked_params
+      env[PARAMS].merge!(unpacked_params)
     end
 
     def validate_cookie_params!(operation, env)
-      cookie_parameters = operation.cookie_parameters
-      return unless cookie_parameters&.any?
+      parameters = operation.cookie_parameters
+      return unless parameters
 
-      unpacked_params = OpenapiParameters::Cookie.new(cookie_parameters).unpack(env['HTTP_COOKIE'])
-      schema_validation = operation.cookie_parameters_schema.validate(unpacked_params)
+      unpacked_params = parameters.unpack(env)
+      schema_validation = parameters.schema.validate(unpacked_params)
       RequestValidation.fail!(400, :cookie, schema_validation:) if schema_validation.error?
       env[COOKIE_PARAMS] = unpacked_params
     end
 
     def validate_header_params!(operation, env)
-      header_parameters = operation.header_parameters
-      return if header_parameters.empty?
+      parameters = operation.header_parameters
+      return unless parameters
 
-      unpacked_header_params = OpenapiParameters::Header.new(header_parameters).unpack_env(env)
-      schema_validation = operation.header_parameters_schema.validate(unpacked_header_params)
+      unpacked_params = parameters.unpack(env)
+      schema_validation = parameters.schema.validate(unpacked_params)
       RequestValidation.fail!(400, :header, schema_validation:) if schema_validation.error?
-      env[HEADER_PARAMS] = unpacked_header_params
+      env[HEADER_PARAMS] = unpacked_params
     end
 
     def validate_request_body!(operation, env)

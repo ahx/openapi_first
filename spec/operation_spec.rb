@@ -43,19 +43,19 @@ RSpec.describe OpenapiFirst::Operation do
 
   describe '#query_parameters' do
     it 'returns the query parameters on path and operation level' do
-      expect(operation.query_parameters.map { |p| p['name'] }).to eq %w[utm limit]
+      expect(operation.query_parameters.map(&:name)).to eq %w[utm limit]
     end
   end
 
   describe '#path_parameters' do
     it 'returns the path parameters on path and operation level' do
-      expect(operation.path_parameters.map { |p| p['name'] }).to eq %w[pet_id]
+      expect(operation.path_parameters.map(&:name)).to eq %w[pet_id]
     end
   end
 
   describe '#header_parameters' do
     it 'returns the header parameters' do
-      expect(operation.header_parameters.map { |p| p['name'] }).to eq %w[Accept-Version]
+      expect(operation.header_parameters.map(&:name)).to eq %w[Accept-Version]
     end
 
     describe 'ignored headers' do
@@ -69,7 +69,7 @@ RSpec.describe OpenapiFirst::Operation do
             'get' => {}
           }
           operation = described_class.new('/pets/{pet_id}', 'get', path_item, openapi_version:)
-          expect(operation.header_parameters.map { |p| p['name'] }).to_not include header
+          expect(operation.header_parameters).to be_nil
         end
       end
     end
@@ -122,12 +122,8 @@ RSpec.describe OpenapiFirst::Operation do
       let(:spec) { OpenapiFirst.load('./spec/data/parameters.yaml') }
       let(:operation) { spec.operations.last }
 
-      it 'raises an exception' do
-        expected_msg =
-          "Response status code or default not found: 201 for '#{operation.name}'"
-        expect do
-          operation.response_body_schema(201, 'application/json')
-        end.to raise_error OpenapiFirst::ResponseCodeNotFoundError, expected_msg
+      it 'returns nil' do
+        expect(operation.response_body_schema(201, 'application/json')).to be_nil
       end
     end
 
@@ -223,45 +219,6 @@ RSpec.describe OpenapiFirst::Operation do
     end
   end
 
-  describe '#request_body_schema' do
-    let(:spec) { OpenapiFirst.load('./spec/data/content-types.yaml') }
-    let(:operation) { spec.operations[1] }
-
-    it 'returns the JSON schema' do
-      schema = operation.request_body_schema('application/json').schema
-      expected_schema = {
-        'title' => 'Without parameter',
-        'type' => 'object'
-      }
-      expect(schema).to eq expected_schema
-    end
-
-    it 'finds an exact match without parameter' do
-      schema = operation.request_body_schema('application/json').schema
-      expect(schema['title']).to eq 'Without parameter'
-    end
-
-    it 'finds an exact match with parameter' do
-      schema = operation.request_body_schema('application/json; profile=custom').schema
-      expect(schema['title']).to eq 'With profile'
-    end
-
-    it 'finds a match while ignorign charset' do
-      schema = operation.request_body_schema('application/json; charset=UTF8').schema
-      expect(schema['title']).to eq 'Without parameter'
-    end
-
-    it 'finds text/* wildcard matcher' do
-      schema = operation.request_body_schema('text/markdown').schema
-      expect(schema['title']).to eq 'Text wildcard'
-    end
-
-    it 'finds */* wildcard matcher' do
-      schema = operation.request_body_schema('application/xml').schema
-      expect(schema['title']).to eq 'Accept everything'
-    end
-  end
-
   describe '#response_for' do
     let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
     let(:operation) { spec.operations.first }
@@ -277,43 +234,9 @@ RSpec.describe OpenapiFirst::Operation do
       let(:spec) { OpenapiFirst.load('./spec/data/parameters.yaml') }
       let(:operation) { spec.operations.last }
 
-      it 'raises an exception' do
-        expected_msg =
-          "Response status code or default not found: 201 for '#{operation.name}'"
-        expect do
-          operation.response_for(201)
-        end.to raise_error OpenapiFirst::ResponseCodeNotFoundError, expected_msg
+      it 'returns nil' do
+        expect(operation.response_for(201)).to be_nil
       end
-    end
-  end
-
-  describe '#valid_request_content_type?' do
-    def build_operation(content)
-      described_class.new('/', 'get', content, openapi_version:)
-    end
-
-    it 'returns true for an exact match' do
-      operation = build_operation({ 'get' => { 'requestBody' => { 'content' => { 'application/json' => {} } } } })
-      valid = operation.valid_request_content_type?('application/json')
-      expect(valid).to be true
-    end
-
-    it 'ignores content type parameters' do
-      operation = build_operation({ 'get' => { 'requestBody' => { 'content' => { 'application/json' => {} } } } })
-      valid = operation.valid_request_content_type?('application/json; charset=UTF8')
-      expect(valid).to be true
-    end
-
-    it 'matches type/*' do
-      operation = build_operation({ 'get' => { 'requestBody' => { 'content' => { 'text/*' => {} } } } })
-      valid = operation.valid_request_content_type?('text/plain')
-      expect(valid).to be true
-    end
-
-    it 'matches */*' do
-      operation = build_operation({ 'get' => { 'requestBody' => { 'content' => { '*/*' => {} } } } })
-      valid = operation.valid_request_content_type?('application/json')
-      expect(valid).to be true
     end
   end
 end

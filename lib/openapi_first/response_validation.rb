@@ -32,8 +32,16 @@ module OpenapiFirst
 
     private
 
+    def response_for(operation, status)
+      response = operation.response_for(status)
+      return response if response
+
+      message = "Response status code or default not found: #{status} for '#{operation.name}'"
+      raise OpenapiFirst::ResponseCodeNotFoundError, message
+    end
+
     def validate_status_only(operation, status)
-      operation.response_for(status)
+      response_for(operation, status)
     end
 
     def validate_response_body(schema, response)
@@ -45,7 +53,7 @@ module OpenapiFirst
     end
 
     def validate_response_headers(operation, status, response_headers)
-      response_header_definitions = operation.response_for(status)&.dig('headers')
+      response_header_definitions = response_for(operation, status)&.dig('headers')
       return unless response_header_definitions
 
       unpacked_headers = unpack_response_headers(response_header_definitions, response_headers)
