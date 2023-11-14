@@ -237,7 +237,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
         run(lambda do |env|
           res = Rack::Response.new
           res.status = 201
-          res.headers.merge!(env[OpenapiFirst::REQUEST_BODY])
+          res.headers.merge!(MultiJson.load(Rack::Request.new(env).body))
           res.finish
         end)
       end

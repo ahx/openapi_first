@@ -5,13 +5,18 @@ module OpenapiFirst
     def initialize(operation, env)
       @operation = operation
       @env = env
-      @parsed_request_body = env[REQUEST_BODY]
     end
 
     def validate!
+      return unless @operation.request_body
+
       content_type = Rack::Request.new(@env).content_type
       validate_request_content_type!(@operation, content_type)
-      validate_request_body!(@operation, @parsed_request_body, content_type)
+      parsed_request_body = BodyParser.new.parse_body(@env)
+      validate_request_body!(@operation, parsed_request_body, content_type)
+      parsed_request_body
+    rescue BodyParsingError => e
+      RequestValidation.fail!(400, :body, message: e.message)
     end
 
     private
@@ -29,7 +34,6 @@ module OpenapiFirst
 
       schema_validation = schema.validate(body)
       RequestValidation.fail!(400, :body, schema_validation:) if schema_validation.error?
-      body
     end
 
     def validate_request_body_presence!(body, operation)

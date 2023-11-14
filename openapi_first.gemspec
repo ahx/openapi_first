@@ -26,18 +26,21 @@ Gem::Specification.new do |spec|
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     `git ls-files -z`
       .split("\x0")
-      .reject { |f| f.match(%r{^(test|spec|features)/}) }
-      .reject { |f| %w[Dockerfile Jenkinsfile .tool-versions].include?(f) }
+      .reject { |f| f.match(%r{^(test|spec|features|benchmarks|examples|bin)/}) }
+      .reject do |f|
+      %w[Dockerfile Jenkinsfile .tool-versions CODEOWNERS .rspec .rubocop.yml .tool-versions
+         Rakefile].include?(f)
+    end
   end
   spec.bindir        = 'exe'
   spec.require_paths = ['lib']
 
   spec.required_ruby_version = '>= 3.1.1'
 
-  spec.add_runtime_dependency 'hanami-router', '~> 2.0.0'
   spec.add_runtime_dependency 'json_refs', '~> 0.1', '>= 0.1.7'
   spec.add_runtime_dependency 'json_schemer', '~> 2.0.0'
   spec.add_runtime_dependency 'multi_json', '~> 1.15'
+  spec.add_runtime_dependency 'mustermann-contrib', '~> 3.0.0'
   spec.add_runtime_dependency 'openapi_parameters', '>= 0.3.1', '< 2.0'
   spec.add_runtime_dependency 'rack', '>= 2.2', '< 4.0'
   spec.metadata = {
