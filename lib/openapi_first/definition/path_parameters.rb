@@ -2,7 +2,7 @@
 
 require 'openapi_parameters'
 require_relative 'parameters'
-require_relative 'router'
+require_relative '../router'
 
 module OpenapiFirst
   class PathParameters < Parameters

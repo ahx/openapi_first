@@ -5,13 +5,15 @@ module OpenapiFirst
     def initialize(media_type_object, operation)
       @media_type_object = media_type_object
       @operation = operation
-    end
 
-    def schema
       schema_object = @media_type_object['schema']
       return unless schema_object
 
-      JsonSchema.new(schema_object, write: @operation.write?, openapi_version: @operation.openapi_version)
+      return unless schema_object
+
+      @schema = Schema.new(schema_object, write: @operation.write?, openapi_version: @operation.openapi_version)
     end
+
+    attr_reader :schema
   end
 end

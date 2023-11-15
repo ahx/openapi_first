@@ -18,7 +18,7 @@ module OpenapiFirst
 
     # @param status [Integer] The intended HTTP status code (usually 400)
     # @param location [Symbol] One of :body, :header, :cookie, :query, :path
-    # @param schema_validation [OpenapiFirst::JsonSchema::Result]
+    # @param schema_validation [OpenapiFirst::Schema::Result]
     def self.fail!(status, location, message: nil, schema_validation: nil)
       throw FAIL, RequestValidationError.new(
         status:,
@@ -51,6 +51,7 @@ module OpenapiFirst
 
         return @error_response_class.new(env, error).render
       end
+
       @app.call(env)
     end
 
@@ -59,13 +60,17 @@ module OpenapiFirst
     def validate_request(operation, env)
       catch(FAIL) do
         env[PARAMS] = {}
-        validate_query_params!(operation, env)
-        validate_path_params!(operation, env)
-        validate_cookie_params!(operation, env)
-        validate_header_params!(operation, env)
+        validate_parameters!(operation, env)
         validate_request_body!(operation, env)
         nil
       end
+    end
+
+    def validate_parameters!(operation, env)
+      validate_query_params!(operation, env)
+      validate_path_params!(operation, env)
+      validate_cookie_params!(operation, env)
+      validate_header_params!(operation, env)
     end
 
     def validate_path_params!(operation, env)

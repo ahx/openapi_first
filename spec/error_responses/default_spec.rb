@@ -40,7 +40,7 @@ RSpec.describe OpenapiFirst::ErrorResponses::Default do
           }
         }
         data = { 'data' => { 'name' => 21, 'numberOfLegs' => 'four' } }
-        schema_validation = OpenapiFirst::JsonSchema.new(schema, openapi_version: '3.1').validate(data)
+        schema_validation = OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data)
         error = described_class.new(
           env,
           OpenapiFirst::RequestValidationError.new(

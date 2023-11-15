@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  class JsonSchema
+  class Schema
     Result = Struct.new(:output, :schema, :data, keyword_init: true) do
       def valid? = output['valid']
       def error? = !output['valid']

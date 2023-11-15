@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require_relative 'json_schema'
+require_relative 'schema'
 
 module OpenapiFirst
-  # Base class for parameters
   class Parameters
     extend Forwardable
 
@@ -20,7 +19,7 @@ module OpenapiFirst
     end
 
     def schema
-      @schema ||= build_json_schema
+      @schema ||= build_schema
     end
 
     def parameters
@@ -31,7 +30,7 @@ module OpenapiFirst
 
     private
 
-    def build_json_schema
+    def build_schema
       init_schema = {
         'type' => 'object',
         'properties' => {},
@@ -42,7 +41,7 @@ module OpenapiFirst
         result['properties'][parameter.name] = parameter.schema if parameter.schema
         result['required'] << parameter.name if parameter.required?
       end
-      JsonSchema.new(schema, openapi_version: @openapi_version)
+      Schema.new(schema, openapi_version: @openapi_version)
     end
   end
 end

@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'openapi_first/json_schema'
 
-RSpec.describe OpenapiFirst::JsonSchema do
+RSpec.describe OpenapiFirst::Schema do
   let(:schema) do
     {
       'required' => ['count'],

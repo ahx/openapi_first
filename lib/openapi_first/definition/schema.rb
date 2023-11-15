@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'json_schemer'
-require_relative 'json_schema/result'
+require_relative 'schema/result'
 
 module OpenapiFirst
-  class JsonSchema
+  class Schema
     attr_reader :schema
 
     SCHEMAS = {

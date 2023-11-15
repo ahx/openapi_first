@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'spec_helper'
-require 'openapi_first/operation'
 
 RSpec.describe OpenapiFirst::Operation do
   let(:openapi_version) { '3.1' }

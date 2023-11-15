@@ -7,7 +7,7 @@ require_relative 'query_parameters'
 require_relative 'header_parameters'
 require_relative 'path_parameters'
 require_relative 'cookie_parameters'
-require_relative 'json_schema'
+require_relative 'schema'
 
 module OpenapiFirst
   class Operation
@@ -60,7 +60,7 @@ module OpenapiFirst
       schema = media_type['schema']
       return unless schema
 
-      JsonSchema.new(schema, write: false, openapi_version:)
+      Schema.new(schema, write: false, openapi_version:)
     end
 
     def response_for(status)

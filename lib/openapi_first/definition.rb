@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'mustermann/template'
-require_relative 'path_item'
+require_relative 'definition/path_item'
 
 module OpenapiFirst
   # Represents an OpenAPI API Description document
