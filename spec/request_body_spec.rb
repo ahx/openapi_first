@@ -3,38 +3,47 @@
 require_relative 'spec_helper'
 
 RSpec.describe OpenapiFirst::RequestBody do
-  describe '#content_for' do
+  describe '#schema_for' do
     def build(content)
       OpenapiFirst::Operation.new('/', 'get', content, openapi_version: '3.1').request_body
     end
 
-    it 'returns true for an exact match' do
-      request_body = build({ 'get' => { 'requestBody' => { 'content' => { 'application/json' => {} } } } })
-      media_type = request_body.content_for('application/json')
-      expect(media_type).to be_a(OpenapiFirst::MediaType)
+    let(:media_type) { { 'schema' => { 'type' => 'object' } } }
+
+    it 'returns a schema for an exact match' do
+      request_body = build({ 'get' => { 'requestBody' => { 'content' => { 'application/json' => media_type } } } })
+      media_type = request_body.schema_for('application/json')
+      expect(media_type).to be_a(OpenapiFirst::Schema)
     end
 
     it 'ignores content type parameters' do
-      request_body = build({ 'get' => { 'requestBody' => { 'content' => { 'application/json' => {} } } } })
-      media_type = request_body.content_for('application/json; charset=UTF8')
-      expect(media_type).to be_a(OpenapiFirst::MediaType)
+      request_body = build({ 'get' => { 'requestBody' => { 'content' => { 'application/json' => media_type } } } })
+      media_type = request_body.schema_for('application/json; charset=UTF8')
+      expect(media_type).to be_a(OpenapiFirst::Schema)
     end
 
     it 'matches type/*' do
-      request_body = build({ 'get' => { 'requestBody' => { 'content' => { 'text/*' => {} } } } })
-      media_type = request_body.content_for('text/plain')
-      expect(media_type).to be_a(OpenapiFirst::MediaType)
+      request_body = build({ 'get' => { 'requestBody' => { 'content' => { 'text/*' => media_type } } } })
+      media_type = request_body.schema_for('text/plain')
+      expect(media_type).to be_a(OpenapiFirst::Schema)
     end
 
     it 'matches */*' do
-      request_body = build({ 'get' => { 'requestBody' => { 'content' => { '*/*' => {} } } } })
-      media_type = request_body.content_for('application/json')
-      expect(media_type).to be_a(OpenapiFirst::MediaType)
+      request_body = build({ 'get' => { 'requestBody' => { 'content' => { '*/*' => media_type } } } })
+      media_type = request_body.schema_for('application/json')
+      expect(media_type).to be_a(OpenapiFirst::Schema)
     end
 
-    it 'returns false for a miss match' do
-      request_body = build({ 'get' => { 'requestBody' => { 'content' => { 'application/xml' => {} } } } })
-      media_type = request_body.content_for('application/json')
+    it 'returns nil for a media type object without schema' do
+      media_type = {}
+      request_body = build({ 'get' => { 'requestBody' => { 'content' => { 'application/json' => media_type } } } })
+      media_type = request_body.schema_for('application/json')
+      expect(media_type).to be_nil
+    end
+
+    it 'returns nil for a miss match' do
+      request_body = build({ 'get' => { 'requestBody' => { 'content' => { 'application/xml' => media_type } } } })
+      media_type = request_body.schema_for('application/json')
       expect(media_type).to be_nil
     end
   end

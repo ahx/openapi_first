@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'media_type'
+require_relative 'schema'
 
 module OpenapiFirst
   class RequestBody
@@ -17,18 +17,26 @@ module OpenapiFirst
       !!@request_body_object['required']
     end
 
-    def content_for(content_type)
-      content&.fetch(content_type) do |_|
+    def schema_for(content_type)
+      content = @request_body_object['content']
+      return unless content&.any?
+
+      content_schemas&.fetch(content_type) do
         type = content_type.split(';')[0]
-        content[type] || content["#{type.split('/')[0]}/*"] || content['*/*']
+        content_schemas[type] || content_schemas["#{type.split('/')[0]}/*"] || content_schemas['*/*']
       end
     end
 
     private
 
-    def content
-      @content ||= @request_body_object.fetch('content', nil).dup.transform_values! do |media_type_object|
-        MediaType.new(media_type_object, @operation)
+    def content_schemas
+      @content_schemas ||= @request_body_object['content']&.each_with_object({}) do |kv, result|
+        type, media_type = kv
+        schema_object = media_type['schema']
+        next unless schema_object
+
+        result[type] = Schema.new(schema_object, write: @operation.write?,
+                                                 openapi_version: @operation.openapi_version)
       end
     end
   end
