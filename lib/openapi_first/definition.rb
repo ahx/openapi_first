@@ -6,9 +6,7 @@ require_relative 'path_item'
 module OpenapiFirst
   # Represents an OpenAPI API Description document
   class Definition
-    METHODS =
-
-      attr_reader :filepath, :paths, :openapi_version
+    attr_reader :filepath, :paths, :openapi_version
 
     def initialize(resolved, filepath)
       @filepath = filepath
