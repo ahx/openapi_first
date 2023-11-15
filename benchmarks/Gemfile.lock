@@ -2,10 +2,10 @@ PATH
   remote: ..
   specs:
     openapi_first (1.0.0.beta5)
-      hanami-router (~> 2.0.0)
       json_refs (~> 0.1, >= 0.1.7)
       json_schemer (~> 2.0.0)
       multi_json (~> 1.15)
+      mustermann-contrib (~> 3.0.0)
       openapi_parameters (>= 0.3.1, < 2.0)
       rack (>= 2.2, < 4.0)
 
