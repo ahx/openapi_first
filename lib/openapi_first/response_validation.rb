@@ -81,7 +81,7 @@ module OpenapiFirst
 
     def unpack_response_headers(response_header_definitions, response_headers)
       headers_as_parameters = response_header_definitions.map do |name, definition|
-        definition.merge('name' => name)
+        definition.merge('name' => name, 'in' => 'header')
       end
       OpenapiParameters::Header.new(headers_as_parameters).unpack(response_headers)
     end
