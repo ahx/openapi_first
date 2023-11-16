@@ -88,6 +88,7 @@ PLATFORMS
 DEPENDENCIES
   bundler
   openapi_first!
+  rack (>= 3.0.0)
   rack-test
   rake
   rspec
