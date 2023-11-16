@@ -28,7 +28,7 @@ module OpenapiFirst
 
       return if no_content?(response_definition)
 
-      content_type = headers[Rack::CONTENT_TYPE]
+      content_type = Rack::Response[status, headers, body].content_type
       raise ResponseInvalid, "Response has no content-type for '#{operation.name}'" unless content_type
 
       response_schema = response_definition.schema_for(content_type)
