@@ -3,27 +3,32 @@
 require_relative 'has_content'
 
 module OpenapiFirst
-  class RequestBody
+  class Response
     include HasContent
 
-    def initialize(request_body_object, operation)
-      @object = request_body_object
+    def initialize(status, response_object, operation)
+      @status = status&.to_i
+      @object = response_object
       @operation = operation
     end
+
+    attr_reader :status
 
     def description
       @object['description']
     end
 
-    def required?
-      !!@object['required']
+    def headers
+      @object['headers']
+    end
+
+    def content?
+      !!content&.any?
     end
 
     private
 
-    def schema_write?
-      @operation.write?
-    end
+    def schema_write? = false
 
     def content
       @object['content']

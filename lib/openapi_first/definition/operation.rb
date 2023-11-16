@@ -3,6 +3,7 @@
 require 'forwardable'
 require 'set'
 require_relative 'request_body'
+require_relative 'response'
 require_relative 'query_parameters'
 require_relative 'header_parameters'
 require_relative 'path_parameters'
@@ -45,29 +46,12 @@ module OpenapiFirst
       @request_body ||= RequestBody.new(operation_object['requestBody'], self) if operation_object['requestBody']
     end
 
-    def response_body_schema(status, content_type)
-      content = response_for(status)&.fetch('content', nil)
-      return if content.nil? || content.empty?
-
-      raise ResponseInvalid, "Response has no content-type for '#{name}'" unless content_type
-
-      media_type = find_content_for_content_type(content, content_type)
-
-      unless media_type
-        message = "Response content type not found '#{content_type}' for '#{name}'"
-        raise ResponseContentTypeNotFoundError, message
-      end
-      schema = media_type['schema']
-      return unless schema
-
-      Schema.new(schema, write: false, openapi_version:)
-    end
-
     def response_for(status)
-      operation_object.dig('responses', status.to_s) ||
-        operation_object.dig('responses', "#{status / 100}XX") ||
-        operation_object.dig('responses', "#{status / 100}xx") ||
-        operation_object.dig('responses', 'default')
+      response_object = operation_object.dig('responses', status.to_s) ||
+                        operation_object.dig('responses', "#{status / 100}XX") ||
+                        operation_object.dig('responses', "#{status / 100}xx") ||
+                        operation_object.dig('responses', 'default')
+      Response.new(status, response_object, self) if response_object
     end
 
     def name
@@ -113,13 +97,6 @@ module OpenapiFirst
     def find_header_parameters
       all_parameters.filter do |p|
         p['in'] == 'header' && !IGNORED_HEADERS.include?(p['name'])
-      end
-    end
-
-    def find_content_for_content_type(content, request_content_type)
-      content.fetch(request_content_type) do |_|
-        type = request_content_type.split(';')[0]
-        content[type] || content["#{type.split('/')[0]}/*"] || content['*/*']
       end
     end
   end

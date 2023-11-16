@@ -88,98 +88,6 @@ RSpec.describe OpenapiFirst::Operation do
     end
   end
 
-  describe '#response_body_schema' do
-    let(:spec) { OpenapiFirst.load('./spec/data/content-types.yaml') }
-    let(:operation) { spec.operations[0] }
-
-    it 'finds an exact match without parameter' do
-      schema = operation.response_body_schema(200, 'application/json').schema
-      expect(schema['title']).to eq 'Without parameter'
-    end
-
-    it 'finds an exact match with parameter' do
-      schema = operation.response_body_schema(200, 'application/json; profile=custom').schema
-      expect(schema['title']).to eq 'With profile'
-    end
-
-    it 'finds a match while ignorign charset' do
-      schema = operation.response_body_schema(200, 'application/json; charset=UTF8').schema
-      expect(schema['title']).to eq 'Without parameter'
-    end
-
-    it 'finds text/* wildcard matcher' do
-      schema = operation.response_body_schema(200, 'text/markdown').schema
-      expect(schema['title']).to eq 'Text wildcard'
-    end
-
-    it 'finds */* wildcard matcher' do
-      schema = operation.response_body_schema(200, 'application/xml').schema
-      expect(schema['title']).to eq 'Accept everything'
-    end
-
-    describe 'when status code cannot be found' do
-      let(:spec) { OpenapiFirst.load('./spec/data/parameters.yaml') }
-      let(:operation) { spec.operations.last }
-
-      it 'returns nil' do
-        expect(operation.response_body_schema(201, 'application/json')).to be_nil
-      end
-    end
-
-    describe 'when response object media type cannot be found' do
-      let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
-      let(:operation) { spec.operations[0] }
-
-      it 'raises an exception' do
-        expected_msg =
-          "Response content type not found 'application/xml' for '#{operation.name}'"
-        expect do
-          operation.response_body_schema(200, 'application/xml')
-        end.to raise_error OpenapiFirst::ResponseContentTypeNotFoundError,
-                           expected_msg
-      end
-    end
-
-    describe 'when response content is not defined' do
-      before do
-        expect(operation).to receive(:response_for).with(200) do
-          { 'description' => 'Blank' }
-        end
-      end
-
-      it 'returns nil' do
-        schema = operation.response_body_schema(200, 'application/json')
-        expect(schema).to be_nil
-      end
-    end
-
-    describe 'when response object media type is not defined' do
-      before do
-        expect(operation).to receive(:response_for).with(200) do
-          { 'content' => {} }
-        end
-      end
-
-      it 'returns nil' do
-        schema = operation.response_body_schema(200, 'application/json')
-        expect(schema).to be_nil
-      end
-    end
-
-    describe 'when response content schema is not defined' do
-      before do
-        expect(operation).to receive(:response_for).with(200) do
-          { 'content' => { 'application/json' => {} } }
-        end
-      end
-
-      it 'returns nil' do
-        schema = operation.response_body_schema(200, 'application/json')
-        expect(schema).to be_nil
-      end
-    end
-  end
-
   describe '#method' do
     let(:spec) { OpenapiFirst.load('./spec/data/petstore-expanded.yaml') }
 
@@ -224,9 +132,7 @@ RSpec.describe OpenapiFirst::Operation do
 
     it 'finds the matching response object for a status code' do
       response = operation.response_for(200)
-      expect(response).to be_a Hash
-      description = response['description']
-      expect(description).to eq 'A paged array of pets'
+      expect(response.description).to eq 'A paged array of pets'
     end
 
     describe 'when status code cannot be found' do

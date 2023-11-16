@@ -22,15 +22,28 @@ module OpenapiFirst
 
     def validate(response, operation)
       status, headers, body = response.to_a
-      return validate_status_only(operation, status) if status == 204
+      response_definition = response_for(operation, status)
+
+      validate_response_headers(response_definition.headers, headers, openapi_version: operation.openapi_version)
+
+      return if no_content?(response_definition)
 
       content_type = headers[Rack::CONTENT_TYPE]
-      response_schema = operation.response_body_schema(status, content_type)
-      validate_response_body(response_schema, body) if response_schema
-      validate_response_headers(operation, status, headers)
+      raise ResponseInvalid, "Response has no content-type for '#{operation.name}'" unless content_type
+
+      response_schema = response_definition.schema_for(content_type)
+      unless response_schema
+        message = "Response content type not found '#{content_type}' for '#{operation.name}'"
+        raise ResponseContentTypeNotFoundError, message
+      end
+      validate_response_body(response_schema, body)
     end
 
     private
+
+    def no_content?(response_definition)
+      response_definition.status == 204 || !response_definition.content?
+    end
 
     def response_for(operation, status)
       response = operation.response_for(status)
@@ -52,15 +65,14 @@ module OpenapiFirst
       raise ResponseBodyInvalidError, validation.message if validation.error?
     end
 
-    def validate_response_headers(operation, status, response_headers)
-      response_header_definitions = response_for(operation, status)&.dig('headers')
+    def validate_response_headers(response_header_definitions, response_headers, openapi_version:)
       return unless response_header_definitions
 
       unpacked_headers = unpack_response_headers(response_header_definitions, response_headers)
       response_header_definitions.each do |name, definition|
         next if name == 'Content-Type'
 
-        validate_response_header(name, definition, unpacked_headers, openapi_version: operation.openapi_version)
+        validate_response_header(name, definition, unpacked_headers, openapi_version:)
       end
     end
 
