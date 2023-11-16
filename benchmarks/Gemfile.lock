@@ -1,12 +1,12 @@
 PATH
   remote: ..
   specs:
-    openapi_first (1.0.0.beta5)
+    openapi_first (1.0.0.beta6)
       json_refs (~> 0.1, >= 0.1.7)
       json_schemer (~> 2.0.0)
       multi_json (~> 1.15)
       mustermann-contrib (~> 3.0.0)
-      openapi_parameters (>= 0.3.1, < 2.0)
+      openapi_parameters (>= 0.3.2, < 2.0)
       rack (>= 2.2, < 4.0)
 
 GEM
@@ -86,7 +86,7 @@ GEM
       mustermann (>= 1.0.0)
     mutex_m (0.2.0)
     nio4r (2.5.9)
-    openapi_parameters (0.3.1)
+    openapi_parameters (0.3.2)
       rack (>= 2.2)
       zeitwerk (~> 2.6)
     openapi_parser (1.0.0)
@@ -98,7 +98,7 @@ GEM
     rack-protection (3.1.0)
       rack (~> 2.2, >= 2.2.4)
     regexp_parser (2.8.2)
-    roda (3.73.0)
+    roda (3.74.0)
       rack
     ruby2_keywords (0.0.5)
     seg (1.2.0)
