@@ -169,7 +169,7 @@ You can filter the URIs that should be handled by passing `only` to `OpenapiFirs
 
 ```ruby
 spec = OpenapiFirst.load('./openapi/openapi.yaml', only: { |path| path.starts_with? '/pets' })
-run OpenapiFirst.app(spec, namespace: Pets)
+use OpenapiFirst::RequestValidation, spec: spec
 ```
 
 ## Development
