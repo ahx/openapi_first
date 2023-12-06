@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe OpenapiFirst::ErrorResponses::Default do
+RSpec.describe OpenapiFirst.plugin(:default)::ErrorResponse do
   describe '#render' do
     let(:env) { {} }
 

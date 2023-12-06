@@ -2,10 +2,14 @@
 
 ## Unreleased
 
+- Add OpenapiFirst.configure
+- Add OpenapiFirst.register, OpenapiFirst.plugin
+
 ## 1.0.0.beta6
+
 - Fix: Make response header validation work with rack 3
 - Refactor router
-  - Remove dependency hanami-router 
+  - Remove dependency hanami-router
   - PathItem and Operation for a request can be found by calling methods on the Definitnion
 - Fixed https://github.com/ahx/openapi_first/issues/155
 - Breaking / Regression: A paths like /pets/{from}-{to} if there is a path "/pets/{id}"
@@ -13,7 +17,7 @@
 ## 1.0.0.beta5
 
 - Added: `OpenapiFirst::Config.default_options=` to set default options globally
-- Added: You can define custom error responses by subclassing `OpenapiFirst::ErrorResponse` and register it via `OpenapiFirst::Plugins.register_error_response(name, MyCustomErrorResponse)`
+- Added: You can define custom error responses by subclassing `OpenapiFirst::ErrorResponse` and register it via `OpenapiFirst.register_error_response(name, MyCustomErrorResponse)`
 
 ## 1.0.0.beta4
 

@@ -20,7 +20,7 @@ module OpenapiFirst
       @app = app
       @raise = options.fetch(:raise_error, false)
       @not_found = options.fetch(:not_found, :halt)
-      @error_response_class = options.fetch(:error_response, Config.default_options.error_response)
+      @error_response_class = options.fetch(:error_response, OpenapiFirst.configuration.error_response)
       spec = options.fetch(:spec)
       raise "You have to pass spec: when initializing #{self.class}" unless spec
 

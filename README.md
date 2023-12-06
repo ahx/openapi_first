@@ -121,13 +121,13 @@ This middleware adds `env['openapi.operation']` which holds an instance of `Open
 
 ## Global configuration
 
-You can configure default options gobally via `OpenapiFirst::Config`:
+You can configure default options gobally:
 
 ```ruby
-OpenapiFirst::Config.default_options = {
-  error_response: :json_api,
-  request_validation_raise_error: true
-}
+OpenapiFirst.configure do |config|
+  config.error_response = :json_api
+  config.request_validation_raise_error = true
+end
 ```
 
 ## Alternatives
