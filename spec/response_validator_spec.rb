@@ -2,13 +2,14 @@
 
 require_relative 'spec_helper'
 require 'rack'
-require 'openapi_first/response_validator'
+require 'openapi_first/response_validation/validator'
 
-RSpec.describe OpenapiFirst::ResponseValidator do
+RSpec.describe OpenapiFirst::ResponseValidation::Validator do
   let(:spec) { './spec/data/petstore.yaml' }
 
   let(:subject) do
-    described_class.new(spec)
+    operation = OpenapiFirst.load(spec).request(request).operation
+    described_class.new(operation)
   end
 
   let(:request) do
@@ -19,89 +20,84 @@ RSpec.describe OpenapiFirst::ResponseValidator do
   let(:headers) { { Rack::CONTENT_TYPE => 'application/json' } }
 
   describe 'valid response' do
-    it 'raises nothing' do
+    let(:response) do
       response_body = json_dump([
                                   { id: 42, name: 'hans' },
                                   { id: 2, name: 'Voldemort' }
                                 ])
-      response = Rack::MockResponse.new(200, headers, response_body)
-      subject.validate(request, response)
+      Rack::Response.new(response_body, 200, headers)
+    end
+
+    it 'raises nothing' do
+      subject.validate(response)
     end
 
     it 'falls back to the default' do
       response_body = JSON.dump(code: 422, message: 'Not good!')
-      response = Rack::MockResponse.new(422, headers, response_body)
-      subject.validate(request, response)
+      response = Rack::Response.new(response_body, 422, headers)
+      subject.validate(response)
     end
 
     it 'returns no errors on additional, not required properties' do
       response_body = json_dump([{ id: 42, name: 'hans', something: 'else' }])
-      response = Rack::MockResponse.new(200, headers, response_body)
-      subject.validate(request, response)
+      response = Rack::Response.new(response_body, 200, headers)
+      subject.validate(response)
     end
 
     describe 'when operation response has has no content defined' do
       let(:spec) { './spec/data/no-response-content.yaml' }
+      let(:response) { Rack::Response.new('body', 200, headers) }
+      let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/')) }
 
       it 'returns no errors' do
-        request = Rack::Request.new(Rack::MockRequest.env_for('/'))
-        response = Rack::MockResponse.new(200, headers, 'body')
-        subject.validate(request, response)
+        subject.validate(response)
       end
 
-      it 'returns no errors when content type is empty' do
-        request = Rack::Request.new(Rack::MockRequest.env_for('/empty-content'))
-        response = Rack::MockResponse.new(200, headers, 'body')
-        subject.validate(request, response)
+      describe 'when content type is empty' do
+        let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/empty-content')) }
+
+        it 'returns no errors' do
+          subject.validate(response)
+        end
       end
     end
   end
 
   describe 'invalid response' do
-    it 'fails on unknown http method' do
-      request = begin
-        env = Rack::MockRequest.env_for('/pets', method: 'PATCH')
-        Rack::Request.new(env)
-      end
-      response_body = json_dump([{ id: 'string', name: 'hans' }])
-      response = Rack::MockResponse.new(200, headers, response_body)
-      expect do
-        subject.validate(request, response)
-      end.to raise_error OpenapiFirst::NotFoundError
-    end
+    context 'when response status is unknown' do
+      let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/pets/12')) }
 
-    it 'fails on unknown status' do
-      env = Rack::MockRequest.env_for('/pets/1')
-      request = Rack::Request.new(env)
-      response_body = json_dump([{ id: 2, name: 'Voldemort' }])
-      response = Rack::MockResponse.new(201, headers, response_body)
-      expect do
-        subject.validate(request, response)
-      end.to raise_error OpenapiFirst::ResponseInvalid
+      it 'fails' do
+        response_body = json_dump({ id: 2, name: 'Voldemort' })
+        response = Rack::Response.new(response_body, 201, headers)
+        expect do
+          subject.validate(response)
+        end.to raise_error OpenapiFirst::ResponseInvalid
+      end
     end
 
     it 'fails on wrong content type' do
       response_body = json_dump([{ id: 2, name: 'Voldemort' }])
       headers = { Rack::CONTENT_TYPE => 'application/xml' }
-      response = Rack::MockResponse.new(200, headers, response_body)
+      response = Rack::Response.new(response_body, 200, headers)
       expect do
-        subject.validate(request, response)
+        subject.validate(response)
       end.to raise_error OpenapiFirst::ResponseInvalid
     end
 
     it 'returns errors on missing property' do
       response_body = json_dump([{ id: 42 }, { id: 2, name: 'Voldemort' }])
-      response = Rack::MockResponse.new(200, headers, response_body)
+      response = Rack::Response.new(response_body, 200, headers)
       expect do
-        subject.validate(request, response)
+        subject.validate(response)
       end.to raise_error OpenapiFirst::ResponseInvalid
     end
 
     it 'returns errors on wrong property type' do
       response_body = json_dump([{ id: 'string', name: 'hans' }])
-      response = Rack::MockResponse.new(200, headers, response_body)
+      response = Rack::Response.new(response_body, 200, headers)
       expect do
-        subject.validate(request, response)
+        subject.validate(response)
       end.to raise_error OpenapiFirst::ResponseInvalid
     end
   end

@@ -6,17 +6,17 @@ module OpenapiFirst
   # This is the base class for error responses
   class ErrorResponse
     ## @param request [Hash] The Rack request env
-    ## @param request_validation_error [OpenapiFirst::RequestValidationError]
-    def initialize(env, request_validation_error)
+    ## @param failure [OpenapiFirst::RequestValidation::Failure]
+    def initialize(env, failure = nil)
       @env = env
-      @request_validation_error = request_validation_error
+      @failure = failure
     end
 
     extend Forwardable
 
-    attr_reader :env, :request_validation_error
+    attr_reader :env
 
-    def_delegators :@request_validation_error, :status, :location, :schema_validation
+    def_delegators :@failure, :status, :location, :message, :request, :schema_validation
 
     def validation_output
       schema_validation&.output
@@ -28,10 +28,6 @@ module OpenapiFirst
 
     def data
       schema_validation&.data
-    end
-
-    def message
-      request_validation_error.message
     end
 
     def render

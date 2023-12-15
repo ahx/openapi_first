@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'json_schemer'
-require_relative 'schema/result'
+require_relative 'schema/validation_result'
 
 module OpenapiFirst
   class Schema
@@ -25,11 +25,15 @@ module OpenapiFirst
     end
 
     def validate(data)
-      Result.new(
+      ValidationResult.new(
         output: @schemer.validate(data),
         schema:,
         data:
       )
+    end
+
+    def [](key)
+      @schema[key]
     end
 
     private

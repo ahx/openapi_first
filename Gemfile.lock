@@ -1,12 +1,12 @@
 PATH
   remote: .
   specs:
-    openapi_first (1.0.0.beta5)
+    openapi_first (1.0.0.beta6)
       json_refs (~> 0.1, >= 0.1.7)
       json_schemer (~> 2.0.0)
       multi_json (~> 1.15)
       mustermann-contrib (~> 3.0.0)
-      openapi_parameters (>= 0.3.1, < 2.0)
+      openapi_parameters (>= 0.3.2, < 2.0)
       rack (>= 2.2, < 4.0)
 
 GEM
@@ -30,7 +30,7 @@ GEM
     mustermann-contrib (3.0.0)
       hansi (~> 0.2.0)
       mustermann (= 3.0.0)
-    openapi_parameters (0.3.1)
+    openapi_parameters (0.3.2)
       rack (>= 2.2)
       zeitwerk (~> 2.6)
     parallel (1.23.0)
@@ -77,7 +77,7 @@ GEM
       unf (~> 0.1.4)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.9)
+    unf_ext (0.0.9.1)
     unicode-display_width (2.5.0)
     zeitwerk (2.6.12)
 

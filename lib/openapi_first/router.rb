@@ -30,20 +30,17 @@ module OpenapiFirst
 
     def call(env)
       env[OPERATION] = nil
-      request = Rack::Request.new(env)
-      path_item, path_params = @definition.find_path_item_and_params(request.path)
-      operation = path_item&.find_operation(request.request_method.downcase)
+      request = @definition.request(Rack::Request.new(env))
+      env[OPERATION] = request.operation
+      env[RAW_PATH_PARAMS] = request.path_params
 
-      env[OPERATION] = operation
-      env[RAW_PATH_PARAMS] = path_params
-
-      if operation.nil?
+      if request.operation.nil?
         raise_error(env) if @raise
         return @app.call(env) if @not_found == :continue
       end
 
-      return NOT_FOUND unless path_item
-      return METHOD_NOT_ALLOWED unless operation
+      return NOT_FOUND unless request.path_item
+      return METHOD_NOT_ALLOWED unless request.operation
 
       @app.call(env)
     end

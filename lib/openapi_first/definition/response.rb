@@ -1,37 +1,25 @@
 # frozen_string_literal: true
 
-require_relative 'has_content'
-
 module OpenapiFirst
-  class Response
-    include HasContent
+  class Definition
+    class Response
+      def initialize(operation:, status:, response_object:, content_type:, content_schema:)
+        @operation = operation
+        @response_object = response_object
+        @status = status
+        @content_type = content_type
+        @content_schema = content_schema
+      end
 
-    def initialize(status, response_object, operation)
-      @status = status&.to_i
-      @object = response_object
-      @operation = operation
-    end
+      attr_reader :operation, :status, :content_type, :content_schema
 
-    attr_reader :status
+      def headers
+        @response_object['headers']
+      end
 
-    def description
-      @object['description']
-    end
-
-    def headers
-      @object['headers']
-    end
-
-    def content?
-      !!content&.any?
-    end
-
-    private
-
-    def schema_write? = false
-
-    def content
-      @object['content']
+      def description
+        @response_object['description']
+      end
     end
   end
 end

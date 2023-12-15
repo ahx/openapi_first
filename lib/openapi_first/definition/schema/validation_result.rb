@@ -2,7 +2,7 @@
 
 module OpenapiFirst
   class Schema
-    Result = Struct.new(:output, :schema, :data, keyword_init: true) do
+    ValidationResult = Struct.new(:output, :schema, :data, keyword_init: true) do
       def valid? = output['valid']
       def error? = !output['valid']
 

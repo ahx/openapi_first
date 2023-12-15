@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'openapi_first/plugins/jsonapi'
 
-RSpec.describe OpenapiFirst.plugin(:jsonapi)::ErrorResponse do
+RSpec.describe OpenapiFirst::Plugins::Jsonapi::ErrorResponse do
   describe '#render' do
     let(:env) { {} }
 

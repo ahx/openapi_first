@@ -42,6 +42,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'json_schemer', '~> 2.0.0'
   spec.add_runtime_dependency 'multi_json', '~> 1.15'
   spec.add_runtime_dependency 'mustermann-contrib', '~> 3.0.0'
-  spec.add_runtime_dependency 'openapi_parameters', '>= 0.3.1', '< 2.0'
+  spec.add_runtime_dependency 'openapi_parameters', '>= 0.3.2', '< 2.0'
   spec.add_runtime_dependency 'rack', '>= 2.2', '< 4.0'
 end

@@ -42,7 +42,8 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     it 'returns an error' do
       expect do
         get '/pets'
-      end.to raise_error OpenapiFirst::ResponseInvalid, "Response has no content-type for 'GET /pets (listPets)'"
+      end.to raise_error OpenapiFirst::ResponseContentTypeNotFoundError,
+                         "Response Content-Type for 'GET /pets (listPets)' must not be empty"
     end
   end
 

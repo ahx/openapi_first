@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'openapi_first/plugins/default'
 
-RSpec.describe OpenapiFirst.plugin(:default)::ErrorResponse do
+RSpec.describe OpenapiFirst::Plugins::Default::ErrorResponse do
   describe '#render' do
     let(:env) { {} }
 
@@ -10,7 +11,7 @@ RSpec.describe OpenapiFirst.plugin(:default)::ErrorResponse do
       specify do
         error = described_class.new(
           env,
-          OpenapiFirst::RequestValidationError.new(
+          OpenapiFirst::RequestValidation::Failure.new(
             status: 400,
             location: :body
           )
@@ -43,7 +44,7 @@ RSpec.describe OpenapiFirst.plugin(:default)::ErrorResponse do
         schema_validation = OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data)
         error = described_class.new(
           env,
-          OpenapiFirst::RequestValidationError.new(
+          OpenapiFirst::RequestValidation::Failure.new(
             status: 400,
             location: :body,
             schema_validation:
