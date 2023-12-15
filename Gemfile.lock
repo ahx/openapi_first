@@ -1,12 +1,12 @@
 PATH
   remote: .
   specs:
-    openapi_first (1.0.0.beta6)
+    openapi_first (1.0.0.beta5)
       json_refs (~> 0.1, >= 0.1.7)
       json_schemer (~> 2.0.0)
       multi_json (~> 1.15)
       mustermann-contrib (~> 3.0.0)
-      openapi_parameters (>= 0.3.2, < 2.0)
+      openapi_parameters (>= 0.3.1, < 2.0)
       rack (>= 2.2, < 4.0)
 
 GEM
@@ -30,7 +30,7 @@ GEM
     mustermann-contrib (3.0.0)
       hansi (~> 0.2.0)
       mustermann (= 3.0.0)
-    openapi_parameters (0.3.2)
+    openapi_parameters (0.3.1)
       rack (>= 2.2)
       zeitwerk (~> 2.6)
     parallel (1.23.0)
@@ -38,7 +38,7 @@ GEM
       ast (~> 2.4.1)
       racc
     racc (1.7.3)
-    rack (3.0.8)
+    rack (2.2.8)
     rack-test (2.1.0)
       rack (>= 1.3)
     rainbow (3.1.1)
@@ -89,7 +89,6 @@ PLATFORMS
 DEPENDENCIES
   bundler
   openapi_first!
-  rack (>= 3.0.0)
   rack-test
   rake
   rspec
