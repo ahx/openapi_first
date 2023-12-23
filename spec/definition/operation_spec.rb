@@ -100,7 +100,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
       expect(schema['title']).to eq 'With profile'
     end
 
-    it 'finds a match while ignorign charset' do
+    it 'finds a match while ignoring charset' do
       schema = operation.response_for(200, 'application/json; charset=UTF8').content_schema
       expect(schema['title']).to eq 'Without parameter'
     end
