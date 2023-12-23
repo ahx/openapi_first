@@ -16,15 +16,15 @@ module OpenapiFirst
 
         request_content_type = Rack::Request.new(@env).content_type
         schema = request_body.schema_for(request_content_type)
-        RequestValidation.fail!(415, :header) unless schema
+        RequestValidation.fail!(:header, status: 415) unless schema
 
         parsed_request_body = BodyParser.new.parse_body(@env)
-        RequestValidation.fail!(400, :body) if request_body.required? && parsed_request_body.nil?
+        RequestValidation.fail!(:body) if request_body.required? && parsed_request_body.nil?
 
         validate_body!(parsed_request_body, schema)
         parsed_request_body
       rescue BodyParsingError => e
-        RequestValidation.fail!(400, :body, message: e.message)
+        RequestValidation.fail!(:body, message: e.message)
       end
 
       private
@@ -34,7 +34,7 @@ module OpenapiFirst
         return unless request_body_schema
 
         validation_result = request_body_schema.validate(parsed_request_body)
-        RequestValidation.fail!(400, :body, validation_result:) if validation_result.error?
+        RequestValidation.fail!(:body, validation_result:) if validation_result.error?
       end
     end
   end

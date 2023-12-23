@@ -16,7 +16,7 @@ module OpenapiFirst
     # @param status [Integer] The intended HTTP status code (usually 400)
     # @param location [Symbol] One of :body, :header, :cookie, :query, :path
     # @param validation_result [OpenapiFirst::Schema::ValidationResult]
-    def self.fail!(status, location, message: nil, validation_result: nil)
+    def self.fail!(location, status: 400, message: nil, validation_result: nil)
       throw FAIL, RequestValidation::Failure.new(
         status:,
         location:,
