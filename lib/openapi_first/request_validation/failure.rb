@@ -3,17 +3,17 @@
 module OpenapiFirst
   module RequestValidation
     class Failure
-      def initialize(status:, location:, message: nil, schema_validation: nil)
+      def initialize(status:, location:, message: nil, validation_result: nil)
         @status = status
         @location = location
         @message = message
-        @schema_validation = schema_validation
+        @validation_result = validation_result
       end
 
-      attr_reader :status, :request, :location, :schema_validation
+      attr_reader :status, :request, :location, :validation_result
 
       def message
-        @message || schema_validation&.message || Rack::Utils::HTTP_STATUS_CODES[status]
+        @message || validation_result&.message || Rack::Utils::HTTP_STATUS_CODES[status]
       end
 
       def error_message

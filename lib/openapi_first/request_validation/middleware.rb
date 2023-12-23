@@ -68,8 +68,8 @@ module OpenapiFirst
         return unless parameters
 
         unpacked_params = parameters.unpack(env)
-        schema_validation = parameters.schema.validate(unpacked_params)
-        RequestValidation.fail!(400, :path, schema_validation:) if schema_validation.error?
+        validation_result = parameters.schema.validate(unpacked_params)
+        RequestValidation.fail!(400, :path, validation_result:) if validation_result.error?
         env[PATH_PARAMS] = unpacked_params
         env[PARAMS].merge!(unpacked_params)
       end
@@ -79,8 +79,8 @@ module OpenapiFirst
         return unless parameters
 
         unpacked_params = parameters.unpack(env)
-        schema_validation = parameters.schema.validate(unpacked_params)
-        RequestValidation.fail!(400, :query, schema_validation:) if schema_validation.error?
+        validation_result = parameters.schema.validate(unpacked_params)
+        RequestValidation.fail!(400, :query, validation_result:) if validation_result.error?
         env[QUERY_PARAMS] = unpacked_params
         env[PARAMS].merge!(unpacked_params)
       end
@@ -90,8 +90,8 @@ module OpenapiFirst
         return unless parameters
 
         unpacked_params = parameters.unpack(env)
-        schema_validation = parameters.schema.validate(unpacked_params)
-        RequestValidation.fail!(400, :cookie, schema_validation:) if schema_validation.error?
+        validation_result = parameters.schema.validate(unpacked_params)
+        RequestValidation.fail!(400, :cookie, validation_result:) if validation_result.error?
         env[COOKIE_PARAMS] = unpacked_params
       end
 
@@ -100,8 +100,8 @@ module OpenapiFirst
         return unless parameters
 
         unpacked_params = parameters.unpack(env)
-        schema_validation = parameters.schema.validate(unpacked_params)
-        RequestValidation.fail!(400, :header, schema_validation:) if schema_validation.error?
+        validation_result = parameters.schema.validate(unpacked_params)
+        RequestValidation.fail!(400, :header, validation_result:) if validation_result.error?
         env[HEADER_PARAMS] = unpacked_params
       end
 

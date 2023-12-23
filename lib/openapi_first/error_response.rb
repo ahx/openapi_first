@@ -16,18 +16,18 @@ module OpenapiFirst
 
     attr_reader :env
 
-    def_delegators :@failure, :status, :location, :message, :request, :schema_validation
+    def_delegators :@failure, :status, :location, :message, :request, :validation_result
 
     def validation_output
-      schema_validation&.output
+      validation_result&.output
     end
 
     def schema
-      schema_validation&.schema
+      validation_result&.schema
     end
 
     def data
-      schema_validation&.data
+      validation_result&.data
     end
 
     def render

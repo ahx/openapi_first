@@ -6,7 +6,7 @@ RSpec.describe OpenapiFirst.plugin(:jsonapi)::ErrorResponse do
   describe '#render' do
     let(:env) { {} }
 
-    context 'when schema_validation is nil' do
+    context 'when validation_result is nil' do
       specify do
         error = described_class.new(
           env,
@@ -25,7 +25,7 @@ RSpec.describe OpenapiFirst.plugin(:jsonapi)::ErrorResponse do
       end
     end
 
-    context 'when schema_validation is specified' do
+    context 'when validation_result is specified' do
       specify do
         schema = {
           'type' => 'object',
@@ -40,13 +40,13 @@ RSpec.describe OpenapiFirst.plugin(:jsonapi)::ErrorResponse do
           }
         }
         data = { 'data' => { 'name' => 21, 'numberOfLegs' => 'four' } }
-        schema_validation = OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data)
+        validation_result = OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data)
         error = described_class.new(
           env,
           OpenapiFirst::RequestValidation::Failure.new(
             status: 400,
             location: :body,
-            schema_validation:
+            validation_result:
           )
         )
         status, headers, body = error.render
