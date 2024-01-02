@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  class NotFoundError < StandardError; end
-
   module RequestValidation
     class Validator
       def initialize(operation)

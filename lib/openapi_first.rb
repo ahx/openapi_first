@@ -2,6 +2,7 @@
 
 require 'yaml'
 require 'json_refs'
+require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'
 require_relative 'openapi_first/plugins'
 require_relative 'openapi_first/definition'

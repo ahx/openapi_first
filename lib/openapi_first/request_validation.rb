@@ -8,8 +8,6 @@ require 'openapi_parameters'
 require_relative 'request_validation/middleware'
 
 module OpenapiFirst
-  class RequestInvalidError < StandardError; end
-
   module RequestValidation
     FAIL = :request_validation_failed
 
