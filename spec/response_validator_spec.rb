@@ -69,7 +69,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
         response = Rack::Response.new(response_body, 201, headers)
         expect do
           subject.validate(response)
-        end.to raise_error OpenapiFirst::ResponseInvalid
+        end.to raise_error OpenapiFirst::ResponseInvalidError
       end
     end
 
@@ -79,7 +79,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       response = Rack::Response.new(response_body, 200, headers)
       expect do
         subject.validate(response)
-      end.to raise_error OpenapiFirst::ResponseInvalid
+      end.to raise_error OpenapiFirst::ResponseInvalidError
     end
 
     it 'returns errors on missing property' do
@@ -87,7 +87,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       response = Rack::Response.new(response_body, 200, headers)
       expect do
         subject.validate(response)
-      end.to raise_error OpenapiFirst::ResponseInvalid
+      end.to raise_error OpenapiFirst::ResponseInvalidError
     end
 
     it 'returns errors on wrong property type' do
@@ -95,7 +95,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       response = Rack::Response.new(response_body, 200, headers)
       expect do
         subject.validate(response)
-      end.to raise_error OpenapiFirst::ResponseInvalid
+      end.to raise_error OpenapiFirst::ResponseInvalidError
     end
   end
 end

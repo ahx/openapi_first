@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breaking: Rename OpenapiFirst::ResponseInvalid to OpenapiFirst::ResponseInvalidError
 - Breaking: Remove OpenapiFirst::Router
 - Add OpenapiFirst.configure
 - Add OpenapiFirst.register, OpenapiFirst.plugin
