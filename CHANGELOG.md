@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breaking: Remove OpenapiFirst::Router
 - Add OpenapiFirst.configure
 - Add OpenapiFirst.register, OpenapiFirst.plugin
 - Replace `env[OpenapiFirst::REQUEST_BODY]`, `env[OpenapiFirst::PARAMS]` with `env[OpenapiFirst::REQUEST].body`, `env[OpenapiFirst::REQUEST].params`

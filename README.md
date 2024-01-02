@@ -6,9 +6,8 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
 
 It provides these Rack middlewares:
 
-- [`OpenapiFirst::RequestValidation`](#request-validation) – Validates the request against the API description and returns 400 if the request is invalid.
-- [`OpenapiFirst::ResponseValidation`](#response-validation) Validates the response and raises an exception if the response body is invalid.
-- [`OpenapiFirst::Router`](#openapifirstrouter) – This internal middleware is added automatically when using request/response validation. It adds the OpenAPI operation for the current request to the Rack env.
+- [`OpenapiFirst::RequestValidation::Middleware`](#request-validation) – Validates the request against the API description and returns 400 if the request is invalid.
+- [`OpenapiFirst::ResponseValidation::Middleware`](#response-validation) Validates the response and raises an exception if the response body is invalid.
 
 Using Request and Response validation together ensures that your implementation follows exactly the API description. This enables you to use the API description as a single source of truth for your API, reason about details and use various tooling.
 
@@ -99,24 +98,6 @@ use OpenapiFirst::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] ==
 | :------ | --------------- | ---------------------------------------------------------------- | ------- |
 | `spec:` |                 | The path to the spec file or spec loaded via `OpenapiFirst.load` |
 
-## OpenapiFirst::Router
-
-This middleware is used automatically, but you can add it to the top of your middleware stack if you want to customize the behavior via options.
-
-```ruby
-use OpenapiFirst::Router, spec: './openapi/openapi.yaml'
-```
-
-This middleware adds `env['openapi.operation']` which holds an instance of `OpenapiFirst::Operation` that responds to `#operation_id`, `#path` (and `#[]` to access raw fields).
-
-### Options and defaults
-
-| Name           | Possible values      | Description                                                                                                                                                                                                                                                     | Default                            |
-| :------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `spec:`        |                      | The path to the spec file or spec loaded via `OpenapiFirst.load`                                                                                                                                                                                                |                                    |
-| `raise_error:` | `false`, `true`      | If set to true the middleware raises `OpenapiFirst::NotFoundError` when a path or method was not found in the API description. This is useful during testing to spot an incomplete API description.                                                             | `false` (don't raise an exception) |
-| `not_found:`   | `:continue`, `:halt` | If set to `:continue` the middleware will not return 404 (405, 415), but just pass handling the request to the next middleware or application in the Rack stack. If combined with `raise_error: true` `raise_error` gets preference and an exception is raised. | `:halt` (return 4xx response)      |
-
 ## Global configuration
 
 You can configure default options gobally:
@@ -126,6 +107,33 @@ OpenapiFirst.configure do |config|
   config.error_response = :json_api
   config.request_validation_raise_error = true
 end
+```
+
+## Manual validation
+
+Instead of using the middlewares you can validate the request and response manually.
+
+```ruby
+require 'openapi_first'
+definition = OpenapiFirst.load('petstore.yaml')
+
+## Request validation
+definition.request(Rack::Request.new(env)).validate # returns nil if request is valid, OpenapiFirst::RequestValidation::Failure if not
+# or
+definition.request(Rack::Request.new(env)).validate! # returns nil if request is valid, raises an exception if not
+
+## Response validation
+response = app.call(env)
+definition.request(Rack::Request.new(env)).response(response).validate! # returns nil if request is valid, raises an exception if not
+```
+
+## Handling only certain paths
+
+You can filter the URIs that should be handled by passing `only` to `OpenapiFirst.load`:
+
+```ruby
+spec = OpenapiFirst.load('./openapi/openapi.yaml', only: { |path| path.starts_with? '/pets' })
+use OpenapiFirst::RequestValidation, spec: spec
 ```
 
 ## Alternatives

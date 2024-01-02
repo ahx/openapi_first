@@ -24,10 +24,9 @@ module OpenapiFirst
 
       def validate_defined(request)
         return if request.known?
+        return RequestValidation.fail!(:not_found, status: 404) unless request.known_path?
 
-        message = "Request '#{request.original.request_method} #{request.original.path}' is not defined"
-        status =  request.known_path? ? 415 : 404
-        RequestValidation.fail!(:not_found, status:, message:)
+        RequestValidation.fail!(:not_found, status: 405) unless request.known_request_method?
       end
 
       def validate_parameters!(request)
@@ -70,7 +69,9 @@ module OpenapiFirst
       end
 
       def validate_request_body!(request)
-        RequestBodyValidator.new(operation).validate!(request)
+        RequestBodyValidator.new(operation).validate!(request.body, request.content_type)
+      rescue BodyParser::ParsingError => e
+        RequestValidation.fail!(:body, message: e.message)
       end
     end
   end

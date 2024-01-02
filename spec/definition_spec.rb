@@ -48,6 +48,16 @@ RSpec.describe OpenapiFirst::Definition do
         expect(definition.request(rack_request)).not_to be_known_request_method
       end
     end
+
+    context 'with SCRIPT_NAME' do
+      let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+      let(:rack_request) { Rack::Request.new(Rack::MockRequest.env_for('/42', script_name: '/pets')) }
+
+      it 'respects SCRIPT_NAME to build the whole path' do
+        expect(definition.request(rack_request)).to be_known_path
+        expect(definition.request(rack_request).operation_id).to eq('showPetById')
+      end
+    end
   end
 
   describe '#response' do
