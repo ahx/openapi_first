@@ -6,32 +6,30 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
 
 It provides these Rack middlewares:
 
-- [`OpenapiFirst::RequestValidation::Middleware`](#request-validation) – Validates the request against the API description and returns 400 if the request is invalid.
+- [`OpenapiFirst::RequestValidation::Middleware`](#request-validation) – Validates the request against the API description and returns 4xx if the request is invalid.
 - [`OpenapiFirst::ResponseValidation::Middleware`](#response-validation) Validates the response and raises an exception if the response body is invalid.
 
-Using Request and Response validation together ensures that your implementation follows exactly the API description. This enables you to use the API description as a single source of truth for your API, reason about details and use various tooling.
+Using request and response validation together ensures that your implementation follows exactly the API description. This enables you to use the API description as a single source of truth for your API, reason about details and use various tooling.
 
-## Request Validation
+## Middlewares
 
-The `OpenapiFirst::RequestValidation` middleware returns a 400 status code with a body that describes the error if the request is not valid.
+`OpenapiFirst` offers one Rack middleware for request validation and one for response validation. Both add a _request_ object to the current Rack env at `env[OpenapiFirst::REQUEST]` (or `env['openapi.request']`), which is in an instance of `OpenapiFirst::RuntimeRequest`. This gives you access to the converted query and path parameters exaclty as described in your API instead of relying on Rack alone parse the request. This only includes the parameters that are defined in the API description. It supports every [`style` and `explode` value as described](https://spec.openapis.org/oas/latest.html#style-examples) in the OpenAPI 3.0 and 3.1 specs.
+
+### OpenapiFirst::RequestValidation::Middleware
+
+This middleware returns a 400 status code with a body that describes the error if the request is not valid.
 
 ```ruby
 use OpenapiFirst::RequestValidation, spec: 'openapi.yaml'
 ```
 
-It adds these fields to the Rack env:
-
-- `env[OpenapiFirst::REQUEST]` – This is an instance of `OpenapiFirst::RuntimeRequest`
-
-### Options and defaults
+#### Options and defaults
 
 | Name              | Possible values                                                 | Description                                                                                        | Default                            |
 | :---------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------- |
 | `spec:`           |                                                                 | The path to the spec file or spec loaded via `OpenapiFirst.load`                                   |
 | `raise_error:`    | `false`, `true`                                                 | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` instead of returning 4xx. | `false` (don't raise an exception) |
 | `error_response:` | `:default`, `:json_api`, Your implementation of `ErrorResponse` | :default                                                                                           |
-
-The error responses conform with [JSON:API](https://jsonapi.org).
 
 Here's an example response body for a missing query parameter "search":
 
@@ -51,42 +49,15 @@ content-type: "application/json"
 }
 ```
 
-### Parameters
-
-The `RequestValidation` middleware adds `env[OpenapiFirst::PARAMS]` (or `env['openapi.params']` ) with the converted query and path parameters. This only includes the parameters that are defined in the API description. It supports every [`style` and `explode` value as described](https://spec.openapis.org/oas/latest.html#style-examples) in the OpenAPI 3.0 and 3.1 specs. So you can do things these:
-
-```ruby
-# GET /pets/filter[id]=1,2,3
-env[OpenapiFirst::PARAMS] # => { 'filter[id]' => [1,2,3] }
-
-# GET /colors/.blue.black.brown?format=csv
-env[OpenapiFirst::PARAMS] # => { 'color_names' => ['blue', 'black', 'brown'], 'format' => 'csv' }
-
-# And a lot more.
-```
-
-Integration for specific webframeworks is ongoing. Don't hesitate to create an issue with you specific needs.
-
-### Request body validation
-
-This middleware adds the parsed request body to `env[OpenapiFirst::REQUEST_BODY]`.
-
-The middleware will return a status `415` if the requests content type does not match or `400` if the request body is invalid.
-
-### Header, Cookie, Query and Path parameter validation
-
-The `RequestValidation` middleware validates the request headers, cookies and path parameters as defined in you API description. It returns a `400` status code if the request is invalid. It adds the parsed merged _path_ and _query_ parameters to `env['openapi.params']`.
-Separate parsed parameters are made available by location at `env['openapi.path_params']`, `env['openapi.query']`, `env['openapi.headers']`, `env['openapi.cookies']` as well if you need to access them separately.
-
 ### readOnly / writeOnly properties
 
 Request validation fails if request includes a property with `readOnly: true`.
 
 Response validation fails if response body includes a property with `writeOnly: true`.
 
-## Response validation
+## OpenapiFirst::ResponseValidation::Middleware
 
-The `OpenapiFirst::ResponseValidation` middleware is especially useful when testing. It _always_ raises an error if the response is not valid.
+This middleware is especially useful when testing. It _always_ raises an error if the response is not valid.
 
 ```ruby
 use OpenapiFirst::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] == 'test'
@@ -104,10 +75,16 @@ You can configure default options gobally:
 
 ```ruby
 OpenapiFirst.configure do |config|
-  config.error_response = :json_api
+  # Specify which plugin is used to render error responses returned by OpenapiFirst::RequestValidation::Middleware (defaults to :default)
+  config.request_validation_error_response = :json_api
+  # Configure if OpenapiFirst::RequestValidation::Middleware should raise an exception (defaults to false)
   config.request_validation_raise_error = true
 end
 ```
+
+## Plugins
+
+OpenapiFirst offers a simple plugin system. See lib/openapi_first/plugins for details. (tbd.)
 
 ## Manual validation
 
