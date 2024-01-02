@@ -8,12 +8,11 @@ module OpenapiFirst
       end
 
       def validate(rack_response)
-        status, headers, body = rack_response.to_a
+        response = Rack::Response[*rack_response.to_a]
 
-        content_type = headers[Rack::CONTENT_TYPE]
-        response_definition = response_for(operation, status, content_type)
-        validate_response_body(response_definition.content_schema, body)
-        validate_response_headers(response_definition.headers, headers)
+        response_definition = response_for(operation, response.status, response.content_type)
+        validate_response_body(response_definition.content_schema, response.body)
+        validate_response_headers(response_definition.headers, response.headers)
       end
 
       private
