@@ -86,150 +86,6 @@ RSpec.describe OpenapiFirst::Definition::Operation do
     end
   end
 
-  describe '#response_for' do
-    let(:spec) { OpenapiFirst.load('./spec/data/content-types.yaml') }
-    let(:operation) { spec.operations[0] }
-
-    it 'finds an exact match without parameter' do
-      schema = operation.response_for(200, 'application/json').content_schema
-      expect(schema['title']).to eq 'Without parameter'
-    end
-
-    it 'finds an exact match with parameter' do
-      schema = operation.response_for(200, 'application/json; profile=custom').content_schema
-      expect(schema['title']).to eq 'With profile'
-    end
-
-    it 'finds a match while ignoring charset' do
-      schema = operation.response_for(200, 'application/json; charset=UTF8').content_schema
-      expect(schema['title']).to eq 'Without parameter'
-    end
-
-    it 'finds text/* wildcard matcher' do
-      schema = operation.response_for(200, 'text/markdown').content_schema
-      expect(schema['title']).to eq 'Text wildcard'
-    end
-
-    it 'finds */* wildcard matcher' do
-      schema = operation.response_for(200, 'application/xml').content_schema
-      expect(schema['title']).to eq 'Accept everything'
-    end
-
-    describe 'when status code cannot be found' do
-      let(:spec) { OpenapiFirst.load('./spec/data/parameters.yaml') }
-      let(:operation) { spec.operations.last }
-
-      it 'returns nil' do
-        expect(operation.response_for(201, 'application/json')).to be_nil
-      end
-    end
-
-    describe 'when response object media type cannot be found' do
-      let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
-      let(:operation) do
-        path_item_object = {
-          'get' => {
-            'responses' => {
-              '200' => {
-                'content' => {
-                  'application/json' => {
-                    'schema' => {
-                      'type' => 'object'
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
-      end
-
-      it 'returns nil' do
-        expect(operation.response_for(200, 'application/xml')).to be_nil
-      end
-    end
-
-    describe 'when response content is not defined' do
-      let(:operation) do
-        path_item_object = {
-          'get' => {
-            'responses' => {
-              '200' => {
-                'description' => 'Blank'
-              }
-            }
-          }
-        }
-        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
-      end
-
-      it 'returns a response without content-type' do
-        response = operation.response_for(200, nil)
-        expect(response.description).to eq 'Blank'
-        expect(response.status).to eq 200
-        expect(response.content_type).to be_nil
-        expect(response.content_schema).to be_nil
-      end
-
-      it 'returns a response with unknown content-type' do
-        response = operation.response_for(200, 'application/json')
-        expect(response.description).to eq 'Blank'
-        expect(response.status).to eq 200
-        expect(response.content_type).to be_nil
-        expect(response.content_schema).to be_nil
-      end
-    end
-
-    describe 'when response object media type is not defined' do
-      let(:operation) do
-        path_item_object = {
-          'get' => {
-            'responses' => {
-              '200' => {
-                'description' => 'Blank',
-                'content' => {}
-              }
-            }
-          }
-        }
-        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
-      end
-
-      it 'returns a response without schema' do
-        response = operation.response_for(200, 'application/json')
-        expect(response.description).to eq 'Blank'
-        expect(response.status).to eq 200
-        expect(response.content_type).to be_nil
-        expect(response.content_schema).to be_nil
-      end
-    end
-
-    describe 'when response content schema is not defined' do
-      let(:operation) do
-        path_item_object = {
-          'get' => {
-            'responses' => {
-              '200' => {
-                'content' => {
-                  'application/json' => {}
-                }
-              }
-            }
-          }
-        }
-        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
-      end
-
-      it 'returns a response with content_type, but without schema' do
-        response = operation.response_for(200, 'application/json')
-        expect(response.status).to eq 200
-        expect(response.content_type).to eq 'application/json'
-        expect(response.content_schema).to be_nil
-      end
-    end
-  end
-
   describe '#method' do
     let(:spec) { OpenapiFirst.load('./spec/data/petstore-expanded.yaml') }
 
@@ -269,16 +125,41 @@ RSpec.describe OpenapiFirst::Definition::Operation do
   end
 
   describe '#response_for' do
-    let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+    let(:spec) { OpenapiFirst.load('./spec/data/content-types.yaml') }
     let(:operation) { spec.operations.first }
 
     it 'finds the matching response object for a status code' do
       response = operation.response_for(200, 'application/json')
       expect(response).to be_a OpenapiFirst::Definition::Response
-      expect(response.description).to eq 'A paged array of pets'
+      expect(response.description).to eq 'Expected response to a valid request'
     end
 
-    describe 'when status code cannot be found' do
+    it 'finds an exact match without parameter' do
+      schema = operation.response_for(200, 'application/json').content_schema
+      expect(schema['title']).to eq 'Without parameter'
+    end
+
+    it 'finds an exact match with parameter' do
+      schema = operation.response_for(200, 'application/json; profile=custom').content_schema
+      expect(schema['title']).to eq 'With profile'
+    end
+
+    it 'finds a match while ignoring charset' do
+      schema = operation.response_for(200, 'application/json; charset=UTF8').content_schema
+      expect(schema['title']).to eq 'Without parameter'
+    end
+
+    it 'finds text/* wildcard matcher' do
+      schema = operation.response_for(200, 'text/markdown').content_schema
+      expect(schema['title']).to eq 'Text wildcard'
+    end
+
+    it 'finds */* wildcard matcher' do
+      schema = operation.response_for(200, 'application/xml').content_schema
+      expect(schema['title']).to eq 'Accept everything'
+    end
+
+    context 'when status code cannot be found' do
       let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
       let(:operation) { spec.path('/pets/{petId}').operation('get') }
 
@@ -287,7 +168,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
       end
     end
 
-    describe 'when content type cannot be found' do
+    context 'when content type cannot be found' do
       let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
       let(:operation) { spec.path('/pets/{petId}').operation('get') }
 
@@ -296,13 +177,118 @@ RSpec.describe OpenapiFirst::Definition::Operation do
       end
     end
 
-    describe 'when default is defined be found' do
+    context 'when default is defined be found' do
       let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
       let(:operation) { spec.path('/pets').operation('get') }
 
       it 'falls back to the default' do
         result = operation.response_for(201, 'application/json')
         expect(result.description).to eq 'unexpected error'
+      end
+    end
+
+    context 'when response object media type cannot be found' do
+      let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+      let(:operation) do
+        path_item_object = {
+          'get' => {
+            'responses' => {
+              '200' => {
+                'content' => {
+                  'application/json' => {
+                    'schema' => {
+                      'type' => 'object'
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
+      end
+
+      it 'returns nil' do
+        expect(operation.response_for(200, 'application/xml')).to be_nil
+      end
+    end
+
+    context 'when response content is not defined' do
+      let(:operation) do
+        path_item_object = {
+          'get' => {
+            'responses' => {
+              '200' => {
+                'description' => 'Blank'
+              }
+            }
+          }
+        }
+        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
+      end
+
+      it 'returns a response without content-type' do
+        response = operation.response_for(200, nil)
+        expect(response.description).to eq 'Blank'
+        expect(response.status).to eq 200
+        expect(response.content_type).to be_nil
+        expect(response.content_schema).to be_nil
+      end
+
+      it 'returns a response with unknown content-type' do
+        response = operation.response_for(200, 'application/json')
+        expect(response.description).to eq 'Blank'
+        expect(response.status).to eq 200
+        expect(response.content_type).to be_nil
+        expect(response.content_schema).to be_nil
+      end
+    end
+
+    context 'when response object media type is not defined' do
+      let(:operation) do
+        path_item_object = {
+          'get' => {
+            'responses' => {
+              '200' => {
+                'description' => 'Blank',
+                'content' => {}
+              }
+            }
+          }
+        }
+        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
+      end
+
+      it 'returns a response without schema' do
+        response = operation.response_for(200, 'application/json')
+        expect(response.description).to eq 'Blank'
+        expect(response.status).to eq 200
+        expect(response.content_type).to be_nil
+        expect(response.content_schema).to be_nil
+      end
+    end
+
+    context 'when response content schema is not defined' do
+      let(:operation) do
+        path_item_object = {
+          'get' => {
+            'responses' => {
+              '200' => {
+                'content' => {
+                  'application/json' => {}
+                }
+              }
+            }
+          }
+        }
+        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
+      end
+
+      it 'returns a response with content_type, but without schema' do
+        response = operation.response_for(200, 'application/json')
+        expect(response.status).to eq 200
+        expect(response.content_type).to eq 'application/json'
+        expect(response.content_schema).to be_nil
       end
     end
   end
