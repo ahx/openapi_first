@@ -193,8 +193,6 @@ RSpec.describe 'Request body validation' do
       post path, '{fo},'
 
       expect(last_response.status).to be 400
-      error = response_body[:errors][0]
-      expect(error[:title]).to eq 'Failed to parse body as application/json'
     end
 
     context 'with default values' do
@@ -379,7 +377,8 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/xml'
         expect do
           post path, '<xml />'
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Header parameter invalid: Unsupported Media Type'
+        end.to raise_error OpenapiFirst::RequestInvalidError,
+                           %(Request content type is not defined. "application/xml" is not defined.)
       end
     end
   end

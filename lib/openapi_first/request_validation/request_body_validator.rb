@@ -12,9 +12,12 @@ module OpenapiFirst
         return unless request_body
 
         schema = request_body.schema_for(request_content_type)
-        RequestValidation.fail!(:header, status: 415) unless schema
+        unless schema
+          RequestValidation.fail!(:unsupported_media_type,
+                                  message: "#{request_content_type.inspect} is not defined.")
+        end
 
-        RequestValidation.fail!(:body) if request_body.required? && parsed_request_body.nil?
+        RequestValidation.fail!(:invalid_body) if request_body.required? && parsed_request_body.nil?
 
         validate_body!(parsed_request_body, schema)
         parsed_request_body
@@ -29,7 +32,7 @@ module OpenapiFirst
         return unless request_body_schema
 
         validation_result = request_body_schema.validate(parsed_request_body)
-        RequestValidation.fail!(:body, validation_result:) if validation_result.error?
+        RequestValidation.fail!(:invalid_body, validation_result:) if validation_result.error?
       end
     end
   end

@@ -22,9 +22,9 @@ module OpenapiFirst
 
       def validate_defined(request)
         return if request.known?
-        return RequestValidation.fail!(:not_found, status: 404) unless request.known_path?
+        return RequestValidation.fail!(:not_found) unless request.known_path?
 
-        RequestValidation.fail!(:not_found, status: 405) unless request.known_request_method?
+        RequestValidation.fail!(:method_not_allowed) unless request.known_request_method?
       end
 
       def validate_parameters!(request)
@@ -39,7 +39,7 @@ module OpenapiFirst
         return unless parameters
 
         validation_result = parameters.schema.validate(request.path_params)
-        RequestValidation.fail!(:path, validation_result:) if validation_result.error?
+        RequestValidation.fail!(:invalid_path, validation_result:) if validation_result.error?
       end
 
       def validate_query_params!(request)
@@ -47,7 +47,7 @@ module OpenapiFirst
         return unless parameters
 
         validation_result = parameters.schema.validate(request.query)
-        RequestValidation.fail!(:query, validation_result:) if validation_result.error?
+        RequestValidation.fail!(:invalid_query, validation_result:) if validation_result.error?
       end
 
       def validate_cookie_params!(request)
@@ -55,7 +55,7 @@ module OpenapiFirst
         return unless parameters
 
         validation_result = parameters.schema.validate(request.cookies)
-        RequestValidation.fail!(:cookie, validation_result:) if validation_result.error?
+        RequestValidation.fail!(:invalid_cookie, validation_result:) if validation_result.error?
       end
 
       def validate_header_params!(request)
@@ -63,13 +63,13 @@ module OpenapiFirst
         return unless parameters
 
         validation_result = parameters.schema.validate(request.headers)
-        RequestValidation.fail!(:header, validation_result:) if validation_result.error?
+        RequestValidation.fail!(:invalid_header, validation_result:) if validation_result.error?
       end
 
       def validate_request_body!(request)
         RequestBodyValidator.new(operation).validate!(request.body, request.content_type)
       rescue BodyParser::ParsingError => e
-        RequestValidation.fail!(:body, message: e.message)
+        RequestValidation.fail!(:invalid_body, message: e.message)
       end
     end
   end

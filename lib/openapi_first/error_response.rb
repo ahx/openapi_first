@@ -7,16 +7,28 @@ module OpenapiFirst
   class ErrorResponse
     ## @param request [Hash] The Rack request env
     ## @param failure [OpenapiFirst::RequestValidation::Failure]
-    def initialize(env, failure = nil)
-      @env = env
+    def initialize(failure: nil)
       @failure = failure
     end
 
     extend Forwardable
 
-    attr_reader :env
+    def_delegators :@failure, :error_type, :request, :validation_result
 
-    def_delegators :@failure, :status, :location, :message, :request, :validation_result
+    STATUS = {
+      not_found: 404,
+      method_not_allowed: 405,
+      unsupported_media_type: 415
+    }.freeze
+    private_constant :STATUS
+
+    def status
+      STATUS[error_type] || 400
+    end
+
+    def message
+      Rack::Utils::HTTP_STATUS_CODES[status]
+    end
 
     def validation_output
       validation_result&.output

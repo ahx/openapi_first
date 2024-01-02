@@ -37,18 +37,20 @@ module OpenapiFirst
         end
 
         def pointer_key
-          case location
-          when :body
+          case error_type
+          when :invalid_body
             :pointer
-          when :query, :path
+          when :invalid_query, :invalid_path
             :parameter
-          else
-            location
+          when :invalid_header
+            :header
+          when :invalid_cookie
+            :cookie
           end
         end
 
         def pointer(data_pointer)
-          return data_pointer if location == :body
+          return data_pointer if error_type == :invalid_body
 
           data_pointer.delete_prefix('/')
         end

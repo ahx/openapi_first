@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Fix response header validation with Rack 3
-- Add interface to validate requests / responses without middlewares
+- Add interface to validate requests / responses without middlewares (see "Manual validation" in README)
 - Breaking: Rename OpenapiFirst::ResponseInvalid to OpenapiFirst::ResponseInvalidError
 - Breaking: Remove OpenapiFirst::Router
 - Add OpenapiFirst.configure
