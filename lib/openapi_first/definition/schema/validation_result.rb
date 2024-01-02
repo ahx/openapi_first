@@ -9,7 +9,7 @@ module OpenapiFirst
       def message
         return unless error?
 
-        (output['errors']&.map { |e| e['error'] }&.join('. ') || output['error'])
+        output['errors']&.map { |e| e['error'] }&.join('. ') || output['error']
       end
     end
   end

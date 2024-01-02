@@ -23,10 +23,10 @@ GEM
       mutex_m
       tzinfo (~> 2.0)
     base64 (0.2.0)
-    benchmark-ips (2.12.0)
+    benchmark-ips (2.13.0)
     benchmark-memory (0.2.0)
       memory_profiler (~> 1)
-    bigdecimal (3.1.4)
+    bigdecimal (3.1.5)
     builder (3.2.4)
     committee (5.0.0)
       json_schema (~> 0.14, >= 0.14.3)
@@ -85,7 +85,7 @@ GEM
     mustermann-grape (1.0.2)
       mustermann (>= 1.0.0)
     mutex_m (0.2.0)
-    nio4r (2.5.9)
+    nio4r (2.7.0)
     openapi_parameters (0.3.2)
       rack (>= 2.2)
       zeitwerk (~> 2.6)
@@ -95,19 +95,20 @@ GEM
     rack (2.2.8)
     rack-accept (0.4.5)
       rack (>= 0.4)
-    rack-protection (3.1.0)
+    rack-protection (3.2.0)
+      base64 (>= 0.1.0)
       rack (~> 2.2, >= 2.2.4)
-    regexp_parser (2.8.2)
-    roda (3.74.0)
+    regexp_parser (2.8.3)
+    roda (3.75.0)
       rack
     ruby2_keywords (0.0.5)
     seg (1.2.0)
     simpleidn (0.2.1)
       unf (~> 0.1.4)
-    sinatra (3.1.0)
+    sinatra (3.2.0)
       mustermann (~> 3.0)
       rack (~> 2.2, >= 2.2.4)
-      rack-protection (= 3.1.0)
+      rack-protection (= 3.2.0)
       tilt (~> 2.0)
     syro (3.2.1)
       rack (>= 1.6.0)
@@ -117,11 +118,12 @@ GEM
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.9)
+    unf_ext (0.0.9.1)
     zeitwerk (2.6.12)
 
 PLATFORMS
   arm64-darwin-21
+  arm64-darwin-22
   x86_64-linux
 
 DEPENDENCIES
