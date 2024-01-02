@@ -98,7 +98,7 @@ RSpec.describe OpenapiFirst::Router do
       end
     end
 
-    describe 'when operation has no operationId' do
+    context 'when operation has no operationId' do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::Router,
@@ -191,7 +191,7 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      describe 'with nil' do
+      context 'with nil' do
         let(:option) { nil }
 
         it 'returns 404' do
@@ -201,7 +201,7 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      describe 'with false' do
+      context 'with false' do
         let(:option) { false }
 
         it 'returns 404' do
@@ -211,7 +211,7 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      describe 'with true' do
+      context 'with true' do
         let(:option) { true }
 
         it 'raises an error if path was not found' do
@@ -243,7 +243,7 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      describe 'with nil' do
+      context 'with nil' do
         let(:option) { nil }
 
         it 'returns 404' do
@@ -253,7 +253,7 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      describe 'with :halt' do
+      context 'with :halt' do
         let(:option) { :halt }
 
         it 'returns 404' do
@@ -263,7 +263,7 @@ RSpec.describe OpenapiFirst::Router do
         end
       end
 
-      describe 'with :continue' do
+      context 'with :continue' do
         let(:option) { :continue }
 
         it 'calls the next app in the stack' do
@@ -273,7 +273,7 @@ RSpec.describe OpenapiFirst::Router do
           expect(last_response.body).to eq 'hello'
         end
 
-        describe 'when combined with raise_error: true' do
+        context 'when combined with raise_error: true' do
           let(:app) do
             Rack::Builder.new do
               use OpenapiFirst::Router,

@@ -197,7 +197,7 @@ RSpec.describe 'Request body validation' do
       expect(error[:title]).to eq 'Failed to parse body as application/json'
     end
 
-    describe 'with default values' do
+    context 'with default values' do
       before { header Rack::CONTENT_TYPE, 'application/json' }
 
       it 'adds the default value if value is missing' do
@@ -257,7 +257,7 @@ RSpec.describe 'Request body validation' do
       expect(error[:title]).to eq 'Unsupported Media Type'
     end
 
-    describe 'when operation does not specify request body' do
+    context 'when operation does not specify request body' do
       it 'skips request body validation' do
         post '/without-request-body'
 
@@ -266,7 +266,7 @@ RSpec.describe 'Request body validation' do
       end
     end
 
-    describe 'when request body is empty and not required' do
+    context 'when request body is empty and not required' do
       it 'skips request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         patch '/pets/1'
@@ -276,7 +276,7 @@ RSpec.describe 'Request body validation' do
       end
     end
 
-    describe 'with a required writeOnly field' do
+    context 'with a required writeOnly field' do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::RequestValidation, spec: './spec/data/writeonly.yaml'
@@ -299,7 +299,7 @@ RSpec.describe 'Request body validation' do
       end
     end
 
-    describe 'with a readOnly required field' do
+    context 'with a readOnly required field' do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::RequestValidation, spec: './spec/data/readonly.yaml', raise_error: true
@@ -321,7 +321,7 @@ RSpec.describe 'Request body validation' do
       end
     end
 
-    describe 'with a required nullable field' do
+    context 'with a required nullable field' do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::RequestValidation, spec: './spec/data/nullable.yaml', raise_error: true

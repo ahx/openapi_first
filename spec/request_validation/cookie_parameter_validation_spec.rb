@@ -49,7 +49,7 @@ RSpec.describe 'Cookie Parameter validation' do
       expect(last_response.status).to be 400
     end
 
-    describe 'when raising' do
+    context 'when raising' do
       let(:app) do
         Rack::Builder.app do
           spec_file = File.expand_path('../data/cookie-parameter-validation.yaml', __dir__)

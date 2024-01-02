@@ -41,7 +41,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       subject.validate(response)
     end
 
-    describe 'when operation response has has no content defined' do
+    context 'when operation response has has no content defined' do
       let(:spec) { './spec/data/no-response-content.yaml' }
       let(:response) { Rack::Response.new('body', 200, headers) }
       let(:path) { '/' }
@@ -50,7 +50,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
         expect(subject.validate(response)).to be_nil
       end
 
-      describe 'when content type is empty' do
+      context 'when content type is empty' do
         let(:path) { '/empty-content' }
 
         it 'returns no errors' do

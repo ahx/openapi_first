@@ -46,7 +46,7 @@ RSpec.describe 'Header Parameter validation' do
       expect(last_request.env[OpenapiFirst::REQUEST].headers['Accept-Version']).to eq 1
     end
 
-    describe 'when raising' do
+    context 'when raising' do
       let(:app) do
         Rack::Builder.app do
           spec_file = File.expand_path('../data/header-parameter-validation.yaml', __dir__)

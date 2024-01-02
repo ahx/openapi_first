@@ -46,7 +46,7 @@ RSpec.describe 'Path Parameter validation' do
       expect(last_response.status).to be 404
     end
 
-    describe 'when raise_error: true' do
+    context 'when raise_error: true' do
       let(:raise_error_option) { true }
 
       it 'raises an error if query parameter is missing' do

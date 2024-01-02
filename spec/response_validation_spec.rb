@@ -31,7 +31,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     expect(last_request.env[OpenapiFirst::REQUEST]).to be_a OpenapiFirst::Definition::RuntimeRequest
   end
 
-  describe 'with a valid response' do
+  context 'with a valid response' do
     it 'returns no errors' do
       get '/pets'
 
@@ -40,7 +40,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'without content-type header' do
+  context 'without content-type header' do
     let(:headers) do
       { 'X-HEAD' => '/api/next-page' }
     end
@@ -53,7 +53,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'with 204 no content response' do
+  context 'with 204 no content response' do
     let(:spec) { './spec/data/no-content.yaml' }
     let(:status) { 204 }
 
@@ -67,11 +67,11 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'operation does not specify content-type' do
+  context 'when operation does not specify content-type' do
     let(:spec) { './spec/data/no-content.yaml' }
     let(:status) { 423 }
 
-    describe 'with any content-type' do
+    context 'with any content-type' do
       let(:headers) do
         { Rack::CONTENT_TYPE => 'application/hal+json' }
       end
@@ -82,7 +82,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       end
     end
 
-    describe 'with an empty content-type' do
+    context 'with an empty content-type' do
       let(:headers) do
         { Rack::CONTENT_TYPE => nil }
       end
@@ -101,7 +101,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'unknown status' do
+  context 'with unknown status' do
     let(:status) { 407 }
 
     specify do
@@ -111,7 +111,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'with a XX wildcard response status' do
+  context 'with a XX wildcard response status' do
     let(:spec) { './spec/data/response-code-wildcard.yaml' }
     let(:response_body) { {} }
 
@@ -144,7 +144,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'response body invalid' do
+  context 'with invalid response body' do
     let(:response_body) do
       json_dump([
                   { name: 'hans' },
@@ -159,7 +159,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'with a writeOnly field' do
+  context 'with a writeOnly field' do
     let(:spec) { './spec/data/writeonly.yaml' }
     let(:status) { 201 }
 
@@ -176,7 +176,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'with a required readOnly field' do
+  context 'with a required readOnly field' do
     let(:spec) { './spec/data/readonly.yaml' }
 
     let(:response_body) do
@@ -189,7 +189,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       end.to raise_error OpenapiFirst::ResponseBodyInvalidError
     end
 
-    describe 'when the readOnly field is valid' do
+    context 'when the readOnly field is valid' do
       let(:response_body) do
         json_dump({ id: '42', name: 'hans' })
       end
@@ -201,10 +201,10 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'with a required nullable field' do
+  context 'with a required nullable field' do
     let(:spec) { './spec/data/nullable.yaml' }
 
-    describe 'when the field is missing' do
+    context 'when the field is missing' do
       let(:response_body) do
         json_dump({})
       end
@@ -216,7 +216,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       end
     end
 
-    describe 'when the field is nil' do
+    context 'when the field is nil' do
       let(:response_body) do
         json_dump({ name: nil })
       end

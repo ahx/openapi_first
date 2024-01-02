@@ -117,10 +117,10 @@ RSpec.describe 'Query Parameter validation' do
       expect(last_request.env[OpenapiFirst::REQUEST].params).to eq expected_params
     end
 
-    describe 'with array query parameters' do
+    context 'with array query parameters' do
       let(:spec) { OpenapiFirst.load('./spec/data/parameters-array.yaml') }
 
-      describe 'with form style no explode parameters (default)' do
+      context 'with form style no explode parameters (default)' do
         it 'parses the array' do
           params = {
             strings: 'a,b,c',
@@ -168,7 +168,7 @@ RSpec.describe 'Query Parameter validation' do
       end
     end
 
-    describe 'with default values' do
+    context 'with default values' do
       it 'adds the default value if parameter is missing' do
         params = {}
         get '/with-default-query-param', params
@@ -194,7 +194,7 @@ RSpec.describe 'Query Parameter validation' do
       end
     end
 
-    describe 'with nested[param]' do
+    context 'with nested[param]' do
       let(:spec) { OpenapiFirst.load('./spec/data/parameters-flat.yaml') }
 
       let(:params) do
