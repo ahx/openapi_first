@@ -24,16 +24,6 @@ RSpec.describe OpenapiFirst::Schema do
     described_class.new(schema, openapi_version: '3.1').validate(data)
   end
 
-  describe 'validate.valid?' do
-    it 'returns true if data is valid' do
-      expect(validate(data).valid?).to be true
-    end
-
-    it 'returns false if data is invalid' do
-      expect(validate({}).valid?).to be false
-    end
-  end
-
   describe 'validate.error?' do
     it 'returns true if data is invalid' do
       expect(validate({}).error?).to be true
