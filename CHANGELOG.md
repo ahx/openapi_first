@@ -2,10 +2,12 @@
 
 ## Unreleased
 
+- Add interface to validate requests / responses without middlewares
 - Breaking: Rename OpenapiFirst::ResponseInvalid to OpenapiFirst::ResponseInvalidError
 - Breaking: Remove OpenapiFirst::Router
 - Add OpenapiFirst.configure
 - Add OpenapiFirst.register, OpenapiFirst.plugin
+- Breaking: Remove `env[OpenapiFirst::OPERATION]`. Use `env[OpenapiFirst::REQUEST]` instead.
 - Replace `env[OpenapiFirst::REQUEST_BODY]`, `env[OpenapiFirst::PARAMS]` with `env[OpenapiFirst::REQUEST].body`, `env[OpenapiFirst::REQUEST].params`
 
 ## 1.0.0.beta6
