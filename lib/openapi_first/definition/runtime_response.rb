@@ -22,18 +22,6 @@ module OpenapiFirst
 
       private
 
-      def status
-        response_definition&.status
-      end
-
-      def content_schema
-        response_definition&.content_schema
-      end
-
-      def content_type
-        response_definition&.content_type
-      end
-
       def response_definition
         @response_definition ||= @operation.response_for(@rack_response.status, @rack_response.content_type)
       end
