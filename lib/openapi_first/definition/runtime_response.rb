@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../response_validation/validator'
+
 module OpenapiFirst
   class Definition
     class RuntimeResponse
@@ -12,8 +14,10 @@ module OpenapiFirst
         response_definition&.description
       end
 
-      def validate
-        # unknown status unless status
+      def validate!
+        return if @operation.nil?
+
+        ResponseValidation::Validator.new(@operation).validate(@rack_response)
       end
 
       private

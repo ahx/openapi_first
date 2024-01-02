@@ -5,7 +5,23 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first'
 
-RSpec.describe 'Request validation' do
+RSpec.describe OpenapiFirst::RequestValidation do
+  describe '.fail!' do
+    it 'throws a failure' do
+      expect do
+        described_class.fail!(:body)
+      end.to throw_symbol(described_class::FAIL, instance_of(described_class::Failure))
+    end
+
+    context 'with an unknown argument' do
+      it 'throws a failure' do
+        expect do
+          described_class.fail!(:unknown)
+        end.to raise_error(ArgumentError)
+      end
+    end
+  end
+
   include Rack::Test::Methods
   let(:app) do
     Rack::Builder.app do
@@ -16,16 +32,9 @@ RSpec.describe 'Request validation' do
     end
   end
 
-  it 'adds merged query and path parameters to env ' do
+  it 'adds request to env ' do
     get '/stuff/12?version=1'
-    expected_params = { 'version' => 1, 'id' => 12 }
-    expect(last_request.env[OpenapiFirst::PARAMS]).to eq expected_params
-  end
-
-  it 'prioritizes path over query params' do
-    get '/same-name-params/12?id=1'
-    expected_params = { 'id' => 12 }
-    expect(last_request.env[OpenapiFirst::PARAMS]).to eq expected_params
+    expect(last_request.env[OpenapiFirst::REQUEST]).to be_a OpenapiFirst::Definition::RuntimeRequest
   end
 
   context 'with custom error_response option' do

@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require 'multi_json'
-require_relative 'use_router'
-require_relative 'response_validation/validator'
+require_relative 'response_validation/middleware'
 
 module OpenapiFirst
   class ResponseInvalid < StandardError; end
@@ -11,20 +10,9 @@ module OpenapiFirst
   class ResponseHeaderInvalidError < ResponseInvalid; end
   class ResponseBodyInvalidError < ResponseInvalid; end
 
-  class ResponseValidation
-    prepend UseRouter
-
-    def initialize(app, _options = {})
-      @app = app
-    end
-
-    def call(env)
-      operation = env[OPERATION]
-      return @app.call(env) unless operation
-
-      response = @app.call(env)
-      Validator.new(operation).validate(response)
-      response
+  module ResponseValidation
+    def self.new(app, options = {})
+      Middleware.new(app, options)
     end
   end
 end

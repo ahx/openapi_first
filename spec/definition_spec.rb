@@ -8,51 +8,44 @@ RSpec.describe OpenapiFirst::Definition do
   end
 
   describe '#request' do
-    let(:result) { definition.request(request) }
-
-    context 'with a matching path and operation' do
+    context 'with a matching path and request method' do
       let(:definition) { OpenapiFirst.load('./spec/data/incompatible-routes.yaml') }
       let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/foo/1')) }
 
       it 'returns a Definition::RuntimeRequest' do
-        expect(result).to be_a(OpenapiFirst::Definition::RuntimeRequest)
-        expect(result.operation.operation_id).to eq 'foo'
+        expect(definition.request(request)).to be_a(OpenapiFirst::Definition::RuntimeRequest)
       end
 
-      it 'has a path_item' do
-        expect(result.path_item).to be_a(OpenapiFirst::Definition::PathItem)
-        expect(result.path_item.path).to eq('/foo/{fooId}')
+      it 'is a known request' do
+        expect(definition.request(request)).to be_known
       end
     end
 
     context 'with different variables in common nested routes' do
       let(:definition) { OpenapiFirst.load('./spec/data/incompatible-routes.yaml') }
 
-      specify do
-        match = definition.request(build_request('/foo/1'))
-        expect(match.path_params).to eq({ 'fooId' => '1' })
-        expect(match.path_item.path).to eq('/foo/{fooId}')
+      it 'finds a match' do
+        request = definition.request(build_request('/foo/1'))
+        expect(request.path_params).to eq({ 'fooId' => '1' })
 
-        match = definition.request(build_request('/foo/1/bar'))
-        expect(match.path_params).to eq({ 'id' => '1' })
-        expect(match.path_item.path).to eq('/foo/{id}/bar')
+        request = definition.request(build_request('/foo/1/bar'))
+        expect(request.path_params).to eq({ 'id' => '1' })
 
-        match = definition.request(build_request('/foo/special'))
-        expect(match.path_params).to eq({})
-        expect(match.path_item.path).to eq('/foo/special')
+        request = definition.request(build_request('/foo/special'))
+        expect(request.path_params).to eq({})
       end
     end
 
     context 'with a matching path but unknown request method' do
       let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
-      let(:request) { build_request('/pets', method: 'PATCH') }
+      let(:rack_request) { build_request('/pets', method: 'PATCH') }
 
-      it 'has a path_item' do
-        expect(result.path_item).to be_a(OpenapiFirst::Definition::PathItem)
+      it 'has a known path' do
+        expect(definition.request(rack_request)).to be_known_path
       end
 
-      it 'has no operation' do
-        expect(result.operation).to be_nil
+      it 'has no known request method' do
+        expect(definition.request(rack_request)).not_to be_known_request_method
       end
     end
   end

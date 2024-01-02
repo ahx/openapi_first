@@ -22,9 +22,7 @@ use OpenapiFirst::RequestValidation, spec: 'openapi.yaml'
 
 It adds these fields to the Rack env:
 
-- `env[OpenapiFirst::PARAMS]` – The parsed parameters (query, path) for the current request (string keyed)
-- `env[OpenapiFirst::REQUEST_BODY]` – The parsed request body (string keyed)
-- `env[OpenapiFirst::OPERATION]` (Added via Router) – The Operation object for the current request. This is an instance of `OpenapiFirst::Operation`.
+- `env[OpenapiFirst::REQUEST]` – This is an instance of `OpenapiFirst::RuntimeRequest`
 
 ### Options and defaults
 

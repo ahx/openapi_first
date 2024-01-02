@@ -1,112 +1,51 @@
 # frozen_string_literal: true
 
 require 'rack'
-require 'multi_json'
-require_relative '../use_router'
-require_relative 'request_body_validator'
-
 module OpenapiFirst
-  class RequestInvalidError < StandardError; end
-
   module RequestValidation
     # A Rack middleware to validate requests against an OpenAPI API description
     class Middleware
-      prepend UseRouter
-
       # @param app The parent Rack application
       # @param options An optional Hash of configuration options to override defaults
-      #   :error_response A Boolean indicating whether to raise an error if validation fails.
-      #                   default: OpenapiFirst::Plugins::Default::ErrorResponse (Config.default_options.error_response)
-      #   :raise_error    The Class to use for error responses.
+      #   :raise_error    A Boolean indicating whether to raise an error if validation fails.
       #                   default: false
+      #   :error_response The Class to use for error responses.
+      #                   default: OpenapiFirst::Plugins::Default::ErrorResponse (Config.default_options.error_response)
       def initialize(app, options = {})
         @app = app
         @raise = options.fetch(:raise_error, OpenapiFirst.configuration.request_validation_raise_error)
         @error_response_class = error_response(options[:error_response])
+
+        spec = options.fetch(:spec)
+        raise "You have to pass spec: when initializing #{self.class}" unless spec
+
+        @definition = spec.is_a?(Definition) ? spec : OpenapiFirst.load(spec)
       end
 
       def call(env)
-        operation = env[OPERATION]
-        return @app.call(env) unless operation
+        request = find_request(env)
+        return @app.call(env) unless request
 
-        error = validate_request(operation, env)
-        if error
-          raise RequestInvalidError, error.error_message if @raise
-
-          return @error_response_class.new(env, error).render
-        end
+        error = if @raise
+                  request.validate!
+                else
+                  request.validate
+                end
+        return @error_response_class.new(env, error).render if error
 
         @app.call(env)
       end
 
       private
 
+      def find_request(env)
+        env[REQUEST] ||= @definition.request(Rack::Request.new(env))
+      end
+
       def error_response(mod)
         return OpenapiFirst.plugin(mod)::ErrorResponse if mod.is_a?(Symbol)
 
         mod || OpenapiFirst.configuration.error_response
-      end
-
-      def validate_request(operation, env)
-        catch(FAIL) do
-          env[PARAMS] = {}
-          validate_parameters!(operation, env)
-          validate_request_body!(operation, env)
-          nil
-        end
-      end
-
-      def validate_parameters!(operation, env)
-        validate_query_params!(operation, env)
-        validate_path_params!(operation, env)
-        validate_cookie_params!(operation, env)
-        validate_header_params!(operation, env)
-      end
-
-      def validate_path_params!(operation, env)
-        parameters = operation.path_parameters
-        return unless parameters
-
-        unpacked_params = parameters.unpack(env)
-        validation_result = parameters.schema.validate(unpacked_params)
-        RequestValidation.fail!(:path, validation_result:) if validation_result.error?
-        env[PATH_PARAMS] = unpacked_params
-        env[PARAMS].merge!(unpacked_params)
-      end
-
-      def validate_query_params!(operation, env)
-        parameters = operation.query_parameters
-        return unless parameters
-
-        unpacked_params = parameters.unpack(env)
-        validation_result = parameters.schema.validate(unpacked_params)
-        RequestValidation.fail!(:query, validation_result:) if validation_result.error?
-        env[QUERY_PARAMS] = unpacked_params
-        env[PARAMS].merge!(unpacked_params)
-      end
-
-      def validate_cookie_params!(operation, env)
-        parameters = operation.cookie_parameters
-        return unless parameters
-
-        unpacked_params = parameters.unpack(env)
-        validation_result = parameters.schema.validate(unpacked_params)
-        RequestValidation.fail!(:cookie, validation_result:) if validation_result.error?
-        env[COOKIE_PARAMS] = unpacked_params
-      end
-
-      def validate_header_params!(operation, env)
-        parameters = operation.header_parameters
-        return unless parameters
-
-        unpacked_params = parameters.unpack(env)
-        validation_result = parameters.schema.validate(unpacked_params)
-        RequestValidation.fail!(:header, validation_result:) if validation_result.error?
-        env[HEADER_PARAMS] = unpacked_params
-      end
-
-      def validate_request_body!(operation, env)
-        env[REQUEST_BODY] = RequestBodyValidator.new(operation, env).validate!
       end
     end
   end

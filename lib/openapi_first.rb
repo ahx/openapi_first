@@ -14,8 +14,6 @@ require_relative 'openapi_first/response_validation'
 module OpenapiFirst
   extend Plugins
 
-  class NotFoundError < StandardError; end
-
   class << self
     def configuration
       @configuration ||= Configuration.new
@@ -26,26 +24,8 @@ module OpenapiFirst
     end
   end
 
-  # The OpenAPI operation for the current request
-  OPERATION = 'openapi.operation'
-
-  # Merged parsed path and query parameters
-  PARAMS = 'openapi.params'
-
-  # Parsed query parameters
-  QUERY_PARAMS = 'openapi.query'
-
-  # Parsed path parameters
-  PATH_PARAMS = 'openapi.path_params'
-
-  # Parsed header parameters, except for Content-Type, Accept and Authorization
-  HEADER_PARAMS = 'openapi.headers'
-
-  # Parsed cookie parameter values
-  COOKIE_PARAMS = 'openapi.cookies'
-
-  # The parsed request body
-  REQUEST_BODY = 'openapi.parsed_request_body'
+  # An instance of RuntimeRequest
+  REQUEST = 'openapi.request'
 
   def self.load(spec_path, only: nil)
     resolved = Dir.chdir(File.dirname(spec_path)) do

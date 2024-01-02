@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  class ResponseValidation
+  module ResponseValidation
     class Validator
       def initialize(operation)
         @operation = operation
       end
 
-      def validate(response)
-        status, headers, body = response.to_a
+      def validate(rack_response)
+        status, headers, body = rack_response.to_a
 
         content_type = headers[Rack::CONTENT_TYPE]
         response_definition = response_for(operation, status, content_type)

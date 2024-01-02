@@ -3,7 +3,6 @@
 require 'rack'
 require 'multi_json'
 require 'mustermann'
-require_relative 'body_parser'
 
 module OpenapiFirst
   class Router
@@ -31,7 +30,7 @@ module OpenapiFirst
     def call(env)
       env[OPERATION] = nil
       request = @definition.request(Rack::Request.new(env))
-      env[OPERATION] = request.operation
+      # env[OPERATION] = request.operation
       env[RAW_PATH_PARAMS] = request.path_params
 
       if request.operation.nil?

@@ -4,17 +4,18 @@ require 'multi_json'
 
 module OpenapiFirst
   class BodyParser
-    def parse_body(env)
-      request = Rack::Request.new(env)
+    class ParsingError < StandardError; end
+
+    def parse(request, content_type)
       body = read_body(request)
       return if body.empty?
 
-      return MultiJson.load(body) if request.media_type =~ (/json/i) && (request.media_type =~ /json/i)
+      return MultiJson.load(body) if content_type =~ (/json/i) && (content_type =~ /json/i)
       return request.POST if request.form_data?
 
       body
     rescue MultiJson::ParseError
-      raise BodyParsingError, 'Failed to parse body as application/json'
+      raise ParsingError, 'Failed to parse body as application/json'
     end
 
     private

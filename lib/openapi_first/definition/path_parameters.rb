@@ -6,8 +6,8 @@ require_relative '../router'
 
 module OpenapiFirst
   class PathParameters < Parameters
-    def unpack(env)
-      OpenapiParameters::Path.new(@parameter_definitions).unpack(env[Router::RAW_PATH_PARAMS])
+    def unpack(original_path_params)
+      OpenapiParameters::Path.new(@parameter_definitions).unpack(original_path_params)
     end
   end
 end

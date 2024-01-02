@@ -2,16 +2,16 @@
 
 require 'rack'
 require 'multi_json'
-require_relative 'use_router'
 require_relative 'request_validation/request_body_validator'
 require_relative 'request_validation/failure'
 require 'openapi_parameters'
 require_relative 'request_validation/middleware'
 
 module OpenapiFirst
+  class RequestInvalidError < StandardError; end
+
   module RequestValidation
     FAIL = :request_validation_failed
-    private_constant :FAIL
 
     # @param status [Integer] The intended HTTP status code (usually 400)
     # @param location [Symbol] One of :body, :header, :cookie, :query, :path

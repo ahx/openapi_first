@@ -86,6 +86,8 @@ module OpenapiFirst
         @cookie_parameters ||= build_parameters(all_parameters.filter { |p| p['in'] == 'cookie' }, CookieParameters)
       end
 
+      private
+
       def all_parameters
         @all_parameters ||= begin
           parameters = @path_item_object['parameters']&.dup || []
@@ -94,8 +96,6 @@ module OpenapiFirst
           parameters
         end
       end
-
-      private
 
       def responses
         @responses ||= Responses.new(self, operation_object['responses'])

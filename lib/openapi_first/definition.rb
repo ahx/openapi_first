@@ -19,6 +19,7 @@ module OpenapiFirst
       path_item, path_params = find_path_item_and_params(rack_request.path)
       operation = path_item&.operation(rack_request.request_method.downcase)
       RuntimeRequest.new(
+        request: rack_request,
         path_item:,
         operation:,
         path_params:

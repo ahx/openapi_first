@@ -8,14 +8,11 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
   let(:spec) { './spec/data/petstore.yaml' }
 
   let(:subject) do
-    operation = OpenapiFirst.load(spec).request(request).operation
+    operation = OpenapiFirst.load(spec).path(path).operation('get')
     described_class.new(operation)
   end
 
-  let(:request) do
-    env = Rack::MockRequest.env_for('/pets')
-    Rack::Request.new(env)
-  end
+  let(:path) { '/pets' }
 
   let(:headers) { { Rack::CONTENT_TYPE => 'application/json' } }
 
@@ -47,14 +44,14 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
     describe 'when operation response has has no content defined' do
       let(:spec) { './spec/data/no-response-content.yaml' }
       let(:response) { Rack::Response.new('body', 200, headers) }
-      let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/')) }
+      let(:path) { '/' }
 
       it 'returns no errors' do
-        subject.validate(response)
+        expect(subject.validate(response)).to be_nil
       end
 
       describe 'when content type is empty' do
-        let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/empty-content')) }
+        let(:path) { '/empty-content' }
 
         it 'returns no errors' do
           subject.validate(response)
@@ -65,7 +62,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
 
   describe 'invalid response' do
     context 'when response status is unknown' do
-      let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/pets/12')) }
+      let(:path) { '/pets/{petId}' }
 
       it 'fails' do
         response_body = json_dump({ id: 2, name: 'Voldemort' })

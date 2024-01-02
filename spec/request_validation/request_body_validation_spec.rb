@@ -71,7 +71,7 @@ RSpec.describe 'Request body validation' do
       post path, request_body
 
       expect(last_response.status).to be(200), last_response.body
-      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
     end
 
     it 'succeeds with multipart form data file binary upload' do
@@ -79,7 +79,7 @@ RSpec.describe 'Request body validation' do
       status, _headers, body = app.call(env)
 
       expect(status).to eq(200), body
-      uploaded_file = env[OpenapiFirst::REQUEST_BODY]['file']
+      uploaded_file = env[OpenapiFirst::REQUEST].body['file']
       expect(uploaded_file).to eq file_content
     end
 
@@ -88,7 +88,7 @@ RSpec.describe 'Request body validation' do
       post path, 'Cat!'
 
       expect(last_response.status).to be(200), last_response.body
-      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq 'Cat!'
+      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq 'Cat!'
     end
 
     it 'works with % in request body' do
@@ -117,7 +117,7 @@ RSpec.describe 'Request body validation' do
       post '/json_api', json_dump(request_body)
 
       expect(last_response.status).to be 200
-      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
     end
 
     it 'works with a custom json media type' do
@@ -125,7 +125,7 @@ RSpec.describe 'Request body validation' do
       post '/custom-json-type', json_dump(request_body)
 
       expect(last_response.status).to be 200
-      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
     end
 
     it 'adds parsed request body to env' do
@@ -133,14 +133,14 @@ RSpec.describe 'Request body validation' do
       post path, json_dump(request_body)
 
       expect(last_response.status).to be 200
-      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
     end
 
     it 'updates REQUEST_BODY' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
-      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
     end
 
     it 'returns 400 if request body is not valid' do
@@ -204,7 +204,7 @@ RSpec.describe 'Request body validation' do
         params = {}
         post '/with-default-body-value', json_dump(params)
         expect(last_response.status).to eq(200)
-        values = last_request.env[OpenapiFirst::REQUEST_BODY]
+        values = last_request.env[OpenapiFirst::REQUEST].body
         expect(values['has_default']).to eq true
       end
 
@@ -220,7 +220,7 @@ RSpec.describe 'Request body validation' do
         params = { has_default: false }
         post '/with-default-body-value', json_dump(params)
         expect(last_response.status).to eq(200)
-        values = last_request.env[OpenapiFirst::REQUEST_BODY]
+        values = last_request.env[OpenapiFirst::REQUEST].body
         expect(values['has_default']).to eq false
       end
     end
@@ -237,7 +237,7 @@ RSpec.describe 'Request body validation' do
       post '/with-form-urlencoded', request_body
 
       expect(last_response.status).to be(200), last_response.body
-      expect(last_request.env[OpenapiFirst::REQUEST_BODY]).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
     end
 
     it 'returns 400 if required request body is missing' do
@@ -279,8 +279,7 @@ RSpec.describe 'Request body validation' do
     describe 'with a required writeOnly field' do
       let(:app) do
         Rack::Builder.new do
-          use OpenapiFirst::Router, spec: './spec/data/writeonly.yaml', raise_error: true
-          use OpenapiFirst::RequestValidation
+          use OpenapiFirst::RequestValidation, spec: './spec/data/writeonly.yaml'
           run lambda { |_env|
             Rack::Response.new('hello', 201).finish
           }
@@ -303,8 +302,7 @@ RSpec.describe 'Request body validation' do
     describe 'with a readOnly required field' do
       let(:app) do
         Rack::Builder.new do
-          use OpenapiFirst::Router, spec: './spec/data/readonly.yaml', raise_error: true
-          use OpenapiFirst::RequestValidation, raise_error: true
+          use OpenapiFirst::RequestValidation, spec: './spec/data/readonly.yaml', raise_error: true
           run lambda { |_env|
             Rack::Response.new('hello', 200).finish
           }
@@ -326,8 +324,7 @@ RSpec.describe 'Request body validation' do
     describe 'with a required nullable field' do
       let(:app) do
         Rack::Builder.new do
-          use OpenapiFirst::Router, spec: './spec/data/nullable.yaml', raise_error: true
-          use OpenapiFirst::RequestValidation, raise_error: true
+          use OpenapiFirst::RequestValidation, spec: './spec/data/nullable.yaml', raise_error: true
           run lambda { |_env|
             Rack::Response.new('hello', 201).finish
           }

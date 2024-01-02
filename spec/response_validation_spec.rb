@@ -25,6 +25,12 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   end
   let(:response) { Rack::Response.new(response_body, status, headers) }
 
+  it 'adds request to env ' do
+    get '/pets'
+
+    expect(last_request.env[OpenapiFirst::REQUEST]).to be_a OpenapiFirst::Definition::RuntimeRequest
+  end
+
   describe 'with a valid response' do
     it 'returns no errors' do
       get '/pets'
@@ -88,19 +94,10 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
   end
 
-  describe 'no operation found' do
-    let(:app) do
-      definition = spec
-      Rack::Builder.app do
-        use OpenapiFirst::ResponseValidation, spec: definition
-        run ->(_env) { [200, {}, ''] }
-      end
-    end
-
-    specify do
-      env = { OpenapiFirst::OPERATION => nil }
-      response = app.call(env)
-      expect(response[0]).to eq 200
+  context 'with an unkown route' do
+    it 'skips response validation' do
+      get '/unknown'
+      expect(last_response.status).to eq 200
     end
   end
 
