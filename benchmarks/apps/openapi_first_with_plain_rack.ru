@@ -25,7 +25,7 @@ app = Rack::Builder.new do
   not_found = ->(_env) { [404, {}, []] }
 
   run(lambda do |env|
-    handlers.fetch(env[OpenapiFirst::OPERATION]&.operation_id, not_found).call(env)
+    handlers.fetch(env[OpenapiFirst::REQUEST]&.operation_id, not_found).call(env)
   end)
 end
 

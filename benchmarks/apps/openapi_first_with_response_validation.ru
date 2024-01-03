@@ -20,6 +20,6 @@ app = Class.new(Hanami::API) do
 end.new
 
 use OpenapiFirst::RequestValidation, spec: File.absolute_path('./openapi.yaml', __dir__)
-use OpenapiFirst::ResponseValidation
+use OpenapiFirst::ResponseValidation, spec: File.absolute_path('./openapi.yaml', __dir__)
 
 run app
