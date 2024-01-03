@@ -71,7 +71,7 @@ use OpenapiFirst::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] ==
 
 ## Global configuration
 
-You can configure default options gobally:
+You can configure default options globally:
 
 ```ruby
 OpenapiFirst.configure do |config|
