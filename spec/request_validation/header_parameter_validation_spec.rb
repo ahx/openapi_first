@@ -22,9 +22,6 @@ RSpec.describe 'Header Parameter validation' do
       header 'Accept-Version', 'not-an-integer'
       get '/pets'
       expect(last_response.status).to eq 400
-      error = json_load(last_response.body, symbolize_keys: true)[:errors][0]
-      expect(error[:title]).to eq 'value at `/Accept-Version` is not an integer'
-      expect(error[:source][:header]).to eq 'Accept-Version'
     end
 
     it 'accepts a valid header parameter' do

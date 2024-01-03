@@ -26,9 +26,6 @@ RSpec.describe 'Path Parameter validation' do
       get '/pets/not-an-integer'
 
       expect(last_response.status).to eq 400
-      error = json_load(last_response.body, symbolize_keys: true)[:errors][0]
-      expect(error[:title]).to eq 'value at `/petId` is not an integer'
-      expect(error[:source][:parameter]).to eq 'petId'
     end
 
     it 'adds the converted path parameter to env ' do

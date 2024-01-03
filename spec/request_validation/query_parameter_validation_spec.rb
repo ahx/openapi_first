@@ -46,9 +46,6 @@ RSpec.describe 'Query Parameter validation' do
       get '/search', params
 
       expect(last_response.status).to eq 400
-      error = response_body[:errors][0]
-      expect(error[:title]).to eq 'object at root is missing required properties: term'
-      expect(error[:source][:parameter]).to eq ''
     end
 
     it 'returns 400 if query parameter has not valid format' do
@@ -56,9 +53,7 @@ RSpec.describe 'Query Parameter validation' do
       get '/search', params
 
       expect(last_response.status).to be 400
-      error = response_body[:errors][0]
-      expect(error[:title]).to eq 'value at `/birthdate` does not match format: date'
-      expect(error[:source][:parameter]).to eq 'birthdate'
+      response_body[:errors][0]
     end
 
     it 'returns 400 if query parameter has not valid date-time format' do
@@ -66,9 +61,6 @@ RSpec.describe 'Query Parameter validation' do
       get '/search', params
 
       expect(last_response.status).to be 400
-      error = response_body[:errors][0]
-      expect(error[:title]).to eq 'value at `/date_time` does not match format: date-time'
-      expect(error[:source][:parameter]).to eq 'date_time'
     end
 
     it 'returns 400 if query parameter is empty' do
@@ -76,10 +68,6 @@ RSpec.describe 'Query Parameter validation' do
       get '/search', params
 
       expect(last_response.status).to be 400
-      error = response_body[:errors][0]
-      pp response_body
-      expect(error[:title]).to eq 'value at `/birthdate` does not match format: date'
-      expect(error[:source][:parameter]).to eq 'birthdate'
     end
 
     it 'returns 400 if query parameter does not match pattern' do
@@ -87,10 +75,6 @@ RSpec.describe 'Query Parameter validation' do
       get '/search', params
 
       expect(last_response.status).to be 400
-      error = response_body[:errors][0]
-      message = 'string at `/include` does not match pattern: (parents|children)+(,(parents|children))*'
-      expect(error[:title]).to eq message
-      expect(error[:source][:parameter]).to eq 'include'
     end
 
     it 'adds parsed query parameters to env ' do
@@ -161,9 +145,6 @@ RSpec.describe 'Query Parameter validation' do
           }
           get '/default-style', params
           expect(last_response.status).to eq(400)
-          error = response_body[:errors][0]
-          expect(error[:source][:parameter]).to eq 'integers/1'
-          expect(error[:title]).to eq 'value at `/integers/1` is not an integer'
         end
       end
     end

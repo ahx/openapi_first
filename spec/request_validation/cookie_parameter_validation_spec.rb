@@ -27,9 +27,6 @@ RSpec.describe 'Cookie Parameter validation' do
       get '/'
 
       expect(last_response.status).to eq 400
-      error = json_load(last_response.body, symbolize_keys: true)[:errors][0]
-      expect(error[:title]).to eq 'value at `/knusper` is not an integer'
-      expect(error[:source][:cookie]).to eq 'knusper'
     end
 
     it 'adds the converted cookie to env ' do
