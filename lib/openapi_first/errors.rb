@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  class NotFoundError < StandardError; end
-  class RequestInvalidError < StandardError; end
-  class ResponseInvalidError < StandardError; end
+  class Error < StandardError; end
+  class NotFoundError < Error; end
+  class RequestInvalidError < Error; end
+  class ResponseInvalidError < Error; end
   class ResponseCodeNotFoundError < ResponseInvalidError; end
   class ResponseContentTypeNotFoundError < ResponseInvalidError; end
   class ResponseHeaderInvalidError < ResponseInvalidError; end
