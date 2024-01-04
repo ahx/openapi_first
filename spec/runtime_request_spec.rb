@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Definition::RuntimeRequest do
+RSpec.describe OpenapiFirst::RuntimeRequest do
   subject(:request) do
     definition.request(rack_request)
   end

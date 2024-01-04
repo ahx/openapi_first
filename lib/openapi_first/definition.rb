@@ -2,7 +2,7 @@
 
 require 'mustermann/template'
 require_relative 'definition/path_item'
-require_relative 'definition/runtime_request'
+require_relative 'runtime_request'
 
 module OpenapiFirst
   # Represents an OpenAPI API Description document

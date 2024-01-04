@@ -13,7 +13,7 @@ RSpec.describe OpenapiFirst::Definition do
       let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/foo/1')) }
 
       it 'returns a Definition::RuntimeRequest' do
-        expect(definition.request(request)).to be_a(OpenapiFirst::Definition::RuntimeRequest)
+        expect(definition.request(request)).to be_a(OpenapiFirst::RuntimeRequest)
       end
 
       it 'is a known request' do
@@ -67,7 +67,7 @@ RSpec.describe OpenapiFirst::Definition do
 
     it 'returns a Definition::RuntimeResponse' do
       result = definition.response(request, response)
-      expect(result).to be_a(OpenapiFirst::Definition::RuntimeResponse)
+      expect(result).to be_a(OpenapiFirst::RuntimeResponse)
       expect(result.description).to eq('A paged array of pets')
     end
   end

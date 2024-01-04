@@ -28,7 +28,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   it 'adds request to env ' do
     get '/pets'
 
-    expect(last_request.env[OpenapiFirst::REQUEST]).to be_a OpenapiFirst::Definition::RuntimeRequest
+    expect(last_request.env[OpenapiFirst::REQUEST]).to be_a OpenapiFirst::RuntimeRequest
   end
 
   context 'with a valid response' do
