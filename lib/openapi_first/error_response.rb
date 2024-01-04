@@ -5,33 +5,40 @@ require 'forwardable'
 module OpenapiFirst
   # This is the base class for error responses
   class ErrorResponse
-    ## @param request [Hash] The Rack request env
-    ## @param request_validation_error [OpenapiFirst::RequestValidationError]
-    def initialize(env, request_validation_error)
-      @env = env
-      @request_validation_error = request_validation_error
+    ## @param failure [OpenapiFirst::RequestValidation::Failure]
+    def initialize(failure: nil)
+      @failure = failure
     end
 
     extend Forwardable
 
-    attr_reader :env, :request_validation_error
+    def_delegators :@failure, :error_type, :validation_result
 
-    def_delegators :@request_validation_error, :status, :location, :schema_validation
+    STATUS = {
+      not_found: 404,
+      method_not_allowed: 405,
+      unsupported_media_type: 415
+    }.freeze
+    private_constant :STATUS
 
-    def validation_output
-      schema_validation&.output
-    end
-
-    def schema
-      schema_validation&.schema
-    end
-
-    def data
-      schema_validation&.data
+    def status
+      STATUS[error_type] || 400
     end
 
     def message
-      request_validation_error.message
+      Rack::Utils::HTTP_STATUS_CODES[status]
+    end
+
+    def validation_output
+      validation_result&.output
+    end
+
+    def schema
+      validation_result&.schema
+    end
+
+    def data
+      validation_result&.data
     end
 
     def render

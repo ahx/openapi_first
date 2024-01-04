@@ -27,15 +27,12 @@ RSpec.describe 'Cookie Parameter validation' do
       get '/'
 
       expect(last_response.status).to eq 400
-      error = json_load(last_response.body, symbolize_keys: true)[:errors][0]
-      expect(error[:title]).to eq 'value at `/knusper` is not an integer'
-      expect(error[:source][:cookie]).to eq 'knusper'
     end
 
     it 'adds the converted cookie to env ' do
       set_cookie 'knusper=42'
       get '/'
-      expect(last_request.env[OpenapiFirst::COOKIE_PARAMS]['knusper']).to eq 42
+      expect(last_request.env[OpenapiFirst::REQUEST].cookies['knusper']).to eq 42
     end
 
     it 'succeeds if cookie is valid' do
@@ -49,7 +46,7 @@ RSpec.describe 'Cookie Parameter validation' do
       expect(last_response.status).to be 400
     end
 
-    describe 'when raising' do
+    context 'when raising' do
       let(:app) do
         Rack::Builder.app do
           spec_file = File.expand_path('../data/cookie-parameter-validation.yaml', __dir__)

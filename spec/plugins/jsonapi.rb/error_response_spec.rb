@@ -2,30 +2,28 @@
 
 require 'spec_helper'
 
-RSpec.describe OpenapiFirst::ErrorResponses::Default do
+RSpec.describe OpenapiFirst.plugin(:jsonapi)::ErrorResponse do
   describe '#render' do
     let(:env) { {} }
 
-    context 'when schema_validation is nil' do
+    context 'when validation_result is nil' do
       specify do
         error = described_class.new(
-          env,
-          OpenapiFirst::RequestValidationError.new(
-            status: 400,
-            location: :body
+          failure: OpenapiFirst::RequestValidation::Failure.new(
+            :invalid_body
           )
         )
         status, headers, body = error.render
         response = Rack::MockResponse.new(status, headers, body)
         expect(response.status).to eq(400)
-        expect(response.content_type).to eq('application/json')
+        expect(response.content_type).to eq('application/vnd.api+json')
         expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
           { errors: [{ status: '400', title: 'Bad Request' }] }
         )
       end
     end
 
-    context 'when schema_validation is specified' do
+    context 'when validation_result is specified' do
       specify do
         schema = {
           'type' => 'object',
@@ -40,19 +38,17 @@ RSpec.describe OpenapiFirst::ErrorResponses::Default do
           }
         }
         data = { 'data' => { 'name' => 21, 'numberOfLegs' => 'four' } }
-        schema_validation = OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data)
+        validation_result = OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data)
         error = described_class.new(
-          env,
-          OpenapiFirst::RequestValidationError.new(
-            status: 400,
-            location: :body,
-            schema_validation:
+          failure: OpenapiFirst::RequestValidation::Failure.new(
+            :invalid_body,
+            validation_result:
           )
         )
         status, headers, body = error.render
         response = Rack::MockResponse.new(status, headers, body)
         expect(response.status).to eq(400)
-        expect(response.content_type).to eq('application/json')
+        expect(response.content_type).to eq('application/vnd.api+json')
         expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
           { errors: [
             {

@@ -2,39 +2,30 @@
 
 require 'yaml'
 require 'json_refs'
-require_relative 'openapi_first/config'
+require_relative 'openapi_first/errors'
+require_relative 'openapi_first/configuration'
 require_relative 'openapi_first/plugins'
 require_relative 'openapi_first/definition'
 require_relative 'openapi_first/version'
-require_relative 'openapi_first/errors'
-require_relative 'openapi_first/router'
+require_relative 'openapi_first/error_response'
 require_relative 'openapi_first/request_validation'
-require_relative 'openapi_first/response_validator'
 require_relative 'openapi_first/response_validation'
-require_relative 'openapi_first/error_responses/default'
-require_relative 'openapi_first/error_responses/json_api'
 
 module OpenapiFirst
-  # The OpenAPI operation for the current request
-  OPERATION = 'openapi.operation'
+  extend Plugins
 
-  # Merged parsed path and query parameters
-  PARAMS = 'openapi.params'
+  class << self
+    def configuration
+      @configuration ||= Configuration.new
+    end
 
-  # Parsed query parameters
-  QUERY_PARAMS = 'openapi.query'
+    def configure
+      yield configuration
+    end
+  end
 
-  # Parsed path parameters
-  PATH_PARAMS = 'openapi.path_params'
-
-  # Parsed header parameters, except for Content-Type, Accept and Authorization
-  HEADER_PARAMS = 'openapi.headers'
-
-  # Parsed cookie parameter values
-  COOKIE_PARAMS = 'openapi.cookies'
-
-  # The parsed request body
-  REQUEST_BODY = 'openapi.parsed_request_body'
+  # An instance of RuntimeRequest
+  REQUEST = 'openapi.request'
 
   def self.load(spec_path, only: nil)
     resolved = Dir.chdir(File.dirname(spec_path)) do

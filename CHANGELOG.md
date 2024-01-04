@@ -2,10 +2,21 @@
 
 ## Unreleased
 
+- Breaking: Moved rack middlewares to OpenapiFirst::Middlewares. Adding `OpenapiFirst::RequestValidation.new`, `OpenapiFirst::ResponseValidation.new` as shortcuts.
+- Fix response header validation with Rack 3
+- Add interface to validate requests / responses without middlewares (see "Manual validation" in README)
+- Breaking: Rename OpenapiFirst::ResponseInvalid to OpenapiFirst::ResponseInvalidError
+- Breaking: Remove OpenapiFirst::Router
+- Add OpenapiFirst.configure
+- Add OpenapiFirst.register, OpenapiFirst.plugin
+- Breaking: Remove `env[OpenapiFirst::OPERATION]`. Use `env[OpenapiFirst::REQUEST]` instead.
+- Replace `env[OpenapiFirst::REQUEST_BODY]`, `env[OpenapiFirst::PARAMS]` with `env[OpenapiFirst::REQUEST].body`, `env[OpenapiFirst::REQUEST].params`
+
 ## 1.0.0.beta6
+
 - Fix: Make response header validation work with rack 3
 - Refactor router
-  - Remove dependency hanami-router 
+  - Remove dependency hanami-router
   - PathItem and Operation for a request can be found by calling methods on the Definitnion
 - Fixed https://github.com/ahx/openapi_first/issues/155
 - Breaking / Regression: A paths like /pets/{from}-{to} if there is a path "/pets/{id}"
@@ -13,7 +24,7 @@
 ## 1.0.0.beta5
 
 - Added: `OpenapiFirst::Config.default_options=` to set default options globally
-- Added: You can define custom error responses by subclassing `OpenapiFirst::ErrorResponse` and register it via `OpenapiFirst::Plugins.register_error_response(name, MyCustomErrorResponse)`
+- Added: You can define custom error responses by subclassing `OpenapiFirst::ErrorResponse` and register it via `OpenapiFirst.register_error_response(name, MyCustomErrorResponse)`
 
 ## 1.0.0.beta4
 

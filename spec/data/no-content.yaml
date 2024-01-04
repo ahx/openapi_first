@@ -17,18 +17,15 @@ paths:
     delete:
       operationId: deletePet
       responses:
-        '204':
-          content:
-            application/json:
-              schema:
-                type: object
+        "204":
+          description: "Pet was deleted"
     get:
       operationId: showPet
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
                 type: object
-        '423':
-          description: 'Locked'
+        "423":
+          description: "Locked"

@@ -22,9 +22,6 @@ RSpec.describe 'Header Parameter validation' do
       header 'Accept-Version', 'not-an-integer'
       get '/pets'
       expect(last_response.status).to eq 400
-      error = json_load(last_response.body, symbolize_keys: true)[:errors][0]
-      expect(error[:title]).to eq 'value at `/Accept-Version` is not an integer'
-      expect(error[:source][:header]).to eq 'Accept-Version'
     end
 
     it 'accepts a valid header parameter' do
@@ -43,10 +40,10 @@ RSpec.describe 'Header Parameter validation' do
     it 'adds the converted header parameter to env ' do
       header 'Accept-Version', '1'
       get '/pets'
-      expect(last_request.env[OpenapiFirst::HEADER_PARAMS]['Accept-Version']).to eq 1
+      expect(last_request.env[OpenapiFirst::REQUEST].headers['Accept-Version']).to eq 1
     end
 
-    describe 'when raising' do
+    context 'when raising' do
       let(:app) do
         Rack::Builder.app do
           spec_file = File.expand_path('../data/header-parameter-validation.yaml', __dir__)

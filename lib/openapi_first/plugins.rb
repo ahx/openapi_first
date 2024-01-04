@@ -1,17 +1,19 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
+  # Plugin System adapted from
+  # Polished Ruby Programming by Jeremy Evans
+  # https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
   module Plugins
-    ERROR_RESPONSES = {} # rubocop:disable Style/MutableConstant
+    PLUGINS = {} # rubocop:disable Style/MutableConstant
 
-    def self.register_error_response(name, klass)
-      ERROR_RESPONSES[name] = klass
+    def register(name, klass)
+      PLUGINS[name] = klass
     end
 
-    def self.find_error_response(name)
-      return name if name.is_a?(Class)
-
-      ERROR_RESPONSES.fetch(name)
+    def plugin(name)
+      require "openapi_first/plugins/#{name}"
+      PLUGINS.fetch(name)
     end
   end
 end
