@@ -20,6 +20,8 @@ module OpenapiFirst
         ResponseValidation::Validator.new(@operation).validate(@rack_response)
       end
 
+      alias validate validate!
+
       private
 
       def response_definition
