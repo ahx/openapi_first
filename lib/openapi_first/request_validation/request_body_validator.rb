@@ -14,12 +14,12 @@ module OpenapiFirst
         schema = request_body.schema_for(request_content_type)
         unless schema
           RequestValidation.fail!(:unsupported_media_type,
-                                  message: "#{request_content_type.inspect} is not defined.")
+                                  message: "Unsupported Media Type '#{request_content_type}'")
         end
 
         if request_body.required? && parsed_request_body.nil?
           RequestValidation.fail!(:invalid_body,
-                                  message: 'request body is not defined.')
+                                  message: 'Request body is not defined')
         end
 
         validate_body!(parsed_request_body, schema)

@@ -357,7 +357,7 @@ RSpec.describe 'Request body validation' do
         expect do
           post path, '{fo},'
         end.to raise_error OpenapiFirst::RequestInvalidError,
-                           'Request body invalid: Failed to parse body as application/json'
+                           'Request body invalid: Failed to parse body as JSON'
       end
 
       it 'raises error if request content-type does not match' do
@@ -365,7 +365,7 @@ RSpec.describe 'Request body validation' do
         expect do
           post path, '<xml />'
         end.to raise_error OpenapiFirst::RequestInvalidError,
-                           %(Request content type is not defined. "application/xml" is not defined.)
+                           %(Request content type is not defined. Unsupported Media Type 'application/xml')
       end
     end
   end

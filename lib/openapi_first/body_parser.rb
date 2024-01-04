@@ -15,7 +15,7 @@ module OpenapiFirst
 
       body
     rescue MultiJson::ParseError
-      raise ParsingError, 'Failed to parse body as application/json'
+      raise ParsingError, 'Failed to parse body as JSON'
     end
 
     private
