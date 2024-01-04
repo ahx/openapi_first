@@ -75,8 +75,6 @@ module OpenapiFirst
       RuntimeResponse.new(operation, rack_response)
     end
 
-    def original = request
-
     private
 
     attr_reader :request, :operation, :path_item
