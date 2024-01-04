@@ -243,10 +243,18 @@ RSpec.describe 'Request body validation' do
     end
 
     context 'when operation does not specify request body' do
-      it 'skips request body validation' do
+      it 'passes with an empty request body' do
         post '/without-request-body'
 
-        expect(last_response.status).to be 200
+        expect(last_response.status).to eq 200
+        expect(last_response.body).to eq 'hello'
+      end
+
+      it 'ignores a given request body' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        post '/without-request-body', request_body
+
+        expect(last_response.status).to eq 200
         expect(last_response.body).to eq 'hello'
       end
     end

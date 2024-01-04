@@ -9,8 +9,6 @@ module OpenapiFirst
 
       def validate!(parsed_request_body, request_content_type)
         request_body = operation.request_body
-        return unless request_body
-
         schema = request_body.schema_for(request_content_type)
         unless schema
           RequestValidation.fail!(:unsupported_media_type,
@@ -23,7 +21,6 @@ module OpenapiFirst
         end
 
         validate_body!(parsed_request_body, schema)
-        parsed_request_body
       end
 
       private

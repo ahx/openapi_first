@@ -67,6 +67,8 @@ module OpenapiFirst
       end
 
       def validate_request_body!(request)
+        return unless operation.request_body
+
         RequestBodyValidator.new(operation).validate!(request.body, request.content_type)
       rescue BodyParser::ParsingError => e
         RequestValidation.fail!(:invalid_body, message: e.message)
