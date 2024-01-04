@@ -17,7 +17,10 @@ module OpenapiFirst
                                   message: "#{request_content_type.inspect} is not defined.")
         end
 
-        RequestValidation.fail!(:invalid_body) if request_body.required? && parsed_request_body.nil?
+        if request_body.required? && parsed_request_body.nil?
+          RequestValidation.fail!(:invalid_body,
+                                  message: 'request body is not defined.')
+        end
 
         validate_body!(parsed_request_body, schema)
         parsed_request_body
