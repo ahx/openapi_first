@@ -5,7 +5,6 @@ require 'forwardable'
 module OpenapiFirst
   # This is the base class for error responses
   class ErrorResponse
-    ## @param request [Hash] The Rack request env
     ## @param failure [OpenapiFirst::RequestValidation::Failure]
     def initialize(failure: nil)
       @failure = failure
@@ -13,7 +12,7 @@ module OpenapiFirst
 
     extend Forwardable
 
-    def_delegators :@failure, :error_type, :request, :validation_result
+    def_delegators :@failure, :error_type, :validation_result
 
     STATUS = {
       not_found: 404,
