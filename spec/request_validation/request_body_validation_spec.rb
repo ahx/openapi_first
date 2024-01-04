@@ -237,9 +237,6 @@ RSpec.describe 'Request body validation' do
       post path, '<xml />'
 
       expect(last_response.status).to be 415
-      error = response_body[:errors][0]
-      expect(error[:status]).to eq '415'
-      expect(error[:title]).to eq 'Unsupported Media Type'
     end
 
     context 'when operation does not specify request body' do

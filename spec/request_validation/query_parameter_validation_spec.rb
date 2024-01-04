@@ -191,23 +191,17 @@ RSpec.describe 'Query Parameter validation' do
         get '/search', params
 
         expect(last_response.status).to eq 400
-        error = response_body[:errors][0]
-        expect(error[:title]).to eq 'object at root is missing required properties: filter[id]'
       end
 
       it 'returns 400 if non-required array parameter is nil' do
         params['filter[tag]'] = nil
         get '/search', params
         expect(last_response.status).to eq 400
-        error = response_body[:errors][0]
-        expect(error[:title]).to eq 'value at `/filter[tag]` is not an array'
       end
 
       it 'returns 400 if non-required array parameter is empty' do
         get '/search?term=Oscar&filter[id]=1&filter[tag]=&filter[other]=things'
         expect(last_response.status).to eq 400
-        error = response_body[:errors][0]
-        expect(error[:title]).to eq 'value at `/filter[tag]` is not an array'
       end
 
       it 'passes if query parameters are valid' do

@@ -12,12 +12,12 @@ module OpenapiFirst
     FAIL = :request_validation_failed
 
     # @param error_type [Symbol] See RequestValidation::Failure::TYPES
-    # @param validation_result [OpenapiFirst::Schema::ValidationResult]
-    def self.fail!(error_type, message: nil, validation_result: nil)
+    # @param errors [Array<OpenapiFirst::Schema::ValidationResult>]
+    def self.fail!(error_type, message: nil, errors: nil)
       throw FAIL, RequestValidation::Failure.new(
         error_type,
         message:,
-        validation_result:
+        errors:
       )
     end
 

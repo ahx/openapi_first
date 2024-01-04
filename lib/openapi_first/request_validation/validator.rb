@@ -38,32 +38,32 @@ module OpenapiFirst
         parameters = operation.path_parameters
         return unless parameters
 
-        validation_result = parameters.schema.validate(request.path_params)
-        RequestValidation.fail!(:invalid_path, validation_result:) if validation_result.error?
+        validation = parameters.schema.validate(request.path_params)
+        RequestValidation.fail!(:invalid_path, errors: validation.errors) if validation.error?
       end
 
       def validate_query_params!(request)
         parameters = operation.query_parameters
         return unless parameters
 
-        validation_result = parameters.schema.validate(request.query)
-        RequestValidation.fail!(:invalid_query, validation_result:) if validation_result.error?
+        validation = parameters.schema.validate(request.query)
+        RequestValidation.fail!(:invalid_query, errors: validation.errors) if validation.error?
       end
 
       def validate_cookie_params!(request)
         parameters = operation.cookie_parameters
         return unless parameters
 
-        validation_result = parameters.schema.validate(request.cookies)
-        RequestValidation.fail!(:invalid_cookie, validation_result:) if validation_result.error?
+        validation = parameters.schema.validate(request.cookies)
+        RequestValidation.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
       end
 
       def validate_header_params!(request)
         parameters = operation.header_parameters
         return unless parameters
 
-        validation_result = parameters.schema.validate(request.headers)
-        RequestValidation.fail!(:invalid_header, validation_result:) if validation_result.error?
+        validation = parameters.schema.validate(request.headers)
+        RequestValidation.fail!(:invalid_header, errors: validation.errors) if validation.error?
       end
 
       def validate_request_body!(request)

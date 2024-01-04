@@ -3,37 +3,51 @@
 module OpenapiFirst
   module Plugins
     module Default
-      class ErrorResponse < OpenapiFirst::ErrorResponse
+      # An error reponse that returns application/problem+json with a list of "errors"
+      # See also https://www.rfc-editor.org/rfc/rfc9457.html
+      class ErrorResponse
+        include OpenapiFirst::ErrorResponse
+
+        TITLES = {
+          not_found: 'Not Found',
+          method_not_allowed: 'Request Method Not Allowed',
+          unsupported_media_type: 'Unsupported Media Type',
+          invalid_body: 'Bad Request Body',
+          invalid_query: 'Bad Query Parameter',
+          invalid_header: 'Bad Request Header',
+          invalid_path: 'Bad Request Path',
+          invalid_cookie: 'Bod Request Cookie'
+        }.freeze
+        private_constant :TITLES
+
         def body
-          MultiJson.dump({ errors: serialized_errors })
+          result = {
+            title:,
+            status:
+          }
+          result[:errors] = errors if failure.errors
+          MultiJson.dump(result)
+        end
+
+        def error_type = failure.error_type
+
+        def title
+          TITLES[error_type] || 'Bad Request'
         end
 
         def content_type
-          'application/json'
+          'application/problem+json'
         end
 
-        def serialized_errors
-          return default_errors unless validation_output
-
+        def errors
           key = pointer_key
-          validation_errors&.map do |error|
+          failure.errors.map do |error|
             {
-              status: status.to_s,
-              source: { key => pointer(error['instanceLocation']) },
-              title: error['error']
+              message: error.error,
+              key => pointer(error.instance_location),
+              code: error.type
             }
           end
-        end
-
-        def validation_errors
-          validation_output['errors'] || [validation_output]
-        end
-
-        def default_errors
-          [{
-            status: status.to_s,
-            title: message
-          }]
         end
 
         def pointer_key

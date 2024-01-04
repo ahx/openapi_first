@@ -1,18 +1,24 @@
 # frozen_string_literal: true
 
-require 'forwardable'
-
 module OpenapiFirst
-  # This is the base class for error responses
-  class ErrorResponse
+  # This is the base module for error responses
+  module ErrorResponse
     ## @param failure [OpenapiFirst::RequestValidation::Failure]
     def initialize(failure: nil)
       @failure = failure
     end
 
-    extend Forwardable
+    attr_reader :failure
 
-    def_delegators :@failure, :error_type, :validation_result
+    # The response body
+    def body
+      raise NotImplementedError
+    end
+
+    # The response content-type
+    def content_type
+      raise NotImplementedError
+    end
 
     STATUS = {
       not_found: 404,
@@ -21,34 +27,14 @@ module OpenapiFirst
     }.freeze
     private_constant :STATUS
 
+    # The response status
     def status
-      STATUS[error_type] || 400
+      STATUS[failure.error_type] || 400
     end
 
-    def message
-      Rack::Utils::HTTP_STATUS_CODES[status]
-    end
-
-    def validation_output
-      validation_result&.output
-    end
-
-    def schema
-      validation_result&.schema
-    end
-
-    def data
-      validation_result&.data
-    end
-
+    # Render this error response
     def render
       Rack::Response.new(body, status, Rack::CONTENT_TYPE => content_type).finish
-    end
-
-    def content_type = 'application/json'
-
-    def body
-      raise NotImplementedError
     end
   end
 end

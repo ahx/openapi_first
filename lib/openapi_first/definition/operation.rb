@@ -7,7 +7,6 @@ require_relative 'query_parameters'
 require_relative 'header_parameters'
 require_relative 'path_parameters'
 require_relative 'cookie_parameters'
-require_relative 'schema'
 require_relative 'responses'
 
 module OpenapiFirst

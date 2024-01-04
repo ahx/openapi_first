@@ -38,11 +38,11 @@ RSpec.describe OpenapiFirst.plugin(:jsonapi)::ErrorResponse do
           }
         }
         data = { 'data' => { 'name' => 21, 'numberOfLegs' => 'four' } }
-        validation_result = OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data)
+        validation = OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data)
         error = described_class.new(
           failure: OpenapiFirst::RequestValidation::Failure.new(
             :invalid_body,
-            validation_result:
+            errors: validation.errors
           )
         )
         status, headers, body = error.render
