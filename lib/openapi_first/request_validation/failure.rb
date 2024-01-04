@@ -3,9 +3,7 @@
 module OpenapiFirst
   module RequestValidation
     ## A failure object which is returned when a request is invalid.
-    # @type [Symbol] can be one of :not_found, :body, :query, :header, :path, :cookie
-    # @status [Number] is the HTTP status code that fits the failure.
-    #         This usually is 400, but can be 404, 405 or 415 as well.
+    # @type [Symbol] See TYPES.keys
     # @message [String] is a generic error message
     # @validation_result [OpenapiFirst::Schema::ValidationResult] is the result of the JSON Schema validation
     class Failure
@@ -29,7 +27,7 @@ module OpenapiFirst
         @validation_result = validation_result
       end
 
-      attr_reader :request, :error_type, :validation_result
+      attr_reader :error_type, :message, :validation_result
 
       # Raise an exception that fits the failure.
       def raise!
