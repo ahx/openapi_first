@@ -6,8 +6,8 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
 
 It provides these Rack middlewares:
 
-- [`OpenapiFirst::RequestValidation::Middleware`](#request-validation) – Validates the request against the API description and returns 4xx if the request is invalid.
-- [`OpenapiFirst::ResponseValidation::Middleware`](#response-validation) Validates the response and raises an exception if the response body is invalid.
+- [`OpenapiFirst::Middlewares::RequestValidation`](#request-validation) – Validates the request against the API description and returns 4xx if the request is invalid.
+- [`OpenapiFirst::Middlewares::ResponseValidation`](#response-validation) Validates the response and raises an exception if the response body is invalid.
 
 Using request and response validation together ensures that your implementation follows exactly the API description. This enables you to use the API description as a single source of truth for your API, reason about details and use various tooling.
 
@@ -15,7 +15,7 @@ Using request and response validation together ensures that your implementation 
 
 `OpenapiFirst` offers one Rack middleware for request validation and one for response validation. Both add a _request_ object to the current Rack env at `env[OpenapiFirst::REQUEST]` (or `env['openapi.request']`), which is in an instance of `OpenapiFirst::RuntimeRequest`. This gives you access to the converted query and path parameters exaclty as described in your API instead of relying on Rack alone parse the request. This only includes the parameters that are defined in the API description. It supports every [`style` and `explode` value as described](https://spec.openapis.org/oas/latest.html#style-examples) in the OpenAPI 3.0 and 3.1 specs.
 
-### OpenapiFirst::RequestValidation::Middleware
+### Request validation
 
 This middleware returns a 400 status code with a body that describes the error if the request is not valid.
 
@@ -55,7 +55,7 @@ Request validation fails if request includes a property with `readOnly: true`.
 
 Response validation fails if response body includes a property with `writeOnly: true`.
 
-## OpenapiFirst::ResponseValidation::Middleware
+## Response validation
 
 This middleware is especially useful when testing. It _always_ raises an error if the response is not valid.
 
@@ -75,9 +75,9 @@ You can configure default options globally:
 
 ```ruby
 OpenapiFirst.configure do |config|
-  # Specify which plugin is used to render error responses returned by OpenapiFirst::RequestValidation::Middleware (defaults to :default)
+  # Specify which plugin is used to render error responses returned by the request validation middleware (defaults to :default)
   config.request_validation_error_response = :json_api
-  # Configure if OpenapiFirst::RequestValidation::Middleware should raise an exception (defaults to false)
+  # Configure if the response validation middleware should raise an exception (defaults to false)
   config.request_validation_raise_error = true
 end
 ```

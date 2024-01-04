@@ -2,9 +2,9 @@
 
 require 'rack'
 module OpenapiFirst
-  module RequestValidation
+  module Middlewares
     # A Rack middleware to validate requests against an OpenAPI API description
-    class Middleware
+    class RequestValidation
       # @param app The parent Rack application
       # @param options An optional Hash of configuration options to override defaults
       #   :raise_error    A Boolean indicating whether to raise an error if validation fails.

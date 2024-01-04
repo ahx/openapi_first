@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breaking: Moved rack middlewares to OpenapiFirst::Middlewares. Adding `OpenapiFirst::RequestValidation.new`, `OpenapiFirst::ResponseValidation.new` as shortcuts.
 - Fix response header validation with Rack 3
 - Add interface to validate requests / responses without middlewares (see "Manual validation" in README)
 - Breaking: Rename OpenapiFirst::ResponseInvalid to OpenapiFirst::ResponseInvalidError

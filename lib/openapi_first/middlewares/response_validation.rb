@@ -2,9 +2,9 @@
 
 require 'rack'
 module OpenapiFirst
-  module ResponseValidation
+  module Middlewares
     # A Rack middleware to validate requests against an OpenAPI API description
-    class Middleware
+    class ResponseValidation
       # @param app The parent Rack application
       # @param options Hash
       #   :spec    Path to the OpenAPI file or an instance of Definition

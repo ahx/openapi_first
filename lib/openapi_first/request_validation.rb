@@ -5,7 +5,7 @@ require 'multi_json'
 require_relative 'request_validation/request_body_validator'
 require_relative 'request_validation/failure'
 require 'openapi_parameters'
-require_relative 'request_validation/middleware'
+require_relative 'middlewares/request_validation'
 
 module OpenapiFirst
   module RequestValidation
@@ -22,7 +22,7 @@ module OpenapiFirst
     end
 
     def self.new(app, options = {})
-      Middleware.new(app, options)
+      OpenapiFirst::Middlewares::RequestValidation.new(app, options)
     end
   end
 end

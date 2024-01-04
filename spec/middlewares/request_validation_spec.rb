@@ -5,7 +5,7 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first'
 
-RSpec.describe OpenapiFirst::RequestValidation::Middleware do
+RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
   include Rack::Test::Methods
 
   let(:app) do
