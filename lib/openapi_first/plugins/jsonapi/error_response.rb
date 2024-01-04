@@ -3,7 +3,9 @@
 module OpenapiFirst
   module Plugins
     module Jsonapi
-      class ErrorResponse < OpenapiFirst::ErrorResponse
+      class ErrorResponse
+        include OpenapiFirst::ErrorResponse
+
         def body
           MultiJson.dump({ errors: serialized_errors })
         end
@@ -13,31 +15,27 @@ module OpenapiFirst
         end
 
         def serialized_errors
-          return default_errors unless validation_output
+          return default_errors unless failure.errors
 
           key = pointer_key
-          validation_errors&.map do |error|
+          failure.errors.map do |error|
             {
               status: status.to_s,
-              source: { key => pointer(error['instanceLocation']) },
-              title: error['error']
+              source: { key => pointer(error.instance_location) },
+              title: error.error
             }
           end
-        end
-
-        def validation_errors
-          validation_output['errors'] || [validation_output]
         end
 
         def default_errors
           [{
             status: status.to_s,
-            title: message
+            title: Rack::Utils::HTTP_STATUS_CODES[status]
           }]
         end
 
         def pointer_key
-          case error_type
+          case failure.error_type
           when :invalid_body
             :pointer
           when :invalid_query, :invalid_path
@@ -50,7 +48,7 @@ module OpenapiFirst
         end
 
         def pointer(data_pointer)
-          return data_pointer if error_type == :invalid_body
+          return data_pointer if failure.error_type == :invalid_body
 
           data_pointer.delete_prefix('/')
         end

@@ -3,9 +3,6 @@
 module OpenapiFirst
   module RequestValidation
     ## A failure object which is returned when a request is invalid.
-    # @type [Symbol] See TYPES.keys
-    # @message [String] is a generic error message
-    # @validation_result [OpenapiFirst::Schema::ValidationResult] is the result of the JSON Schema validation
     class Failure
       TYPES = {
         not_found: 'Request path is not defined.',
@@ -19,27 +16,30 @@ module OpenapiFirst
       }.freeze
       private_constant :TYPES
 
-      def initialize(error_type, message: nil, validation_result: nil)
+      # @param type [Symbol] See TYPES.keys
+      # @param message [String] A generic error message
+      # @param errors [Array<OpenapiFirst::Schema::ValidationError>]
+      def initialize(error_type, message: nil, errors: nil)
         raise ArgumentError, "error_type must be one of #{TYPES.keys}" unless TYPES.key?(error_type)
 
         @error_type = error_type
         @message = message
-        @validation_result = validation_result
+        @errors = errors
       end
 
-      attr_reader :error_type, :message, :validation_result
+      attr_reader :error_type, :message, :errors
 
       # Raise an exception that fits the failure.
       def raise!
-        raise NotFoundError, error_message if error_type == :not_found
+        raise NotFoundError, exception_message if error_type == :not_found
 
-        raise RequestInvalidError, error_message
+        raise RequestInvalidError, exception_message
       end
 
       private
 
-      def error_message
-        "#{TYPES.fetch(error_type)} #{@message || validation_result&.message}"
+      def exception_message
+        "#{TYPES.fetch(error_type)} #{@message || errors&.map(&:error)&.join('. ')}"
       end
     end
   end

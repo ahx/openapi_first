@@ -43,7 +43,7 @@ RSpec.describe OpenapiFirst::Plugins::Jsonapi::ErrorResponse do
         error = described_class.new(
           failure: OpenapiFirst::RequestValidation::Failure.new(
             :invalid_body,
-            validation_result:
+            errors: validation_result.errors
           )
         )
         status, headers, body = error.render

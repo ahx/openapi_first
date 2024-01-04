@@ -31,8 +31,8 @@ module OpenapiFirst
         request_body_schema = schema
         return unless request_body_schema
 
-        validation_result = request_body_schema.validate(parsed_request_body)
-        RequestValidation.fail!(:invalid_body, validation_result:) if validation_result.error?
+        validation = request_body_schema.validate(parsed_request_body)
+        RequestValidation.fail!(:invalid_body, errors: validation.errors) if validation.error?
       end
     end
   end

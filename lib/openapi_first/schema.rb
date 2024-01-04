@@ -19,14 +19,14 @@ module OpenapiFirst
         access_mode: write ? 'write' : 'read',
         meta_schema: SCHEMAS.fetch(openapi_version),
         insert_property_defaults: true,
-        output_format: 'detailed',
+        output_format: 'classic',
         before_property_validation: method(:before_property_validation)
       )
     end
 
     def validate(data)
       ValidationResult.new(
-        output: @schemer.validate(data),
+        @schemer.validate(data),
         schema:,
         data:
       )

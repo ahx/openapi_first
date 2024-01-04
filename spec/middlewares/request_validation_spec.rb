@@ -56,7 +56,9 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
 
   context 'with custom error_response option' do
     let(:app) do
-      custom_class = Class.new(OpenapiFirst::ErrorResponse) do
+      custom_class = Class.new do
+        include OpenapiFirst::ErrorResponse
+
         def body = 'custom error body'
         def content_type = 'text/plain'
         def status = 409
