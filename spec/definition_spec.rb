@@ -26,13 +26,13 @@ RSpec.describe OpenapiFirst::Definition do
 
       it 'finds a match' do
         request = definition.request(build_request('/foo/1'))
-        expect(request.path_params).to eq({ 'fooId' => '1' })
+        expect(request.path_parameters).to eq({ 'fooId' => '1' })
 
         request = definition.request(build_request('/foo/1/bar'))
-        expect(request.path_params).to eq({ 'id' => '1' })
+        expect(request.path_parameters).to eq({ 'id' => '1' })
 
         request = definition.request(build_request('/foo/special'))
-        expect(request.path_params).to eq({})
+        expect(request.path_parameters).to eq({})
       end
     end
 

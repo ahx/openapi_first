@@ -117,6 +117,20 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
     end
   end
 
+  describe '#media_type' do
+    let(:definition) { OpenapiFirst.load('./spec/data/petstore-expanded.yaml') }
+
+    let(:rack_request) do
+      Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST')).tap do |r|
+        r.add_header 'CONTENT_TYPE', 'application/json; charset=UTF8'
+      end
+    end
+
+    it 'returns the content type without parameters' do
+      expect(request.media_type).to eq('application/json')
+    end
+  end
+
   describe '#params' do
     let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
 
@@ -130,7 +144,7 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
     end
   end
 
-  describe '#path_params' do
+  describe '#path_parameters' do
     let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
 
     let(:rack_request) do
@@ -138,7 +152,7 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
     end
 
     it 'returns the path param' do
-      expect(subject.path_params['id']).to eq(42)
+      expect(subject.path_parameters['id']).to eq(42)
     end
 
     context 'without defined parameters' do
@@ -147,7 +161,7 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
       end
 
       it 'returns an empty Hash' do
-        expect(subject.path_params).to eq({})
+        expect(subject.path_parameters).to eq({})
       end
     end
   end
@@ -173,6 +187,10 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
       it 'returns an empty Hash' do
         expect(subject.query).to eq({})
       end
+    end
+
+    it 'aliases to query_parameters' do
+      expect(subject.query_parameters['limit']).to eq(3)
     end
   end
 
@@ -244,6 +262,10 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
 
     it 'returns the parsed body' do
       expect(subject.body).to eq('foo' => 'bar')
+    end
+
+    it 'is aliased with parsed_body' do
+      expect(subject.parsed_body).to eq('foo' => 'bar')
     end
   end
 end

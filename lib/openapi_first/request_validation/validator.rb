@@ -38,7 +38,7 @@ module OpenapiFirst
         parameters = operation.path_parameters
         return unless parameters
 
-        validation = parameters.schema.validate(request.path_params)
+        validation = parameters.schema.validate(request.path_parameters)
         RequestValidation.fail!(:invalid_path, errors: validation.errors) if validation.error?
       end
 

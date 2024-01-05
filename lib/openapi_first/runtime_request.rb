@@ -18,7 +18,7 @@ module OpenapiFirst
       @original_path_params = path_params
     end
 
-    def_delegators :@request, :content_type
+    def_delegators :@request, :content_type, :media_type
     def_delegators :@operation, :operation_id
 
     def known?
@@ -35,11 +35,11 @@ module OpenapiFirst
 
     # Merged path and query parameters
     def params
-      @params ||= query.merge(path_params)
+      @params ||= query.merge(path_parameters)
     end
 
-    def path_params
-      @path_params ||=
+    def path_parameters
+      @path_parameters ||=
         operation.path_parameters&.unpack(@original_path_params) || {}
     end
 
@@ -47,6 +47,8 @@ module OpenapiFirst
       @query ||=
         operation.query_parameters&.unpack(request.env) || {}
     end
+
+    alias query_parameters query
 
     def headers
       @headers ||=
@@ -61,6 +63,7 @@ module OpenapiFirst
     def body
       @body ||= BodyParser.new.parse(request, request.media_type)
     end
+    alias parsed_body body
 
     def validate
       RequestValidation::Validator.new(operation).validate(self)
