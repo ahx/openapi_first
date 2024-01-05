@@ -31,19 +31,30 @@ use OpenapiFirst::RequestValidation, spec: 'openapi.yaml'
 | `raise_error:`    | `false`, `true`                                                 | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` instead of returning 4xx. | `false` (don't raise an exception) |
 | `error_response:` | `:default`, `:json_api`, Your implementation of `ErrorResponse` | :default                                                                                           |
 
-Here's an example response body for a missing query parameter "search":
+Here's an example response body about an invalid request body. See also [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457).
 
 ```json
 http-status: 400
 content-type: "application/json"
 
 {
+  "title": "Bad Request Body",
+  "status": 400,
   "errors": [
     {
-      "title": "is missing",
-      "source": {
-        "parameter": "search"
-      }
+      "message": "value at `/data/name` is not a string",
+      "pointer": "/data/name",
+      "code": "string"
+    },
+    {
+      "message": "number at `/data/numberOfLegs` is less than: 2",
+      "pointer": "/data/numberOfLegs",
+      "code": "minimum"
+    },
+    {
+      "message": "object at `/data` is missing required properties: mandatory",
+      "pointer": "/data",
+      "code": "required"
     }
   ]
 }
