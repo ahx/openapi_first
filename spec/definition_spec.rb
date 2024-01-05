@@ -36,6 +36,34 @@ RSpec.describe OpenapiFirst::Definition do
       end
     end
 
+    context 'with different patterns on the same path' do
+      let(:definition) { OpenapiFirst.load('./spec/data/parameters-path.yaml') }
+
+      it 'supports /{date}' do
+        runtime_request = definition.request(build_request('/info/2020-01-01'))
+        operation_id = runtime_request.operation_id
+
+        expect(operation_id).to eq 'info_date'
+        expect(runtime_request.params['date']).to eq('2020-01-01')
+      end
+
+      pending 'supports /{start_date}..{end_date}' do
+        runtime_request = definition.request(build_request('/info/2020-01-01..2020-01-02'))
+        operation_id = runtime_request.operation_id
+        expect(operation_id).to eq 'info_date_range'
+
+        expect(runtime_request.params['start_date']).to eq('2020-01-01')
+        expect(runtime_request.params['end_date']).to eq('2020-01-02')
+      end
+
+      it 'still works without parameters' do
+        runtime_request = definition.request(build_request('/info'))
+        operation_id = runtime_request.operation_id
+        expect(operation_id).to eq 'info'
+        expect(runtime_request.params).to be_empty
+      end
+    end
+
     context 'with a matching path but unknown request method' do
       let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
       let(:rack_request) { build_request('/pets', method: 'PATCH') }
