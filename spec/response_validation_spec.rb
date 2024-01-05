@@ -48,8 +48,8 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     it 'returns an error' do
       expect do
         get '/pets'
-      end.to raise_error OpenapiFirst::ResponseContentTypeNotFoundError,
-                         "Response Content-Type for 'GET /pets (listPets)' must not be empty"
+      end.to raise_error OpenapiFirst::ResponseInvalidError,
+                         "Response header is invalid: Content-Type for 'GET /pets (listPets)' must not be empty"
     end
   end
 
@@ -107,7 +107,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     specify do
       expect do
         get '/pets/42'
-      end.to raise_error OpenapiFirst::ResponseCodeNotFoundError
+      end.to raise_error OpenapiFirst::ResponseNotFoundError
     end
   end
 
@@ -139,7 +139,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       it 'finds the "default" response and raises an error' do
         expect do
           post '/test', json_dump({})
-        end.to raise_error OpenapiFirst::ResponseBodyInvalidError
+        end.to raise_error OpenapiFirst::ResponseInvalidError
       end
     end
   end
@@ -155,7 +155,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     it 'raises ResponseBodyInvalidError' do
       expect do
         get '/pets/42'
-      end.to raise_error OpenapiFirst::ResponseBodyInvalidError
+      end.to raise_error OpenapiFirst::ResponseInvalidError
     end
   end
 
@@ -171,7 +171,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       it 'raises an error' do
         expect do
           post '/test', json_dump({ name: 'hans', password: 'admin' })
-        end.to raise_error OpenapiFirst::ResponseBodyInvalidError
+        end.to raise_error OpenapiFirst::ResponseInvalidError
       end
     end
   end
@@ -186,7 +186,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     it 'raises an error if the readOnly field is missing' do
       expect do
         get '/test/42'
-      end.to raise_error OpenapiFirst::ResponseBodyInvalidError
+      end.to raise_error OpenapiFirst::ResponseInvalidError
     end
 
     context 'when the readOnly field is valid' do
@@ -212,7 +212,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
       it 'raises an error' do
         expect do
           get '/test'
-        end.to raise_error OpenapiFirst::ResponseBodyInvalidError
+        end.to raise_error OpenapiFirst::ResponseInvalidError
       end
     end
 
@@ -255,7 +255,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     it 'fails with an invalid header' do
       expect do
         post '/echo', json_dump({ 'Location' => '/echos/42', 'X-Id' => 'not-an-integer' })
-      end.to raise_error OpenapiFirst::ResponseHeaderInvalidError
+      end.to raise_error OpenapiFirst::ResponseInvalidError
     end
 
     it 'ignores "Content-Type" header' do
@@ -266,7 +266,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     it 'fails with a missing header' do
       expect do
         post '/echo', json_dump({ 'X-Id' => '42' })
-      end.to raise_error OpenapiFirst::ResponseHeaderInvalidError
+      end.to raise_error OpenapiFirst::ResponseInvalidError
     end
   end
 end

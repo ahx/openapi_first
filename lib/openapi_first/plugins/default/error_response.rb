@@ -32,7 +32,7 @@ module OpenapiFirst
         def error_type = failure.error_type
 
         def title
-          TITLES[error_type] || 'Bad Request'
+          TITLES.fetch(error_type)
         end
 
         def content_type

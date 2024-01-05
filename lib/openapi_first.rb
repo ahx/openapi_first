@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'yaml'
+require 'multi_json'
 require 'json_refs'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'
@@ -24,7 +25,7 @@ module OpenapiFirst
     end
   end
 
-  # An instance of RuntimeRequest
+  # Key in rack to find instance of RuntimeRequest
   REQUEST = 'openapi.request'
 
   def self.load(spec_path, only: nil)

@@ -10,7 +10,7 @@ RSpec.describe OpenapiFirst::RequestValidation do
     it 'throws a failure' do
       expect do
         described_class.fail!(:invalid_body)
-      end.to throw_symbol(described_class::FAIL, instance_of(described_class::Failure))
+      end.to throw_symbol(described_class::FAILURE, instance_of(described_class::Failure))
     end
 
     context 'with an unknown argument' do

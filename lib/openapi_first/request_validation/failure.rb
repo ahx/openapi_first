@@ -9,10 +9,10 @@ module OpenapiFirst
         method_not_allowed: 'Request method is not defined.',
         unsupported_media_type: 'Request content type is not defined.',
         invalid_body: 'Request body invalid:',
-        invalid_query: 'Query parameter invalid:',
-        invalid_header: 'Header parameter invalid:',
-        invalid_path: 'Path segment invalid:',
-        invalid_cookie: 'Cookie value invalid:'
+        invalid_query: 'Query parameter is invalid:',
+        invalid_header: 'Request header is invalid:',
+        invalid_path: 'Path segment is invalid:',
+        invalid_cookie: 'Cookie value is invalid:'
       }.freeze
       private_constant :TYPES
 

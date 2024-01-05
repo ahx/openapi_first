@@ -50,10 +50,10 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
     context 'if response is invalid' do
       let(:rack_response) { Rack::Response.new(JSON.dump('foo'), 200, { 'Content-Type' => 'application/json' }) }
 
-      it 'raises ResponseInvalidError' do
-        expect do
-          response.validate
-        end.to raise_error(OpenapiFirst::ResponseInvalidError)
+      it 'returns a Failure' do
+        result = response.validate
+        expect(result).to be_a(OpenapiFirst::Failure)
+        expect(result.error_type).to eq :invalid_response_body
       end
     end
   end

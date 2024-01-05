@@ -61,7 +61,7 @@ RSpec.describe 'Cookie Parameter validation' do
       it 'returns 400 if cookie parameter is invalid' do
         expect do
           get '/'
-        end.to raise_error OpenapiFirst::RequestInvalidError, /^Cookie value invalid: \w+/
+        end.to raise_error OpenapiFirst::RequestInvalidError, /^Cookie value is invalid: \w+/
       end
     end
   end

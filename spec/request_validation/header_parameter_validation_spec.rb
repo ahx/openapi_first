@@ -60,7 +60,7 @@ RSpec.describe 'Header Parameter validation' do
         expect do
           get '/pets'
         end.to raise_error OpenapiFirst::RequestInvalidError,
-                           'Header parameter invalid: value at `/Accept-Version` is not an integer'
+                           'Request header is invalid: value at `/Accept-Version` is not an integer'
       end
     end
   end

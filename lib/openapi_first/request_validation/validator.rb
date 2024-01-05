@@ -8,7 +8,7 @@ module OpenapiFirst
       end
 
       def validate(runtime_request)
-        catch(FAIL) do
+        catch(FAILURE) do
           validate_defined(runtime_request)
           validate_parameters!(runtime_request)
           validate_request_body!(runtime_request)

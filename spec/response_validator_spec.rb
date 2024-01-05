@@ -68,8 +68,8 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
         response_body = json_dump({ id: 2, name: 'Voldemort' })
         response = Rack::Response.new(response_body, 201, headers)
         expect do
-          subject.validate(response)
-        end.to raise_error OpenapiFirst::ResponseInvalidError
+          subject.validate(response).raise!
+        end.to raise_error OpenapiFirst::ResponseNotFoundError
       end
     end
 
@@ -78,7 +78,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       headers = { Rack::CONTENT_TYPE => 'application/xml' }
       response = Rack::Response.new(response_body, 200, headers)
       expect do
-        subject.validate(response)
+        subject.validate(response).raise!
       end.to raise_error OpenapiFirst::ResponseInvalidError
     end
 
@@ -86,7 +86,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       response_body = json_dump([{ id: 42 }, { id: 2, name: 'Voldemort' }])
       response = Rack::Response.new(response_body, 200, headers)
       expect do
-        subject.validate(response)
+        subject.validate(response).raise!
       end.to raise_error OpenapiFirst::ResponseInvalidError
     end
 
@@ -94,7 +94,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       response_body = json_dump([{ id: 'string', name: 'hans' }])
       response = Rack::Response.new(response_body, 200, headers)
       expect do
-        subject.validate(response)
+        subject.validate(response).raise!
       end.to raise_error OpenapiFirst::ResponseInvalidError
     end
   end

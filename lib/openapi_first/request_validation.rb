@@ -9,12 +9,12 @@ require_relative 'middlewares/request_validation'
 
 module OpenapiFirst
   module RequestValidation
-    FAIL = :request_validation_failed
+    FAILURE = :openapi_first_validation_failure
 
     # @param error_type [Symbol] See RequestValidation::Failure::TYPES
     # @param errors [Array<OpenapiFirst::Schema::ValidationResult>]
     def self.fail!(error_type, message: nil, errors: nil)
-      throw FAIL, RequestValidation::Failure.new(
+      throw FAILURE, RequestValidation::Failure.new(
         error_type,
         message:,
         errors:
