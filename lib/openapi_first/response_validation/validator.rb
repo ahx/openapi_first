@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../failure'
+
 module OpenapiFirst
   module ResponseValidation
     class Validator
@@ -11,7 +13,7 @@ module OpenapiFirst
         return unless operation
 
         response = Rack::Response[*rack_response.to_a]
-        catch(FAILURE) do
+        catch Failure::FAILURE do
           response_definition = response_for(operation, response.status, response.content_type)
           validate_response_body(response_definition.content_schema, response.body)
           validate_response_headers(response_definition.headers, response.headers)
@@ -29,15 +31,15 @@ module OpenapiFirst
 
         unless operation.response_status_defined?(status)
           message = "Response status '#{status}' not found for '#{operation.name}'"
-          ResponseValidation.fail!(:response_not_found, message:)
+          Failure.fail!(:response_not_found, message:)
         end
         if content_type.nil? || content_type.empty?
           message = "Content-Type for '#{operation.name}' must not be empty"
-          ResponseValidation.fail!(:invalid_response_header, message:)
+          Failure.fail!(:invalid_response_header, message:)
         end
 
         message = "Content-Type '#{content_type}' is not defined for '#{operation.name}'"
-        ResponseValidation.fail!(:invalid_response_header, message:)
+        Failure.fail!(:invalid_response_header, message:)
       end
 
       def validate_response_body(schema, response)
@@ -47,7 +49,7 @@ module OpenapiFirst
         response.each { |chunk| full_body << chunk }
         data = full_body.empty? ? {} : load_json(full_body)
         validation = schema.validate(data)
-        ResponseValidation.fail!(:invalid_response_body, errors: validation.errors) if validation.error?
+        Failure.fail!(:invalid_response_body, errors: validation.errors) if validation.error?
       end
 
       def validate_response_headers(response_header_definitions, response_headers)
@@ -64,8 +66,8 @@ module OpenapiFirst
       def validate_response_header(name, definition, unpacked_headers, openapi_version:)
         unless unpacked_headers.key?(name)
           if definition['required']
-            ResponseValidation.fail!(:invalid_response_header,
-                                     message: "Required response header '#{name}' is missing")
+            Failure.fail!(:invalid_response_header,
+                          message: "Required response header '#{name}' is missing")
           end
 
           return
@@ -78,8 +80,8 @@ module OpenapiFirst
         validation_result = validation.validate(value)
         return unless validation_result.error?
 
-        ResponseValidation.fail!(:invalid_response_header,
-                                 errors: validation_result.errors)
+        Failure.fail!(:invalid_response_header,
+                      errors: validation_result.errors)
       end
 
       def unpack_response_headers(response_header_definitions, response_headers)
