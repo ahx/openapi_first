@@ -26,13 +26,41 @@ RSpec.describe OpenapiFirst::Definition do
 
       it 'finds a match' do
         request = definition.request(build_request('/foo/1'))
-        expect(request.path_params).to eq({ 'fooId' => '1' })
+        expect(request.path_parameters).to eq({ 'fooId' => '1' })
 
         request = definition.request(build_request('/foo/1/bar'))
-        expect(request.path_params).to eq({ 'id' => '1' })
+        expect(request.path_parameters).to eq({ 'id' => '1' })
 
         request = definition.request(build_request('/foo/special'))
-        expect(request.path_params).to eq({})
+        expect(request.path_parameters).to eq({})
+      end
+    end
+
+    context 'with different patterns on the same path' do
+      let(:definition) { OpenapiFirst.load('./spec/data/parameters-path.yaml') }
+
+      it 'supports /{date}' do
+        runtime_request = definition.request(build_request('/info/2020-01-01'))
+        operation_id = runtime_request.operation_id
+
+        expect(operation_id).to eq 'info_date'
+        expect(runtime_request.params['date']).to eq('2020-01-01')
+      end
+
+      it 'supports /{start_date}..{end_date}' do
+        runtime_request = definition.request(build_request('/info/2020-01-01..2020-01-02'))
+        operation_id = runtime_request.operation_id
+        expect(operation_id).to eq 'info_date_range'
+
+        expect(runtime_request.params['start_date']).to eq('2020-01-01')
+        expect(runtime_request.params['end_date']).to eq('2020-01-02')
+      end
+
+      it 'still works without parameters' do
+        runtime_request = definition.request(build_request('/info'))
+        operation_id = runtime_request.operation_id
+        expect(operation_id).to eq 'info'
+        expect(runtime_request.params).to be_empty
       end
     end
 

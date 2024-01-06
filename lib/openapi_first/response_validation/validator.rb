@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../failure'
+
 module OpenapiFirst
   module ResponseValidation
     class Validator
@@ -8,11 +10,15 @@ module OpenapiFirst
       end
 
       def validate(rack_response)
-        response = Rack::Response[*rack_response.to_a]
+        return unless operation
 
-        response_definition = response_for(operation, response.status, response.content_type)
-        validate_response_body(response_definition.content_schema, response.body)
-        validate_response_headers(response_definition.headers, response.headers)
+        response = Rack::Response[*rack_response.to_a]
+        catch Failure::FAILURE do
+          response_definition = response_for(operation, response.status, response.content_type)
+          validate_response_body(response_definition.content_schema, response.body)
+          validate_response_headers(response_definition.headers, response.headers)
+          nil
+        end
       end
 
       private
@@ -24,16 +30,16 @@ module OpenapiFirst
         return response if response
 
         unless operation.response_status_defined?(status)
-          message = "Response status '#{status}' not found at '#{operation.name}'"
-          raise OpenapiFirst::ResponseCodeNotFoundError, message
+          message = "Response status '#{status}' not found for '#{operation.name}'"
+          Failure.fail!(:response_not_found, message:)
         end
         if content_type.nil? || content_type.empty?
-          message = "Response Content-Type for '#{operation.name}' must not be empty"
-          raise OpenapiFirst::ResponseContentTypeNotFoundError, message
+          message = "Content-Type for '#{operation.name}' must not be empty"
+          Failure.fail!(:invalid_response_header, message:)
         end
 
-        message = "Content-Type #{content_type} not found at '#{operation.name}'"
-        raise OpenapiFirst::ResponseContentTypeNotFoundError, message
+        message = "Content-Type '#{content_type}' is not defined for '#{operation.name}'"
+        Failure.fail!(:invalid_response_header, message:)
       end
 
       def validate_response_body(schema, response)
@@ -43,7 +49,7 @@ module OpenapiFirst
         response.each { |chunk| full_body << chunk }
         data = full_body.empty? ? {} : load_json(full_body)
         validation = schema.validate(data)
-        raise ResponseBodyInvalidError, validation.message if validation.error?
+        Failure.fail!(:invalid_response_body, errors: validation.errors) if validation.error?
       end
 
       def validate_response_headers(response_header_definitions, response_headers)
@@ -59,7 +65,10 @@ module OpenapiFirst
 
       def validate_response_header(name, definition, unpacked_headers, openapi_version:)
         unless unpacked_headers.key?(name)
-          raise ResponseHeaderInvalidError, "Required response header '#{name}' is missing" if definition['required']
+          if definition['required']
+            Failure.fail!(:invalid_response_header,
+                          message: "Required response header '#{name}' is missing")
+          end
 
           return
         end
@@ -69,7 +78,10 @@ module OpenapiFirst
         validation = Schema.new(definition['schema'], openapi_version:)
         value = unpacked_headers[name]
         validation_result = validation.validate(value)
-        raise ResponseHeaderInvalidError, validation_result.message if validation_result.error?
+        return unless validation_result.error?
+
+        Failure.fail!(:invalid_response_header,
+                      errors: validation_result.errors)
       end
 
       def unpack_response_headers(response_header_definitions, response_headers)
@@ -77,12 +89,6 @@ module OpenapiFirst
           definition.merge('name' => name, 'in' => 'header')
         end
         OpenapiParameters::Header.new(headers_as_parameters).unpack(response_headers)
-      end
-
-      def format_response_error(error)
-        return "Write-only field appears in response: #{error['data_pointer']}" if error['type'] == 'writeOnly'
-
-        JSONSchemer::Errors.pretty(error)
       end
 
       def load_json(string)

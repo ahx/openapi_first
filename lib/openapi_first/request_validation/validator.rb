@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative '../failure'
+require_relative 'request_body_validator'
+
 module OpenapiFirst
   module RequestValidation
     class Validator
@@ -8,7 +11,7 @@ module OpenapiFirst
       end
 
       def validate(runtime_request)
-        catch(FAIL) do
+        catch Failure::FAILURE do
           validate_defined(runtime_request)
           validate_parameters!(runtime_request)
           validate_request_body!(runtime_request)
@@ -22,9 +25,9 @@ module OpenapiFirst
 
       def validate_defined(request)
         return if request.known?
-        return RequestValidation.fail!(:not_found) unless request.known_path?
+        return Failure.fail!(:not_found) unless request.known_path?
 
-        RequestValidation.fail!(:method_not_allowed) unless request.known_request_method?
+        Failure.fail!(:method_not_allowed) unless request.known_request_method?
       end
 
       def validate_parameters!(request)
@@ -38,8 +41,8 @@ module OpenapiFirst
         parameters = operation.path_parameters
         return unless parameters
 
-        validation = parameters.schema.validate(request.path_params)
-        RequestValidation.fail!(:invalid_path, errors: validation.errors) if validation.error?
+        validation = parameters.schema.validate(request.path_parameters)
+        Failure.fail!(:invalid_path, errors: validation.errors) if validation.error?
       end
 
       def validate_query_params!(request)
@@ -47,7 +50,7 @@ module OpenapiFirst
         return unless parameters
 
         validation = parameters.schema.validate(request.query)
-        RequestValidation.fail!(:invalid_query, errors: validation.errors) if validation.error?
+        Failure.fail!(:invalid_query, errors: validation.errors) if validation.error?
       end
 
       def validate_cookie_params!(request)
@@ -55,7 +58,7 @@ module OpenapiFirst
         return unless parameters
 
         validation = parameters.schema.validate(request.cookies)
-        RequestValidation.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
+        Failure.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
       end
 
       def validate_header_params!(request)
@@ -63,7 +66,7 @@ module OpenapiFirst
         return unless parameters
 
         validation = parameters.schema.validate(request.headers)
-        RequestValidation.fail!(:invalid_header, errors: validation.errors) if validation.error?
+        Failure.fail!(:invalid_header, errors: validation.errors) if validation.error?
       end
 
       def validate_request_body!(request)
@@ -71,7 +74,7 @@ module OpenapiFirst
 
         RequestBodyValidator.new(operation).validate!(request.body, request.content_type)
       rescue BodyParser::ParsingError => e
-        RequestValidation.fail!(:invalid_body, message: e.message)
+        Failure.fail!(:invalid_body, message: e.message)
       end
     end
   end

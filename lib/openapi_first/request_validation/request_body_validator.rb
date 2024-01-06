@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../failure'
+
 module OpenapiFirst
   module RequestValidation
     class RequestBodyValidator
@@ -11,13 +13,13 @@ module OpenapiFirst
         request_body = operation.request_body
         schema = request_body.schema_for(request_content_type)
         unless schema
-          RequestValidation.fail!(:unsupported_media_type,
-                                  message: "Unsupported Media Type '#{request_content_type}'")
+          Failure.fail!(:unsupported_media_type,
+                        message: "Unsupported Media Type '#{request_content_type}'")
         end
 
         if request_body.required? && parsed_request_body.nil?
-          RequestValidation.fail!(:invalid_body,
-                                  message: 'Request body is not defined')
+          Failure.fail!(:invalid_body,
+                        message: 'Request body is not defined')
         end
 
         validate_body!(parsed_request_body, schema)
@@ -32,7 +34,7 @@ module OpenapiFirst
         return unless request_body_schema
 
         validation = request_body_schema.validate(parsed_request_body)
-        RequestValidation.fail!(:invalid_body, errors: validation.errors) if validation.error?
+        Failure.fail!(:invalid_body, errors: validation.errors) if validation.error?
       end
     end
   end

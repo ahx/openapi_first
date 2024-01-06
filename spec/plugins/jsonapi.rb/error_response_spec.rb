@@ -9,7 +9,7 @@ RSpec.describe OpenapiFirst.plugin(:jsonapi)::ErrorResponse do
     context 'when validation_result is nil' do
       specify do
         error = described_class.new(
-          failure: OpenapiFirst::RequestValidation::Failure.new(
+          failure: OpenapiFirst::Failure.new(
             :invalid_body
           )
         )
@@ -40,7 +40,7 @@ RSpec.describe OpenapiFirst.plugin(:jsonapi)::ErrorResponse do
         data = { 'data' => { 'name' => 21, 'numberOfLegs' => 'four' } }
         validation = OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data)
         error = described_class.new(
-          failure: OpenapiFirst::RequestValidation::Failure.new(
+          failure: OpenapiFirst::Failure.new(
             :invalid_body,
             errors: validation.errors
           )

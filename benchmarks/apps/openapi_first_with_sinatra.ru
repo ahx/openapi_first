@@ -24,6 +24,6 @@ class SinatraWithOpenapiFirstExample < Sinatra::Base
   end
 end
 
-use OpenapiFirst::RequestValidation, spec: File.absolute_path('./openapi.yaml', __dir__)
+use OpenapiFirst::Middlewares::RequestValidation, spec: File.absolute_path('./openapi.yaml', __dir__)
 
 run SinatraWithOpenapiFirstExample

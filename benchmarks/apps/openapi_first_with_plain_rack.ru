@@ -4,11 +4,11 @@ require 'multi_json'
 require 'openapi_first'
 
 app = Rack::Builder.new do
-  use OpenapiFirst::RequestValidation, spec: File.expand_path('./openapi.yaml', __dir__)
+  use OpenapiFirst::Middlewares::RequestValidation, spec: File.expand_path('./openapi.yaml', __dir__)
 
   handlers = {
     'find_thing' => lambda do |env|
-      params = env[OpenapiFirst::PARAMS]
+      params = env[OpenapiFirst::REQUEST].params
       body = MultiJson.dump(hello: 'world', id: params.fetch('id'))
       [200, { 'Content-Type' => 'application/json' }, [body]]
     end,

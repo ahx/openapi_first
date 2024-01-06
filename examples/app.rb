@@ -6,8 +6,8 @@ require 'rack'
 # This example is a bit contrived, but it shows what you could do with the middlewares
 
 App = Rack::Builder.new do
-  use OpenapiFirst::RequestValidation, raise_error: true, spec: File.expand_path('./openapi.yaml', __dir__)
-  use OpenapiFirst::ResponseValidation, spec: File.expand_path('./openapi.yaml', __dir__)
+  use OpenapiFirst::Middlewares::RequestValidation, raise_error: true, spec: File.expand_path('./openapi.yaml', __dir__)
+  use OpenapiFirst::Middlewares::ResponseValidation, spec: File.expand_path('./openapi.yaml', __dir__)
 
   handlers = {
     'things#index' => ->(_env) { [200, { 'Content-Type' => 'application/json' }, ['{"hello": "world"}']] }

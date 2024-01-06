@@ -10,7 +10,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
 
   let(:app) do
     Rack::Builder.app do
-      use(OpenapiFirst::RequestValidation, spec: File.expand_path('../data/petstore.yaml', __dir__))
+      use(OpenapiFirst::Middlewares::RequestValidation, spec: File.expand_path('../data/petstore.yaml', __dir__))
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
@@ -64,8 +64,8 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
         def status = 409
       end
       Rack::Builder.app do
-        use OpenapiFirst::RequestValidation, spec: './spec/data/request-body-validation.yaml',
-                                             error_response: custom_class
+        use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
+                                                          error_response: custom_class
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
         }
@@ -83,7 +83,8 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
   context 'with :default error_response option' do
     let(:app) do
       Rack::Builder.app do
-        use OpenapiFirst::RequestValidation, spec: './spec/data/request-body-validation.yaml', error_response: :default
+        use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
+                                                          error_response: :default
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
         }

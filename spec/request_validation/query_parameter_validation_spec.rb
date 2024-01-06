@@ -16,7 +16,7 @@ RSpec.describe 'Query Parameter validation' do
     oas = spec
     raise_error = raise_error_option
     Rack::Builder.app do
-      use(OpenapiFirst::RequestValidation, spec: oas, raise_error:)
+      use(OpenapiFirst::Middlewares::RequestValidation, spec: oas, raise_error:)
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
@@ -227,7 +227,7 @@ RSpec.describe 'Query Parameter validation' do
 
       it 'raises an error if query parameter is missing' do
         params.delete(:term)
-        message = 'Query parameter invalid: object at root is missing required properties: term'
+        message = 'Query parameter is invalid: object at root is missing required properties: term'
         expect do
           get '/search', params
         end.to raise_error OpenapiFirst::RequestInvalidError, message
@@ -235,7 +235,7 @@ RSpec.describe 'Query Parameter validation' do
 
       it 'raises an error if query parameter is invalid' do
         params[:include] = 'foo,bar'
-        message = %r{Query parameter invalid: string at `/include` does not match pattern}
+        message = %r{Query parameter is invalid: string at `/include` does not match pattern}
         expect do
           get '/search', params
         end.to raise_error OpenapiFirst::RequestInvalidError, message

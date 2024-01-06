@@ -9,7 +9,7 @@ RSpec.describe OpenapiFirst::Plugins::Default::ErrorResponse do
 
   it 'returns application/problem+json' do
     error_response = described_class.new(
-      failure: OpenapiFirst::RequestValidation::Failure.new(:invalid_body)
+      failure: OpenapiFirst::Failure.new(:invalid_body)
     )
     response = Rack::MockResponse[*error_response.render]
     expect(response.content_type).to eq 'application/problem+json'
@@ -39,7 +39,7 @@ RSpec.describe OpenapiFirst::Plugins::Default::ErrorResponse do
 
     subject(:error_response) do
       described_class.new(
-        failure: OpenapiFirst::RequestValidation::Failure.new(
+        failure: OpenapiFirst::Failure.new(
           :invalid_body,
           errors: validation_result.errors
         )
@@ -91,7 +91,7 @@ RSpec.describe OpenapiFirst::Plugins::Default::ErrorResponse do
 
     subject(:error_response) do
       described_class.new(
-        failure: OpenapiFirst::RequestValidation::Failure.new(
+        failure: OpenapiFirst::Failure.new(
           :invalid_query,
           errors: validation_result.errors
         )
@@ -120,7 +120,7 @@ RSpec.describe OpenapiFirst::Plugins::Default::ErrorResponse do
   context 'with unsupported media type' do
     subject(:error_response) do
       described_class.new(
-        failure: OpenapiFirst::RequestValidation::Failure.new(
+        failure: OpenapiFirst::Failure.new(
           :unsupported_media_type
         )
       )
@@ -139,7 +139,7 @@ RSpec.describe OpenapiFirst::Plugins::Default::ErrorResponse do
   context 'when validation_result is nil' do
     subject(:error_response) do
       described_class.new(
-        failure: OpenapiFirst::RequestValidation::Failure.new(
+        failure: OpenapiFirst::Failure.new(
           :invalid_body
         )
       )

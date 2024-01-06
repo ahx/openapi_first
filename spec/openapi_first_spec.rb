@@ -36,6 +36,16 @@ RSpec.describe OpenapiFirst do
       expect(OpenapiFirst.load(spec_path)).to be_a OpenapiFirst::Definition
     end
 
+    it 'works with YAML' do
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml')
+      expect(definition.path('/pets').operation('get').operation_id).to eq('listPets')
+    end
+
+    it 'works with JSON' do
+      definition = OpenapiFirst.load('./spec/data/petstore.json')
+      expect(definition.path('/pets').operation('get').operation_id).to eq('listPets')
+    end
+
     describe 'only option' do
       specify 'with empty filter' do
         definition = OpenapiFirst.load(spec_path, only: nil)

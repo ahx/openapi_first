@@ -13,13 +13,14 @@ module OpenapiFirst
       response_definition&.description
     end
 
-    def validate!
-      return if @operation.nil?
-
+    def validate
       ResponseValidation::Validator.new(@operation).validate(@rack_response)
     end
 
-    alias validate validate!
+    def validate!
+      error = validate
+      error&.raise!
+    end
 
     private
 
