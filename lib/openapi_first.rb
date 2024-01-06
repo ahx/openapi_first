@@ -29,11 +29,23 @@ module OpenapiFirst
   REQUEST = 'openapi.request'
 
   def self.load(spec_path, only: nil)
-    resolved = Dir.chdir(File.dirname(spec_path)) do
-      content = YAML.load_file(File.basename(spec_path))
-      JsonRefs.call(content, resolve_local_ref: true, resolve_file_ref: true)
-    end
+    resolved = Bundle.resolve(spec_path)
     resolved['paths'].filter!(&->(key, _) { only.call(key) }) if only
     Definition.new(resolved, spec_path)
+  end
+
+  module Bundle
+    def self.resolve(spec_path)
+      Dir.chdir(File.dirname(spec_path)) do
+        content = load_file(File.basename(spec_path))
+        JsonRefs.call(content, resolve_local_ref: true, resolve_file_ref: true)
+      end
+    end
+
+    def self.load_file(spec_path)
+      return MultiJson.load(File.read(spec_path)) if File.extname(spec_path) == '.json'
+
+      YAML.unsafe_load_file(spec_path)
+    end
   end
 end
