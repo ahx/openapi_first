@@ -2,8 +2,6 @@
 
 OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.openapis.org/) API description. It supports OpenAPI 3.0 and 3.1. It offers request and response validation to ensure that your implementation follows exactly the API description.
 
-This makes your API description reliable, reason about API design and use various tooling on top of OpenAPI.
-
 ## Contents
 
 <!-- TOC -->
