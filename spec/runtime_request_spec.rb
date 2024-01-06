@@ -166,6 +166,18 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
     end
   end
 
+  describe '#path_item' do
+    let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
+
+    let(:rack_request) do
+      Rack::Request.new(Rack::MockRequest.env_for('/stuff/42'))
+    end
+
+    it 'returns the path item definition for the request' do
+      expect(subject.path_item.path).to eq('/stuff/{id}')
+    end
+  end
+
   describe '#query' do
     let(:rack_request) do
       Rack::Request.new(Rack::MockRequest.env_for('/pets?limit=3&unknown=5'))

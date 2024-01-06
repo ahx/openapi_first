@@ -20,6 +20,8 @@ module OpenapiFirst
     def_delegators :@request, :content_type, :media_type
     def_delegators :@operation, :operation_id
 
+    attr_reader :path_item
+
     def known?
       known_path? && known_request_method?
     end
@@ -79,6 +81,6 @@ module OpenapiFirst
 
     private
 
-    attr_reader :request, :operation, :path_item
+    attr_reader :request, :operation
   end
 end
