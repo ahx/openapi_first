@@ -8,7 +8,7 @@ app = Rack::Builder.new do
 
   handlers = {
     'find_thing' => lambda do |env|
-      params = env[OpenapiFirst::PARAMS]
+      params = env[OpenapiFirst::REQUEST].params
       body = MultiJson.dump(hello: 'world', id: params.fetch('id'))
       [200, { 'Content-Type' => 'application/json' }, [body]]
     end,
