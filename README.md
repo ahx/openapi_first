@@ -44,7 +44,7 @@ request.headers
 request.cookies
 
 # Validate the request
-request.validate # Returns OpenapiFirst::RequestValidation::Failure if validation fails
+request.validate # Returns OpenapiFirst:::Failure if validation fails
 request.validate! # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if validation fails
 
 # Find the response
@@ -52,7 +52,8 @@ rack_response = Rack::Response[*app.call(env)]
 response = request.response(rack_response) # or definition.response(rack_request, rack_response)
 
 # Validate response
-response.validate! # Raises OpenapiFirst::ResponseInvalidError if validation fails
+response.validate # Returns OpenapiFirst::Failure
+response.validate! # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError if validation fails
 ```
 
 OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
