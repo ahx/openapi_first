@@ -10,7 +10,8 @@ RSpec.describe 'Cookie Parameter validation' do
 
   let(:app) do
     Rack::Builder.app do
-      use OpenapiFirst::RequestValidation, spec: File.expand_path('../data/cookie-parameter-validation.yaml', __dir__)
+      use OpenapiFirst::Middlewares::RequestValidation,
+          spec: File.expand_path('../data/cookie-parameter-validation.yaml', __dir__)
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
@@ -50,8 +51,8 @@ RSpec.describe 'Cookie Parameter validation' do
       let(:app) do
         Rack::Builder.app do
           spec_file = File.expand_path('../data/cookie-parameter-validation.yaml', __dir__)
-          use OpenapiFirst::RequestValidation, raise_error: true,
-                                               spec: spec_file
+          use OpenapiFirst::Middlewares::RequestValidation, raise_error: true,
+                                                            spec: spec_file
           run lambda { |_env|
             Rack::Response.new('hello', 200).finish
           }

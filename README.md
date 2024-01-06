@@ -120,7 +120,7 @@ Response validation fails if response body includes a property with `writeOnly: 
 This middleware is especially useful when testing. It _always_ raises an error if the response is not valid.
 
 ```ruby
-use OpenapiFirst::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] == 'test'
+use OpenapiFirst::Middlewares::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] == 'test'
 ```
 
 #### Options

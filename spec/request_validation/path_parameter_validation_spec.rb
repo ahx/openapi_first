@@ -13,8 +13,10 @@ RSpec.describe 'Path Parameter validation' do
   let(:app) do
     raise_error = raise_error_option
     Rack::Builder.app do
-      use(OpenapiFirst::RequestValidation, spec: File.expand_path('../data/path-parameter-validation.yaml', __dir__),
-                                           raise_error:)
+      use OpenapiFirst::Middlewares::RequestValidation, {
+        spec: File.expand_path('../data/path-parameter-validation.yaml', __dir__),
+        raise_error:
+      }
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }

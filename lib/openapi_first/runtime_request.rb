@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require 'openapi_parameters'
 require_relative 'runtime_response'
 require_relative 'body_parser'
 require_relative 'request_validation/validator'

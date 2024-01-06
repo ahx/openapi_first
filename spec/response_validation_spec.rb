@@ -12,7 +12,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     res = response
     definition = spec
     Rack::Builder.app do
-      use OpenapiFirst::ResponseValidation, spec: definition
+      use OpenapiFirst::Middlewares::ResponseValidation, spec: definition
       run ->(_env) { res.finish }
     end
   end
@@ -231,7 +231,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   describe 'response header validation' do
     let(:app) do
       Rack::Builder.app do
-        use OpenapiFirst::ResponseValidation, spec: './spec/data/response-header.yaml'
+        use OpenapiFirst::Middlewares::ResponseValidation, spec: './spec/data/response-header.yaml'
         run(lambda do |env|
           res = Rack::Response.new
           res.status = 201

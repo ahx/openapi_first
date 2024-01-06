@@ -9,8 +9,8 @@ require_relative 'openapi_first/plugins'
 require_relative 'openapi_first/definition'
 require_relative 'openapi_first/version'
 require_relative 'openapi_first/error_response'
-require_relative 'openapi_first/request_validation'
-require_relative 'openapi_first/response_validation'
+require_relative 'openapi_first/middlewares/response_validation'
+require_relative 'openapi_first/middlewares/request_validation'
 
 module OpenapiFirst
   extend Plugins

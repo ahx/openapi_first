@@ -3,7 +3,7 @@
 module OpenapiFirst
   # This is the base module for error responses
   module ErrorResponse
-    ## @param failure [OpenapiFirst::RequestValidation::Failure]
+    ## @param failure [OpenapiFirst::Failure]
     def initialize(failure: nil)
       @failure = failure
     end
