@@ -8,7 +8,6 @@ This makes your API description reliable, reason about API design and use variou
 
 <!-- TOC -->
 
-- [Contents](#contents)
 - [Manual use](#manual-use)
 - [Rack Middlewares](#rack-middlewares)
 - [Configuration](#configuration)

@@ -1,18 +1,18 @@
 # Changelog
 
-## Unreleased
+## 1.0.0
 
-- Fixed: Add support for paths like `/{a}..{b}`
 - Breaking: The default error uses application/problem+json content-type
 - Breaking: Moved rack middlewares to OpenapiFirst::Middlewares
-- Fix response header validation with Rack 3
-- Add interface to validate requests / responses without middlewares (see "Manual validation" in README)
 - Breaking: Rename OpenapiFirst::ResponseInvalid to OpenapiFirst::ResponseInvalidError
 - Breaking: Remove OpenapiFirst::Router
+- Breaking: Remove `env[OpenapiFirst::OPERATION]`. Use `env[OpenapiFirst::REQUEST]` instead.
+- Breaking: Remove `env[OpenapiFirst::REQUEST_BODY]`, `env[OpenapiFirst::PARAMS]`. Use `env[OpenapiFirst::REQUEST].body env[OpenapiFirst::REQUEST].params` instead.
+- Add interface to validate requests / responses without middlewares (see "Manual validation" in README)
 - Add OpenapiFirst.configure
 - Add OpenapiFirst.register, OpenapiFirst.plugin
-- Breaking: Remove `env[OpenapiFirst::OPERATION]`. Use `env[OpenapiFirst::REQUEST]` instead.
-- Replace `env[OpenapiFirst::REQUEST_BODY]`, `env[OpenapiFirst::PARAMS]` with `env[OpenapiFirst::REQUEST].body`, `env[OpenapiFirst::REQUEST].params`
+- Fix response header validation with Rack 3
+- Fixed: Add support for paths like `/{a}..{b}`
 
 ## 1.0.0.beta6
 
