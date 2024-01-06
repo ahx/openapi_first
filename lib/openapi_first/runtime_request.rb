@@ -17,8 +17,9 @@ module OpenapiFirst
       @original_path_params = path_params
     end
 
-    def_delegators :@request, :content_type, :media_type
-    def_delegators :@operation, :operation_id
+    def_delegators :@request, :content_type, :media_type, :path
+    def_delegators :@operation, :operation_id, :request_method
+    def_delegator :@path_item, :path, :path_definition
 
     attr_reader :path_item
 

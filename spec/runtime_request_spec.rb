@@ -5,6 +5,10 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
     definition.request(rack_request)
   end
 
+  let(:rack_request) do
+    Rack::Request.new(Rack::MockRequest.env_for('/pets/42'))
+  end
+
   let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
 
   describe '#known?' do
@@ -166,18 +170,6 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
     end
   end
 
-  describe '#path_item' do
-    let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
-
-    let(:rack_request) do
-      Rack::Request.new(Rack::MockRequest.env_for('/stuff/42'))
-    end
-
-    it 'returns the path item definition for the request' do
-      expect(subject.path_item.path).to eq('/stuff/{id}')
-    end
-  end
-
   describe '#query' do
     let(:rack_request) do
       Rack::Request.new(Rack::MockRequest.env_for('/pets?limit=3&unknown=5'))
@@ -278,6 +270,30 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
 
     it 'is aliased with parsed_body' do
       expect(subject.parsed_body).to eq('foo' => 'bar')
+    end
+  end
+
+  describe '#path' do
+    it 'returns the path of the request' do
+      expect(subject.path).to eq('/pets/42')
+    end
+  end
+
+  describe '#path_item' do
+    it 'returns the path item definition for the request' do
+      expect(subject.path_item.path).to eq('/pets/{petId}')
+    end
+  end
+
+  describe '#path_definition' do
+    it 'returns the path item definition for the request' do
+      expect(subject.path_definition).to eq('/pets/{petId}')
+    end
+  end
+
+  describe '#request_method' do
+    it 'returns the request_method of the request' do
+      expect(subject.request_method).to eq('get')
     end
   end
 end
