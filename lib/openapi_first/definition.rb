@@ -49,17 +49,27 @@ module OpenapiFirst
     end
 
     def find_path_item_and_params(request_path)
-      matches = paths.each_with_object([]) do |kv, result|
-        path, path_item_object = kv
+      if paths.key?(request_path)
+        return [
+          PathItem.new(request_path, paths[request_path], openapi_version:),
+          {}
+        ]
+      end
+      search_for_path_item(request_path)
+    end
+
+    def search_for_path_item(request_path)
+      paths.find do |path, path_item_object|
         template = Mustermann::Template.new(path)
         path_params = template.params(request_path)
         next unless path_params
+        next unless path_params.size == template.names.size
 
-        path_item = PathItem.new(path, path_item_object, openapi_version:)
-        result << [path_item, path_params]
+        return [
+          PathItem.new(path, path_item_object, openapi_version:),
+          path_params
+        ]
       end
-      # Thanks to open ota42y/openapi_parser for this part
-      matches.min_by { |match| match[1].size }
     end
 
     def detect_version(resolved)

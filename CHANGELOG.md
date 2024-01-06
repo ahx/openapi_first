@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed: Add support for paths like `/{a}..{b}`
 - Breaking: The default error uses application/problem+json content-type
 - Breaking: Moved rack middlewares to OpenapiFirst::Middlewares. Adding `OpenapiFirst::RequestValidation.new`, `OpenapiFirst::ResponseValidation.new` as shortcuts.
 - Fix response header validation with Rack 3

@@ -47,7 +47,7 @@ RSpec.describe OpenapiFirst::Definition do
         expect(runtime_request.params['date']).to eq('2020-01-01')
       end
 
-      pending 'supports /{start_date}..{end_date}' do
+      it 'supports /{start_date}..{end_date}' do
         runtime_request = definition.request(build_request('/info/2020-01-01..2020-01-02'))
         operation_id = runtime_request.operation_id
         expect(operation_id).to eq 'info_date_range'
