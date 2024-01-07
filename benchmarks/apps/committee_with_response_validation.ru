@@ -24,6 +24,7 @@ use Committee::Middleware::RequestValidation,
     parse_response_by_content_type: true
 
 use Committee::Middleware::ResponseValidation,
-    schema_path: File.absolute_path('./openapi.yaml', __dir__)
+    schema_path: File.absolute_path('./openapi.yaml', __dir__),
+    strict: true
 
 run app

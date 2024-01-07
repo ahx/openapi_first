@@ -35,7 +35,7 @@ GEM
       rack (>= 2.2)
       zeitwerk (~> 2.6)
     parallel (1.24.0)
-    parser (3.3.0.0)
+    parser (3.3.0.2)
       ast (~> 2.4.1)
       racc
     racc (1.7.3)
