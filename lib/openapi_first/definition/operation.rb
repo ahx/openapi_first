@@ -20,8 +20,6 @@ module OpenapiFirst
       WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
       private_constant :WRITE_METHODS
 
-      attr_reader :path, :method, :openapi_version
-
       def initialize(path, request_method, path_item_object, openapi_version:)
         @path = path
         @method = request_method
@@ -29,6 +27,9 @@ module OpenapiFirst
         @openapi_version = openapi_version
         @operation_object = @path_item_object[request_method]
       end
+
+      attr_reader :path, :method, :openapi_version
+      alias request_method method
 
       def operation_id
         operation_object['operationId']

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
 paths:
-  '/echo':
+  "/echo":
     post:
       requestBody:
         required: true
@@ -10,16 +10,18 @@ paths:
             schema:
               type: object
       responses:
-        '201':
+        "204":
+          description: No headers
+        "201":
           description: Ok
           headers:
             OptionalWithoutSchema:
-              description: 'optonal'
-            'Content-Type':
+              description: "optonal"
+            "Content-Type":
               required: true
               schema:
                 type: string
-                const: 'this should be ignored'
+                const: "this should be ignored"
             Location:
               required: true
               schema:
@@ -28,4 +30,3 @@ paths:
             X-Id:
               schema:
                 type: integer
-

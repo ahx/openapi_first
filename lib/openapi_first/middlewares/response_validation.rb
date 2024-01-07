@@ -20,7 +20,8 @@ module OpenapiFirst
       def call(env)
         request = find_request(env)
         response = @app.call(env)
-        request.response(response).validate!
+
+        request.response(Rack::Response[*response.to_a]).validate!
 
         response
       end

@@ -7,17 +7,21 @@ require 'openapi_first/response_validation/validator'
 RSpec.describe OpenapiFirst::ResponseValidation::Validator do
   let(:spec) { './spec/data/petstore.yaml' }
 
-  let(:subject) do
-    operation = OpenapiFirst.load(spec).path(path).operation('get')
-    described_class.new(operation)
-  end
-
   let(:path) { '/pets' }
+  let(:operation) { OpenapiFirst.load(spec).path(path).operation('get') }
+  let(:subject) { described_class.new(operation) }
 
   let(:headers) { { Rack::CONTENT_TYPE => 'application/json' } }
 
-  describe 'valid response' do
-    let(:response) do
+  let(:response) do
+    OpenapiFirst::RuntimeResponse.new(
+      operation,
+      rack_response
+    )
+  end
+
+  context 'with a valid response' do
+    let(:rack_response) do
       response_body = json_dump([
                                   { id: 42, name: 'hans' },
                                   { id: 2, name: 'Voldemort' }
@@ -29,21 +33,31 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       subject.validate(response)
     end
 
-    it 'falls back to the default' do
-      response_body = JSON.dump(code: 422, message: 'Not good!')
-      response = Rack::Response.new(response_body, 422, headers)
-      subject.validate(response)
+    context 'when response is not defined, but there is a default' do
+      let(:rack_response) do
+        response_body = JSON.dump(code: 422, message: 'Not good!')
+        Rack::Response.new(response_body, 422, headers)
+      end
+
+      it 'falls back to the default' do
+        subject.validate(response)
+      end
     end
 
-    it 'returns no errors on additional, not required properties' do
-      response_body = json_dump([{ id: 42, name: 'hans', something: 'else' }])
-      response = Rack::Response.new(response_body, 200, headers)
-      subject.validate(response)
+    context 'with additional, not required properties' do
+      let(:rack_response) do
+        response_body = json_dump([{ id: 42, name: 'hans', something: 'else' }])
+        Rack::Response.new(response_body, 200, headers)
+      end
+
+      it 'returns no errors' do
+        subject.validate(response)
+      end
     end
 
     context 'when operation response has has no content defined' do
       let(:spec) { './spec/data/no-response-content.yaml' }
-      let(:response) { Rack::Response.new('body', 200, headers) }
+      let(:rack_response) { Rack::Response.new('body', 200, headers) }
       let(:path) { '/' }
 
       it 'returns no errors' do
@@ -64,38 +78,56 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
     context 'when response status is unknown' do
       let(:path) { '/pets/{petId}' }
 
-      it 'fails' do
+      let(:rack_response) do
         response_body = json_dump({ id: 2, name: 'Voldemort' })
-        response = Rack::Response.new(response_body, 201, headers)
+        Rack::Response.new(response_body, 201, headers)
+      end
+
+      it 'fails' do
         expect do
           subject.validate(response).raise!
         end.to raise_error OpenapiFirst::ResponseNotFoundError
       end
     end
 
-    it 'fails on wrong content type' do
-      response_body = json_dump([{ id: 2, name: 'Voldemort' }])
-      headers = { Rack::CONTENT_TYPE => 'application/xml' }
-      response = Rack::Response.new(response_body, 200, headers)
-      expect do
-        subject.validate(response).raise!
-      end.to raise_error OpenapiFirst::ResponseInvalidError
+    context 'with wrong content-type' do
+      let(:rack_response) do
+        response_body = json_dump([{ id: 2, name: 'Voldemort' }])
+        headers = { Rack::CONTENT_TYPE => 'application/xml' }
+        Rack::Response.new(response_body, 200, headers)
+      end
+
+      it 'fails on wrong content type' do
+        expect do
+          subject.validate(response).raise!
+        end.to raise_error OpenapiFirst::ResponseInvalidError
+      end
     end
 
-    it 'returns errors on missing property' do
-      response_body = json_dump([{ id: 42 }, { id: 2, name: 'Voldemort' }])
-      response = Rack::Response.new(response_body, 200, headers)
-      expect do
-        subject.validate(response).raise!
-      end.to raise_error OpenapiFirst::ResponseInvalidError
+    context 'with missing property' do
+      let(:rack_response) do
+        response_body = json_dump([{ id: 42 }, { id: 2, name: 'Voldemort' }])
+        Rack::Response.new(response_body, 200, headers)
+      end
+
+      it 'fails' do
+        expect do
+          subject.validate(response).raise!
+        end.to raise_error OpenapiFirst::ResponseInvalidError
+      end
     end
 
-    it 'returns errors on wrong property type' do
-      response_body = json_dump([{ id: 'string', name: 'hans' }])
-      response = Rack::Response.new(response_body, 200, headers)
-      expect do
-        subject.validate(response).raise!
-      end.to raise_error OpenapiFirst::ResponseInvalidError
+    context 'with wrong property type' do
+      let(:rack_response) do
+        response_body = json_dump([{ id: 'string', name: 'hans' }])
+        Rack::Response.new(response_body, 200, headers)
+      end
+
+      it 'fails' do
+        expect do
+          subject.validate(response).raise!
+        end.to raise_error OpenapiFirst::ResponseInvalidError
+      end
     end
   end
 end
