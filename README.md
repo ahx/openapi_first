@@ -33,9 +33,10 @@ request = definition.request(rack_request)
 
 # Inspect the request and access parsed parameters
 request.known? # Is the request defined in the API description?
-request.parsed_body # alias: body
+request.content_type
+request.body # alias: parsed_body
 request.path_parameters # => { "pet_id" => 42 }
-request.query_parameters # alias: query_parameters
+request.query_parameters # alias: query
 request.params # Merged path and query parameters
 request.headers
 request.cookies
@@ -50,6 +51,13 @@ request.validate! # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::No
 # Find the response
 rack_response = Rack::Response[*app.call(env)]
 response = request.response(rack_response) # or definition.response(rack_request, rack_response)
+
+# Inspect the response
+response.known? # Is the response defined in the API description?
+response.status # => 200
+response.content_type
+request.body # alias: parsed_body
+request.headers # parsed response headers
 
 # Validate response
 response.validate # Returns OpenapiFirst::Failure if validation fails

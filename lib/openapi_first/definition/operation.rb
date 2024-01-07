@@ -27,9 +27,9 @@ module OpenapiFirst
         @openapi_version = openapi_version
         @operation_object = @path_item_object[request_method]
       end
-      
+
       attr_reader :path, :method, :openapi_version
-      alias :request_method :method
+      alias request_method method
 
       def operation_id
         operation_object['operationId']

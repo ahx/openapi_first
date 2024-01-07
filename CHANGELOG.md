@@ -1,5 +1,9 @@
 # Changelog
 
+## unreleased
+
+- Added methods `known?`, `status_type`, `body`, `headers` to `RuntimeResponse` to inspect the parsed response
+
 ## 1.0.0
 
 - Breaking: The default error uses application/problem+json content-type

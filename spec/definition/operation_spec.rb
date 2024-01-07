@@ -187,6 +187,16 @@ RSpec.describe OpenapiFirst::Definition::Operation do
       end
     end
 
+    context 'when no content-type is defined' do
+      let(:spec) { OpenapiFirst.load('./spec/data/content-types.yaml') }
+      let(:operation) { spec.path('/without-content').operation('get') }
+
+      it 'returns the response without content' do
+        result = operation.response_for(204, 'application/json')
+        expect(result.description).to eq 'no content'
+      end
+    end
+
     context 'when response object media type cannot be found' do
       let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
       let(:operation) do

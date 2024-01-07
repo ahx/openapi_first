@@ -113,7 +113,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
 
   context 'with a XX wildcard response status' do
     let(:spec) { './spec/data/response-code-wildcard.yaml' }
-    let(:response_body) { {} }
+    let(:response_body) { json_dump({}) }
 
     context 'when 4XX (upcase) is expected and 404 is sent' do
       let(:status) { 404 }

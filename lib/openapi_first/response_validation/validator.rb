@@ -9,14 +9,14 @@ module OpenapiFirst
         @operation = operation
       end
 
-      def validate(rack_response)
+      def validate(runtime_response)
         return unless operation
 
-        response = Rack::Response[*rack_response.to_a]
         catch Failure::FAILURE do
-          response_definition = response_for(operation, response.status, response.content_type)
-          validate_response_body(response_definition.content_schema, response.body)
-          validate_response_headers(response_definition.headers, response.headers)
+          validate_defined(runtime_response)
+          response_definition = runtime_response.response_definition
+          validate_response_body(response_definition.content_schema, runtime_response.body)
+          validate_response_headers(response_definition.headers, runtime_response.headers)
           nil
         end
       end
@@ -25,37 +25,34 @@ module OpenapiFirst
 
       attr_reader :operation
 
-      def response_for(operation, status, content_type)
-        response = operation.response_for(status, content_type)
-        return response if response
+      def validate_defined(runtime_response)
+        return if runtime_response.known?
 
-        unless operation.response_status_defined?(status)
-          message = "Response status '#{status}' not found for '#{operation.name}'"
+        unless runtime_response.known_status?
+          message = "Response status '#{runtime_response.status}' not found for '#{runtime_response.name}'"
           Failure.fail!(:response_not_found, message:)
         end
+
+        content_type = runtime_response.content_type
         if content_type.nil? || content_type.empty?
-          message = "Content-Type for '#{operation.name}' must not be empty"
+          message = "Content-Type for '#{runtime_response.name}' must not be empty"
           Failure.fail!(:invalid_response_header, message:)
         end
 
-        message = "Content-Type '#{content_type}' is not defined for '#{operation.name}'"
+        message = "Content-Type '#{content_type}' is not defined for '#{runtime_response.name}'"
         Failure.fail!(:invalid_response_header, message:)
       end
 
-      def validate_response_body(schema, response)
+      def validate_response_body(schema, parsed_body)
         return unless schema
 
-        full_body = +''
-        response.each { |chunk| full_body << chunk }
-        data = full_body.empty? ? {} : load_json(full_body)
-        validation = schema.validate(data)
+        validation = schema.validate(parsed_body)
         Failure.fail!(:invalid_response_body, errors: validation.errors) if validation.error?
       end
 
-      def validate_response_headers(response_header_definitions, response_headers)
+      def validate_response_headers(response_header_definitions, unpacked_headers)
         return unless response_header_definitions
 
-        unpacked_headers = unpack_response_headers(response_header_definitions, response_headers)
         response_header_definitions.each do |name, definition|
           next if name == 'Content-Type'
 
@@ -82,13 +79,6 @@ module OpenapiFirst
 
         Failure.fail!(:invalid_response_header,
                       errors: validation_result.errors)
-      end
-
-      def unpack_response_headers(response_header_definitions, response_headers)
-        headers_as_parameters = response_header_definitions.map do |name, definition|
-          definition.merge('name' => name, 'in' => 'header')
-        end
-        OpenapiParameters::Header.new(headers_as_parameters).unpack(response_headers)
       end
 
       def load_json(string)
