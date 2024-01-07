@@ -16,7 +16,7 @@ module OpenapiFirst
           invalid_query: 'Bad Query Parameter',
           invalid_header: 'Bad Request Header',
           invalid_path: 'Bad Request Path',
-          invalid_cookie: 'Bod Request Cookie'
+          invalid_cookie: 'Bad Request Cookie'
         }.freeze
         private_constant :TITLES
 
