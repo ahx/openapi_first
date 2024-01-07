@@ -5,6 +5,14 @@ ENV['RACK_ENV'] = 'test'
 require 'bundler/setup'
 require 'openapi_first'
 require 'multi_json'
+require 'simplecov'
+
+SimpleCov.start do
+  enable_coverage :branch
+  primary_coverage :branch
+end
+
+SimpleCov.minimum_coverage line: 99, branch: 85
 
 module OpenapiFirstSpecHelpers
   def json_dump(data)

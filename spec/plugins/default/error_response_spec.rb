@@ -117,6 +117,132 @@ RSpec.describe OpenapiFirst::Plugins::Default::ErrorResponse do
     end
   end
 
+  context 'with invalid request header ' do
+    let(:schema) do
+      {
+        'type' => 'object',
+        'properties' => {
+          'limit' => { 'type' => 'integer', 'maximum' => 100 }
+        }
+      }
+    end
+
+    let(:data) do
+      { 'limit' => 101 }
+    end
+
+    subject(:error_response) do
+      described_class.new(
+        failure: OpenapiFirst::Failure.new(
+          :invalid_header,
+          errors: validation_result.errors
+        )
+      )
+    end
+
+    it 'renders an error about invalid parameter' do
+      response = Rack::MockResponse[*error_response.render]
+      expect(response.status).to eq(400)
+      expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
+        {
+          title: 'Bad Request Header',
+          status: 400,
+          errors: [
+            {
+              message: 'number at `/limit` is greater than: 100',
+              header: 'limit',
+              code: 'maximum'
+            }
+          ]
+        }
+      )
+    end
+  end
+
+  context 'with invalid path segment value ' do
+    let(:schema) do
+      {
+        'type' => 'object',
+        'properties' => {
+          'limit' => { 'type' => 'integer', 'maximum' => 100 }
+        }
+      }
+    end
+
+    let(:data) do
+      { 'limit' => 101 }
+    end
+
+    subject(:error_response) do
+      described_class.new(
+        failure: OpenapiFirst::Failure.new(
+          :invalid_path,
+          errors: validation_result.errors
+        )
+      )
+    end
+
+    it 'renders an error about invalid parameter' do
+      response = Rack::MockResponse[*error_response.render]
+      expect(response.status).to eq(400)
+      expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
+        {
+          title: 'Bad Request Path',
+          status: 400,
+          errors: [
+            {
+              message: 'number at `/limit` is greater than: 100',
+              parameter: 'limit',
+              code: 'maximum'
+            }
+          ]
+        }
+      )
+    end
+  end
+
+  context 'with invalid cookie value' do
+    let(:schema) do
+      {
+        'type' => 'object',
+        'properties' => {
+          'limit' => { 'type' => 'integer', 'maximum' => 100 }
+        }
+      }
+    end
+
+    let(:data) do
+      { 'limit' => 101 }
+    end
+
+    subject(:error_response) do
+      described_class.new(
+        failure: OpenapiFirst::Failure.new(
+          :invalid_cookie,
+          errors: validation_result.errors
+        )
+      )
+    end
+
+    it 'renders an error about invalid parameter' do
+      response = Rack::MockResponse[*error_response.render]
+      expect(response.status).to eq(400)
+      expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
+        {
+          title: 'Bad Request Cookie',
+          status: 400,
+          errors: [
+            {
+              message: 'number at `/limit` is greater than: 100',
+              cookie: 'limit',
+              code: 'maximum'
+            }
+          ]
+        }
+      )
+    end
+  end
+
   context 'with unsupported media type' do
     subject(:error_response) do
       described_class.new(
