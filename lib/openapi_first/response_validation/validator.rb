@@ -15,7 +15,7 @@ module OpenapiFirst
         catch Failure::FAILURE do
           validate_defined(runtime_response)
           response_definition = runtime_response.response_definition
-          validate_response_body(response_definition.content_schema, runtime_response.body)
+          validate_response_body(response_definition.content_schema, runtime_response)
           validate_response_headers(response_definition.headers, runtime_response.headers)
           nil
         end
@@ -43,8 +43,14 @@ module OpenapiFirst
         Failure.fail!(:invalid_response_header, message:)
       end
 
-      def validate_response_body(schema, parsed_body)
+      def validate_response_body(schema, runtime_response)
         return unless schema
+
+        begin
+          parsed_body = runtime_response.body
+        rescue ParseError => e
+          Failure.fail!(:invalid_response_body, message: e.message)
+        end
 
         validation = schema.validate(parsed_body)
         Failure.fail!(:invalid_response_body, errors: validation.errors) if validation.error?

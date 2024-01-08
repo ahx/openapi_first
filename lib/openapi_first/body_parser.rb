@@ -4,7 +4,11 @@ require 'multi_json'
 
 module OpenapiFirst
   class BodyParser
-    class ParsingError < StandardError; end
+    def self.const_missing(const_name)
+      super unless const_name == :ParsingError
+      warn 'DEPRECATION WARNING: OpenapiFirst::BodyParser::ParsingError is deprecated. Use OpenapiFirst::ParseError instead.' # rubocop:disable Layout/LineLength
+      OpenapiFirst::ParseError
+    end
 
     def parse(request, content_type)
       body = read_body(request)
@@ -15,7 +19,7 @@ module OpenapiFirst
 
       body
     rescue MultiJson::ParseError
-      raise ParsingError, 'Failed to parse body as JSON'
+      raise ParseError, 'Failed to parse body as JSON'
     end
 
     private

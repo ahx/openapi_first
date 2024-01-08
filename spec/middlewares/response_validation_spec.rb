@@ -61,7 +61,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
       expect do
         get '/pets'
       end.to raise_error OpenapiFirst::ResponseInvalidError,
-                         'Response body is invalid: value at root is not an array'
+                         'Response body is invalid: Failed to parse response body as JSON'
     end
   end
 

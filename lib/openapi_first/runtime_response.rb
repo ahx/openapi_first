@@ -29,10 +29,7 @@ module OpenapiFirst
     end
 
     def body
-      @body ||= begin
-        read_body = @rack_response.body.join
-        content_type =~ /json/i ? load_json(read_body) : read_body
-      end
+      @body ||= content_type =~ /json/i ? load_json(original_body) : original_body
     end
 
     def headers
@@ -54,10 +51,14 @@ module OpenapiFirst
 
     private
 
+    def original_body
+      @rack_response.body.join
+    end
+
     def load_json(string)
       MultiJson.load(string)
     rescue MultiJson::ParseError
-      string
+      raise ParseError, 'Failed to parse response body as JSON'
     end
 
     def unpack_response_headers
