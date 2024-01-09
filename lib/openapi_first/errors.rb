@@ -2,6 +2,7 @@
 
 module OpenapiFirst
   class Error < StandardError; end
+  class ParseError < Error; end
   class NotFoundError < Error; end
   class RequestInvalidError < Error; end
   class ResponseNotFoundError < Error; end

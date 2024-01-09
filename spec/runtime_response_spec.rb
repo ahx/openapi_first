@@ -43,6 +43,18 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
         expect(response.body).to eq(JSON.dump({ foo: :bar }))
       end
     end
+
+    context 'with invalid JSON' do
+      let(:rack_response) do
+        Rack::Response.new('{foobar}', 200, { 'Content-Type' => 'application/json' })
+      end
+
+      it 'raises a ParseError' do
+        expect do
+          response.body
+        end.to raise_error OpenapiFirst::ParseError, 'Failed to parse response body as JSON'
+      end
+    end
   end
 
   describe '#name' do

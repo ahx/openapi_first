@@ -268,6 +268,18 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
       expect(subject.body).to eq('foo' => 'bar')
     end
 
+    context 'with invalid JSON' do
+      let(:rack_request) do
+        env = Rack::MockRequest.env_for('/pets', method: 'POST', input: '{foobar}')
+        env['CONTENT_TYPE'] = 'application/json'
+        Rack::Request.new(env)
+      end
+
+      it 'raises a ParseError' do
+        expect { subject.body }.to raise_error(OpenapiFirst::ParseError, 'Failed to parse body as JSON')
+      end
+    end
+
     it 'is aliased with parsed_body' do
       expect(subject.parsed_body).to eq('foo' => 'bar')
     end

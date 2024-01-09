@@ -30,9 +30,28 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
   end
 
-  context 'when request is invalid' do
+  context 'when parameter is invalid' do
     it 'returns 400' do
       get '/pets?limit=three'
+
+      expect(last_response.status).to eq 400
+    end
+  end
+
+  context 'when request body is invalid JSON' do
+    let(:app) do
+      Rack::Builder.app do
+        use(OpenapiFirst::Middlewares::RequestValidation,
+            spec: File.expand_path('../data/petstore-expanded.yaml', __dir__))
+        run lambda { |_env|
+          Rack::Response.new('hello', 200).finish
+        }
+      end
+    end
+
+    it 'returns 400' do
+      header 'Content-Type', 'application/json'
+      post '/pets', 'not json'
 
       expect(last_response.status).to eq 400
     end
