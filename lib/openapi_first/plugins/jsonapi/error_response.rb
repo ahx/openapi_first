@@ -22,7 +22,8 @@ module OpenapiFirst
             {
               status: status.to_s,
               source: { key => pointer(error.instance_location) },
-              title: error.error
+              title: error.error,
+              code: error.type
             }
           end
         end
