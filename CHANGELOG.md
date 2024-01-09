@@ -2,8 +2,9 @@
 
 ## 1.1.0
 
-- Added methods `known?`, `status`, `body`, `headers`, `content_type` to inspect the parsed response (`RuntimeResponse`)
+- Add `known?`, `status`, `body`, `headers`, `content_type` methods to inspect the parsed response (`RuntimeResponse`)
 - Add `OpenapiFirst::ParseError` which is raised by low-level interfaces like `request.body` if the body could not be parsed.
+- Add "code" field to errors in JSON:API error response
 
 ## 1.0.0
 
