@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    openapi_first (1.0.0)
+    openapi_first (1.1.0)
       json_refs (~> 0.1, >= 0.1.7)
       json_schemer (~> 2.1.0)
       multi_json (~> 1.15)
@@ -47,7 +47,7 @@ GEM
     rack-protection (3.2.0)
       base64 (>= 0.1.0)
       rack (~> 2.2, >= 2.2.4)
-    regexp_parser (2.8.3)
+    regexp_parser (2.9.0)
     ruby2_keywords (0.0.5)
     simpleidn (0.2.1)
       unf (~> 0.1.4)

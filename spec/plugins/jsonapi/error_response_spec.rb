@@ -53,11 +53,17 @@ RSpec.describe OpenapiFirst::Plugins::Jsonapi::ErrorResponse do
       expect(body).to eq({
                            errors: [
                              { status: '400',
-                               source: { pointer: '/data/name' }, title: 'value at `/data/name` is not a string' },
-                             { status: '400', source: { pointer: '/data/numberOfLegs' },
-                               title: 'number at `/data/numberOfLegs` is less than: 2' },
-                             { status: '400', source: { pointer: '/data' },
-                               title: 'object at `/data` is missing required properties: mandatory' }
+                               source: { pointer: '/data/name' },
+                               title: 'value at `/data/name` is not a string',
+                               code: 'string' },
+                             { status: '400',
+                               source: { pointer: '/data/numberOfLegs' },
+                               title: 'number at `/data/numberOfLegs` is less than: 2',
+                               code: 'minimum' },
+                             { status: '400',
+                               source: { pointer: '/data' },
+                               title: 'object at `/data` is missing required properties: mandatory',
+                               code: 'required' }
                            ]
                          })
     end
@@ -93,7 +99,7 @@ RSpec.describe OpenapiFirst::Plugins::Jsonapi::ErrorResponse do
         {
           errors: [
             { source: { parameter: 'limit' }, status: '400',
-              title: 'number at `/limit` is greater than: 100' }
+              title: 'number at `/limit` is greater than: 100', code: 'maximum' }
           ]
         }
       )
@@ -130,7 +136,7 @@ RSpec.describe OpenapiFirst::Plugins::Jsonapi::ErrorResponse do
         {
           errors: [
             { source: { cookie: 'limit' }, status: '400',
-              title: 'number at `/limit` is greater than: 100' }
+              title: 'number at `/limit` is greater than: 100', code: 'maximum' }
           ]
         }
       )
@@ -167,7 +173,7 @@ RSpec.describe OpenapiFirst::Plugins::Jsonapi::ErrorResponse do
         {
           errors: [
             { source: { parameter: 'limit' }, status: '400',
-              title: 'number at `/limit` is greater than: 100' }
+              title: 'number at `/limit` is greater than: 100', code: 'maximum' }
           ]
         }
       )
@@ -204,7 +210,7 @@ RSpec.describe OpenapiFirst::Plugins::Jsonapi::ErrorResponse do
         {
           errors: [
             { source: { header: 'limit' }, status: '400',
-              title: 'number at `/limit` is greater than: 100' }
+              title: 'number at `/limit` is greater than: 100', code: 'maximum' }
           ]
         }
       )

@@ -26,4 +26,3 @@ paths:
                 properties:
                   hello:
                     type: string
-
