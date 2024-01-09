@@ -8,8 +8,12 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
 
 - [Manual use](#manual-use)
 - [Rack Middlewares](#rack-middlewares)
+  - [Request validation](#request-validation)
+  - [Response validation](#response-validation)
 - [Configuration](#configuration)
 - [Development](#development)
+  - [Benchmarks](#benchmarks)
+  - [Contributing](#contributing)
 
 <!-- /TOC -->
 
@@ -86,9 +90,9 @@ use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml'
 | :---------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `spec:`           |                                                                           | The path to the spec file or spec loaded via `OpenapiFirst.load`                                                                    |
 | `raise_error:`    | `false` (default), `true`                                                 | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` or `OpenapiFirst::NotFoundError` instead of returning 4xx. |
-| `error_response:` | `:default` (default), `:json_api`, Your implementation of `ErrorResponse` | :default                                                                                                                            |
+| `error_response:` | `:default` (default), `:json_api`, Your implementation of `ErrorResponse` |
 
-Here's an example response body about an invalid request body. See also [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457).
+Here in an example response body about an invalid request body. See also [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457).
 
 ```json
 http-status: 400
@@ -116,6 +120,50 @@ content-type: "application/problem+json"
   ]
 }
 ```
+
+openapi_first offers a [JSON:API](https://jsonapi.org/) error response as well:
+
+```ruby
+use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml, error_response: :jsonapi'
+```
+
+Here is an example error response:
+
+```json
+// http-status: 400
+// content-type: "application/vnd.api+json"
+
+{
+  "errors": [
+    {
+      "status": "400",
+      "source": {
+        "pointer": "/data/name"
+      },
+      "title": "value at `/data/name` is not a string",
+      "code": "string"
+    },
+    {
+      "status": "400",
+      "source": {
+        "pointer": "/data/numberOfLegs"
+      },
+      "title": "number at `/data/numberOfLegs` is less than: 2",
+      "code": "minimum"
+    },
+    {
+      "status": "400",
+      "source": {
+        "pointer": "/data"
+      },
+      "title": "object at `/data` is missing required properties: mandatory",
+      "code": "required"
+    }
+  ]
+}
+```
+
+You can build your own custom error response with `error_response: MyCustomClass` that implements `OpenapiFirst::ErrorResponse`.
 
 #### readOnly / writeOnly properties
 
