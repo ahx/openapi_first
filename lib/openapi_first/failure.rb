@@ -20,7 +20,7 @@ module OpenapiFirst
     private_constant :TYPES
 
     # @param error_type [Symbol] See Failure::TYPES.keys
-    # @param errors [Array<OpenapiFirst::Schema::ValidationResult>]
+    # @param errors [Array<OpenapiFirst::Schema::ValidationError>]
     def self.fail!(error_type, message: nil, errors: nil)
       throw FAILURE, new(
         error_type,
