@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'spec_helper'
-
-RSpec.describe OpenapiFirst::RequestBody do
+RSpec.describe OpenapiFirst::Definition::RequestBody do
   describe '#schema_for' do
     def build(content)
       OpenapiFirst::Definition::Operation.new('/', 'get', content, openapi_version: '3.1').request_body

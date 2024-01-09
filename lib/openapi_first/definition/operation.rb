@@ -2,11 +2,8 @@
 
 require 'forwardable'
 require 'set'
+require 'openapi_parameters'
 require_relative 'request_body'
-require_relative 'query_parameters'
-require_relative 'header_parameters'
-require_relative 'path_parameters'
-require_relative 'cookie_parameters'
 require_relative 'responses'
 
 module OpenapiFirst
@@ -67,34 +64,63 @@ module OpenapiFirst
         @name ||= "#{method.upcase} #{path} (#{operation_id})"
       end
 
-      def query_parameters
-        @query_parameters ||= build_parameters(all_parameters.filter { |p| p['in'] == 'query' }, QueryParameters)
-      end
-
       def path_parameters
-        @path_parameters ||= build_parameters(all_parameters.filter { |p| p['in'] == 'path' }, PathParameters)
+        all_parameters['path']
       end
 
-      IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
-      private_constant :IGNORED_HEADERS
+      def query_parameters
+        all_parameters['query']
+      end
 
       def header_parameters
-        @header_parameters ||= build_parameters(find_header_parameters, HeaderParameters)
+        all_parameters['header']
       end
 
       def cookie_parameters
-        @cookie_parameters ||= build_parameters(all_parameters.filter { |p| p['in'] == 'cookie' }, CookieParameters)
+        all_parameters['cookie']
+      end
+
+      def path_parameters_schema
+        @path_parameters_schema ||= build_schema(path_parameters)
+      end
+
+      def query_parameters_schema
+        @query_parameters_schema ||= build_schema(query_parameters)
+      end
+
+      def header_parameters_schema
+        @header_parameters_schema ||= build_schema(header_parameters)
+      end
+
+      def cookie_parameters_schema
+        @cookie_parameters_schema ||= build_schema(cookie_parameters)
       end
 
       private
 
+      IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
+      private_constant :IGNORED_HEADERS
+
       def all_parameters
-        @all_parameters ||= begin
-          parameters = @path_item_object['parameters']&.dup || []
-          parameters_on_operation = operation_object['parameters']
-          parameters.concat(parameters_on_operation) if parameters_on_operation
-          parameters
+        @all_parameters ||= (@path_item_object.fetch('parameters', []) + operation_object.fetch('parameters', []))
+                            .reject { |p| p['in'] == 'header' && IGNORED_HEADERS.include?(p['name']) }
+                            .group_by { _1['in'] }
+      end
+
+      def build_schema(parameters)
+        return unless parameters&.any?
+
+        init_schema = {
+          'type' => 'object',
+          'properties' => {},
+          'required' => []
+        }
+        schema = parameters.each_with_object(init_schema) do |parameter_def, result|
+          parameter = OpenapiParameters::Parameter.new(parameter_def)
+          result['properties'][parameter.name] = parameter.schema if parameter.schema
+          result['required'] << parameter.name if parameter.required?
         end
+        Schema.new(schema, openapi_version: @openapi_version)
       end
 
       def responses
@@ -105,12 +131,6 @@ module OpenapiFirst
 
       def build_parameters(parameters, klass)
         klass.new(parameters, openapi_version:) if parameters.any?
-      end
-
-      def find_header_parameters
-        all_parameters.filter do |p|
-          p['in'] == 'header' && !IGNORED_HEADERS.include?(p['name'])
-        end
       end
     end
   end
