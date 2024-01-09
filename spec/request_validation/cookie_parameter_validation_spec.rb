@@ -39,12 +39,12 @@ RSpec.describe 'Cookie Parameter validation' do
     it 'succeeds if cookie is valid' do
       set_cookie 'knusper=42'
       get '/'
-      expect(last_response.status).to be 200
+      expect(last_response.status).to eq(200), last_response.body
     end
 
     it 'returns 400 if required cookie is missing' do
       get '/'
-      expect(last_response.status).to be 400
+      expect(last_response.status).to eq 400
     end
 
     context 'when raising' do

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'forwardable'
+require 'openapi_parameters'
 require_relative 'runtime_response'
 require_relative 'body_parser'
 require_relative 'request_validation/validator'
@@ -41,25 +42,32 @@ module OpenapiFirst
     end
 
     def path_parameters
+      return {} unless operation.path_parameters
+
       @path_parameters ||=
-        operation.path_parameters&.unpack(@original_path_params) || {}
+        OpenapiParameters::Path.new(operation.path_parameters).unpack(@original_path_params) || {}
     end
 
     def query
+      return {} unless operation.query_parameters
+
       @query ||=
-        operation.query_parameters&.unpack(request.env) || {}
+        OpenapiParameters::Query.new(operation.query_parameters).unpack(request.env[Rack::QUERY_STRING]) || {}
     end
 
     alias query_parameters query
 
     def headers
-      @headers ||=
-        operation.header_parameters&.unpack(request.env) || {}
+      return {} unless operation.header_parameters
+
+      @headers ||= OpenapiParameters::Header.new(operation.header_parameters).unpack_env(request.env) || {}
     end
 
     def cookies
+      return {} unless operation.cookie_parameters
+
       @cookies ||=
-        operation.cookie_parameters&.unpack(request.env) || {}
+        OpenapiParameters::Cookie.new(operation.cookie_parameters).unpack(request.env[Rack::HTTP_COOKIE]) || {}
     end
 
     def body

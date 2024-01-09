@@ -4,7 +4,7 @@ require 'multi_json'
 require 'committee'
 require 'sinatra'
 
-class SinatraWithCommiteeExample < Sinatra::Base
+app = Class.new(Sinatra::Base) do
   set :environment, :production
 
   get '/hello/:id' do
@@ -28,4 +28,4 @@ use Committee::Middleware::RequestValidation,
     schema_path: File.absolute_path('./openapi.yaml', __dir__),
     parse_response_by_content_type: true
 
-run SinatraWithCommiteeExample
+run app

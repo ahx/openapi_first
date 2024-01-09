@@ -8,7 +8,8 @@ RSpec.describe OpenapiFirst::Definition::Operation do
       'parameters' => [
         { 'name' => 'Accept-Version', 'in' => 'header', 'schema' => { 'type' => 'integer' } },
         { 'name' => 'utm', 'in' => 'query', 'schema' => { 'type' => 'string' } },
-        { 'name' => 'pet_id', 'in' => 'path', 'schema' => { 'type' => 'string' } }
+        { 'name' => 'pet_id', 'in' => 'path', 'schema' => { 'type' => 'string' } },
+        { 'name' => 'xfactor', 'in' => 'cookie', 'schema' => { 'type' => 'string' } }
       ],
       'get' => {
         'operationId' => 'get_pet',
@@ -40,19 +41,31 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#query_parameters' do
     it 'returns the query parameters on path and operation level' do
-      expect(operation.query_parameters.map(&:name)).to eq %w[utm limit]
+      expect(operation.query_parameters.map { |p| p['name'] }).to eq %w[utm limit]
+    end
+  end
+
+  describe '#query_parameters_schema' do
+    it 'returns a schema' do
+      expect(operation.query_parameters_schema).to be_a OpenapiFirst::Schema
     end
   end
 
   describe '#path_parameters' do
     it 'returns the path parameters on path and operation level' do
-      expect(operation.path_parameters.map(&:name)).to eq %w[pet_id]
+      expect(operation.path_parameters.map { |p| p['name'] }).to eq %w[pet_id]
+    end
+  end
+
+  describe '#path_parameters_schema' do
+    it 'returns a schema' do
+      expect(operation.path_parameters_schema).to be_a OpenapiFirst::Schema
     end
   end
 
   describe '#header_parameters' do
     it 'returns the header parameters' do
-      expect(operation.header_parameters.map(&:name)).to eq %w[Accept-Version]
+      expect(operation.header_parameters.map { |p| p['name'] }).to eq %w[Accept-Version]
     end
 
     describe 'ignored headers' do
@@ -69,6 +82,24 @@ RSpec.describe OpenapiFirst::Definition::Operation do
           expect(operation.header_parameters).to be_nil
         end
       end
+    end
+  end
+
+  describe '#header_parameters_schema' do
+    it 'returns a schema' do
+      expect(operation.header_parameters_schema).to be_a OpenapiFirst::Schema
+    end
+  end
+
+  describe '#cookie_parameters' do
+    it 'returns cookie parameters' do
+      expect(operation.cookie_parameters.map { |p| p['name'] }).to eq %w[xfactor]
+    end
+  end
+
+  describe '#cookie_parameters_schema' do
+    it 'returns a schema' do
+      expect(operation.cookie_parameters_schema).to be_a OpenapiFirst::Schema
     end
   end
 

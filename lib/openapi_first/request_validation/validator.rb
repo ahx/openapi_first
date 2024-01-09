@@ -38,34 +38,34 @@ module OpenapiFirst
       end
 
       def validate_path_params!(request)
-        parameters = operation.path_parameters
-        return unless parameters
+        schema = operation.path_parameters_schema
+        return unless schema
 
-        validation = parameters.schema.validate(request.path_parameters)
+        validation = schema.validate(request.path_parameters)
         Failure.fail!(:invalid_path, errors: validation.errors) if validation.error?
       end
 
       def validate_query_params!(request)
-        parameters = operation.query_parameters
-        return unless parameters
+        schema = operation.query_parameters_schema
+        return unless schema
 
-        validation = parameters.schema.validate(request.query)
+        validation = schema.validate(request.query)
         Failure.fail!(:invalid_query, errors: validation.errors) if validation.error?
       end
 
       def validate_cookie_params!(request)
-        parameters = operation.cookie_parameters
-        return unless parameters
+        schema = operation.cookie_parameters_schema
+        return unless schema
 
-        validation = parameters.schema.validate(request.cookies)
+        validation = schema.validate(request.cookies)
         Failure.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
       end
 
       def validate_header_params!(request)
-        parameters = operation.header_parameters
-        return unless parameters
+        schema = operation.header_parameters_schema
+        return unless schema
 
-        validation = parameters.schema.validate(request.headers)
+        validation = schema.validate(request.headers)
         Failure.fail!(:invalid_header, errors: validation.errors) if validation.error?
       end
 
