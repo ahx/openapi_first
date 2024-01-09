@@ -2,22 +2,27 @@
 
 require 'multi_json'
 require 'committee'
-require 'hanami/api'
+require 'sinatra'
 
-app = Class.new(Hanami::API) do
+app = Class.new(Sinatra::Base) do
+  set :environment, :production
+
   get '/hello/:id' do
-    json(hello: 'world', id: params.fetch(:id))
+    content_type :json
+    MultiJson.dump(hello: 'world', id: params.fetch('id'))
   end
 
   get '/hello' do
-    json([{ hello: 'world' }])
+    content_type :json
+    MultiJson.dump([{ hello: 'world' }])
   end
 
   post '/hello' do
+    content_type :json
     status 201
-    json(hello: 'world')
+    MultiJson.dump(hello: 'world')
   end
-end.new
+end
 
 use Committee::Middleware::RequestValidation,
     schema_path: File.absolute_path('./openapi.yaml', __dir__),
