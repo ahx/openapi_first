@@ -1,8 +1,8 @@
 # Changelog
 
-## unreleased
+## 1.1.0
 
-- Added methods `known?`, `status_type`, `body`, `headers` to `RuntimeResponse` to inspect the parsed response
+- Added methods `known?`, `status`, `body`, `headers`, `content_type` to inspect the parsed response (`RuntimeResponse`)
 - Add `OpenapiFirst::ParseError` which is raised by low-level interfaces like `request.body` if the body could not be parsed.
 
 ## 1.0.0

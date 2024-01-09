@@ -1,6 +1,6 @@
 # openapi_first
 
-OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.openapis.org/) API description. It supports OpenAPI 3.0 and 3.1. It offers request and response validation to ensure that your implementation follows exactly the API description.
+OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.openapis.org/) API description. It supports OpenAPI 3.0 and 3.1. It offers request and response validation and it ensures that your implementation follows exactly the API description.
 
 ## Contents
 
@@ -56,7 +56,7 @@ response = request.response(rack_response) # or definition.response(rack_request
 response.known? # Is the response defined in the API description?
 response.status # => 200
 response.content_type
-request.body # alias: parsed_body
+response.body
 request.headers # parsed response headers
 
 # Validate response
