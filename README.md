@@ -86,11 +86,11 @@ use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml'
 
 #### Options
 
-| Name              | Possible values                                                           | Description                                                                                                                         |
-| :---------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `spec:`           |                                                                           | The path to the spec file or spec loaded via `OpenapiFirst.load`                                                                    |
-| `raise_error:`    | `false` (default), `true`                                                 | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` or `OpenapiFirst::NotFoundError` instead of returning 4xx. |
-| `error_response:` | `:default` (default), `:json_api`, Your implementation of `ErrorResponse` |
+| Name              | Possible values                                                          | Description                                                                                                                         |
+| :---------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `spec:`           |                                                                          | The path to the spec file or spec loaded via `OpenapiFirst.load`                                                                    |
+| `raise_error:`    | `false` (default), `true`                                                | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` or `OpenapiFirst::NotFoundError` instead of returning 4xx. |
+| `error_response:` | `:default` (default), `:jsonapi`, Your implementation of `ErrorResponse` |
 
 Here in an example response body about an invalid request body. See also [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457).
 
@@ -192,7 +192,7 @@ You can configure default options globally:
 ```ruby
 OpenapiFirst.configure do |config|
   # Specify which plugin is used to render error responses returned by the request validation middleware (defaults to :default)
-  config.request_validation_error_response = :json_api
+  config.request_validation_error_response = :jsonapi
   # Configure if the response validation middleware should raise an exception (defaults to false)
   config.request_validation_raise_error = true
 end
