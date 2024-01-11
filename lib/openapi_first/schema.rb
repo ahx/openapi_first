@@ -32,10 +32,6 @@ module OpenapiFirst
       )
     end
 
-    def [](key)
-      @schema[key]
-    end
-
     private
 
     def before_property_validation(data, property, property_schema, parent)

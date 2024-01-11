@@ -166,28 +166,28 @@ RSpec.describe OpenapiFirst::Definition::Operation do
     end
 
     it 'finds an exact match without parameter' do
-      schema = operation.response_for(200, 'application/json').content_schema
-      expect(schema['title']).to eq 'Without parameter'
+      response = operation.response_for(200, 'application/json')
+      expect(response.content_type).to eq 'application/json'
     end
 
     it 'finds an exact match with parameter' do
-      schema = operation.response_for(200, 'application/json; profile=custom').content_schema
-      expect(schema['title']).to eq 'With profile'
+      response = operation.response_for(200, 'application/json; profile=custom')
+      expect(response.content_type).to eq 'application/json; profile=custom'
     end
 
     it 'finds a match while ignoring charset' do
-      schema = operation.response_for(200, 'application/json; charset=UTF8').content_schema
-      expect(schema['title']).to eq 'Without parameter'
+      response = operation.response_for(200, 'application/json; charset=UTF8')
+      expect(response.content_type).to eq 'application/json'
     end
 
     it 'finds text/* wildcard matcher' do
-      schema = operation.response_for(200, 'text/markdown').content_schema
-      expect(schema['title']).to eq 'Text wildcard'
+      response = operation.response_for(200, 'text/markdown')
+      expect(response.content_type).to eq 'text/*'
     end
 
     it 'finds */* wildcard matcher' do
-      schema = operation.response_for(200, 'application/xml').content_schema
-      expect(schema['title']).to eq 'Accept everything'
+      response = operation.response_for(200, 'application/xml')
+      expect(response.content_type).to eq '*/*'
     end
 
     context 'when status code cannot be found' do
