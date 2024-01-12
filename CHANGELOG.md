@@ -1,9 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.1.1
 
-- Fix `response.body` to work with real-world responses that don't respond to `.join`
-  like `ActionDispatch::Response::RackBody`
+- Fix reading response body for example when running Rails (`ActionDispatch::Response::RackBody`)
 
 ## 1.1.0
 
