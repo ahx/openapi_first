@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'action_dispatch'
+
 RSpec.describe OpenapiFirst::RuntimeResponse do
   subject(:response) do
     definition.request(rack_request).response(rack_response)
@@ -9,7 +11,9 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
     Rack::Request.new(Rack::MockRequest.env_for('/pets/1'))
   end
 
-  let(:rack_response) { Rack::Response.new(JSON.dump([]), 200, { 'Content-Type' => 'application/json' }) }
+  let(:rack_response) do
+    Rack::Response.new(JSON.dump([]), 200, { 'Content-Type' => 'application/json' })
+  end
 
   let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
 
@@ -27,7 +31,8 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
 
   describe '#body' do
     let(:rack_response) do
-      Rack::Response.new(JSON.dump({ foo: :bar }), 200, { 'Content-Type' => 'application/json' })
+      app_response = Rack::Response.new(JSON.dump({ foo: :bar }), 200, { 'Content-Type' => 'application/json' }).to_a
+      Rack::Response[*app_response]
     end
 
     it 'returns the parsed body' do
@@ -53,6 +58,18 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
         expect do
           response.body
         end.to raise_error OpenapiFirst::ParseError, 'Failed to parse response body as JSON'
+      end
+    end
+
+    context 'when using Rails' do
+      let(:rack_response) do
+        app_response = ActionDispatch::Response.create(200, { 'Content-Type' => 'application/json' },
+                                                       JSON.dump({ foo: :bar })).to_a
+        Rack::Response[*app_response]
+      end
+
+      it 'returns the parsed body' do
+        expect(response.body).to eq('foo' => 'bar')
       end
     end
   end

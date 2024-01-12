@@ -52,7 +52,9 @@ module OpenapiFirst
     private
 
     def original_body
-      @rack_response.body.join
+      buffered_body = String.new
+      @rack_response.body.each { |chunk| buffered_body << chunk }
+      buffered_body
     end
 
     def load_json(string)
