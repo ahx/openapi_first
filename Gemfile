@@ -8,6 +8,7 @@ gem 'rack', '>= 3.0.0'
 gem 'rackup'
 
 group :test, :development do
+  gem 'actionpack'
   gem 'bundler'
   gem 'rack-test'
   gem 'rake'

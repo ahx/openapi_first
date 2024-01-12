@@ -13,6 +13,7 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     definition = spec
     Rack::Builder.app do
       use OpenapiFirst::Middlewares::ResponseValidation, spec: definition
+      use Rack::Lint
       run ->(_env) { res.finish }
     end
   end
@@ -83,6 +84,16 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
 
     context 'with an empty content-type' do
+      # App without Rack::Lint, because it would raise an error about the empty content-type
+      let(:app) do
+        res = response
+        definition = spec
+        Rack::Builder.app do
+          use OpenapiFirst::Middlewares::ResponseValidation, spec: definition
+          run ->(_env) { res.finish }
+        end
+      end
+
       let(:headers) do
         { Rack::CONTENT_TYPE => nil }
       end

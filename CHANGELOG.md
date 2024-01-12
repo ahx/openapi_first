@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Fix `response.body` to work with real-world responses that don't respond to `.join`
+  like `ActionDispatch::Response::RackBody`
+
 ## 1.1.0
 
 - Add `known?`, `status`, `body`, `headers`, `content_type` methods to inspect the parsed response (`RuntimeResponse`)

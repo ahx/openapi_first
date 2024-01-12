@@ -52,7 +52,9 @@ module OpenapiFirst
     private
 
     def original_body
-      @rack_response.body.join
+      buffered_body = String.new
+      @rack_response.body.each { |chunk| buffered_body << chunk }
+      buffered_body
     end
 
     def load_json(string)
@@ -67,7 +69,7 @@ module OpenapiFirst
       headers_as_parameters = response_definition.headers.map do |name, definition|
         definition.merge('name' => name, 'in' => 'header')
       end
-      OpenapiParameters::Header.new(headers_as_parameters).unpack(@rack_response.header)
+      OpenapiParameters::Header.new(headers_as_parameters).unpack(@rack_response.headers)
     end
   end
 end
