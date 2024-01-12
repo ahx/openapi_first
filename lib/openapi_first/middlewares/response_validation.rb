@@ -19,11 +19,13 @@ module OpenapiFirst
 
       def call(env)
         request = find_request(env)
-        response = @app.call(env)
+        status, headers, body = @app.call(env)
 
-        request.response(Rack::Response[*response.to_a]).validate!
+        body = body.to_ary if body.respond_to?(:to_ary)
 
-        response
+        request.response(Rack::Response[status, headers, body]).validate!
+
+        [status, headers, body]
       end
 
       private
