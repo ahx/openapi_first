@@ -3,12 +3,11 @@
 ## 1.1.1
 
 - Fix reading response body for example when running Rails (`ActionDispatch::Response::RackBody`)
-
-## 1.1.0
-
 - Add `known?`, `status`, `body`, `headers`, `content_type` methods to inspect the parsed response (`RuntimeResponse`)
 - Add `OpenapiFirst::ParseError` which is raised by low-level interfaces like `request.body` if the body could not be parsed.
 - Add "code" field to errors in JSON:API error response
+
+## 1.1.0 (yanked)
 
 ## 1.0.0
 
