@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Added `operation` to `RuntimeRequest` by [@MrBananaLord](https://github.com/ahx/openapi_first/pull/216)
+
 ## 1.1.1
 
 - Fix reading response body for example when running Rails (`ActionDispatch::Response::RackBody`)
