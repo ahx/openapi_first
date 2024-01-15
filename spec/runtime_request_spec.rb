@@ -308,4 +308,10 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
       expect(subject.request_method).to eq('get')
     end
   end
+
+  describe '#operation' do
+    it 'returns the request operation' do
+      expect(request.operation.path).to eq('/pets/{petId}')
+    end
+  end
 end

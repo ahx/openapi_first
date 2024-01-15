@@ -22,7 +22,7 @@ module OpenapiFirst
     def_delegators :@operation, :operation_id, :request_method
     def_delegator :@path_item, :path, :path_definition
 
-    attr_reader :path_item
+    attr_reader :path_item, :operation
 
     def known?
       known_path? && known_request_method?
@@ -90,6 +90,6 @@ module OpenapiFirst
 
     private
 
-    attr_reader :request, :operation
+    attr_reader :request
   end
 end
