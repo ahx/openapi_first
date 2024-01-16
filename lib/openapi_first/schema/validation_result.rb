@@ -20,13 +20,6 @@ module OpenapiFirst
           ValidationError.new(err)
         end
       end
-
-      # Returns a message that is used in exception messages.
-      def message
-        return unless error?
-
-        errors.map(&:error).join('. ')
-      end
     end
   end
 end

@@ -195,44 +195,6 @@ RSpec.describe OpenapiFirst::Schema do
     end
   end
 
-  describe 'validate.message' do
-    it 'returns nil if data is valid' do
-      expect(validate(data).message).to be_nil
-    end
-
-    it 'returns a message if data is invalid' do
-      expect(validate({}).message).to eq 'object at root is missing required properties: data'
-    end
-
-    it 'returns a longer message with nested errors' do
-      schema = {
-        'required' => ['pets'],
-        'properties' => {
-          'count' => {
-            'type' => 'integer'
-          },
-          'pets' => {
-            'type' => 'array',
-            'items' => {
-              'required' => ['name'],
-              'properties' => {
-                'name' => {
-                  'type' => 'string'
-                }
-              }
-            }
-          }
-        }
-      }
-      validator = described_class.new(schema, openapi_version: '3.1')
-      validation = validator.validate({ 'count' => 'a', 'pets' => [{ name: 12 }] })
-      expect(validation.message).to eq 'value at `/count` is not an integer. value at `/pets/0/name` is not a string'
-
-      validation = validator.validate({})
-      expect(validation.message).to eq 'object at root is missing required properties: pets'
-    end
-  end
-
   describe 'validate.data' do
     it 'returns the original data' do
       expect(validate(data).data).to be data
