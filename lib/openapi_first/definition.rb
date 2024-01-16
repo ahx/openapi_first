@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'mustermann/template'
+require 'mustermann'
 require_relative 'definition/path_item'
 require_relative 'runtime_request'
 
@@ -60,7 +60,7 @@ module OpenapiFirst
 
     def search_for_path_item(request_path)
       paths.find do |path, path_item_object|
-        template = Mustermann::Template.new(path)
+        template = Mustermann.new(path)
         path_params = template.params(request_path)
         next unless path_params
         next unless path_params.size == template.names.size

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added support for unescaped special characters in the path params (https://github.com/ahx/openapi_first/pull/217)
 - Added `operation` to `RuntimeRequest` by [@MrBananaLord](https://github.com/ahx/openapi_first/pull/216)
 
 ## 1.1.1

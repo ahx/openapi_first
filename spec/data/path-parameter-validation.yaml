@@ -17,3 +17,17 @@ paths:
       responses:
         '200':
           description: successful
+  /users/{userName}:
+    parameters: 
+      - name: userName
+        in: path
+        required: true
+        schema:
+          type: string
+    get: 
+      summary: Find users by user name
+      operationId: findUserByUserName
+      responses:
+        '200':
+          description: successful
+      
