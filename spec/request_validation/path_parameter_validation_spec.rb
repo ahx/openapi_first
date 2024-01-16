@@ -30,14 +30,26 @@ RSpec.describe 'Path Parameter validation' do
       expect(last_response.status).to eq 400
     end
 
-    it 'adds the converted path parameter to env ' do
+    it 'adds the converted path parameter to env' do
       get '/pets/42'
       expect(last_request.env[OpenapiFirst::REQUEST].params['petId']).to eq 42
     end
 
-    it 'succeeds if path parameter are valid' do
-      get '/pets/42'
-      expect(last_response.status).to be 200
+    context 'with valid parameters' do
+      it 'succeeds for valid integer' do
+        get '/pets/42'
+        expect(last_response.status).to eq(200)
+      end
+
+      it 'succeeds for valid string' do
+        get '/users/joe'
+        expect(last_response.status).to eq(200)
+      end
+
+      it 'succeds for string with special characters' do
+        get '/users/joe!doe'
+        expect(last_response.status).to eq(200)
+      end
     end
 
     it 'returns 404 if path parameter is empty' do
