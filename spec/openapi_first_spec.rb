@@ -31,6 +31,26 @@ RSpec.describe OpenapiFirst do
     }
   end
 
+  describe '.parse' do
+    it 'loads a Hash' do
+      definition = OpenapiFirst.parse(YAML.safe_load_file('./spec/data/petstore.yaml'))
+      expect(definition.path('/pets').operation('get').operation_id).to eq('listPets')
+    end
+
+    it 'supports :only' do
+      hash = YAML.safe_load_file('./spec/data/petstore.yaml')
+      only = ->(path) { path == '/pets' }
+      definition = OpenapiFirst.parse(hash, only:)
+      expected = %w[/pets]
+      expect(definition.paths.keys).to eq expected
+    end
+
+    it 'loads a Hash' do
+      definition = OpenapiFirst.parse(YAML.safe_load_file('./spec/data/petstore.yaml'))
+      expect(definition.path('/pets').operation('get').operation_id).to eq('listPets')
+    end
+  end
+
   describe '.load' do
     it 'returns a Definition' do
       expect(OpenapiFirst.load(spec_path)).to be_a OpenapiFirst::Definition

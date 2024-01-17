@@ -9,7 +9,7 @@ module OpenapiFirst
   class Definition
     attr_reader :filepath, :paths, :openapi_version
 
-    def initialize(resolved, filepath)
+    def initialize(resolved, filepath = nil)
       @filepath = filepath
       @paths = resolved['paths']
       @openapi_version = detect_version(resolved)

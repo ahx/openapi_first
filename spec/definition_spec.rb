@@ -136,5 +136,13 @@ RSpec.describe OpenapiFirst::Definition do
     it 'returns the path of the file' do
       expect(definition.filepath).to eq './spec/data/petstore.yaml'
     end
+
+    context 'when initialized with a hash' do
+      let(:definition) { OpenapiFirst::Definition.new(YAML.load_file('./spec/data/petstore.yaml')) }
+
+      it 'returns nil' do
+        expect(definition.filepath).to be_nil
+      end
+    end
   end
 end
