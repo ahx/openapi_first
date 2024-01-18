@@ -28,10 +28,20 @@ module OpenapiFirst
   # Key in rack to find instance of RuntimeRequest
   REQUEST = 'openapi.request'
 
-  def self.load(spec_path, only: nil)
-    resolved = Bundle.resolve(spec_path)
+  # Load and dereference an OpenAPI spec file
+  def self.load(filepath, only: nil)
+    resolved = bundle(filepath)
+    parse(resolved, only:, filepath:)
+  end
+
+  # Parse a dereferenced Hash
+  def self.parse(resolved, only: nil, filepath: nil)
     resolved['paths'].filter!(&->(key, _) { only.call(key) }) if only
-    Definition.new(resolved, spec_path)
+    Definition.new(resolved, filepath)
+  end
+
+  def self.bundle(filepath)
+    Bundle.resolve(filepath)
   end
 
   module Bundle
