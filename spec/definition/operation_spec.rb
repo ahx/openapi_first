@@ -103,11 +103,11 @@ RSpec.describe OpenapiFirst::Definition::Operation do
     end
   end
 
-  describe '#[], #dig' do
+  describe '#[]' do
     it 'allows to access the resolved hash' do
       expect(operation['operationId']).to eq 'get_pet'
-      expect(operation.dig('responses', '200', 'content', 'application/json', 'schema', 'type')).to eq 'array'
-      expect(operation.dig('responses', 'default', 'description')).to eq 'unexpected error'
+      expect(operation['responses'].dig('200', 'content', 'application/json', 'schema', 'type')).to eq 'array'
+      expect(operation['responses'].dig('default', 'description')).to eq 'unexpected error'
     end
   end
 

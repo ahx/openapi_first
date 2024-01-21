@@ -11,8 +11,7 @@ module OpenapiFirst
     class Operation
       extend Forwardable
       def_delegators :operation_object,
-                     :[],
-                     :dig
+                     :[]
 
       WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
       private_constant :WRITE_METHODS

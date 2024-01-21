@@ -47,9 +47,22 @@ module OpenapiFirst
 
     # Raise an exception that fits the failure.
     def raise!
-      exception, message_prefix = TYPES.fetch(error_type)
+      exception, = TYPES.fetch(error_type)
+      raise exception, exception_message
+    end
 
-      raise exception, "#{message_prefix} #{@message || errors&.map(&:error)&.join('. ')}"
+    def exception_message
+      _, message_prefix = TYPES.fetch(error_type)
+
+      "#{message_prefix} #{@message || generate_message}"
+    end
+
+    private
+
+    def generate_message
+      messages = errors&.take(4)&.map(&:error)
+      messages << "... (#{errors.size} errors total)" if errors && errors.size > 4
+      messages&.join('. ')
     end
   end
 end
