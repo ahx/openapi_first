@@ -20,7 +20,7 @@ examples = [
 
 glob = ARGV[0] || './apps/*.ru'
 apps = Dir[glob].each_with_object({}) do |config, hash|
-  hash[config] = Rack::Builder.parse_file(config).first
+  hash[config] = Rack::Builder.parse_file(config)
 end
 apps.freeze
 
