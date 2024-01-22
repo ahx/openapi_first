@@ -6,7 +6,8 @@ module OpenapiFirst
   class BodyParser
     def self.const_missing(const_name)
       super unless const_name == :ParsingError
-      warn 'DEPRECATION WARNING: OpenapiFirst::BodyParser::ParsingError is deprecated. Use OpenapiFirst::ParseError instead.' # rubocop:disable Layout/LineLength
+      warn 'DEPRECATION WARNING: OpenapiFirst::BodyParser::ParsingError is deprecated. ' \
+           'Use OpenapiFirst::ParseError instead.'
       OpenapiFirst::ParseError
     end
 
