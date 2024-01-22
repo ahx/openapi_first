@@ -325,7 +325,8 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post '/test', json_dump({})
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: object at root is missing required properties: name' # rubocop:disable Layout/LineLength
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: ' \
+                                                              'object at root is missing required properties: name'
       end
 
       it 'succeeds if field is nil' do
@@ -346,7 +347,8 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post path, json_dump(request_body)
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: value at `/attributes/name` is not a string' # rubocop:disable Layout/LineLength
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: ' \
+                                                              'value at `/attributes/name` is not a string'
       end
 
       it 'raises error if required field is missing' do
@@ -354,7 +356,8 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'application/json'
         expect do
           post path, json_dump(request_body)
-        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: object at `/attributes` is missing required properties: name' # rubocop:disable Layout/LineLength
+        end.to raise_error OpenapiFirst::RequestInvalidError, 'Request body invalid: object at `/attributes` ' \
+                                                              'is missing required properties: name'
       end
 
       it 'raises error if request body is invalid JSON' do

@@ -36,7 +36,8 @@ RSpec.describe OpenapiFirst::Failure do
         expect do
           failure.raise!
         end.to raise_error(OpenapiFirst::RequestInvalidError,
-                           'Request body invalid: something is wrong over there 0. something is wrong over there 1. something is wrong over there 2. something is wrong over there 3. ... (100 errors total)') # rubocop:disable Layout/LineLength
+                           'Request body invalid: something is wrong over there 0. something is wrong over there 1. ' \
+                           'something is wrong over there 2. something is wrong over there 3. ... (100 errors total)')
       end
     end
   end
