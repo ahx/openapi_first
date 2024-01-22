@@ -1,6 +1,7 @@
 # Changelog
 
-## Unreleased
+## 1.2.0
+
 - Added `OpenapiFirst.parse(hash)` to load ("parse") a resolved/de-referenced Hash
 - Added support for unescaped special characters in the path params (https://github.com/ahx/openapi_first/pull/217)
 - Added `operation` to `RuntimeRequest` by [@MrBananaLord](https://github.com/ahx/openapi_first/pull/216)
