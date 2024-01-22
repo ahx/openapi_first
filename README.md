@@ -11,6 +11,7 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
   - [Request validation](#request-validation)
   - [Response validation](#response-validation)
 - [Configuration](#configuration)
+- [Framework integration](#framework-integration)
 - [Development](#development)
   - [Benchmarks](#benchmarks)
   - [Contributing](#contributing)
@@ -197,6 +198,21 @@ OpenapiFirst.configure do |config|
   config.request_validation_raise_error = true
 end
 ```
+
+## Framework integration
+
+Using rack middlewares is supported in probably all Ruby web frameworks.
+If you are using Ruby on Rails for example, you can add the request validation middleware globally in `config/application.rb` or inside specific controllers.
+
+When running integration tests (or request specs when using rspec), it makes sense to add the response validation middleware to `config/environments/test.rb`:
+
+```ruby
+config.middleware.use OpenapiFirst::Middlewares::ResponseValidation,
+  spec: 'api/openapi.yaml'
+```
+
+That way you don't have to call specific test assertions to make sure your API matches the OpenAPI document.
+There is no need to run response validation on production if your test coverage is decent.
 
 ## Development
 
