@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['andreas.haller@posteo.de']
   spec.licenses      = ['MIT']
 
-  spec.summary       = 'Implement REST APIs based on OpenApi 3.x'
+  spec.summary       = 'Implement HTTP APIs based on OpenApi 3.x'
   spec.homepage      = 'https://github.com/ahx/openapi_first'
 
   if spec.respond_to?(:metadata)
@@ -27,9 +27,9 @@ Gem::Specification.new do |spec|
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     `git ls-files -z`
       .split("\x0")
-      .reject { |f| f.match(%r{^(test|spec|features|benchmarks|examples|bin)/}) }
+      .reject { |f| f.match(%r{^(test|spec|features|benchmarks|examples|bin|\.github|Gemfile)/}) }
       .reject do |f|
-      %w[Dockerfile Jenkinsfile .tool-versions CODEOWNERS .rspec .rubocop.yml .tool-versions
+      %w[Dockerfile Jenkinsfile .tool-versions CODEOWNERS .rspec .rubocop.yml .tool-versions .github
          Rakefile].include?(f)
     end
   end
