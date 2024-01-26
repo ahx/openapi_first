@@ -7,7 +7,8 @@ module OpenapiFirst
       @request_validation_raise_error = false
     end
 
-    attr_reader :request_validation_error_response, :request_validation_raise_error
+    attr_reader :request_validation_error_response
+    attr_accessor :request_validation_raise_error
 
     def request_validation_error_response=(mod)
       @request_validation_error_response = if mod.is_a?(Symbol)

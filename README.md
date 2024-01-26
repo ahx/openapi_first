@@ -202,7 +202,7 @@ You can configure default options globally:
 OpenapiFirst.configure do |config|
   # Specify which plugin is used to render error responses returned by the request validation middleware (defaults to :default)
   config.request_validation_error_response = :jsonapi
-  # Configure if the response validation middleware should raise an exception (defaults to false)
+  # Configure if the request validation middleware should raise an exception (defaults to false)
   config.request_validation_raise_error = true
 end
 ```
