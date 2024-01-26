@@ -50,14 +50,14 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
       end
 
       it 'returns Failure' do
-        expect(request.validate.error_type).to eq(:method_not_allowed)
+        expect(request.validate.type).to eq(:method_not_allowed)
       end
     end
   end
 
-  describe '#validation_failure' do
+  describe '#error' do
     it 'is nil by default' do
-      expect(request.validation_failure).to be_nil
+      expect(request.error).to be_nil
     end
 
     context 'with invalid request' do
@@ -67,7 +67,7 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
 
       it 'returns Failure' do
         request.validate
-        expect(request.validation_failure.error_type).to eq(:method_not_allowed)
+        expect(request.error.type).to eq(:method_not_allowed)
       end
     end
 
@@ -78,7 +78,7 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
 
       it 'returns nil' do
         request.validate
-        expect(request.validation_failure).to be_nil
+        expect(request.error).to be_nil
       end
     end
   end
@@ -96,7 +96,7 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
       it 'returns a valid response' do
         result = request.validate_response(rack_response)
         expect(result).to be_valid
-        expect(result.validation_failure).to be_nil
+        expect(result.error).to be_nil
       end
     end
 
@@ -108,7 +108,7 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
       it 'returns an invalid response' do
         result = request.validate_response(rack_response)
         expect(result).not_to be_valid
-        expect(result.validation_failure.error_type).to eq(:invalid_response_body)
+        expect(result.error.type).to eq(:invalid_response_body)
       end
     end
   end

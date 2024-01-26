@@ -39,19 +39,9 @@ rack_request = Rack::Request.new(env)
 # Find and validate request
 request = definition.validate_request(rack_request)
 request.valid? # => true / false
-request.validation_failure # => Failure object if request is invalid
-request.validation_failure&.raise! # Raises NotFoundError or RequestInvalidError
-
-# or find, validate and raise
-request = definition.validate_request(rack_request, raise_error: true)
-
-# or find, then validate
-request = definition.request(rack_request)
-request.validate
-
-# or find, then validate and raise
-request = definition.request(rack_request)
-request.validate!
+request.error # => Failure object if request is invalid
+# Or raise an exception if validation fails:
+request = definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if request is invalid
 
 # Access parsed parameters
 request.body # alias: parsed_body
@@ -60,13 +50,11 @@ request.query # alias: query_parameters
 request.params # Merged path and query parameters
 request.headers
 request.cookies
-
 # Inspect the request
 request.known? # Is the request defined in the API description?
 request.content_type
 request.request_method # => "get"
 request.path # => "/pets/42"
-request.path_definition # => "/pets/{pet_id}"
 ```
 
 ### Validate response
@@ -75,23 +63,20 @@ request.path_definition # => "/pets/{pet_id}"
 # Find and validate the response
 rack_response = Rack::Response[*app.call(env)]
 response = definition.validate_response(rack_request, rack_response)
-# or if you want to raise an error when validation fails use:
-definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
-# You can also call a method on the request object
+# Raise an exception if validation fails:
+response = definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
+# Or you can also call a method on the request object mentioned above
 request.validate_response(rack_response)
 
+# Access parsed response
+response.body
+request.headers
 # Inspect the response
 response.known? # Is the response defined in the API description?
-request.valid? # => true / false
-request.validation_failure # => Failure object if response is invalid
+response.valid? # => true / false
+response.error # => Failure object if response is invalid
 response.status # => 200
 response.content_type
-response.body
-request.headers # parsed response headers
-
-# Validate response
-response.validate # Returns OpenapiFirst::Failure if validation fails
-response.validate! # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError if validation fails
 ```
 
 OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).

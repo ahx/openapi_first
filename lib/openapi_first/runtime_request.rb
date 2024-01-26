@@ -16,7 +16,7 @@ module OpenapiFirst
       @path_item = path_item
       @operation = operation
       @original_path_params = path_params
-      @validation_failure = nil
+      @error = nil
       @validated = false
     end
 
@@ -24,11 +24,11 @@ module OpenapiFirst
     def_delegators :@operation, :operation_id, :request_method
     def_delegator :@path_item, :path, :path_definition
 
-    attr_reader :path_item, :operation, :validation_failure
+    attr_reader :path_item, :operation, :error
 
     def valid?
       validate unless @validated
-      validation_failure.nil?
+      error.nil?
     end
 
     def known?
@@ -84,7 +84,7 @@ module OpenapiFirst
 
     def validate
       @validated = true
-      @validation_failure = RequestValidation::Validator.new(operation).validate(self)
+      @error = RequestValidation::Validator.new(operation).validate(self)
     end
 
     def validate!
@@ -94,7 +94,7 @@ module OpenapiFirst
 
     def validate_response(rack_response, raise_error: false)
       validated = response(rack_response).tap(&:validate)
-      validated.validation_failure&.raise! if raise_error
+      validated.error&.raise! if raise_error
       validated
     end
 

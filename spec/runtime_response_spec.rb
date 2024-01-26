@@ -57,7 +57,7 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
       it 'returns a Failure' do
         result = response.validate
         expect(result).to be_a(OpenapiFirst::Failure)
-        expect(result.error_type).to eq :invalid_response_body
+        expect(result.type).to eq :invalid_response_body
       end
     end
   end
@@ -78,11 +78,11 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
     end
   end
 
-  describe '#validation_failure' do
+  describe '#error' do
     context 'if response is valid' do
       it 'returns nil' do
         response.validate
-        expect(response.validation_failure).to be_nil
+        expect(response.error).to be_nil
       end
     end
 
@@ -91,9 +91,9 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
 
       it 'returns a Failure' do
         response.validate
-        result = response.validation_failure
+        result = response.error
         expect(result).to be_a(OpenapiFirst::Failure)
-        expect(result.error_type).to eq :invalid_response_body
+        expect(result.type).to eq :invalid_response_body
       end
     end
   end

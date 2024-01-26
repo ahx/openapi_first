@@ -29,7 +29,7 @@ module OpenapiFirst
 
     # The response status
     def status
-      STATUS[failure.error_type] || 400
+      STATUS[failure.type] || 400
     end
 
     # Render this error response

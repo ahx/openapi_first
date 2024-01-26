@@ -19,7 +19,7 @@ module OpenapiFirst
 
     def validate_request(rack_request, raise_error: false)
       validated = request(rack_request).tap(&:validate)
-      validated.validation_failure&.raise! if raise_error
+      validated.error&.raise! if raise_error
       validated
     end
 

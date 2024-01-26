@@ -36,7 +36,7 @@ module OpenapiFirst
         end
 
         def pointer_key
-          case failure.error_type
+          case failure.type
           when :invalid_body
             :pointer
           when :invalid_query, :invalid_path
@@ -49,7 +49,7 @@ module OpenapiFirst
         end
 
         def pointer(data_pointer)
-          return data_pointer if failure.error_type == :invalid_body
+          return data_pointer if failure.type == :invalid_body
 
           data_pointer.delete_prefix('/')
         end
