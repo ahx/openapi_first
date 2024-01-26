@@ -26,7 +26,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
 
     it 'adds request to env ' do
       get '/pets'
-      expect(last_request.env[OpenapiFirst::REQUEST]).to be_a OpenapiFirst::RuntimeRequest
+      expect(last_request.env[OpenapiFirst::REQUEST].operation_id).to eq 'listPets'
     end
   end
 

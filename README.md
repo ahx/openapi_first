@@ -7,6 +7,8 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
 <!-- TOC -->
 
 - [Manual use](#manual-use)
+  - [Validate request](#validate-request)
+  - [Validate response](#validate-response)
 - [Rack Middlewares](#rack-middlewares)
   - [Request validation](#request-validation)
   - [Response validation](#response-validation)
@@ -26,40 +28,62 @@ Load the API description:
 ```ruby
 require 'openapi_first'
 
-definition = OpenapiFirst.load('petstore.yaml')
+definition = OpenapiFirst.load('openapi.yaml')
 ```
 
-Validate request / response:
+### Validate request
 
 ```ruby
+rack_request = Rack::Request.new(env)
 
-# Find the request
-rack_request = Rack::Request.new(env) # GET /pets/42
+# Find and validate request
+request = definition.validate_request(rack_request)
+request.valid? # => true / false
+request.validation_failure # => Failure object if request is invalid
+request.validation_failure&.raise! # Raises NotFoundError or RequestInvalidError
+
+# or find, validate and raise
+request = definition.validate_request(rack_request, raise_error: true)
+
+# or find, then validate
 request = definition.request(rack_request)
+request.validate
 
-# Inspect the request and access parsed parameters
-request.known? # Is the request defined in the API description?
-request.content_type
+# or find, then validate and raise
+request = definition.request(rack_request)
+request.validate!
+
+# Access parsed parameters
 request.body # alias: parsed_body
 request.path_parameters # => { "pet_id" => 42 }
-request.query_parameters # alias: query
+request.query # alias: query_parameters
 request.params # Merged path and query parameters
 request.headers
 request.cookies
+
+# Inspect the request
+request.known? # Is the request defined in the API description?
+request.content_type
 request.request_method # => "get"
 request.path # => "/pets/42"
 request.path_definition # => "/pets/{pet_id}"
+```
 
-# Validate the request
-request.validate # Returns OpenapiFirst:::Failure if validation fails
-request.validate! # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if validation fails
+### Validate response
 
-# Find the response
+```ruby
+# Find and validate the response
 rack_response = Rack::Response[*app.call(env)]
-response = request.response(rack_response) # or definition.response(rack_request, rack_response)
+response = definition.validate_response(rack_request, rack_response)
+# or if you want to raise an error when validation fails use:
+definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
+# You can also call a method on the request object
+request.validate_response(rack_response)
 
 # Inspect the response
 response.known? # Is the response defined in the API description?
+request.valid? # => true / false
+request.validation_failure # => Failure object if response is invalid
 response.status # => 200
 response.content_type
 response.body
@@ -245,3 +269,7 @@ bundle exec ruby benchmarks.rb
 If you have a question or an idea or found a bug don't hesitate to [create an issue](https://github.com/ahx/openapi_first/issues) or [start a discussion](https://github.com/ahx/openapi_first/discussions).
 
 Pull requests are very welcome as well, of course. Feel free to create a "draft" pull request early on, even if your change is still work in progress. 🤗
+
+```
+
+```

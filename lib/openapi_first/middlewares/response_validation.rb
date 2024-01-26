@@ -23,7 +23,7 @@ module OpenapiFirst
 
         body = body.to_ary if body.respond_to?(:to_ary)
 
-        request.response(Rack::Response[status, headers, body]).validate!
+        request.validate_response(Rack::Response[status, headers, body], raise_error: true)
 
         [status, headers, body]
       end

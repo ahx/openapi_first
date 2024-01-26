@@ -11,10 +11,18 @@ module OpenapiFirst
     def initialize(operation, rack_response)
       @operation = operation
       @rack_response = rack_response
+      @validation_failure = nil
     end
+
+    attr_reader :validation_failure
 
     def_delegators :@rack_response, :status, :content_type
     def_delegators :@operation, :name
+
+    def valid?
+      validate unless @validated
+      @validation_failure.nil?
+    end
 
     def known?
       !!response_definition
@@ -37,7 +45,8 @@ module OpenapiFirst
     end
 
     def validate
-      ResponseValidation::Validator.new(@operation).validate(self)
+      @validated = true
+      @validation_failure = ResponseValidation::Validator.new(@operation).validate(self)
     end
 
     def validate!
