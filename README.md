@@ -12,6 +12,7 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
   - [Response validation](#response-validation)
 - [Configuration](#configuration)
 - [Framework integration](#framework-integration)
+- [Alternatives](#alternatives)
 - [Development](#development)
   - [Benchmarks](#benchmarks)
   - [Contributing](#contributing)
@@ -213,6 +214,11 @@ config.middleware.use OpenapiFirst::Middlewares::ResponseValidation,
 
 That way you don't have to call specific test assertions to make sure your API matches the OpenAPI document.
 There is no need to run response validation on production if your test coverage is decent.
+
+## Alternatives
+
+This gem was inspired by [committe](https://github.com/interagent/committee) (Ruby) and [Connexion](https://github.com/spec-first/connexion) (Python).
+Here is a [feature comparison between openapi_first and committee](https://gist.github.com/ahx/1538c31f0652f459861713b5259e366a).
 
 ## Development
 
