@@ -34,24 +34,22 @@ definition = OpenapiFirst.load('openapi.yaml')
 ### Validate request
 
 ```ruby
-rack_request = Rack::Request.new(env)
-
 # Find and validate request
+rack_request = Rack::Request.new(env)
 request = definition.validate_request(rack_request)
-request.valid? # => true / false
-request.error # => Failure object if request is invalid
 # Or raise an exception if validation fails:
 request = definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if request is invalid
 
-# Access parsed parameters
+# Inspect the request and access parsed parameters
+request.known? # Is the request defined in the API description?
+request.valid? # => true / false
+request.error # => Failure object if request is invalid
 request.body # alias: parsed_body
 request.path_parameters # => { "pet_id" => 42 }
 request.query # alias: query_parameters
 request.params # Merged path and query parameters
 request.headers
 request.cookies
-# Inspect the request
-request.known? # Is the request defined in the API description?
 request.content_type
 request.request_method # => "get"
 request.path # => "/pets/42"
@@ -63,18 +61,18 @@ request.path # => "/pets/42"
 # Find and validate the response
 rack_response = Rack::Response[*app.call(env)]
 response = definition.validate_response(rack_request, rack_response)
+
 # Raise an exception if validation fails:
 response = definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
 # Or you can also call a method on the request object mentioned above
 request.validate_response(rack_response)
 
-# Access parsed response
-response.body
-request.headers
-# Inspect the response
+# Inspect the response and access parsed parameters and
 response.known? # Is the response defined in the API description?
 response.valid? # => true / false
 response.error # => Failure object if response is invalid
+response.body
+request.headers
 response.status # => 200
 response.content_type
 ```
