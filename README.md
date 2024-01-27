@@ -78,7 +78,8 @@ openapi_first offers a [JSON:API](https://jsonapi.org/) error response as well:
 use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml, error_response: :jsonapi'
 ```
 
-Here is an example error response:
+<details>
+<summary>Here is an example error response</summary>
 
 ```json
 // http-status: 400
@@ -113,6 +114,8 @@ Here is an example error response:
   ]
 }
 ```
+
+<details>
 
 You can build your own custom error response with `error_response: MyCustomClass` that implements `OpenapiFirst::ErrorResponse`.
 
