@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'openapi_first/version'
+require_relative 'lib/openapi_first/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'openapi_first'
@@ -12,15 +12,10 @@ Gem::Specification.new do |spec|
   spec.summary       = 'Implement HTTP APIs based on OpenApi 3.x'
   spec.homepage      = 'https://github.com/ahx/openapi_first'
 
-  if spec.respond_to?(:metadata)
-    spec.metadata['https://github.com/ahx/openapi_first'] = spec.homepage
-    spec.metadata['source_code_uri'] = 'https://github.com/ahx/openapi_first'
-    spec.metadata['changelog_uri'] = 'https://github.com/ahx/openapi_first/blob/main/CHANGELOG.md'
-    spec.metadata['rubygems_mfa_required'] = 'true'
-  else
-    raise 'RubyGems 2.0 or newer is required to protect against ' \
-          'public gem pushes.'
-  end
+  spec.metadata['homepage_uri'] = spec.homepage
+  spec.metadata['source_code_uri'] = 'https://github.com/ahx/openapi_first'
+  spec.metadata['changelog_uri'] = 'https://github.com/ahx/openapi_first/blob/main/CHANGELOG.md'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 
   spec.files         = Dir['{lib}/**/*.rb']
   spec.require_paths = ['lib']
