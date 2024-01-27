@@ -24,16 +24,7 @@ Gem::Specification.new do |spec|
           'public gem pushes.'
   end
 
-  spec.files = Dir.chdir(File.expand_path(__dir__)) do
-    `git ls-files -z`
-      .split("\x0")
-      .reject { |f| f.match(%r{^(test|spec|features|benchmarks|examples|bin|\.github|Gemfile)/}) }
-      .reject do |f|
-      %w[Dockerfile Jenkinsfile .tool-versions CODEOWNERS .rspec .rubocop.yml .tool-versions .github
-         Rakefile].include?(f)
-    end
-  end
-  spec.bindir        = 'exe'
+  spec.files         = Dir['{lib}/**/*.rb']
   spec.require_paths = ['lib']
 
   spec.required_ruby_version = '>= 3.1.1'
