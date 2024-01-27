@@ -4,6 +4,7 @@ require 'json_schemer'
 require_relative 'schema/validation_result'
 
 module OpenapiFirst
+  # Validate data via JSON Schema. A wrapper around JSONSchemer.
   class Schema
     attr_reader :schema
 

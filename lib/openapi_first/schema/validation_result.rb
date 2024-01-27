@@ -4,6 +4,7 @@ require_relative 'validation_error'
 
 module OpenapiFirst
   class Schema
+    # Result of validating data against a schema. Return value of Schema#validate.
     class ValidationResult
       def initialize(validation, schema:, data:)
         @validation = validation
@@ -15,6 +16,7 @@ module OpenapiFirst
 
       def error? = @validation.any?
 
+      # Returns an array of ValidationError objects.
       def errors
         @errors ||= @validation.map do |err|
           ValidationError.new(err)

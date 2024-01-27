@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-lib = File.expand_path('lib', __dir__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'openapi_first/version'
+require_relative 'lib/openapi_first/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'openapi_first'
@@ -14,26 +12,12 @@ Gem::Specification.new do |spec|
   spec.summary       = 'Implement HTTP APIs based on OpenApi 3.x'
   spec.homepage      = 'https://github.com/ahx/openapi_first'
 
-  if spec.respond_to?(:metadata)
-    spec.metadata['https://github.com/ahx/openapi_first'] = spec.homepage
-    spec.metadata['source_code_uri'] = 'https://github.com/ahx/openapi_first'
-    spec.metadata['changelog_uri'] = 'https://github.com/ahx/openapi_first/blob/main/CHANGELOG.md'
-    spec.metadata['rubygems_mfa_required'] = 'true'
-  else
-    raise 'RubyGems 2.0 or newer is required to protect against ' \
-          'public gem pushes.'
-  end
+  spec.metadata['homepage_uri'] = spec.homepage
+  spec.metadata['source_code_uri'] = 'https://github.com/ahx/openapi_first'
+  spec.metadata['changelog_uri'] = 'https://github.com/ahx/openapi_first/blob/main/CHANGELOG.md'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 
-  spec.files = Dir.chdir(File.expand_path(__dir__)) do
-    `git ls-files -z`
-      .split("\x0")
-      .reject { |f| f.match(%r{^(test|spec|features|benchmarks|examples|bin|\.github|Gemfile)/}) }
-      .reject do |f|
-      %w[Dockerfile Jenkinsfile .tool-versions CODEOWNERS .rspec .rubocop.yml .tool-versions .github
-         Rakefile].include?(f)
-    end
-  end
-  spec.bindir        = 'exe'
+  spec.files         = Dir['{lib}/**/*.rb']
   spec.require_paths = ['lib']
 
   spec.required_ruby_version = '>= 3.1.1'

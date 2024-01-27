@@ -3,6 +3,7 @@
 require 'multi_json'
 
 module OpenapiFirst
+  # @!visibility private
   class BodyParser
     def self.const_missing(const_name)
       super unless const_name == :ParsingError

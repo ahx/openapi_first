@@ -2,6 +2,7 @@
 
 module OpenapiFirst
   class Schema
+    # One of multiple validation errors. Returned by Schema::ValidationResult#errors.
     class ValidationError
       def initialize(json_schemer_error)
         @error = json_schemer_error

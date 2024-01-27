@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
+  # A failure object returned when validation of request or response has failed.
   class Failure
     FAILURE = :openapi_first_validation_failure
 
@@ -29,7 +30,7 @@ module OpenapiFirst
       )
     end
 
-    # @param type [Symbol] See TYPES.keys
+    # @param error_type [Symbol] See TYPES.keys
     # @param message [String] A generic error message
     # @param errors [Array<OpenapiFirst::Schema::ValidationError>]
     def initialize(error_type, message: nil, errors: nil)

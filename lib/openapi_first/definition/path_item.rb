@@ -4,6 +4,7 @@ require_relative 'operation'
 
 module OpenapiFirst
   class Definition
+    # A pathItem as defined in the OpenAPI document.
     class PathItem
       def initialize(path, path_item_object, openapi_version:)
         @path = path

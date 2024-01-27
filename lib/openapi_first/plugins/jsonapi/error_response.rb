@@ -3,6 +3,7 @@
 module OpenapiFirst
   module Plugins
     module Jsonapi
+      # A JSON:API conform error response. See https://jsonapi.org/.
       class ErrorResponse
         include OpenapiFirst::ErrorResponse
 

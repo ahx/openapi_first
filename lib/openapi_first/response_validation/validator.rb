@@ -4,6 +4,7 @@ require_relative '../failure'
 
 module OpenapiFirst
   module ResponseValidation
+    # Validates a RuntimeResponse against an Operation.
     class Validator
       def initialize(operation)
         @operation = operation

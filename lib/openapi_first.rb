@@ -12,14 +12,18 @@ require_relative 'openapi_first/error_response'
 require_relative 'openapi_first/middlewares/response_validation'
 require_relative 'openapi_first/middlewares/request_validation'
 
+# OpenapiFirst is a toolchain to build HTTP APIS based on OpenAPI API descriptions.
 module OpenapiFirst
   extend Plugins
 
   class << self
+    # @return [Configuration]
     def configuration
       @configuration ||= Configuration.new
     end
 
+    # @return [Configuration]
+    # @yield [Configuration]
     def configure
       yield configuration
     end
@@ -29,21 +33,25 @@ module OpenapiFirst
   REQUEST = 'openapi.request'
 
   # Load and dereference an OpenAPI spec file
+  # @return [Definition]
   def self.load(filepath, only: nil)
     resolved = bundle(filepath)
     parse(resolved, only:, filepath:)
   end
 
   # Parse a dereferenced Hash
+  # @return [Definition]
   def self.parse(resolved, only: nil, filepath: nil)
     resolved['paths'].filter!(&->(key, _) { only.call(key) }) if only
     Definition.new(resolved, filepath)
   end
 
+  # @!visibility private
   def self.bundle(filepath)
     Bundle.resolve(filepath)
   end
 
+  # @!visibility private
   module Bundle
     def self.resolve(spec_path)
       Dir.chdir(File.dirname(spec_path)) do
