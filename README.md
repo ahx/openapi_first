@@ -43,7 +43,10 @@ use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml'
 | `raise_error:`    | `false` (default), `true`                                                | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` or `OpenapiFirst::NotFoundError` instead of returning 4xx. |
 | `error_response:` | `:default` (default), `:jsonapi`, Your implementation of `ErrorResponse` |
 
-Here in an example response body about an invalid request body. See also [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457).
+#### Error responses
+
+openapi_first produces a useful machine readable error response that can be customized.
+The default response looks like this. See also [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457).
 
 ```json
 http-status: 400
@@ -79,7 +82,7 @@ use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml, error_res
 ```
 
 <details>
-<summary>Here is an example error response</summary>
+<summary>See details of JSON:API error response</summary>
 
 ```json
 // http-status: 400
@@ -116,6 +119,8 @@ use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml, error_res
 ```
 
 </details>
+
+#### Custom error responses
 
 You can build your own custom error response with `error_response: MyCustomClass` that implements `OpenapiFirst::ErrorResponse`.
 
