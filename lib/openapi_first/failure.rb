@@ -44,8 +44,17 @@ module OpenapiFirst
       @errors = errors
     end
 
-    attr_reader :error_type, :message, :errors
+    # @attr_reader [Symbol] error_type The type of the failure. See TYPES.keys.
+    # @alias type error_type
+    # Example: :invalid_body
+    attr_reader :error_type
     alias type error_type
+
+    # @attr_reader [String] message A generic error message
+    attr_reader :message
+
+    # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>] errors Validation errors caused by failed Schema validation.
+    attr_reader :errors
 
     # Raise an exception that fits the failure.
     def raise!
