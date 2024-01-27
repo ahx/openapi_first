@@ -17,6 +17,18 @@ RSpec.describe OpenapiFirst::Failure do
     end
   end
 
+  describe '#type' do
+    it 'returns the error type' do
+      expect(described_class.new(:invalid_body).type).to eq(:invalid_body)
+    end
+  end
+
+  describe '#type' do
+    it 'returns the error type' do
+      expect(described_class.new(:invalid_body).type).to eq(:invalid_body)
+    end
+  end
+
   describe '#raise!' do
     it 'raises an error' do
       expect do

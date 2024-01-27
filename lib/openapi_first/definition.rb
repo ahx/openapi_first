@@ -3,6 +3,8 @@
 require 'mustermann'
 require_relative 'definition/path_item'
 require_relative 'runtime_request'
+require_relative 'request_validation/validator'
+require_relative 'response_validation/validator'
 
 module OpenapiFirst
   # Represents an OpenAPI API Description document
@@ -13,6 +15,16 @@ module OpenapiFirst
       @filepath = filepath
       @paths = resolved['paths']
       @openapi_version = detect_version(resolved)
+    end
+
+    def validate_request(rack_request, raise_error: false)
+      validated = request(rack_request).tap(&:validate)
+      validated.error&.raise! if raise_error
+      validated
+    end
+
+    def validate_response(rack_request, rack_response, raise_error: false)
+      request(rack_request).validate_response(rack_response, raise_error:)
     end
 
     def request(rack_request)

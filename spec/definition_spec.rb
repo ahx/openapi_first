@@ -7,6 +7,115 @@ RSpec.describe OpenapiFirst::Definition do
     Rack::Request.new(Rack::MockRequest.env_for(path, method:))
   end
 
+  describe '#validate_request' do
+    let(:definition) do
+      OpenapiFirst.parse({
+                           'openapi' => '3.1.0',
+                           'paths' => {
+                             '/stuff/{id}' => {
+                               'get' => {
+                                 'parameters' => [
+                                   {
+                                     'name' => 'id',
+                                     'in' => 'path',
+                                     'required' => true,
+                                     'schema' => {
+                                       'type' => 'integer'
+                                     }
+                                   }
+                                 ]
+                               }
+                             }
+                           }
+                         })
+    end
+
+    context 'when request is valid' do
+      let(:request) { build_request('/stuff/42') }
+
+      it 'returns a valid request' do
+        validated = definition.validate_request(request)
+        expect(validated).to be_valid
+        expect(validated.path_parameters).to eq({ 'id' => 42 })
+      end
+    end
+
+    context 'when request is invalid' do
+      let(:request) { build_request('/stuff/foo') }
+
+      it 'returns an invalid request' do
+        validated = definition.validate_request(request)
+        expect(validated).not_to be_valid
+        expect(validated.path_parameters).to eq({ 'id' => 'foo' })
+      end
+
+      it 'raises an error with raise_error: true' do
+        expect do
+          definition.validate_request(request, raise_error: true)
+        end.to raise_error(OpenapiFirst::RequestInvalidError)
+      end
+    end
+  end
+
+  describe '#validate_response' do
+    let(:definition) do
+      OpenapiFirst.parse({
+                           'openapi' => '3.1.0',
+                           'paths' => {
+                             '/stuff' => {
+                               'get' => {
+                                 'responses' => {
+                                   '200' => {
+                                     'description' => 'OK',
+                                     'content' => {
+                                       'application/json' => {
+                                         'schema' => {
+                                           'type' => 'object',
+                                           'properties' => {
+                                             'id' => {
+                                               'type' => 'integer'
+                                             }
+                                           }
+                                         }
+                                       }
+                                     }
+                                   }
+                                 }
+                               }
+                             }
+                           }
+                         })
+    end
+
+    let(:request) { build_request('/stuff') }
+
+    context 'when response is valid' do
+      let(:response) { Rack::Response.new(JSON.dump({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
+
+      it 'returns a valid response' do
+        validated = definition.validate_response(request, response)
+        expect(validated).to be_valid
+        expect(validated.body).to eq({ 'id' => 42 })
+      end
+    end
+
+    context 'when response is invalid' do
+      let(:response) { Rack::Response.new(JSON.dump({ 'id' => 'foo' }), 200, { 'Content-Type' => 'application/json' }) }
+
+      it 'returns an invalid response' do
+        validated = definition.validate_response(request, response)
+        expect(validated).not_to be_valid
+        expect(validated.body).to eq({ 'id' => 'foo' })
+      end
+
+      it 'raises an error with raise_error: true' do
+        expect do
+          definition.validate_response(request, response, raise_error: true)
+        end.to raise_error(OpenapiFirst::ResponseInvalidError)
+      end
+    end
+  end
+
   describe '#request' do
     context 'with a matching path and request method' do
       let(:definition) { OpenapiFirst.load('./spec/data/incompatible-routes.yaml') }

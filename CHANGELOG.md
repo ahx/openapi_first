@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Added new API: `Definition#validate_request`, `Definition#validate_response`, `RuntimeRequest#validate_response` (see readme) [#222](https://github.com/ahx/openapi_first/pull/222)
+
 ## 1.2.0
 
 - Added `OpenapiFirst.parse(hash)` to load ("parse") a resolved/de-referenced Hash

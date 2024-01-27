@@ -16,13 +16,20 @@ module OpenapiFirst
       @path_item = path_item
       @operation = operation
       @original_path_params = path_params
+      @error = nil
+      @validated = false
     end
 
     def_delegators :@request, :content_type, :media_type, :path
     def_delegators :@operation, :operation_id, :request_method
     def_delegator :@path_item, :path, :path_definition
 
-    attr_reader :path_item, :operation
+    attr_reader :path_item, :operation, :error
+
+    def valid?
+      validate unless @validated
+      error.nil?
+    end
 
     def known?
       known_path? && known_request_method?
@@ -76,12 +83,19 @@ module OpenapiFirst
     alias parsed_body body
 
     def validate
-      RequestValidation::Validator.new(operation).validate(self)
+      @validated = true
+      @error = RequestValidation::Validator.new(operation).validate(self)
     end
 
     def validate!
       error = validate
       error&.raise!
+    end
+
+    def validate_response(rack_response, raise_error: false)
+      validated = response(rack_response).tap(&:validate)
+      validated.error&.raise! if raise_error
+      validated
     end
 
     def response(rack_response)

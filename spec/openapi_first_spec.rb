@@ -41,8 +41,8 @@ RSpec.describe OpenapiFirst do
       hash = YAML.safe_load_file('./spec/data/petstore.yaml')
       only = ->(path) { path == '/pets' }
       definition = OpenapiFirst.parse(hash, only:)
-      expected = %w[/pets]
-      expect(definition.paths.keys).to eq expected
+      expect(definition.path('/pets')).to be_truthy
+      expect(definition.path('/pets/{petId}')).to be_nil
     end
 
     it 'loads a Hash' do
@@ -70,13 +70,13 @@ RSpec.describe OpenapiFirst do
       specify 'with empty filter' do
         definition = OpenapiFirst.load(spec_path, only: nil)
         expected = %w[/pets /pets/{id}]
-        expect(definition.paths.keys).to eq expected
+        expect(definition.operations.map(&:path).uniq).to eq expected
       end
 
       specify 'filtering paths' do
         definition = OpenapiFirst.load spec_path, only: ->(path) { path == '/pets' }
         expected = %w[/pets]
-        expect(definition.paths.keys).to eq expected
+        expect(definition.operations.map(&:path).uniq).to eq expected
       end
     end
   end

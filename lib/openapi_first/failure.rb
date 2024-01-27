@@ -44,6 +44,7 @@ module OpenapiFirst
     end
 
     attr_reader :error_type, :message, :errors
+    alias type error_type
 
     # Raise an exception that fits the failure.
     def raise!

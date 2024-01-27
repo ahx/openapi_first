@@ -29,10 +29,10 @@ module OpenapiFirst
           MultiJson.dump(result)
         end
 
-        def error_type = failure.error_type
+        def type = failure.type
 
         def title
-          TITLES.fetch(error_type)
+          TITLES.fetch(type)
         end
 
         def content_type
@@ -51,7 +51,7 @@ module OpenapiFirst
         end
 
         def pointer_key
-          case error_type
+          case type
           when :invalid_body
             :pointer
           when :invalid_query, :invalid_path
@@ -64,7 +64,7 @@ module OpenapiFirst
         end
 
         def pointer(data_pointer)
-          return data_pointer if error_type == :invalid_body
+          return data_pointer if type == :invalid_body
 
           data_pointer.delete_prefix('/')
         end

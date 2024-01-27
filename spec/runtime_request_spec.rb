@@ -11,6 +11,108 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
 
   let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
 
+  describe '#valid?' do
+    context 'with valid request' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{}'))
+      end
+
+      it 'returns true' do
+        expect(request).to be_valid
+      end
+    end
+
+    context 'with invalid request' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/pets/23', method: 'POST', input: '[]'))
+      end
+
+      it 'returns false' do
+        expect(request).not_to be_valid
+      end
+    end
+  end
+
+  describe '#validate' do
+    context 'with valid request' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{}'))
+      end
+
+      it 'returns nil' do
+        expect(request.validate).to be_nil
+      end
+    end
+
+    context 'with invalid request' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/pets/23', method: 'POST', input: '[]'))
+      end
+
+      it 'returns Failure' do
+        expect(request.validate.type).to eq(:method_not_allowed)
+      end
+    end
+  end
+
+  describe '#error' do
+    it 'is nil by default' do
+      expect(request.error).to be_nil
+    end
+
+    context 'with invalid request' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/pets/23', method: 'POST', input: '[]'))
+      end
+
+      it 'returns Failure' do
+        request.validate
+        expect(request.error.type).to eq(:method_not_allowed)
+      end
+    end
+
+    context 'with valid request' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{}'))
+      end
+
+      it 'returns nil' do
+        request.validate
+        expect(request.error).to be_nil
+      end
+    end
+  end
+
+  describe '#validate_response' do
+    let(:rack_request) do
+      Rack::Request.new(Rack::MockRequest.env_for('/pets'))
+    end
+
+    let(:rack_response) do
+      Rack::Response.new(JSON.dump([]), 200, { 'Content-Type' => 'application/json' })
+    end
+
+    context 'with valid response' do
+      it 'returns a valid response' do
+        result = request.validate_response(rack_response)
+        expect(result).to be_valid
+        expect(result.error).to be_nil
+      end
+    end
+
+    context 'with invalid response' do
+      let(:rack_response) do
+        Rack::Response.new(JSON.dump('foo'), 200, { 'Content-Type' => 'application/json' })
+      end
+
+      it 'returns an invalid response' do
+        result = request.validate_response(rack_response)
+        expect(result).not_to be_valid
+        expect(result.error.type).to eq(:invalid_response_body)
+      end
+    end
+  end
+
   describe '#known?' do
     context 'with known path and request method' do
       let(:rack_request) do
