@@ -12,6 +12,7 @@ require_relative 'openapi_first/error_response'
 require_relative 'openapi_first/middlewares/response_validation'
 require_relative 'openapi_first/middlewares/request_validation'
 
+# OpenapiFirst is a toolchain to build HTTP APIS based on OpenAPI API descriptions.
 module OpenapiFirst
   extend Plugins
 
@@ -44,7 +45,7 @@ module OpenapiFirst
     Bundle.resolve(filepath)
   end
 
-  module Bundle
+  module Bundle # :nodoc:
     def self.resolve(spec_path)
       Dir.chdir(File.dirname(spec_path)) do
         content = load_file(File.basename(spec_path))

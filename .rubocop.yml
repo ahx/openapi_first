@@ -3,7 +3,9 @@ AllCops:
   NewCops: enable
   SuggestExtensions: false
 Style/Documentation:
-  Enabled: false
+  Exclude:
+    - "spec/**/*"
+    - "benchmarks/**/*"
 Style/ExponentialNotation:
   Enabled: true
 Metrics/BlockLength:

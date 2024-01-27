@@ -5,6 +5,7 @@ require_relative 'request_body_validator'
 
 module OpenapiFirst
   module RequestValidation
+    # Validates a RuntimeRequest against an Operation.
     class Validator
       def initialize(operation)
         @operation = operation

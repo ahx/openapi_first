@@ -4,7 +4,7 @@ require_relative '../failure'
 
 module OpenapiFirst
   module RequestValidation
-    class RequestBodyValidator
+    class RequestBodyValidator # :nodoc:
       def initialize(operation)
         @operation = operation
       end

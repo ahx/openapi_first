@@ -8,6 +8,9 @@ require_relative 'responses'
 
 module OpenapiFirst
   class Definition
+    # Represents an operation object in the OpenAPI 3.X specification.
+    # Use this class to access information about the operation. Use `#[key]` to read the raw data.
+    # When using the middleware you can access the operation object via `env[OpenapiFirst::REQUEST].operation`.
     class Operation
       extend Forwardable
       def_delegators :operation_object,

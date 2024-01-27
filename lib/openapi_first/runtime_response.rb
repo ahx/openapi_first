@@ -5,6 +5,7 @@ require_relative 'body_parser'
 require_relative 'response_validation/validator'
 
 module OpenapiFirst
+  # Represents a response returned by the Rack application and how it relates to the API description.
   class RuntimeResponse
     extend Forwardable
 

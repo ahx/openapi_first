@@ -2,6 +2,9 @@
 
 module OpenapiFirst
   class Definition
+    # Represents a response definition in the OpenAPI document.
+    # This is not a direct reflecton of the OpenAPI 3.X response definition, but a combination of
+    # status, content type and content schema.
     class Response
       def initialize(operation:, status:, response_object:, content_type:, content_schema:)
         @operation = operation

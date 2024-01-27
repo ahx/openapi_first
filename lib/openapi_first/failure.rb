@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
+  # A failure object returned when validation of request or response has failed.
   class Failure
     FAILURE = :openapi_first_validation_failure
 

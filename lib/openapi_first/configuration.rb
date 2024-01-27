@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
+  # Global configuration. Currently only used for the request validation middleware.
   class Configuration
     def initialize
       @request_validation_error_response = OpenapiFirst.plugin(:default)::ErrorResponse

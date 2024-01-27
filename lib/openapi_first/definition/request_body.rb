@@ -4,6 +4,7 @@ require_relative '../schema'
 
 module OpenapiFirst
   class Definition
+    # Represents a request body definition in the OpenAPI document that belongs to an operation.
     class RequestBody
       def initialize(request_body_object, operation)
         @request_body_object = request_body_object

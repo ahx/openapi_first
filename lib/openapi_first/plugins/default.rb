@@ -4,7 +4,7 @@ require_relative 'default/error_response'
 
 module OpenapiFirst
   module Plugins
-    module Default
+    module Default # :nodoc:
       OpenapiFirst.register(:default, self)
     end
   end
