@@ -14,6 +14,10 @@ module OpenapiFirst
         @content_schema = content_schema
       end
 
+      # @attr_reader [Operation] operation The operation this response belongs to.
+      # @attr_reader [Integer] status The HTTP status code of the response definition.
+      # @attr_reader [String, nil] content_type Content type of this response.
+      # @attr_reader [Schema, nil] content_schema the Schema of the response body.
       attr_reader :operation, :status, :content_type, :content_schema
 
       def headers

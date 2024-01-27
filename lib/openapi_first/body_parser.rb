@@ -3,7 +3,8 @@
 require 'multi_json'
 
 module OpenapiFirst
-  class BodyParser # :nodoc:
+  # @!visibility private
+  class BodyParser
     def self.const_missing(const_name)
       super unless const_name == :ParsingError
       warn 'DEPRECATION WARNING: OpenapiFirst::BodyParser::ParsingError is deprecated. ' \

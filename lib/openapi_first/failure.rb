@@ -30,7 +30,7 @@ module OpenapiFirst
       )
     end
 
-    # @param type [Symbol] See TYPES.keys
+    # @param error_type [Symbol] See TYPES.keys
     # @param message [String] A generic error message
     # @param errors [Array<OpenapiFirst::Schema::ValidationError>]
     def initialize(error_type, message: nil, errors: nil)
