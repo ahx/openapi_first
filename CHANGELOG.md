@@ -1,10 +1,20 @@
 # Changelog
 
-## Unreleased
+## 1.3.0
+
+No breaking changes
+
+New features:
 
 - Added new API: `Definition#validate_request`, `Definition#validate_response`, `RuntimeRequest#validate_response` (see readme) [#222](https://github.com/ahx/openapi_first/pull/222)
 
+Fixes:
+
+- Manual response validation (without the middleware) just works in Rails' request tests now. [#224](https://github.com/ahx/openapi_first/pull/224)
+
 ## 1.2.0
+
+No breaking changes
 
 - Added `OpenapiFirst.parse(hash)` to load ("parse") a resolved/de-referenced Hash
 - Added support for unescaped special characters in the path params (https://github.com/ahx/openapi_first/pull/217)
