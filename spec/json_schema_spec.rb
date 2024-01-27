@@ -74,6 +74,13 @@ RSpec.describe OpenapiFirst::Schema do
       expect(validate({ 'foo' => 'bar' }).errors).to be_any
     end
 
+    it 'has a message' do
+      errors = validate({ 'data' => {} }).errors
+      error = errors.first
+      expect(error.error).to eq('object at `/data` is missing required properties: count, color')
+      expect(error.message).to eq('object at `/data` is missing required properties: count, color')
+    end
+
     it 'returns errors about missing fields' do
       errors = validate({ 'data' => {} }).errors
       expect(errors.count).to eq(1)

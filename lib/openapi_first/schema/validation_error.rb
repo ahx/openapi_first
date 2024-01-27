@@ -9,6 +9,7 @@ module OpenapiFirst
       end
 
       def error = @error['error']
+      alias message error
       def schemer_error = @error
       def instance_location = @error['data_pointer']
       def schema_location = @error['schema_pointer']
