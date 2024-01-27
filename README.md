@@ -115,7 +115,7 @@ use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml, error_res
 }
 ```
 
-<details>
+</details>
 
 You can build your own custom error response with `error_response: MyCustomClass` that implements `OpenapiFirst::ErrorResponse`.
 
