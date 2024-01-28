@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    openapi_first (1.2.1)
+    openapi_first (1.3.0)
       json_refs (~> 0.1, >= 0.1.7)
       json_schemer (~> 2.1.0)
       multi_json (~> 1.15)
