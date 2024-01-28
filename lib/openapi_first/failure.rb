@@ -53,7 +53,7 @@ module OpenapiFirst
     # @attr_reader [String] message A generic error message
     attr_reader :message
 
-    # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>] errors Validation errors caused by failed Schema validation.
+    # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>] errors Validation errors.
     attr_reader :errors
 
     # Raise an exception that fits the failure.
