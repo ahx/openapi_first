@@ -153,6 +153,17 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
         expect(response.body).to eq('foo' => 'bar')
       end
     end
+
+    context 'when using Rails tests' do
+      let(:rack_response) do
+        app_response = Rack::Response.new(JSON.dump({ foo: :bar }), 200, { 'Content-Type' => 'application/json' })
+        ActionDispatch::TestResponse.from_response(app_response)
+      end
+
+      it 'returns the parsed body' do
+        expect(response.body).to eq('foo' => 'bar')
+      end
+    end
   end
 
   describe '#name' do

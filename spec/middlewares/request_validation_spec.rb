@@ -10,7 +10,9 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
 
   let(:app) do
     Rack::Builder.app do
+      use Rack::Lint
       use(OpenapiFirst::Middlewares::RequestValidation, spec: File.expand_path('../data/petstore.yaml', __dir__))
+      use Rack::Lint
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }

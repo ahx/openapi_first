@@ -85,10 +85,15 @@ module OpenapiFirst
 
     private
 
+    # Usually the body responds to #each, but when using manual response validation without the middleware
+    # in Rails request specs the body is a String. So this code handles both cases.
     def original_body
       buffered_body = String.new
-      @rack_response.body.each { |chunk| buffered_body << chunk }
-      buffered_body
+      if @rack_response.body.respond_to?(:each)
+        @rack_response.body.each { |chunk| buffered_body.to_s << chunk }
+        return buffered_body
+      end
+      @rack_response.body
     end
 
     def load_json(string)

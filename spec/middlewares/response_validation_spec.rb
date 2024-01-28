@@ -10,7 +10,9 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
   let(:app) do
     Rack::Builder.app do
+      use Rack::Lint
       use(OpenapiFirst::Middlewares::ResponseValidation, spec: File.expand_path('../data/petstore.yaml', __dir__))
+      use Rack::Lint
       run lambda { |_env|
         Rack::Response.new('[]', 200, { 'Content-Type' => 'application/json' }).finish
       }
