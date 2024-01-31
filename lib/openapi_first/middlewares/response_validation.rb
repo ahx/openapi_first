@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rack'
+
 module OpenapiFirst
   module Middlewares
     # A Rack middleware to validate requests against an OpenAPI API description
@@ -16,6 +17,9 @@ module OpenapiFirst
 
         @definition = spec.is_a?(Definition) ? spec : OpenapiFirst.load(spec)
       end
+
+      # @attr_reader [Proc] app The upstream Rack application
+      attr_reader :app
 
       def call(env)
         request = find_request(env)

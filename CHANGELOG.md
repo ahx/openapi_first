@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Chore: Add Readme back to gem. Link to docs.
+- Middlewares now have an `#app` method for easier subclassing
 
 ## 1.3.1
 

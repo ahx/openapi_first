@@ -73,4 +73,11 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
       expect(last_response.status).to eq 200
     end
   end
+
+  describe '#app' do
+    it 'returns the next app in the stack' do
+      app = double
+      expect(described_class.new(app, spec: File.expand_path('../data/petstore.yaml', __dir__)).app).to eq app
+    end
+  end
 end
