@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Chore: Add Readme back to gem. Link to docs.
+
 ## 1.3.1
 
 - Fixed warning about duplicated constant

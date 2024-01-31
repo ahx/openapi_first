@@ -13,11 +13,12 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/ahx/openapi_first'
 
   spec.metadata['homepage_uri'] = spec.homepage
+  spec.metadata['documentation_uri'] = 'https://www.rubydoc.info/gems/openapi_first/'
   spec.metadata['source_code_uri'] = 'https://github.com/ahx/openapi_first'
   spec.metadata['changelog_uri'] = 'https://github.com/ahx/openapi_first/blob/main/CHANGELOG.md'
   spec.metadata['rubygems_mfa_required'] = 'true'
 
-  spec.files         = Dir['{lib}/**/*.rb']
+  spec.files         = Dir['{lib}/**/*.rb', 'LICENSE.txt', 'README.md', 'CHANGELOG.md']
   spec.require_paths = ['lib']
 
   spec.required_ruby_version = '>= 3.1.1'
