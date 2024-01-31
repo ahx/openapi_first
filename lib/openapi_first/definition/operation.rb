@@ -157,8 +157,6 @@ module OpenapiFirst
 
       private
 
-      WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
-
       IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
 
       def all_parameters
