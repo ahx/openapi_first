@@ -17,9 +17,6 @@ module OpenapiFirst
       def_delegators :operation_object,
                      :[]
 
-      WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
-      private_constant :WRITE_METHODS
-
       def initialize(path, request_method, path_item_object, openapi_version:)
         @path = path
         @method = request_method
@@ -56,6 +53,7 @@ module OpenapiFirst
       # Checks if the operation is a write operation.
       # This is the case for POST, PUT, PATCH and DELETE request methods.
       # @return [Boolean] `true` if the operation is a write operation, `false` otherwise.
+      # @deprecated Use {#write?} instead.
       def write?
         WRITE_METHODS.include?(method)
       end
@@ -157,7 +155,11 @@ module OpenapiFirst
 
       private
 
+      WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
+      private_constant :WRITE_METHODS
+
       IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
+      private_constant :IGNORED_HEADERS
 
       def all_parameters
         @all_parameters ||= (@path_item_object.fetch('parameters', []) + operation_object.fetch('parameters', []))

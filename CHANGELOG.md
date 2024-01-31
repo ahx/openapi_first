@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+- Fixed warning about duplicated constant
+
 ## 1.3.0
 
 No breaking changes
