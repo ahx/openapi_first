@@ -37,7 +37,7 @@ module OpenapiFirst
           schema_object = media_type['schema']
           next unless schema_object
 
-          result[type] = Schema.new(schema_object, write: @operation.write?,
+          result[type] = Schema.new(schema_object, write: true,
                                                    openapi_version: @operation.openapi_version)
         end
       end
