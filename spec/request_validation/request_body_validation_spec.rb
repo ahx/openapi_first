@@ -154,9 +154,17 @@ RSpec.describe 'Request body validation' do
       request_body['attributes'].delete('name')
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
-      pp last_response.body
 
       expect(last_response.status).to be 400
+      expect(json_load(last_response.body)).to eq({
+                                                    'title' => 'Bad Request Body',
+                                                    'status' => 400,
+                                                    'errors' => [{
+                                                      'message' => 'object at `/attributes` is missing required properties: name',
+                                                      'pointer' => '/attributes',
+                                                      'code' => 'required'
+                                                    }]
+                                                  })
     end
 
     it 'returns 400 if value is not defined in enum' do
