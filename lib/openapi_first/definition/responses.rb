@@ -66,6 +66,10 @@ module OpenapiFirst
       end
 
       def find_response_object(status)
+        # According to OAS status has to be a string,
+        # but there are a few API descriptions out there that use integers because of YAML.
+        return @responses_object[status] if @responses_object.key?(status)
+
         @responses_object[status.to_s] ||
           @responses_object["#{status / 100}XX"] ||
           @responses_object["#{status / 100}xx"] ||
