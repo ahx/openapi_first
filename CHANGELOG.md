@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-
+- Fixed: Use forked version of json_refs which does not call chdir, which causes a problem in threaded environments
 - Added: The response definition is found if the status is defined as an Integer instead of String.
 - Chore: Add Readme back to gem. Link to docs.
 - Middlewares now have an `#app` method for easier subclassing
