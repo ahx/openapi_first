@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-# This is a fork of the json_refs gem with some simplifications.
+# This is a fork of the json_refs gem, which does not use
+# open-uri, does not call chdir and adds caching of files during dereferencing.
 # The original code is available at https://github.com/tzmfreedom/json_refs
-# This is a simplified version, which does not use chdir. See also https://github.com/tzmfreedom/json_refs/pull/11
+# See also https://github.com/tzmfreedom/json_refs/pull/11
 # The code was originally written by Makoto Tajitsu with the MIT License.
 #
 # The MIT License (MIT)
@@ -33,16 +34,16 @@ require 'yaml'
 
 module JsonRefs
   class << self
-    def call(doc)
-      Dereferencer.new(Dir.pwd, doc).call
+    def dereference(doc)
+      file_cache = {}
+      Dereferencer.new(Dir.pwd, doc, file_cache).call
     end
-
-    alias dereference call
 
     def load(filename)
       doc_dir = File.dirname(filename)
       doc = Loader.handle(filename)
-      Dereferencer.new(doc_dir, doc).call
+      file_cache = {}
+      Dereferencer.new(doc_dir, doc, file_cache).call
     end
   end
 
@@ -66,9 +67,10 @@ module JsonRefs
   end
 
   class Dereferencer
-    def initialize(doc_dir, doc)
+    def initialize(doc_dir, doc, file_cache)
       @doc = doc
       @doc_dir = doc_dir
+      @file_cache = file_cache
     end
 
     def call(doc = @doc, keys = [])
@@ -127,11 +129,15 @@ module JsonRefs
     end
 
     def dereference_file(referenced_path)
-      referenced_path = "#{doc_dir}/#{referenced_path}" unless File.absolute_path?(referenced_path)
-      directory = File.dirname(referenced_path)
+      referenced_path = File.expand_path(referenced_path, doc_dir) unless File.absolute_path?(referenced_path)
+      @file_cache[referenced_path] ||= load_referenced_file(referenced_path)
+    end
 
-      referenced_doc = Loader.handle(referenced_path)
-      Dereferencer.new(directory, referenced_doc).call
+    def load_referenced_file(absolute_path)
+      directory = File.dirname(absolute_path)
+
+      referenced_doc = Loader.handle(absolute_path)
+      Dereferencer.new(directory, referenced_doc, @file_cache).call
     end
   end
 end
