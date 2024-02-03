@@ -2,7 +2,7 @@
 
 require 'yaml'
 require 'multi_json'
-require 'json_refs'
+require_relative 'openapi_first/json_refs'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'
 require_relative 'openapi_first/plugins'
@@ -35,7 +35,7 @@ module OpenapiFirst
   # Load and dereference an OpenAPI spec file
   # @return [Definition]
   def self.load(filepath, only: nil)
-    resolved = bundle(filepath)
+    resolved = Bundle.resolve(filepath)
     parse(resolved, only:, filepath:)
   end
 
@@ -47,23 +47,9 @@ module OpenapiFirst
   end
 
   # @!visibility private
-  def self.bundle(filepath)
-    Bundle.resolve(filepath)
-  end
-
-  # @!visibility private
   module Bundle
     def self.resolve(spec_path)
-      Dir.chdir(File.dirname(spec_path)) do
-        content = load_file(File.basename(spec_path))
-        JsonRefs.call(content, resolve_local_ref: true, resolve_file_ref: true)
-      end
-    end
-
-    def self.load_file(spec_path)
-      return MultiJson.load(File.read(spec_path)) if File.extname(spec_path) == '.json'
-
-      YAML.unsafe_load_file(spec_path)
+      JsonRefs.load(spec_path)
     end
   end
 end

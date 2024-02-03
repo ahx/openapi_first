@@ -6,6 +6,7 @@ Style/Documentation:
   Exclude:
     - "spec/**/*"
     - "benchmarks/**/*"
+    - "lib/openapi_first/json_refs.rb"
 Style/ExponentialNotation:
   Enabled: true
 Metrics/BlockLength:

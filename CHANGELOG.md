@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-
+- Fixed: No longer use chdir when, resolving splitted files, which causes a problem in threaded environments
 - Added: The response definition is found if the status is defined as an Integer instead of String.
 - Chore: Add Readme back to gem. Link to docs.
 - Middlewares now have an `#app` method for easier subclassing
