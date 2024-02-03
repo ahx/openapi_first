@@ -1,10 +1,17 @@
 # Changelog
 
 ## Unreleased
-- Fixed: No longer use chdir when, resolving splitted files, which causes a problem in threaded environments
-- Added: The response definition is found if the status is defined as an Integer instead of String.
-- Chore: Add Readme back to gem. Link to docs.
-- Middlewares now have an `#app` method for easier subclassing
+
+## 1.3.2
+
+### Changed
+
+- The response definition is found even if the status is defined as an Integer instead of a String. This is not provided for in the OAS specification, but is often done this way, because of YAML.
+
+### Fixed
+
+- Reduced initial load time for composed API descriptions [#232](https://github.com/ahx/openapi_first/pull/232)
+- Chore: Add Readme back to gem. Add link to docs.
 
 ## 1.3.1
 
