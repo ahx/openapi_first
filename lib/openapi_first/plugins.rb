@@ -7,13 +7,18 @@ module OpenapiFirst
   # @!visibility private
   module Plugins
     PLUGINS = {} # rubocop:disable Style/MutableConstant
+    private_constant :PLUGINS
 
     def register(name, klass)
-      PLUGINS[name] = klass
+      PLUGINS[name.to_sym] = klass
     end
 
     def plugin(name)
       require "openapi_first/plugins/#{name}"
+      PLUGINS.fetch(name.to_sym)
+    end
+
+    def find_plugin(name)
       PLUGINS.fetch(name)
     end
   end
