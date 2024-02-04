@@ -4,7 +4,7 @@ module OpenapiFirst
   # Global configuration. Currently only used for the request validation middleware.
   class Configuration
     def initialize
-      @request_validation_error_response = OpenapiFirst.plugin(:default)::ErrorResponse
+      @request_validation_error_response = OpenapiFirst.find_plugin(:default)::ErrorResponse
       @request_validation_raise_error = false
     end
 
@@ -13,7 +13,7 @@ module OpenapiFirst
 
     def request_validation_error_response=(mod)
       @request_validation_error_response = if mod.is_a?(Symbol)
-                                             OpenapiFirst.plugin(:default)::ErrorResponse
+                                             OpenapiFirst.find_plugin(:default)::ErrorResponse
                                            else
                                              mod
                                            end

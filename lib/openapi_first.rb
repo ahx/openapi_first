@@ -53,3 +53,6 @@ module OpenapiFirst
     end
   end
 end
+
+OpenapiFirst.plugin(:default)
+OpenapiFirst.plugin(:jsonapi)
