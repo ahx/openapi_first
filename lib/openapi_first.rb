@@ -49,7 +49,8 @@ module OpenapiFirst
   # @!visibility private
   module Bundle
     def self.resolve(spec_path)
-      JsonRefs.load(spec_path)
+      @file_cache ||= {}
+      @file_cache[File.expand_path(spec_path).to_sym] ||= JsonRefs.load(spec_path)
     end
   end
 end

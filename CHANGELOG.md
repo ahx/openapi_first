@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Cache the resolved OAD. This especially makes things run faster in tests.
+
 ## 1.3.2
 
 ### Changed
