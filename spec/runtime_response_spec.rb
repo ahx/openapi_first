@@ -209,7 +209,7 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
 
     subject(:response) do
       operation = definition.path('/echo').operation('post')
-      described_class.new(operation, rack_response)
+      described_class.new(operation, rack_response, validator: ->(_) {})
     end
 
     let(:rack_response) do

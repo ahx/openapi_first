@@ -10,10 +10,9 @@ module OpenapiFirst
     class PathItem
       extend Forwardable
 
-      def initialize(path, path_item_object, openapi_version:)
+      def initialize(path, path_item_object)
         @path = path
         @path_item_object = path_item_object
-        @openapi_version = openapi_version
         @path_template = PathTemplate.new(path)
       end
 
@@ -24,9 +23,7 @@ module OpenapiFirst
       def operation(request_method)
         return unless @path_item_object[request_method]
 
-        Operation.new(
-          @path, request_method, @path_item_object, openapi_version: @openapi_version
-        )
+        Operation.new(@path, request_method, @path_item_object)
       end
 
       METHODS = %w[get head post put patch delete trace options].freeze

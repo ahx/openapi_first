@@ -17,11 +17,10 @@ module OpenapiFirst
       def_delegators :operation_object,
                      :[]
 
-      def initialize(path, request_method, path_item_object, openapi_version:)
+      def initialize(path, request_method, path_item_object)
         @path = path
         @method = request_method
         @path_item_object = path_item_object
-        @openapi_version = openapi_version
         @operation_object = @path_item_object[request_method]
       end
 
@@ -34,8 +33,6 @@ module OpenapiFirst
       # @return [String] The request method of the operation.
       attr_reader :method
       alias request_method method
-
-      attr_reader :openapi_version # :nodoc:
 
       # Returns the operation ID as defined in the API description.
       # @return [String, nil]
@@ -61,7 +58,7 @@ module OpenapiFirst
       # Returns the request body definition if defined in the API description.
       # @return [RequestBody, nil] The request body of the operation, or `nil` if not present.
       def request_body
-        @request_body ||= RequestBody.new(operation_object['requestBody'], self) if operation_object['requestBody']
+        @request_body ||= RequestBody.new(operation_object['requestBody']) if operation_object['requestBody']
       end
 
       # Checks if a response status is defined for this operation.
@@ -95,7 +92,7 @@ module OpenapiFirst
       # Returns a unique name for this operation. Used for generating error messages.
       # @visibility private
       def name
-        @name ||= "#{method.upcase} #{path}"
+        @name ||= "#{method.upcase} #{path}".freeze
       end
 
       # Returns the path parameters of the operation.
@@ -175,12 +172,11 @@ module OpenapiFirst
           'properties' => {},
           'required' => []
         }
-        schema = parameters.each_with_object(init_schema) do |parameter_def, result|
+        parameters.each_with_object(init_schema) do |parameter_def, result|
           parameter = OpenapiParameters::Parameter.new(parameter_def)
           result['properties'][parameter.name] = parameter.schema if parameter.schema
           result['required'] << parameter.name if parameter.required?
         end
-        Schema.new(schema, openapi_version: @openapi_version)
       end
 
       def responses
@@ -190,7 +186,7 @@ module OpenapiFirst
       attr_reader :operation_object
 
       def build_parameters(parameters, klass)
-        klass.new(parameters, openapi_version:) if parameters.any?
+        klass.new(parameters) if parameters.any?
       end
     end
   end

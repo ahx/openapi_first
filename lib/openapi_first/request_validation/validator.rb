@@ -7,8 +7,9 @@ module OpenapiFirst
   module RequestValidation
     # Validates a RuntimeRequest against an Operation.
     class Validator
-      def initialize(operation)
+      def initialize(operation, schema_builder:)
         @operation = operation
+        @schema_builder = schema_builder
       end
 
       def validate(runtime_request)
@@ -39,43 +40,50 @@ module OpenapiFirst
       end
 
       def validate_path_params!(request)
-        schema = operation.path_parameters_schema
-        return unless schema
+        @path_parameters_schema ||= build_schema(operation.path_parameters_schema)
+        return unless @path_parameters_schema
 
-        validation = schema.validate(request.path_parameters)
+        validation = @path_parameters_schema.validate(request.path_parameters)
         Failure.fail!(:invalid_path, errors: validation.errors) if validation.error?
       end
 
       def validate_query_params!(request)
-        schema = operation.query_parameters_schema
-        return unless schema
+        @query_parameters_schema ||= build_schema(operation.query_parameters_schema)
+        return unless @query_parameters_schema
 
-        validation = schema.validate(request.query)
+        validation = @query_parameters_schema.validate(request.query)
         Failure.fail!(:invalid_query, errors: validation.errors) if validation.error?
       end
 
       def validate_cookie_params!(request)
-        schema = operation.cookie_parameters_schema
-        return unless schema
+        @cookie_parameters_schema ||= build_schema(operation.cookie_parameters_schema)
+        return unless @cookie_parameters_schema
 
-        validation = schema.validate(request.cookies)
+        validation = @cookie_parameters_schema.validate(request.cookies)
         Failure.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
       end
 
       def validate_header_params!(request)
-        schema = operation.header_parameters_schema
-        return unless schema
+        @header_parameters_schema ||= build_schema(operation.header_parameters_schema)
+        return unless @header_parameters_schema
 
-        validation = schema.validate(request.headers)
+        validation = @header_parameters_schema.validate(request.headers)
         Failure.fail!(:invalid_header, errors: validation.errors) if validation.error?
       end
 
       def validate_request_body!(request)
         return unless operation.request_body
 
-        RequestBodyValidator.new(operation).validate!(request.body, request.content_type)
+        RequestBodyValidator.new(operation.request_body, schema_builder: @schema_builder)
+                            .validate!(request.body, request.content_type)
       rescue ParseError => e
         Failure.fail!(:invalid_body, message: e.message)
+      end
+
+      def build_schema(schema)
+        return unless schema
+
+        @schema_builder.build_schema(schema)
       end
     end
   end

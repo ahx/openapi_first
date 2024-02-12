@@ -12,6 +12,7 @@ module OpenapiFirst
         @status = status
         @content_type = content_type
         @content_schema = content_schema
+        freeze
       end
 
       # @attr_reader [Operation] operation The operation this response belongs to.

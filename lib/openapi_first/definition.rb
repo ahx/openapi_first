@@ -17,6 +17,11 @@ module OpenapiFirst
       @filepath = filepath
       @paths = resolved['paths']
       @openapi_version = detect_version(resolved)
+      @path_items = Hash.new do |hash, pathname|
+        if (path_item_object = @paths[pathname])
+          hash[pathname] = PathItem.new(pathname, path_item_object)
+        end
+      end
     end
 
     # Validates the request against the API description.
@@ -48,7 +53,9 @@ module OpenapiFirst
         request: rack_request,
         path_item:,
         operation:,
-        path_params:
+        path_params:,
+        validator: RequestValidation::Validator.new(operation, schema_builder: self),
+        response_validator: ResponseValidation::Validator.new(operation, openapi_version: @openapi_version)
       )
     end
 
@@ -63,7 +70,7 @@ module OpenapiFirst
     # Gets all the operations defined in the API description.
     # @return [Array<Operation>] An array of Operation objects.
     def operations
-      @operations ||= path_items.flat_map(&:operations)
+      @paths.keys.flat_map { |pathname| path(pathname).operations }
     end
 
     # Gets the PathItem object for the specified path.
@@ -72,33 +79,25 @@ module OpenapiFirst
     # Example:
     #   definition.path('/pets/{id}')
     def path(pathname)
-      return unless paths.key?(pathname)
+      @path_items[pathname]
+    end
 
-      PathItem.new(pathname, paths[pathname], openapi_version:)
+    def build_schema(schema)
+      Schema.new(schema, openapi_version:)
     end
 
     private
 
-    # Gets all the PathItem objects defined in the API description.
-    # @return [Array] An array of PathItem objects.
-    def path_items
-      @path_items ||= paths.flat_map do |path, path_item_object|
-        PathItem.new(path, path_item_object, openapi_version:)
-      end
-    end
-
     def find_path_item_and_params(request_path)
-      if paths.key?(request_path)
-        return [
-          PathItem.new(request_path, paths[request_path], openapi_version:),
-          {}
-        ]
-      end
+      simple = path(request_path)
+      return [simple, {}] if simple
+
       search_for_path_item(request_path)
     end
 
     def search_for_path_item(request_path)
-      path_items.find do |path_item|
+      @paths.each_key do |pathname|
+        path_item = path(pathname)
         path_params = path_item.match(request_path)
         next unless path_params
 
@@ -107,6 +106,7 @@ module OpenapiFirst
           path_params
         ]
       end
+      nil
     end
 
     def detect_version(resolved)

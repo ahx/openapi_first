@@ -4,20 +4,22 @@ require 'forwardable'
 require 'openapi_parameters'
 require_relative 'runtime_response'
 require_relative 'body_parser'
-require_relative 'request_validation/validator'
+require_relative 'response_validation/validator'
 
 module OpenapiFirst
   # RuntimeRequest represents how an incoming request (Rack::Request) matches a request definition.
   class RuntimeRequest
     extend Forwardable
 
-    def initialize(request:, path_item:, operation:, path_params:)
+    def initialize(request:, path_item:, operation:, path_params:, validator:, response_validator: nil) # rubocop:disable Metrics/ParameterLists
       @request = request
       @path_item = path_item
       @operation = operation
       @original_path_params = path_params
       @error = nil
       @validated = false
+      @validator = validator
+      @response_validator = response_validator
     end
 
     def_delegators :@request, :content_type, :media_type, :path
@@ -122,7 +124,7 @@ module OpenapiFirst
     # @return [Failure, nil] The Failure object if validation failed.
     def validate
       @validated = true
-      @error = RequestValidation::Validator.new(operation).validate(self)
+      @error = @validator.validate(self)
     end
 
     # Validates the request and raises an error if validation fails.
@@ -145,7 +147,7 @@ module OpenapiFirst
     # @param rack_response [Rack::Response] The rack response object.
     # @return [RuntimeResponse] The RuntimeResponse object.
     def response(rack_response)
-      RuntimeResponse.new(operation, rack_response)
+      RuntimeResponse.new(operation, rack_response, validator: @response_validator)
     end
 
     private

@@ -6,8 +6,9 @@ module OpenapiFirst
   module ResponseValidation
     # Validates a RuntimeResponse against an Operation.
     class Validator
-      def initialize(operation)
+      def initialize(operation, openapi_version:)
         @operation = operation
+        @openapi_version = openapi_version
       end
 
       def validate(runtime_response)
@@ -53,7 +54,7 @@ module OpenapiFirst
           Failure.fail!(:invalid_response_body, message: e.message)
         end
 
-        validation = schema.validate(parsed_body)
+        validation = build_schema(schema).validate(parsed_body)
         Failure.fail!(:invalid_response_body, errors: validation.errors) if validation.error?
       end
 
@@ -63,11 +64,11 @@ module OpenapiFirst
         response_header_definitions.each do |name, definition|
           next if name == 'Content-Type'
 
-          validate_response_header(name, definition, unpacked_headers, openapi_version: operation.openapi_version)
+          validate_response_header(name, definition, unpacked_headers)
         end
       end
 
-      def validate_response_header(name, definition, unpacked_headers, openapi_version:)
+      def validate_response_header(name, definition, unpacked_headers)
         unless unpacked_headers.key?(name)
           if definition['required']
             Failure.fail!(:invalid_response_header,
@@ -79,7 +80,7 @@ module OpenapiFirst
 
         return unless definition.key?('schema')
 
-        validation = Schema.new(definition['schema'], openapi_version:)
+        validation = build_schema(definition['schema'])
         value = unpacked_headers[name]
         validation_result = validation.validate(value)
         return unless validation_result.error?
@@ -92,6 +93,10 @@ module OpenapiFirst
         MultiJson.load(string)
       rescue MultiJson::ParseError
         string
+      end
+
+      def build_schema(schema)
+        Schema.new(schema, openapi_version: @openapi_version, write: false)
       end
     end
   end
