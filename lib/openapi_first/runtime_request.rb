@@ -4,19 +4,21 @@ require 'forwardable'
 require 'openapi_parameters'
 require_relative 'runtime_response'
 require_relative 'body_parser'
-require_relative 'request_validation/validator'
+require_relative 'response_validation/validator'
 
 module OpenapiFirst
   # RuntimeRequest represents how an incoming request (Rack::Request) matches a request definition.
   class RuntimeRequest
     extend Forwardable
 
-    def initialize(request:, path_item:, operation:, path_params:)
+    def initialize(request:, path_item:, operation:, path_params:, validator:, response_validator: nil) # rubocop:disable Metrics/ParameterLists
       @request = request
       @path_item = path_item
       @operation = operation
       @original_path_params = path_params
       @validated = false
+      @validator = validator
+      @response_validator = response_validator
     end
 
     def_delegators :@request, :content_type, :media_type, :path
@@ -123,7 +125,8 @@ module OpenapiFirst
     def validate
       warn '[DEPRECATION] `validate` is deprecated. Please use ' \
            "`OpenapiFirst.load('openapi.yaml').validate_request(rack_request)` instead."
-      @error = RequestValidation::Validator.new(operation).validate(self)
+      @validated = true
+      @error = @validator.validate(self)
     end
 
     # Validates the request and raises an error if validation fails.
@@ -152,7 +155,7 @@ module OpenapiFirst
     def response(rack_response)
       warn '[DEPRECATION] `response` is deprecated. Please use ' \
            "`OpenapiFirst.load('openapi.yaml').validate_response(request, response, raise_error: false)` instead."
-      RuntimeResponse.new(operation, rack_response)
+      RuntimeResponse.new(operation, rack_response, validator: @response_validator)
     end
 
     private

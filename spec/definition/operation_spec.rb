@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe OpenapiFirst::Definition::Operation do
-  let(:openapi_version) { '3.1' }
-
   let(:operation) do
     path_item = {
       'parameters' => [
@@ -30,7 +28,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
         }
       }
     }
-    described_class.new('/pets/{pet_id}', 'get', path_item, openapi_version:)
+    described_class.new('/pets/{pet_id}', 'get', path_item)
   end
 
   describe '#operation_id' do
@@ -47,7 +45,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#query_parameters_schema' do
     it 'returns a schema' do
-      expect(operation.query_parameters_schema).to be_a OpenapiFirst::Schema
+      expect(operation.query_parameters_schema).to be_truthy
     end
   end
 
@@ -59,7 +57,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#path_parameters_schema' do
     it 'returns a schema' do
-      expect(operation.path_parameters_schema).to be_a OpenapiFirst::Schema
+      expect(operation.path_parameters_schema).to be_truthy
     end
   end
 
@@ -78,7 +76,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
             ],
             'get' => {}
           }
-          operation = described_class.new('/pets/{pet_id}', 'get', path_item, openapi_version:)
+          operation = described_class.new('/pets/{pet_id}', 'get', path_item)
           expect(operation.header_parameters).to be_nil
         end
       end
@@ -87,7 +85,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#header_parameters_schema' do
     it 'returns a schema' do
-      expect(operation.header_parameters_schema).to be_a OpenapiFirst::Schema
+      expect(operation.header_parameters_schema).to be_truthy
     end
   end
 
@@ -99,7 +97,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#cookie_parameters_schema' do
     it 'returns a schema' do
-      expect(operation.cookie_parameters_schema).to be_a OpenapiFirst::Schema
+      expect(operation.cookie_parameters_schema).to be_truthy
     end
   end
 
@@ -131,12 +129,12 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#read?' do
     it 'returns true if write? returns false' do
-      operation = OpenapiFirst::Definition::Operation.new('/', 'get', {}, openapi_version:)
+      operation = OpenapiFirst::Definition::Operation.new('/', 'get', {})
       expect(operation.read?).to be true
     end
 
     it 'returns false if write? returns true' do
-      operation = OpenapiFirst::Definition::Operation.new('/', 'post', {}, openapi_version:)
+      operation = OpenapiFirst::Definition::Operation.new('/', 'post', {})
       expect(operation.read?).to be false
     end
   end
@@ -144,13 +142,13 @@ RSpec.describe OpenapiFirst::Definition::Operation do
   describe 'write?' do
     %w[POST PUT PATCH DELETE].each do |http_method|
       it "returns true for #{http_method}" do
-        operation = OpenapiFirst::Definition::Operation.new('/', http_method.downcase, {}, openapi_version:)
+        operation = OpenapiFirst::Definition::Operation.new('/', http_method.downcase, {})
         expect(operation.write?).to be true
       end
     end
 
     it 'returns false for GET' do
-      operation = OpenapiFirst::Definition::Operation.new('/', 'get', {}, openapi_version:)
+      operation = OpenapiFirst::Definition::Operation.new('/', 'get', {})
       expect(operation.write?).to be false
     end
   end
@@ -246,7 +244,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
             }
           }
         }
-        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
+        described_class.new('/pets', 'get', path_item_object)
       end
 
       it 'returns nil' do
@@ -265,7 +263,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
             }
           }
         }
-        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
+        described_class.new('/pets', 'get', path_item_object)
       end
 
       it 'returns a response without content-type' do
@@ -297,7 +295,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
             }
           }
         }
-        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
+        described_class.new('/pets', 'get', path_item_object)
       end
 
       it 'returns a response without schema' do
@@ -322,7 +320,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
             }
           }
         }
-        described_class.new('/pets', 'get', path_item_object, openapi_version: '3.1')
+        described_class.new('/pets', 'get', path_item_object)
       end
 
       it 'returns a response with content_type, but without schema' do

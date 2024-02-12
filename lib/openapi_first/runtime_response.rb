@@ -2,16 +2,17 @@
 
 require 'forwardable'
 require_relative 'body_parser'
-require_relative 'response_validation/validator'
 
 module OpenapiFirst
   # Represents a response returned by the Rack application and how it relates to the API description.
   class RuntimeResponse
     extend Forwardable
 
-    def initialize(operation, rack_response)
+    def initialize(operation, rack_response, validator:)
       @operation = operation
       @rack_response = rack_response
+      @error = nil
+      @validator = validator
     end
 
     # @return [Failure, nil] Error object if validation failed.
@@ -73,7 +74,8 @@ module OpenapiFirst
     def validate
       warn '[DEPRECATION] `validate` is deprecated. ' \
            "Please use `OpenapiFirst.load('openapi.yaml').validate_response(rack_request, rack_response)` instead."
-      @error = ResponseValidation::Validator.new(@operation).validate(self)
+      @validated = true
+      @error = @validator.validate(self)
     end
 
     # Validates the response and raises an error if invalid.

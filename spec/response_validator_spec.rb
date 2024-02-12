@@ -9,14 +9,15 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
 
   let(:path) { '/pets' }
   let(:operation) { OpenapiFirst.load(spec).path(path).operation('get') }
-  let(:subject) { described_class.new(operation) }
+  let(:subject) { described_class.new(operation, openapi_version: '3.1') }
 
   let(:headers) { { Rack::CONTENT_TYPE => 'application/json' } }
 
   let(:response) do
     OpenapiFirst::RuntimeResponse.new(
       operation,
-      rack_response
+      rack_response,
+      validator: subject
     )
   end
 

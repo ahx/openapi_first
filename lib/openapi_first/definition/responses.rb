@@ -9,6 +9,7 @@ module OpenapiFirst
       def initialize(operation, responses_object)
         @operation = operation
         @responses_object = responses_object
+        freeze
       end
 
       def status_defined?(status)
@@ -59,10 +60,7 @@ module OpenapiFirst
         return unless response_content_type
 
         content_object = find_response_body(response_object['content'], response_content_type)
-        content_schema_object = content_object&.fetch('schema', nil)
-        return unless content_schema_object
-
-        Schema.new(content_schema_object, write: false, openapi_version: operation.openapi_version)
+        content_object&.fetch('schema', nil)
       end
 
       def find_response_object(status)
