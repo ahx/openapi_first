@@ -76,78 +76,10 @@ module OpenapiFirst
         responses.response_for(status, content_type)
       end
 
-      # Returns the schema for a given content type.
-      # @param content_type [String] The content type.
-      # @return [Schema, nil] The schema for the given content type, or `nil` if not found.
-      def schema_for(content_type)
-        content = @request_body_object['content']
-        return unless content&.any?
-
-        content_schemas&.fetch(content_type) do
-          type = content_type.split(';')[0]
-          content_schemas[type] || content_schemas["#{type.split('/')[0]}/*"] || content_schemas['*/*']
-        end
-      end
-
       # Returns a unique name for this operation. Used for generating error messages.
       # @visibility private
       def name
         @name ||= "#{method.upcase} #{path}".freeze
-      end
-
-      # Returns the path parameters of the operation.
-      # @return [Array<Hash>] The path parameters of the operation.
-      def path_parameters
-        all_parameters['path']
-      end
-
-      # Returns the query parameters of the operation.
-      # Returns parameters defined on the path and in the operation.
-      # @return [Array<Hash>] The query parameters of the operation.
-      def query_parameters
-        all_parameters['query']
-      end
-
-      # Returns the header parameters of the operation.
-      # Returns parameters defined on the path and in the operation.
-      # @return [Array<Hash>] The header parameters of the operation.
-      def header_parameters
-        all_parameters['header']
-      end
-
-      # Returns the cookie parameters of the operation.
-      # Returns parameters defined on the path and in the operation.
-      # @return [Array<Hash>] The cookie parameters of the operation.
-      def cookie_parameters
-        all_parameters['cookie']
-      end
-
-      # Returns the schema for the path parameters.
-      # @visibility private
-      # @return [Schema, nil] The schema for the path parameters, or `nil` if not found.
-      def path_parameters_schema
-        @path_parameters_schema ||= build_schema(path_parameters)
-      end
-
-      # Returns the schema for the query parameters.
-      # @visibility private
-      # @return [Schema, nil] The schema for the query parameters, or `nil` if not found.
-      def query_parameters_schema
-        @query_parameters_schema ||= build_schema(query_parameters)
-      end
-
-      # Returns the schema for the header parameters.
-      # @visibility private
-      # @return [Schema, nil] The schema for the header parameters, or `nil` if not found.
-      def header_parameters_schema
-        @header_parameters_schema ||= build_schema(header_parameters)
-      end
-
-      # Returns the schema for the cookie parameters.
-      # @visibility private
-      # @return [Schema, nil] The schema for the cookie parameters, or `nil` if not found.
-      def cookie_parameters_schema
-        @cookie_parameters_schema ||= build_schema(cookie_parameters)
       end
 
       private
