@@ -69,7 +69,7 @@ module OpenapiFirst
     # @return [Failure, nil] Returns the validation error, or nil if the response is valid.
     def validate
       @validated = true
-      @error = @validator.validate(self)
+      @error = @validator.call(self)
     end
 
     # Validates the response and raises an error if invalid.

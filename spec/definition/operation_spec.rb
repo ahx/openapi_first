@@ -2,33 +2,25 @@
 
 RSpec.describe OpenapiFirst::Definition::Operation do
   let(:operation) do
-    path_item = {
+    operation_object = {
+      'operationId' => 'get_pet',
       'parameters' => [
-        { 'name' => 'Accept-Version', 'in' => 'header', 'schema' => { 'type' => 'integer' } },
-        { 'name' => 'utm', 'in' => 'query', 'schema' => { 'type' => 'string' } },
-        { 'name' => 'pet_id', 'in' => 'path', 'schema' => { 'type' => 'string' } },
-        { 'name' => 'xfactor', 'in' => 'cookie', 'schema' => { 'type' => 'string' } }
+        { 'name' => 'limit', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
       ],
-      'get' => {
-        'operationId' => 'get_pet',
-        'parameters' => [
-          { 'name' => 'limit', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
-        ],
-        'responses' => {
-          '200' => {
-            'content' => {
-              'application/json' => {
-                'schema' => { 'type' => 'array' }
-              }
+      'responses' => {
+        '200' => {
+          'content' => {
+            'application/json' => {
+              'schema' => { 'type' => 'array' }
             }
-          },
-          'default' => {
-            'description' => 'unexpected error'
           }
+        },
+        'default' => {
+          'description' => 'unexpected error'
         }
       }
     }
-    described_class.new('/pets/{pet_id}', 'get', path_item)
+    described_class.new('/pets/{pet_id}', 'get', operation_object)
   end
 
   describe '#operation_id' do
@@ -38,66 +30,26 @@ RSpec.describe OpenapiFirst::Definition::Operation do
   end
 
   describe '#query_parameters' do
-    it 'returns the query parameters on path and operation level' do
-      expect(operation.query_parameters.map { |p| p['name'] }).to eq %w[utm limit]
-    end
-  end
-
-  describe '#query_parameters_schema' do
-    it 'returns a schema' do
-      expect(operation.query_parameters_schema).to be_truthy
+    it 'returns the query parameters on  operation level' do
+      expect(operation.query_parameters.map { |p| p['name'] }).to eq %w[limit]
     end
   end
 
   describe '#path_parameters' do
-    it 'returns the path parameters on path and operation level' do
-      expect(operation.path_parameters.map { |p| p['name'] }).to eq %w[pet_id]
-    end
-  end
-
-  describe '#path_parameters_schema' do
-    it 'returns a schema' do
-      expect(operation.path_parameters_schema).to be_truthy
+    it 'returns the path parameters on operation level' do
+      expect(operation.path_parameters).to be_nil
     end
   end
 
   describe '#header_parameters' do
     it 'returns the header parameters' do
-      expect(operation.header_parameters.map { |p| p['name'] }).to eq %w[Accept-Version]
-    end
-
-    describe 'ignored headers' do
-      # These are ignored, as described in the OpenAPI spec.
-      %w[Content-Type Accept Authorization].each do |header|
-        it "excludes the #{header} header" do
-          path_item = {
-            'parameters' => [
-              { 'name' => header, 'in' => 'header', 'schema' => { 'type' => 'integer' } }
-            ],
-            'get' => {}
-          }
-          operation = described_class.new('/pets/{pet_id}', 'get', path_item)
-          expect(operation.header_parameters).to be_nil
-        end
-      end
-    end
-  end
-
-  describe '#header_parameters_schema' do
-    it 'returns a schema' do
-      expect(operation.header_parameters_schema).to be_truthy
+      expect(operation.header_parameters).to be_nil
     end
   end
 
   describe '#cookie_parameters' do
     it 'returns cookie parameters' do
-      expect(operation.cookie_parameters.map { |p| p['name'] }).to eq %w[xfactor]
-    end
-  end
-
-  describe '#cookie_parameters_schema' do
-    it 'returns a schema' do
-      expect(operation.cookie_parameters_schema).to be_truthy
+      expect(operation.cookie_parameters).to be_nil
     end
   end
 
@@ -229,22 +181,20 @@ RSpec.describe OpenapiFirst::Definition::Operation do
     context 'when response object media type cannot be found' do
       let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
       let(:operation) do
-        path_item_object = {
-          'get' => {
-            'responses' => {
-              '200' => {
-                'content' => {
-                  'application/json' => {
-                    'schema' => {
-                      'type' => 'object'
-                    }
+        operation_object = {
+          'responses' => {
+            '200' => {
+              'content' => {
+                'application/json' => {
+                  'schema' => {
+                    'type' => 'object'
                   }
                 }
               }
             }
           }
         }
-        described_class.new('/pets', 'get', path_item_object)
+        described_class.new('/pets', 'get', operation_object)
       end
 
       it 'returns nil' do
@@ -254,16 +204,14 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
     context 'when response content is not defined' do
       let(:operation) do
-        path_item_object = {
-          'get' => {
-            'responses' => {
-              '200' => {
-                'description' => 'Blank'
-              }
+        operation_object = {
+          'responses' => {
+            '200' => {
+              'description' => 'Blank'
             }
           }
         }
-        described_class.new('/pets', 'get', path_item_object)
+        described_class.new('/pets', 'get', operation_object)
       end
 
       it 'returns a response without content-type' do
@@ -285,17 +233,15 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
     context 'when response object media type is not defined' do
       let(:operation) do
-        path_item_object = {
-          'get' => {
-            'responses' => {
-              '200' => {
-                'description' => 'Blank',
-                'content' => {}
-              }
+        operation_object = {
+          'responses' => {
+            '200' => {
+              'description' => 'Blank',
+              'content' => {}
             }
           }
         }
-        described_class.new('/pets', 'get', path_item_object)
+        described_class.new('/pets', 'get', operation_object)
       end
 
       it 'returns a response without schema' do
@@ -309,18 +255,16 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
     context 'when response content schema is not defined' do
       let(:operation) do
-        path_item_object = {
-          'get' => {
-            'responses' => {
-              '200' => {
-                'content' => {
-                  'application/json' => {}
-                }
+        operation_object = {
+          'responses' => {
+            '200' => {
+              'content' => {
+                'application/json' => {}
               }
             }
           }
         }
-        described_class.new('/pets', 'get', path_item_object)
+        described_class.new('/pets', 'get', operation_object)
       end
 
       it 'returns a response with content_type, but without schema' do

@@ -9,7 +9,6 @@ module OpenapiFirst
       def initialize(operation, responses_object)
         @operation = operation
         @responses_object = responses_object
-        freeze
       end
 
       def status_defined?(status)
@@ -30,7 +29,7 @@ module OpenapiFirst
 
       private
 
-      attr_reader :openapi_version, :operation
+      attr_reader :operation
 
       def response_without_content(status, response_object)
         Response.new(operation:, status:, response_object:, content_type: nil, content_schema: nil)

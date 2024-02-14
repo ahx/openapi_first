@@ -11,7 +11,7 @@ module OpenapiFirst
         @openapi_version = openapi_version
       end
 
-      def validate(runtime_response)
+      def call(runtime_response)
         return unless operation
 
         catch Failure::FAILURE do
