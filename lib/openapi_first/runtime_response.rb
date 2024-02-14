@@ -75,7 +75,7 @@ module OpenapiFirst
       warn '[DEPRECATION] `validate` is deprecated. ' \
            "Please use `OpenapiFirst.load('openapi.yaml').validate_response(rack_request, rack_response)` instead."
       @validated = true
-      @error = @validator.validate(self)
+      @error = @validator.call(self)
     end
 
     # Validates the response and raises an error if invalid.

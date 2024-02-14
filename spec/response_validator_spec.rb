@@ -31,7 +31,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
     end
 
     it 'raises nothing' do
-      subject.validate(response)
+      subject.call(response)
     end
 
     context 'when response is not defined, but there is a default' do
@@ -41,7 +41,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       end
 
       it 'falls back to the default' do
-        subject.validate(response)
+        subject.call(response)
       end
     end
 
@@ -52,7 +52,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       end
 
       it 'returns no errors' do
-        subject.validate(response)
+        subject.call(response)
       end
     end
 
@@ -62,14 +62,14 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
       let(:path) { '/' }
 
       it 'returns no errors' do
-        expect(subject.validate(response)).to be_nil
+        expect(subject.call(response)).to be_nil
       end
 
       context 'when content type is empty' do
         let(:path) { '/empty-content' }
 
         it 'returns no errors' do
-          subject.validate(response)
+          subject.call(response)
         end
       end
     end
@@ -86,7 +86,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
 
       it 'fails' do
         expect do
-          subject.validate(response).raise!
+          subject.call(response).raise!
         end.to raise_error OpenapiFirst::ResponseNotFoundError
       end
     end
@@ -100,7 +100,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
 
       it 'fails on wrong content type' do
         expect do
-          subject.validate(response).raise!
+          subject.call(response).raise!
         end.to raise_error OpenapiFirst::ResponseInvalidError
       end
     end
@@ -113,7 +113,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
 
       it 'fails' do
         expect do
-          subject.validate(response).raise!
+          subject.call(response).raise!
         end.to raise_error OpenapiFirst::ResponseInvalidError
       end
     end
@@ -126,7 +126,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
 
       it 'fails' do
         expect do
-          subject.validate(response).raise!
+          subject.call(response).raise!
         end.to raise_error OpenapiFirst::ResponseInvalidError
       end
     end

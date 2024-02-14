@@ -71,10 +71,10 @@ module OpenapiFirst
     # Returns the parsed path parameters of the request.
     # @return [Hash]
     def path_parameters
-      return {} unless operation.path_parameters
-
-      @path_parameters ||=
-        OpenapiParameters::Path.new(operation.path_parameters).unpack(@original_path_params) || {}
+      @path_parameters ||= begin
+        parameters = Array(path_item&.path_parameters) + Array(operation&.path_parameters)
+        parameters ? OpenapiParameters::Path.new(parameters).unpack(@original_path_params) : {}
+      end
     end
 
     # Returns the parsed query parameters.
@@ -82,10 +82,10 @@ module OpenapiFirst
     # @note This method is aliased as query_parameters.
     # @return [Hash]
     def query
-      return {} unless operation.query_parameters
-
-      @query ||=
-        OpenapiParameters::Query.new(operation.query_parameters).unpack(request.env[Rack::QUERY_STRING]) || {}
+      @query ||= begin
+        parameters = Array(path_item&.query_parameters) + Array(operation&.query_parameters)
+        parameters ? OpenapiParameters::Query.new(parameters).unpack(request.env[Rack::QUERY_STRING]) : {}
+      end
     end
 
     alias query_parameters query
@@ -94,19 +94,20 @@ module OpenapiFirst
     # This only includes parameters that are defined in the API description.
     # @return [Hash]
     def headers
-      return {} unless operation.header_parameters
-
-      @headers ||= OpenapiParameters::Header.new(operation.header_parameters).unpack_env(request.env) || {}
+      @headers ||= begin
+        parameters = Array(path_item&.header_parameters) + Array(operation&.header_parameters)
+        OpenapiParameters::Header.new(parameters).unpack_env(request.env) || {}
+      end
     end
 
     # Returns the parsed cookie parameters.
     # This only includes parameters that are defined in the API description.
     # @return [Hash]
     def cookies
-      return {} unless operation.cookie_parameters
-
-      @cookies ||=
-        OpenapiParameters::Cookie.new(operation.cookie_parameters).unpack(request.env[Rack::HTTP_COOKIE]) || {}
+      @cookies ||= begin
+        parameters = Array(path_item&.cookie_parameters) + Array(operation&.cookie_parameters)
+        parameters ? OpenapiParameters::Cookie.new(parameters).unpack(request.env[Rack::HTTP_COOKIE]) : {}
+      end
     end
 
     # Returns the parsed request body.
@@ -126,7 +127,7 @@ module OpenapiFirst
       warn '[DEPRECATION] `validate` is deprecated. Please use ' \
            "`OpenapiFirst.load('openapi.yaml').validate_request(rack_request)` instead."
       @validated = true
-      @error = @validator.validate(self)
+      @error = @validator.call(self)
     end
 
     # Validates the request and raises an error if validation fails.

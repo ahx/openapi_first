@@ -17,15 +17,13 @@ module OpenapiFirst
       def_delegators :operation_object,
                      :[]
 
-      def initialize(path, request_method, path_item_object)
+      def initialize(path, request_method, operation_object)
         @path = path
         @method = request_method
-        @path_item_object = path_item_object
-        @operation_object = @path_item_object[request_method]
+        @operation_object = operation_object
       end
 
-      # Returns the path of the operation as in the API description.
-      # @return [String] The path of the operation.
+      # @attr_reader [String] path The path of the operation as in the API description.
       attr_reader :path
 
       # Returns the (downcased) request method of the operation.
@@ -82,6 +80,12 @@ module OpenapiFirst
         @name ||= "#{method.upcase} #{path}".freeze
       end
 
+      %w[query path header cookie].each do |location|
+        define_method("#{location}_parameters") do
+          all_parameters[location]
+        end
+      end
+
       private
 
       WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
@@ -91,24 +95,7 @@ module OpenapiFirst
       private_constant :IGNORED_HEADERS
 
       def all_parameters
-        @all_parameters ||= (@path_item_object.fetch('parameters', []) + operation_object.fetch('parameters', []))
-                            .reject { |p| p['in'] == 'header' && IGNORED_HEADERS.include?(p['name']) }
-                            .group_by { _1['in'] }
-      end
-
-      def build_schema(parameters)
-        return unless parameters&.any?
-
-        init_schema = {
-          'type' => 'object',
-          'properties' => {},
-          'required' => []
-        }
-        parameters.each_with_object(init_schema) do |parameter_def, result|
-          parameter = OpenapiParameters::Parameter.new(parameter_def)
-          result['properties'][parameter.name] = parameter.schema if parameter.schema
-          result['required'] << parameter.name if parameter.required?
-        end
+        @all_parameters ||= operation_object.fetch('parameters', []).group_by { _1['in'] }.freeze
       end
 
       def responses

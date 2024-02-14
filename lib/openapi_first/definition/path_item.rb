@@ -21,9 +21,10 @@ module OpenapiFirst
       def_delegator :@path_template, :match
 
       def operation(request_method)
-        return unless @path_item_object[request_method]
+        operation_object = @path_item_object[request_method]
+        return unless operation_object
 
-        Operation.new(@path, request_method, @path_item_object)
+        Operation.new(path, request_method, operation_object)
       end
 
       METHODS = %w[get head post put patch delete trace options].freeze
@@ -31,6 +32,18 @@ module OpenapiFirst
 
       def operations
         @operations ||= @path_item_object.slice(*METHODS).keys.map { |method| operation(method) }
+      end
+
+      %w[query path header cookie].each do |location|
+        define_method("#{location}_parameters") do
+          all_parameters[location]
+        end
+      end
+
+      private
+
+      def all_parameters
+        @all_parameters ||= @path_item_object.fetch('parameters', []).group_by { _1['in'] }.freeze
       end
     end
   end

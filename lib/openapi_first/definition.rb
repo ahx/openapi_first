@@ -62,8 +62,8 @@ module OpenapiFirst
         path_item:,
         operation:,
         path_params:,
-        validator: RequestValidation::Validator.new(operation, schema_builder: self),
-        response_validator: ResponseValidation::Validator.new(operation, openapi_version: @openapi_version)
+        validator: build_request_validator(path_item, operation),
+        response_validator: build_response_validator(operation)
       )
     end
 
@@ -96,6 +96,14 @@ module OpenapiFirst
     end
 
     private
+
+    def build_request_validator(path_item, operation)
+      RequestValidation::Validator.new(path_item, operation, schema_builder: self)
+    end
+
+    def build_response_validator(operation)
+      ResponseValidation::Validator.new(operation, openapi_version: @openapi_version)
+    end
 
     def find_path_item_and_params(request_path)
       simple = path(request_path)
