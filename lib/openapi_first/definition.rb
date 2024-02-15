@@ -93,7 +93,7 @@ module OpenapiFirst
     end
 
     def build_response_validator(operation)
-      ResponseValidation::Validator.new(operation, openapi_version: @openapi_version)
+      ->(response) { ResponseValidation::Validator.new(operation, openapi_version: @openapi_version).call(response) }
     end
 
     def find_path_item_and_params(request_path)
