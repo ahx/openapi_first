@@ -21,16 +21,26 @@ module OpenapiFirst
         @path = path
         @method = request_method
         @operation_object = operation_object
+        @responses = Responses.new(self, operation_object['responses'])
+        @request_body = RequestBody.new(operation_object['requestBody']) if operation_object['requestBody']
+        @all_parameters = operation_object.fetch('parameters', []).group_by { _1['in'] }.freeze
+        @name = "#{method.upcase} #{path} (#{operation_id})".freeze
       end
 
       # @attr_reader [String] path The path of the operation as in the API description.
       attr_reader :path
 
-      # Returns the (downcased) request method of the operation.
+      # @attr_reader [String] method The (downcased) request method of the operation.
       # Example: "get"
-      # @return [String] The request method of the operation.
       attr_reader :method
       alias request_method method
+
+      # @attr_reader [RequestBody, nil] request_body The request body of the operation, or `nil` if not present.
+      attr_reader :request_body
+
+      # @visibility private
+      # @attr_reader [String] A unique name for this operation. Used for generating error messages and as cache key.
+      attr_reader :name
 
       # Returns the operation ID as defined in the API description.
       # @return [String, nil]
@@ -51,12 +61,6 @@ module OpenapiFirst
       # @deprecated Use {#write?} instead.
       def write?
         WRITE_METHODS.include?(method)
-      end
-
-      # Returns the request body definition if defined in the API description.
-      # @return [RequestBody, nil] The request body of the operation, or `nil` if not present.
-      def request_body
-        @request_body ||= RequestBody.new(operation_object['requestBody']) if operation_object['requestBody']
       end
 
       # Checks if a response status is defined for this operation.
@@ -94,15 +98,7 @@ module OpenapiFirst
       IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
       private_constant :IGNORED_HEADERS
 
-      def all_parameters
-        @all_parameters ||= operation_object.fetch('parameters', []).group_by { _1['in'] }.freeze
-      end
-
-      def responses
-        @responses ||= Responses.new(self, operation_object['responses'])
-      end
-
-      attr_reader :operation_object
+      attr_reader :all_parameters, :operation_object, :responses
 
       def build_parameters(parameters, klass)
         klass.new(parameters) if parameters.any?

@@ -42,9 +42,7 @@ module OpenapiFirst
 
       private
 
-      def all_parameters
-        @all_parameters ||= @path_item_object.fetch('parameters', []).group_by { _1['in'] }.freeze
-      end
+      attr_reader :all_parameters
     end
   end
 end
