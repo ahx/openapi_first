@@ -37,6 +37,8 @@ Some redundant methods to validate or inspect requests/responses will be removed
 
 - Fixed handling "binary" format in optional multipart file uploads
 - Cache the resolved OAD. This especially makes things run faster in tests.
+- Refactor: Make Operation, PathItem simpler. Pass validators to RuntimeRequest.
+- Operation#query_parameters, Operation#*_parameters now only returns parameters that are defined on the operation level not on the PathItem. Use PathItem#*_parameters to get those.
 
 ## 1.3.3 (yanked)
 
