@@ -17,11 +17,6 @@ module OpenapiFirst
       @filepath = filepath
       @paths = resolved['paths']
       @openapi_version = detect_version(resolved)
-      @path_items = Hash.new do |hash, pathname|
-        if (path_item_object = @paths[pathname])
-          hash[pathname] = PathItem.new(pathname, path_item_object)
-        end
-      end
     end
 
     # Validates the request against the API description.
@@ -79,7 +74,9 @@ module OpenapiFirst
     # Example:
     #   definition.path('/pets/{id}')
     def path(pathname)
-      @path_items[pathname]
+      return unless @paths.key?(pathname)
+
+      PathItem.new(pathname, @paths[pathname])
     end
 
     def build_schema(schema)
@@ -89,11 +86,13 @@ module OpenapiFirst
     private
 
     def build_request_validator(path_item, operation)
-      RequestValidation::Validator.new(path_item, operation, schema_builder: self)
+      @request_validators ||= Hash.new do |hash, key|
+        hash[key] = RequestValidation::Validator.new(path_item, operation, schema_builder: self)
+      end[operation&.name]
     end
 
     def build_response_validator(operation)
-      ->(response) { ResponseValidation::Validator.new(operation, openapi_version: @openapi_version).call(response) }
+      ResponseValidation::Validator.new(operation, openapi_version: @openapi_version)
     end
 
     def find_path_item_and_params(request_path)
