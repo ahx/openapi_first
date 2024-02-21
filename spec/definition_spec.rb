@@ -54,6 +54,13 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe '#configuration' do
+    it 'returns a frozen configuration' do
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml')
+      expect(definition.configuration).to be_frozen
+    end
+  end
+
   describe '#validate_request' do
     let(:definition) do
       OpenapiFirst.parse({
