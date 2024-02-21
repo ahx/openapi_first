@@ -19,6 +19,7 @@ module OpenapiFirst
       @openapi_version = detect_version(resolved)
       @configuration = OpenapiFirst.configuration.clone
       yield @configuration if block_given?
+      @configuration.freeze
     end
 
     # Validates the request against the API description.
