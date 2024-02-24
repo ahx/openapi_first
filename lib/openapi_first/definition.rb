@@ -9,7 +9,7 @@ module OpenapiFirst
   # Represents an OpenAPI API Description document
   # This is returned by OpenapiFirst.load.
   class Definition
-    attr_reader :filepath, :paths, :openapi_version, :configuration
+    attr_reader :filepath, :paths, :openapi_version, :config
 
     # @param resolved [Hash] The resolved OpenAPI document.
     # @param filepath [String] The file path of the OpenAPI document.
@@ -17,9 +17,9 @@ module OpenapiFirst
       @filepath = filepath
       @paths = resolved['paths']
       @openapi_version = detect_version(resolved)
-      @configuration = OpenapiFirst.configuration.clone
-      yield @configuration if block_given?
-      @configuration.freeze
+      @config = OpenapiFirst.configuration.clone
+      yield @config if block_given?
+      @config.freeze
     end
 
     # Validates the request against the API description.
@@ -28,7 +28,7 @@ module OpenapiFirst
     # @return [RuntimeRequest] The validated request object.
     def validate_request(rack_request, raise_error: false)
       validated = request(rack_request).tap(&:validate)
-      @configuration.call_hook(:after_request_validation, validated)
+      @config.hooks[:after_request_validation]&.each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
       validated
     end
@@ -40,7 +40,7 @@ module OpenapiFirst
     # @return [RuntimeResponse] The validated response object.
     def validate_response(rack_request, rack_response, raise_error: false)
       validated = response(rack_request, rack_response).tap(&:validate)
-      @configuration.call_hook(:after_response_validation, validated)
+      @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
       validated
     end
@@ -86,24 +86,12 @@ module OpenapiFirst
       PathItem.new(pathname, @paths[pathname])
     end
 
-    def build_schema(schema)
-      Schema.new(schema, openapi_version:)
-    end
-
     private
 
     def build_request_validator(path_item, operation)
       @build_request_validator ||= Hash.new do |hash, key|
-        hash[key] = RequestValidation::Validator.new(path_item, operation, schema_builder: self)
+        hash[key] = RequestValidation::Validator.new(path_item, operation, config:, openapi_version:)
       end[operation&.name]
-    end
-
-    def with_hooks(validator, after_hook)
-      lambda do |object|
-        validator.call(object).tap do
-          @configuration.call_hook(after_hook, object)
-        end
-      end
     end
 
     def build_response_validator(operation)

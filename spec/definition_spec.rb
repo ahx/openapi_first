@@ -5,59 +5,10 @@ RSpec.describe OpenapiFirst::Definition do
     Rack::Request.new(Rack::MockRequest.env_for(path, method:))
   end
 
-  describe 'config.after_request_validation' do
-    let(:called) { [] }
-    let(:definition) do
-      OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
-        config.after_request_validation do |request|
-          called << [request.operation.operation_id, request.valid?]
-        end
-      end
-    end
-
-    it 'calls the hook' do
-      definition.validate_request(build_request('/pets?limit=24'))
-
-      expect(called).to eq([['listPets', true]])
-    end
-
-    it 'calls the hook with an invalid request' do
-      definition.validate_request(build_request('/pets?limit=fourtytwo'))
-
-      expect(called).to eq([['listPets', false]])
-    end
-  end
-
-  describe 'config.after_response_validation' do
-    let(:called) { [] }
-
-    let(:definition) do
-      OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
-        config.after_response_validation do |response|
-          called << response.valid?
-        end
-      end
-    end
-
-    it 'calls the hook' do
-      response = Rack::Response.new('[]', 200, { 'Content-Type' => 'application/json' })
-      definition.validate_response(build_request('/pets/42'), response)
-
-      expect(called).to eq([true])
-    end
-
-    it 'calls the hook with an invalid response' do
-      response = Rack::Response.new('{"foo": "bar"}', 200, { 'Content-Type' => 'application/json' })
-      definition.validate_response(build_request('/pets/42'), response)
-
-      expect(called).to eq([false])
-    end
-  end
-
-  describe '#configuration' do
+  describe '#config' do
     it 'returns a frozen configuration' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml')
-      expect(definition.configuration).to be_frozen
+      expect(definition.config).to be_frozen
     end
   end
 

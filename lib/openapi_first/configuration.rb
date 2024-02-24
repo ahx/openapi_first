@@ -6,6 +6,7 @@ module OpenapiFirst
     def initialize
       @request_validation_error_response = OpenapiFirst.find_plugin(:default)::ErrorResponse
       @request_validation_raise_error = false
+      @hooks = {}
     end
 
     attr_reader :request_validation_error_response, :hooks
@@ -17,20 +18,13 @@ module OpenapiFirst
       copy
     end
 
-    def call_hook(hook, arg)
-      return if hooks.nil?
-
-      hooks[hook]&.map do |action|
-        action.call(arg)
-      end
-    end
-
     %i[
       after_request_validation
       after_response_validation
+      after_request_parameter_property_validation
+      after_request_body_property_validation
     ].each do |hook|
       define_method(hook) do |&block|
-        @hooks ||= {}
         @hooks[hook] ||= []
         hooks[hook] << block
       end
