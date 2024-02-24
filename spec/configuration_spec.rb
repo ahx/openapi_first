@@ -4,11 +4,13 @@ RSpec.describe OpenapiFirst::Configuration do
   describe '#after' do
     it 'adds a hook' do
       config = OpenapiFirst::Configuration.new
+      called = []
       config.after_request_validation do |request|
-        request
+        called << request
       end
 
-      expect(config.hooks[:after_request_validation].size).to eq(1)
+      config.hooks[:after_request_validation]&.each { |hook| hook.call('request') }
+      expect(called).to eq(%w[request])
     end
 
     it 'adds multiple actions' do
@@ -21,22 +23,6 @@ RSpec.describe OpenapiFirst::Configuration do
       end
 
       expect(config.hooks[:after_request_validation].size).to eq(2)
-    end
-  end
-
-  describe '#call_hook' do
-    it 'calls the configured action' do
-      config = OpenapiFirst::Configuration.new
-      config.after_request_validation do |request|
-        request
-      end
-
-      expect(config.call_hook(:after_request_validation, 'request')).to eq(['request'])
-    end
-
-    it 'does nothing if no hook is setup' do
-      config = OpenapiFirst::Configuration.new
-      expect(config.call_hook(:after_request_validation, 'request')).to be_nil
     end
   end
 
@@ -53,9 +39,9 @@ RSpec.describe OpenapiFirst::Configuration do
 
     it 'clones empty configs' do
       config = OpenapiFirst::Configuration.new
-      expect(config.hooks).to eq(nil)
+      expect(config.hooks).to be_empty
       cloned = config.clone
-      expect(cloned.hooks).to eq(nil)
+      expect(cloned.hooks).to be_empty
     end
   end
 end

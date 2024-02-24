@@ -7,10 +7,11 @@ module OpenapiFirst
   module RequestValidation
     # Validates a RuntimeRequest against an Operation.
     class Validator
-      def initialize(path_item, operation, schema_builder:)
+      def initialize(path_item, operation, config:, openapi_version:)
         @path_item = path_item
         @operation = operation
-        @schema_builder = schema_builder
+        @config = config
+        @openapi_version = openapi_version
         @validators = []
         @validators << method(:validate_path_params!) if path_parameters
         @validators << method(:validate_query_params!) if query_parameters
@@ -29,7 +30,7 @@ module OpenapiFirst
 
       private
 
-      attr_reader :operation, :path_item, :raw_path_params
+      attr_reader :operation, :path_item, :config, :openapi_version
 
       def validate_defined(request)
         return if request.known?
@@ -98,26 +99,26 @@ module OpenapiFirst
       def validate_request_body!(request)
         return unless operation.request_body
 
-        RequestBodyValidator.new(operation.request_body, schema_builder: @schema_builder)
+        RequestBodyValidator.new(operation.request_body, openapi_version:, config:)
                             .validate!(request.body, request.content_type)
       rescue ParseError => e
         Failure.fail!(:invalid_body, message: e.message)
       end
 
-      def build_parameters_schema(parameters)
+      def build_parameters_schema(parameters) # rubocop:disable Metrics/AbcSize
         return unless parameters&.any?
 
-        init_schema = {
-          'type' => 'object',
-          'properties' => {},
-          'required' => []
-        }
-        schema = parameters.each_with_object(init_schema) do |parameter_def, result|
+        schema = parameters.each_with_object({
+                                               'type' => 'object',
+                                               'properties' => {},
+                                               'required' => []
+                                             }) do |parameter_def, result|
           parameter = OpenapiParameters::Parameter.new(parameter_def)
           result['properties'][parameter.name] = parameter.schema if parameter.schema
           result['required'] << parameter.name if parameter.required?
         end
-        @schema_builder.build_schema(schema)
+        after_property_validation = config.hooks[:after_request_parameter_property_validation]
+        Schema.new(schema, openapi_version:, after_property_validation:)
       end
     end
   end

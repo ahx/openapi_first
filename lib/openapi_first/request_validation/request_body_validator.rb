@@ -5,9 +5,10 @@ require_relative '../failure'
 module OpenapiFirst
   module RequestValidation
     class RequestBodyValidator # :nodoc:
-      def initialize(request_body, schema_builder:)
+      def initialize(request_body, openapi_version:, config:)
         @request_body = request_body
-        @schema_builder = schema_builder
+        @openapi_version = openapi_version
+        @config = config
       end
 
       def validate!(parsed_request_body, request_content_type)
@@ -27,7 +28,7 @@ module OpenapiFirst
 
       private
 
-      attr_reader :operation
+      attr_reader :operation, :config, :openapi_version
 
       def schema_for(content_type)
         @schema_for ||= {}
@@ -35,7 +36,8 @@ module OpenapiFirst
           schema = @request_body.schema_for(content_type)
           return unless schema
 
-          @schema_for[content_type] = @schema_builder.build_schema(schema)
+          after_property_validation = config.hooks[:after_request_body_property_validation]
+          @schema_for[content_type] = Schema.new(schema, openapi_version:, after_property_validation:)
         end
       end
 
