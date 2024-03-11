@@ -113,7 +113,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#name' do
     it 'returns a human readable name' do
-      expect(operation.name).to eq 'GET /pets/{pet_id} (get_pet)'
+      expect(operation.name).to eq 'GET /pets/{pet_id}'
     end
   end
 

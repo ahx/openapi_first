@@ -22,8 +22,10 @@ module OpenapiFirst
     # @attr_reader [String] content_type The content_type of the Rack::Response.
     def_delegators :@rack_response, :status, :content_type
 
-    # @attr_reader [String] name The name of the operation. Used for generating error messages.
-    def_delegators :@operation, :name # @visibility private
+    # @return [String] name The name of the operation. Used for generating error messages.
+    def name
+      "#{@operation.name} response status: #{status}"
+    end
 
     # Checks if the response is valid. Runs the validation unless it has been run before.
     # @return [Boolean]
