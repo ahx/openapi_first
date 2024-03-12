@@ -168,7 +168,7 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
 
   describe '#name' do
     it 'returns a name to identify the operation' do
-      expect(response.name).to eq('GET /pets/{petId} (showPetById)')
+      expect(response.name).to eq('GET /pets/{petId} response status: 200')
     end
   end
 

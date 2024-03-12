@@ -95,7 +95,7 @@ module OpenapiFirst
       # Returns a unique name for this operation. Used for generating error messages.
       # @visibility private
       def name
-        @name ||= "#{method.upcase} #{path} (#{operation_id})"
+        @name ||= "#{method.upcase} #{path}"
       end
 
       # Returns the path parameters of the operation.
