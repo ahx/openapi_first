@@ -69,6 +69,14 @@ RSpec.describe 'Request body validation' do
       expect(uploaded_file).to eq File.read(fixture_path('foo.txt'))
     end
 
+    it 'succeeds without optional file upload' do
+      header Rack::CONTENT_TYPE,  'multipart/form-data'
+      post '/multipart-with-file', 'petId' => '12'
+      expect(last_response.status).to eq(200)
+
+      expect(last_request.env[OpenapiFirst::REQUEST].body['petId']).to eq('12')
+    end
+
     it 'supports text/plain content type' do
       header Rack::CONTENT_TYPE, 'text/plain'
       post path, 'Cat!'
