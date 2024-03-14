@@ -10,21 +10,6 @@ RSpec.describe 'Request body validation' do
     '/pets'
   end
 
-  def multipart_file_upload(url, http_method, filename, boundary = Rack::Multipart::MULTIPART_BOUNDARY)
-    path = fixture_path(filename)
-    file = Rack::Multipart::UploadedFile.new(path)
-    data = Rack::Multipart.build_multipart('file' => file)
-    env = Rack::MockRequest.env_for(
-      url,
-      'CONTENT_TYPE' => "multipart/form-data; boundary=#{boundary}",
-      'CONTENT_LENGTH' => data.length.to_s,
-      method: http_method,
-      input: StringIO.new(data)
-    )
-
-    [env, File.binread(path)]
-  end
-
   def fixture_path(name)
     Pathname.new(Dir.pwd).join('spec', 'data', name).realpath
   end
@@ -75,12 +60,13 @@ RSpec.describe 'Request body validation' do
     end
 
     it 'succeeds with multipart form data file binary upload' do
-      env, file_content = multipart_file_upload('/multipart-with-file', 'POST', 'foo.txt')
-      status, _headers, body = app.call(env)
+      uploaded_file = Rack::Test::UploadedFile.new(fixture_path('foo.txt'))
 
-      expect(status).to eq(200), body
-      uploaded_file = env[OpenapiFirst::REQUEST].body['file']
-      expect(uploaded_file).to eq file_content
+      post '/multipart-with-file', 'file' => uploaded_file
+      expect(last_response.status).to eq(200)
+
+      uploaded_file = last_request.env[OpenapiFirst::REQUEST].body['file']
+      expect(uploaded_file).to eq File.read(fixture_path('foo.txt'))
     end
 
     it 'supports text/plain content type' do
