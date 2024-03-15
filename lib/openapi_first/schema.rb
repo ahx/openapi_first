@@ -42,7 +42,7 @@ module OpenapiFirst
     def binary_format(data, property, property_schema, _parent)
       return unless property_schema.is_a?(Hash) && property_schema['format'] == 'binary'
 
-      data[property] = data[property][:tempfile].read
+      data[property] = data.dig(property, :tempfile)&.read if data[property]
     end
   end
 end
