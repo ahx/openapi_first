@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 1.3.3
+
+- Fixed handling "binary" format in optional multipart file uploads
 - Cache the resolved OAD. This especially makes things run faster in tests.
 
 ## 1.3.2
