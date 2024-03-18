@@ -270,6 +270,46 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
         expect(subject.path_parameters).to eq({})
       end
     end
+
+    context 'with kebab-case path params' do
+      let(:definition) do
+        OpenapiFirst.parse({
+                             'openapi' => '3.1.0',
+                             'paths' => {
+                               '/stuff/{ke-bab}/{under_score}' => {
+                                 'get' => {
+                                   'parameters' => [
+                                     {
+                                       'name' => 'ke-bab',
+                                       'in' => 'path',
+                                       'required' => true,
+                                       'schema' => {
+                                         'type' => 'string'
+                                       }
+                                     }, {
+                                       'name' => 'under_score',
+                                       'in' => 'path',
+                                       'required' => true,
+                                       'schema' => {
+                                         'type' => 'string'
+                                       }
+                                     }
+                                   ]
+                                 }
+                               }
+                             }
+                           })
+      end
+
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/stuff/one/two'))
+      end
+
+      it 'parses path parameters' do
+        expect(subject.path_parameters['ke-bab']).to eq('one')
+        expect(subject.path_parameters['under_score']).to eq('two')
+      end
+    end
   end
 
   describe '#query' do
