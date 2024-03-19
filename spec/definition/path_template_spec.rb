@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::PathTemplate do
+RSpec.describe OpenapiFirst::Definition::PathTemplate do
   describe '#match' do
     it 'returns empty params with exact string match' do
       expect(described_class.new('/a/b').match('/a/b')).to eq({})

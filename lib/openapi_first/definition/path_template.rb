@@ -1,35 +1,40 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  # @visibility private
-  class PathTemplate
-    def initialize(template)
-      @template = template
-      @names = template.scan(NAMES_PAT).flatten
-      parts = template.split(CURLIES_PAT).map! do |part|
-        if part.start_with?('{')
-          part.sub(/{.*?}/, '([^/?#]+)')
-        else
-          Regexp.escape(part)
-        end
+  class Definition
+    # @visibility private
+    class PathTemplate
+      # See also https://spec.openapis.org/oas/v3.1.0#path-templating
+      TEMPLATE_EXPRESSION = /(\{[^}]+\})/
+      TEMPLATE_EXPRESSION_NAME = /\{([^}]+)\}/
+      ALLOWED_PARAMETER_CHARACTERS = %r{([^/?#]+)}
+
+      def initialize(template)
+        @template = template
+        @names = template.scan(TEMPLATE_EXPRESSION_NAME).flatten
+        @pattern = build_pattern(template)
       end
-      @pattern = %r{^#{parts.join}/?$}
-    end
 
-    CURLIES_PAT = /(\{[^}]+\})/
-    NAMES_PAT = /\{([^}]+)\}/
+      def match(path)
+        return {} if path == @template
+        return if @names.empty?
 
-    def match(path)
-      return {} if path == @template
-      return if @names.empty?
+        matches = path.match(@pattern)
+        return unless matches
 
-      matches = path.match(@pattern)
-      return unless matches
+        values = matches.captures
+        @names.zip(values).to_h
+      end
 
-      values = matches.captures
-      return if values.length != @names.length
+      private
 
-      @names.zip(values).to_h
+      def build_pattern(template)
+        parts = template.split(TEMPLATE_EXPRESSION).map! do |part|
+          part.start_with?('{') ? ALLOWED_PARAMETER_CHARACTERS : Regexp.escape(part)
+        end
+
+        %r{^#{parts.join}/?$}
+      end
     end
   end
 end
