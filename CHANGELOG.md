@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added support for `/some/{kebab-cased}` path parameters ([#245](https://github.com/ahx/openapi_first/issues/245))
+
 ## 1.3.4
 
 - Fixed handling "binary" format in optional multipart file uploads

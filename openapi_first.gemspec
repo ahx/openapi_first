@@ -26,7 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'hana', '~> 1.3'
   spec.add_runtime_dependency 'json_schemer', '~> 2.1.0'
   spec.add_runtime_dependency 'multi_json', '~> 1.15'
-  spec.add_runtime_dependency 'mustermann', '~> 3.0.0'
   spec.add_runtime_dependency 'openapi_parameters', '>= 0.3.2', '< 2.0'
   spec.add_runtime_dependency 'rack', '>= 2.2', '< 4.0'
 end
