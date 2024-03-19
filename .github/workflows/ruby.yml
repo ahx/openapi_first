@@ -20,4 +20,5 @@ jobs:
           ruby-version: "3.1"
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - run: BUNDLE_GEMFILE=Gemfile bundle exec rake
-      - run: BUNDLE_GEMFILE=Gemfile.rack2 bundle lock --add-platform x86_64-linux && bundle exec rake
+      - run: BUNDLE_GEMFILE=Gemfile.rack2 bundle lock --add-platform x86_64-linux && BUNDLE_GEMFILE=Gemfile.rack2 bundle exec rake
+      - run: BUNDLE_GEMFILE=Gemfile.rails6 bundle lock --add-platform x86_64-linux && BUNDLE_GEMFILE=Gemfile.rails6 bundle exec rake

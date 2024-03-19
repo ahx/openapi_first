@@ -24,12 +24,16 @@ module OpenapiFirst
       def call(env)
         request = find_request(env)
         status, headers, body = @app.call(env)
-        body = body.to_ary if body.respond_to?(:to_ary)
+        body = read_body(body)
         request.validate_response(Rack::Response[status, headers, body], raise_error: true)
         [status, headers, body]
       end
 
       private
+
+      def read_body(body)
+        body.to_ary if body.respond_to?(:to_ary)
+      end
 
       def find_request(env)
         env[REQUEST] ||= @definition.request(Rack::Request.new(env))
