@@ -276,7 +276,7 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
         OpenapiFirst.parse({
                              'openapi' => '3.1.0',
                              'paths' => {
-                               '/stuff/{ke-bab}/{under_score}' => {
+                               '/ke-bab/{ke-bab}/{under_score}' => {
                                  'get' => {
                                    'parameters' => [
                                      {
