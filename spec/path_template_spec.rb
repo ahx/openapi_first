@@ -19,7 +19,6 @@ RSpec.describe OpenapiFirst::PathTemplate do
         .to eq({ 'ke-bab' => '1', 'under_score' => '2' })
     end
 
-
     it 'returns params where variable is in the middle' do
       expect(described_class.new('/stuff/{id}/things').match('/stuff/42/things')).to eq({ 'id' => '42' })
     end

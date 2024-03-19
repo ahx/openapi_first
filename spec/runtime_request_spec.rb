@@ -302,7 +302,7 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
       end
 
       let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/stuff/one/two'))
+        Rack::Request.new(Rack::MockRequest.env_for('/ke-bab/one/two'))
       end
 
       it 'parses path parameters' do
