@@ -9,7 +9,7 @@ RSpec.describe OpenapiFirst::Configuration do
         called << request
       end
 
-      config.hooks[:after_request_validation]&.each { |hook| hook.call('request') }
+      config.hooks[:after_request_validation].each { |hook| hook.call('request') }
       expect(called).to eq(%w[request])
     end
 
