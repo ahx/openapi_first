@@ -16,14 +16,6 @@ RSpec.describe OpenapiFirst do
 
   let(:spec_path) { './spec/data/petstore-expanded.yaml' }
 
-  let(:namespace) do
-    Module.new do
-      def self.update_pet(_params, _res)
-        'updated'
-      end
-    end
-  end
-
   let(:request_body) do
     {
       'type' => 'pet',
