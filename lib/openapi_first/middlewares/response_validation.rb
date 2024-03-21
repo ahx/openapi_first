@@ -32,7 +32,11 @@ module OpenapiFirst
       private
 
       def read_body(body)
-        body.to_ary if body.respond_to?(:to_ary)
+        return body.to_ary if body.respond_to?(:to_ary)
+
+        result = []
+        body.each { |part| result << part }
+        result
       end
 
       def find_request(env)
