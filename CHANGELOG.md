@@ -4,7 +4,7 @@
 
 ## 1.3.6
 
-- FIx Rack 2 / Rails 6 compatibility ([#246](https://github.com/ahx/openapi_first/issues/246)
+- Fix Rack 2 / Rails 6 compatibility ([#246](https://github.com/ahx/openapi_first/issues/246)
 
 ## 1.3.5
 
