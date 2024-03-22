@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Make it work with Rack 2 / Rails 6
+
 ## 1.3.5
 
 - Added support for `/some/{kebab-cased}` path parameters ([#245](https://github.com/ahx/openapi_first/issues/245))
