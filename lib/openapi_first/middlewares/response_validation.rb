@@ -22,9 +22,9 @@ module OpenapiFirst
       attr_reader :app
 
       def call(env)
-        request = find_request(env)
         status, headers, body = @app.call(env)
         body = read_body(body)
+        request = find_request(env)
         request.validate_response(Rack::Response[status, headers, body], raise_error: true)
         [status, headers, body]
       end

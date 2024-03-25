@@ -26,12 +26,6 @@ RSpec.describe OpenapiFirst::ResponseValidation do
   end
   let(:response) { Rack::Response.new(response_body, status, headers) }
 
-  it 'adds request to env ' do
-    get '/pets'
-
-    expect(last_request.env[OpenapiFirst::REQUEST]).to be_a OpenapiFirst::RuntimeRequest
-  end
-
   context 'with a valid response' do
     it 'returns no errors' do
       get '/pets'

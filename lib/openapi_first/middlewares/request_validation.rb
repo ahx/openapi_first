@@ -26,19 +26,15 @@ module OpenapiFirst
       attr_reader :app
 
       def call(env)
-        request = find_request(env)
-        failure = request.validate
-        failure.raise! if failure && @raise
+        validated = @definition.validate_request(Rack::Request.new(env), raise_error: @raise)
+        env[REQUEST] = validated
+        failure = validated.error
         return @error_response_class.new(failure:).render if failure
 
         @app.call(env)
       end
 
       private
-
-      def find_request(env)
-        env[REQUEST] ||= @definition.request(Rack::Request.new(env))
-      end
 
       def error_response(mod)
         return OpenapiFirst.find_plugin(mod)::ErrorResponse if mod.is_a?(Symbol)

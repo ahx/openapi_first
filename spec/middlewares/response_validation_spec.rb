@@ -25,11 +25,6 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
       expect(last_response.status).to eq 200
     end
-
-    it 'adds request to env ' do
-      get '/pets'
-      expect(last_request.env[OpenapiFirst::REQUEST]).to be_a OpenapiFirst::RuntimeRequest
-    end
   end
 
   context 'when response is invalid' do

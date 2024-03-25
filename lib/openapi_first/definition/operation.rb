@@ -23,7 +23,6 @@ module OpenapiFirst
         @operation_object = operation_object
         @responses = Responses.new(self, operation_object['responses'])
         @request_body = RequestBody.new(operation_object['requestBody']) if operation_object['requestBody']
-        @all_parameters = operation_object.fetch('parameters', []).group_by { _1['in'] }.freeze
       end
 
       # @attr_reader [String] path The path of the operation as in the API description.
@@ -93,7 +92,11 @@ module OpenapiFirst
       IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
       private_constant :IGNORED_HEADERS
 
-      attr_reader :all_parameters, :operation_object, :responses
+      attr_reader :operation_object, :responses
+
+      def all_parameters
+        @all_parameters ||= operation_object.fetch('parameters', []).group_by { _1['in'] }.freeze
+      end
 
       def build_parameters(parameters, klass)
         klass.new(parameters) if parameters.any?
