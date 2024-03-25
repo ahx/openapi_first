@@ -8,8 +8,33 @@ module OpenapiFirst
       @request_validation_raise_error = false
     end
 
-    attr_reader :request_validation_error_response
+    attr_reader :request_validation_error_response, :hooks
     attr_accessor :request_validation_raise_error
+
+    def clone
+      copy = super
+      copy.instance_variable_set(:@hooks, @hooks&.transform_values(&:clone))
+      copy
+    end
+
+    def call_hook(hook, arg)
+      return if hooks.nil?
+
+      hooks[hook]&.map do |action|
+        action.call(arg)
+      end
+    end
+
+    %i[
+      after_request_validation
+      after_response_validation
+    ].each do |hook|
+      define_method(hook) do |&block|
+        @hooks ||= {}
+        @hooks[hook] ||= []
+        hooks[hook] << block
+      end
+    end
 
     def request_validation_error_response=(mod)
       @request_validation_error_response = if mod.is_a?(Symbol)

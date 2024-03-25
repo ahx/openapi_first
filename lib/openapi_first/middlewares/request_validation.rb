@@ -29,6 +29,7 @@ module OpenapiFirst
         validated = @definition.validate_request(Rack::Request.new(env), raise_error: @raise)
         env[REQUEST] ||= validated
         failure = validated.error
+        failure.raise! if failure && @raise
         return @error_response_class.new(failure:).render if failure
 
         @app.call(env)
