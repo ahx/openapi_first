@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-- Add :after_request_validation, :after_response_validation hooks
-- Add :after_request_body_property_validation, :after_request_parameter_property_validation
+- Add hooks:
+  - after_request_validation
+  - after_response_validation
+  - after_request_body_property_validation
+  - after_request_parameter_property_validation
 
 ## 1.3.6
 
@@ -17,7 +20,6 @@
 
 - Fixed handling "binary" format in optional multipart file uploads
 - Cache the resolved OAD. This especially makes things run faster in tests.
-- Refactor: Make Operation, PathItem simpler. Pass validators to RuntimeRequest.
 - Operation#query_parameters, Operation#_\_parameters now only returns parameters that are defined on the operation level not on the PathItem. Use PathItem#_\_parameters to get those.
 
 ## 1.3.3 (yanked)
