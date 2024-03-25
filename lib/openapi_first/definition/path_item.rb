@@ -14,6 +14,7 @@ module OpenapiFirst
         @path = path
         @path_item_object = path_item_object
         @path_template = PathTemplate.new(path)
+        @all_parameters = @path_item_object.fetch('parameters', []).group_by { _1['in'] }.freeze
       end
 
       attr_reader :path
