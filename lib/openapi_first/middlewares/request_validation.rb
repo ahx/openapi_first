@@ -27,8 +27,6 @@ module OpenapiFirst
 
       def call(env)
         request = find_request(env)
-        return @app.call(env) unless request
-
         failure = request.validate
         failure.raise! if failure && @raise
         return @error_response_class.new(failure:).render if failure

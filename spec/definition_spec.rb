@@ -1,10 +1,57 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-
 RSpec.describe OpenapiFirst::Definition do
   def build_request(path, method: 'GET')
     Rack::Request.new(Rack::MockRequest.env_for(path, method:))
+  end
+
+  describe 'config.after_request_validation' do
+    let(:called) { [] }
+    let(:definition) do
+      OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+        config.after_request_validation do |request|
+          called << [request.operation.operation_id, request.valid?]
+        end
+      end
+    end
+
+    it 'calls the hook' do
+      definition.validate_request(build_request('/pets?limit=24'))
+
+      expect(called).to eq([['listPets', true]])
+    end
+
+    it 'calls the hook with an invalid request' do
+      definition.validate_request(build_request('/pets?limit=fourtytwo'))
+
+      expect(called).to eq([['listPets', false]])
+    end
+  end
+
+  describe 'config.after_response_validation' do
+    let(:called) { [] }
+
+    let(:definition) do
+      OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+        config.after_response_validation do |response|
+          called << response.valid?
+        end
+      end
+    end
+
+    it 'calls the hook' do
+      response = Rack::Response.new('[]', 200, { 'Content-Type' => 'application/json' })
+      definition.validate_response(build_request('/pets/42'), response)
+
+      expect(called).to eq([true])
+    end
+
+    it 'calls the hook with an invalid response' do
+      response = Rack::Response.new('{"foo": "bar"}', 200, { 'Content-Type' => 'application/json' })
+      definition.validate_response(build_request('/pets/42'), response)
+
+      expect(called).to eq([false])
+    end
   end
 
   describe '#validate_request' do

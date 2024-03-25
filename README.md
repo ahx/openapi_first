@@ -13,6 +13,8 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
   - [Validate request](#validate-request)
   - [Validate response](#validate-response)
 - [Configuration](#configuration)
+  - [Hooks](#hooks)
+  - [Defaults](#defaults)
 - [Framework integration](#framework-integration)
 - [Alternatives](#alternatives)
 - [Development](#development)
@@ -161,7 +163,7 @@ definition = OpenapiFirst.load('openapi.yaml')
 rack_request = Rack::Request.new(env)
 request = definition.validate_request(rack_request)
 # Or raise an exception if validation fails:
-request = definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if request is invalid
+definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if request is invalid
 
 # Inspect the request and access parsed parameters
 request.known? # Is the request defined in the API description?
@@ -176,6 +178,8 @@ request.cookies
 request.content_type
 request.request_method # => "get"
 request.path # => "/pets/42"
+request.operation.operation_id # => "showPetById"
+request.definition.filepath # => '/absolute/path/openapi.yaml'
 ```
 
 ### Validate response
@@ -203,6 +207,37 @@ response.content_type
 OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
 ## Configuration
+
+### Hooks
+
+You can integrate your code at certain points during request/response validation via hooks.
+
+Available hooks:
+- after_request_validation
+- after_response_validation
+
+Setup per per instance:
+
+```ruby
+OpenapiFirst.load('openapi.yaml') do |config|
+  config.after_response_validation do |response, validation_result|
+    # validation.
+    # response.operation
+  end
+end
+```
+
+Setup globally:
+
+```ruby
+OpenapiFirst.configure do |config|
+  config.after_response_validation do |response|
+    # response.valid?
+  end
+end
+```
+
+### Defaults
 
 You can configure default options globally:
 

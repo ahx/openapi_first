@@ -24,7 +24,6 @@ module OpenapiFirst
         @responses = Responses.new(self, operation_object['responses'])
         @request_body = RequestBody.new(operation_object['requestBody']) if operation_object['requestBody']
         @all_parameters = operation_object.fetch('parameters', []).group_by { _1['in'] }.freeze
-        @name = "#{method.upcase} #{path} (#{operation_id})".freeze
       end
 
       # @attr_reader [String] path The path of the operation as in the API description.
@@ -37,10 +36,6 @@ module OpenapiFirst
 
       # @attr_reader [RequestBody, nil] request_body The request body of the operation, or `nil` if not present.
       attr_reader :request_body
-
-      # @visibility private
-      # @attr_reader [String] A unique name for this operation. Used for generating error messages and as cache key.
-      attr_reader :name
 
       # Returns the operation ID as defined in the API description.
       # @return [String, nil]
