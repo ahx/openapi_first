@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Add hooks:
+### New Features
+
+- Hooks:
   - after_request_validation
   - after_response_validation
   - after_request_body_property_validation
@@ -10,7 +12,7 @@
 
 ## 1.3.6
 
-- Fix Rack 2 / Rails 6 compatibility ([#246](https://github.com/ahx/openapi_first/issues/246)
+- Fixed Rack 2 / Rails 6 compatibility ([#246](https://github.com/ahx/openapi_first/issues/246)
 
 ## 1.3.5
 
@@ -20,7 +22,7 @@
 
 - Fixed handling "binary" format in optional multipart file uploads
 - Cache the resolved OAD. This especially makes things run faster in tests.
-- Operation#query_parameters, Operation#_\_parameters now only returns parameters that are defined on the operation level not on the PathItem. Use PathItem#_\_parameters to get those.
+- Internally used `Operation#query_parameters`, `Operation#path_parameters` etc. now only returns parameters that are defined on the operation level not on the PathItem. Use `PathItem#query_parameters` to get those.
 
 ## 1.3.3 (yanked)
 
