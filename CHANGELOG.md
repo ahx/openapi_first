@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-- Add :after_request_validation, :after_response_validation hooks
-- Add :after_request_body_property_validation, :after_request_parameter_property_validation
+- Add hooks:
+  - after_request_validation
+  - after_response_validation
+  - after_request_body_property_validation
+  - after_request_parameter_property_validation
 
 ## 1.4.3
 

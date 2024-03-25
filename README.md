@@ -213,8 +213,10 @@ OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 You can integrate your code at certain points during request/response validation via hooks.
 
 Available hooks:
-- after_request_validation
-- after_response_validation
+- `after_request_validation`
+- `after_response_validation`
+- `after_request_parameter_property_validation`
+- `after_request_body_property_validation`
 
 Setup per per instance:
 
@@ -231,8 +233,8 @@ Setup globally:
 
 ```ruby
 OpenapiFirst.configure do |config|
-  config.after_response_validation do |response|
-    # response.valid?
+  config.after_request_parameter_property_validation do |data, property, property_schema|
+    data[property] = Date.iso8601(data[property]) if propert_schema['format'] == 'date'
   end
 end
 ```
