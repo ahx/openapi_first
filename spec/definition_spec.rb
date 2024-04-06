@@ -158,7 +158,7 @@ RSpec.describe OpenapiFirst::Definition do
         operation_id = runtime_request.operation_id
 
         expect(operation_id).to eq 'info_date'
-        expect(runtime_request.params['date']).to eq('2020-01-01')
+        expect(runtime_request.path_parameters['date']).to eq('2020-01-01')
       end
 
       it 'supports /{start_date}..{end_date}' do
@@ -166,15 +166,15 @@ RSpec.describe OpenapiFirst::Definition do
         operation_id = runtime_request.operation_id
         expect(operation_id).to eq 'info_date_range'
 
-        expect(runtime_request.params['start_date']).to eq('2020-01-01')
-        expect(runtime_request.params['end_date']).to eq('2020-01-02')
+        expect(runtime_request.path_parameters['start_date']).to eq('2020-01-01')
+        expect(runtime_request.path_parameters['end_date']).to eq('2020-01-02')
       end
 
       it 'still works without parameters' do
         runtime_request = definition.request(build_request('/info'))
         operation_id = runtime_request.operation_id
         expect(operation_id).to eq 'info'
-        expect(runtime_request.params).to be_empty
+        expect(runtime_request.path_parameters).to be_empty
       end
     end
 
@@ -199,18 +199,6 @@ RSpec.describe OpenapiFirst::Definition do
         expect(definition.request(rack_request)).to be_known_path
         expect(definition.request(rack_request).operation_id).to eq('showPetById')
       end
-    end
-  end
-
-  describe '#response' do
-    let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
-    let(:request) { build_request('/pets') }
-    let(:response) { Rack::Response.new('', 200, { 'Content-Type' => 'application/json' }) }
-
-    it 'returns a Definition::RuntimeResponse' do
-      result = definition.response(request, response)
-      expect(result).to be_a(OpenapiFirst::RuntimeResponse)
-      expect(result.description).to eq('A paged array of pets')
     end
   end
 

@@ -16,8 +16,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
   let(:response) do
     OpenapiFirst::RuntimeResponse.new(
       operation,
-      rack_response,
-      validator: subject
+      rack_response
     )
   end
 

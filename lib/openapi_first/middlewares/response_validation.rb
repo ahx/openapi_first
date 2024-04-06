@@ -24,8 +24,9 @@ module OpenapiFirst
       def call(env)
         status, headers, body = @app.call(env)
         body = read_body(body)
-        @definition.validate_response(Rack::Request.new(env), Rack::Response[status, headers, body], raise_error: true)
-        env[REQUEST] ||= @definition.request(Rack::Request.new(env))
+        request = Rack::Request.new(env)
+        env[REQUEST] = @definition.request(Rack::Request.new(env))
+        @definition.validate_response(request, Rack::Response[status, headers, body], raise_error: true)
         [status, headers, body]
       end
 

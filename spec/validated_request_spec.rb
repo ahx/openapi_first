@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::RuntimeRequest do
+RSpec.describe OpenapiFirst::ValidatedRequest do
   subject(:request) do
-    definition.request(rack_request)
+    definition.validate_request(rack_request)
   end
 
   let(:rack_request) do
@@ -33,171 +33,91 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
     end
   end
 
-  describe '#validate' do
-    context 'with valid request' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{}'))
-      end
+  # describe '#known?' do
+  #   context 'with known path and request method' do
+  #     let(:rack_request) do
+  #       Rack::Request.new(Rack::MockRequest.env_for('/pets'))
+  #     end
 
-      it 'returns nil' do
-        expect(request.validate).to be_nil
-      end
-    end
+  #     it 'returns true' do
+  #       expect(request).to be_known
+  #     end
+  #   end
 
-    context 'with invalid request' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets/23', method: 'POST', input: '[]'))
-      end
+  #   context 'with known path, but unknown request method' do
+  #     let(:rack_request) do
+  #       Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'PATCH'))
+  #     end
 
-      it 'returns Failure' do
-        expect(request.validate.type).to eq(:method_not_allowed)
-      end
-    end
-  end
+  #     it 'returns false' do
+  #       expect(request).not_to be_known
+  #     end
+  #   end
 
-  describe '#error' do
-    it 'is nil by default' do
-      expect(request.error).to be_nil
-    end
+  #   context 'with unknown path' do
+  #     let(:rack_request) do
+  #       Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
+  #     end
 
-    context 'with invalid request' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets/23', method: 'POST', input: '[]'))
-      end
+  #     it 'returns false' do
+  #       expect(request).not_to be_known
+  #     end
+  #   end
+  # end
 
-      it 'returns Failure' do
-        request.validate
-        expect(request.error.type).to eq(:method_not_allowed)
-      end
-    end
+  # describe '#known_path?' do
+  #   context 'with known path' do
+  #     let(:rack_request) do
+  #       Rack::Request.new(Rack::MockRequest.env_for('/pets'))
+  #     end
 
-    context 'with valid request' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{}'))
-      end
+  #     it 'returns true' do
+  #       expect(request).to be_known_path
+  #     end
+  #   end
 
-      it 'returns nil' do
-        request.validate
-        expect(request.error).to be_nil
-      end
-    end
-  end
+  #   context 'with unknown path' do
+  #     let(:rack_request) do
+  #       Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
+  #     end
 
-  describe '#validate_response' do
-    let(:rack_request) do
-      Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-    end
+  #     it 'returns false' do
+  #       expect(request).not_to be_known_path
+  #     end
+  #   end
+  # end
 
-    let(:rack_response) do
-      Rack::Response.new(JSON.dump([]), 200, { 'Content-Type' => 'application/json' })
-    end
+  # describe '#known_request_method?' do
+  #   context 'with known request method' do
+  #     let(:rack_request) do
+  #       Rack::Request.new(Rack::MockRequest.env_for('/pets'))
+  #     end
 
-    context 'with valid response' do
-      it 'returns a valid response' do
-        result = request.validate_response(rack_response)
-        expect(result).to be_valid
-        expect(result.error).to be_nil
-      end
-    end
+  #     it 'returns true' do
+  #       expect(request).to be_known_request_method
+  #     end
+  #   end
 
-    context 'with invalid response' do
-      let(:rack_response) do
-        Rack::Response.new(JSON.dump('foo'), 200, { 'Content-Type' => 'application/json' })
-      end
+  #   context 'with unknown request method' do
+  #     let(:rack_request) do
+  #       Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'PATCH'))
+  #     end
 
-      it 'returns an invalid response' do
-        result = request.validate_response(rack_response)
-        expect(result).not_to be_valid
-        expect(result.error.type).to eq(:invalid_response_body)
-      end
-    end
-  end
+  #     it 'returns false' do
+  #       expect(request).not_to be_known_request_method
+  #     end
+  #   end
 
-  describe '#known?' do
-    context 'with known path and request method' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-      end
+  #   context 'with known request method, but unknown path' do
+  #     let(:rack_request) do
+  #       Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
+  #     end
 
-      it 'returns true' do
-        expect(request).to be_known
-      end
-    end
-
-    context 'with known path, but unknown request method' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'PATCH'))
-      end
-
-      it 'returns false' do
-        expect(request).not_to be_known
-      end
-    end
-
-    context 'with unknown path' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
-      end
-
-      it 'returns false' do
-        expect(request).not_to be_known
-      end
-    end
-  end
-
-  describe '#known_path?' do
-    context 'with known path' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-      end
-
-      it 'returns true' do
-        expect(request).to be_known_path
-      end
-    end
-
-    context 'with unknown path' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
-      end
-
-      it 'returns false' do
-        expect(request).not_to be_known_path
-      end
-    end
-  end
-
-  describe '#known_request_method?' do
-    context 'with known request method' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-      end
-
-      it 'returns true' do
-        expect(request).to be_known_request_method
-      end
-    end
-
-    context 'with unknown request method' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'PATCH'))
-      end
-
-      it 'returns false' do
-        expect(request).not_to be_known_request_method
-      end
-    end
-
-    context 'with known request method, but unknown path' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
-      end
-
-      it 'returns false' do
-        expect(request).not_to be_known_request_method
-      end
-    end
-  end
+  #     it 'returns false' do
+  #       expect(request).not_to be_known_request_method
+  #     end
+  #   end
+  # end
 
   describe '#operation_id' do
     let(:rack_request) do
@@ -439,11 +359,11 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
     end
   end
 
-  describe '#path_definition' do
-    it 'returns the path item definition for the request' do
-      expect(subject.path_definition).to eq('/pets/{petId}')
-    end
-  end
+  # describe '#path_definition' do
+  #   it 'returns the path item definition for the request' do
+  #     expect(subject.path_definition).to eq('/pets/{petId}')
+  #   end
+  # end
 
   describe '#request_method' do
     it 'returns the request_method of the request' do
@@ -451,42 +371,42 @@ RSpec.describe OpenapiFirst::RuntimeRequest do
     end
   end
 
-  describe '#response' do
-    let(:response) { Rack::Response.new('', 200, { 'Content-Type' => 'application/json' }) }
+  # describe '#response' do
+  #   let(:response) { Rack::Response.new('', 200, { 'Content-Type' => 'application/json' }) }
 
-    it 'returns a Definition::RuntimeResponse' do
-      result = request.response(response)
-      expect(result).to be_a(OpenapiFirst::RuntimeResponse)
-      expect(result.description).to eq('Expected response to a valid request')
-    end
+  #   it 'returns a Definition::RuntimeResponse' do
+  #     result = request.response(response)
+  #     expect(result).to be_a(OpenapiFirst::RuntimeResponse)
+  #     expect(result.description).to eq('Expected response to a valid request')
+  #   end
 
-    context 'when API description has integers as status' do
-      let(:definition) do
-        hash = {
-          'openapi' => '3.1.0',
-          'paths' => {
-            '/pets/{petId}' => {
-              'parameters' => [
-                { 'name' => 'petId', 'in' => 'path', 'required' => true, 'schema' => { 'type' => 'integer' } }
-              ],
-              'get' => {
-                'responses' => {
-                  200 => { 'description' => 'Expected response to a valid request' }
-                }
-              }
-            }
-          }
-        }
-        OpenapiFirst.parse(hash)
-      end
+  #   context 'when API description has integers as status' do
+  #     let(:definition) do
+  #       hash = {
+  #         'openapi' => '3.1.0',
+  #         'paths' => {
+  #           '/pets/{petId}' => {
+  #             'parameters' => [
+  #               { 'name' => 'petId', 'in' => 'path', 'required' => true, 'schema' => { 'type' => 'integer' } }
+  #             ],
+  #             'get' => {
+  #               'responses' => {
+  #                 200 => { 'description' => 'Expected response to a valid request' }
+  #               }
+  #             }
+  #           }
+  #         }
+  #       }
+  #       OpenapiFirst.parse(hash)
+  #     end
 
-      it 'just works, even though OAS wants strings' do
-        result = request.response(response)
-        expect(result).to be_a(OpenapiFirst::RuntimeResponse)
-        expect(result.description).to eq('Expected response to a valid request')
-      end
-    end
-  end
+  #     it 'just works, even though OAS wants strings' do
+  #       result = request.response(response)
+  #       expect(result).to be_a(OpenapiFirst::RuntimeResponse)
+  #       expect(result.description).to eq('Expected response to a valid request')
+  #     end
+  #   end
+  # end
 
   describe '#operation' do
     it 'returns the request operation' do

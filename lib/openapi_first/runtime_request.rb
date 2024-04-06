@@ -11,14 +11,11 @@ module OpenapiFirst
   class RuntimeRequest
     extend Forwardable
 
-    def initialize(request:, path_item:, operation:, path_params:, validator:, response_validator: nil) # rubocop:disable Metrics/ParameterLists
+    def initialize(request:, path_item:, operation:, path_params:)
       @request = request
       @path_item = path_item
       @operation = operation
       @original_path_params = path_params
-      @validated = false
-      @validator = validator
-      @response_validator = response_validator
     end
 
     def_delegators :@request, :content_type, :media_type, :path
@@ -37,13 +34,6 @@ module OpenapiFirst
     # @return [Failure, nil]
     attr_accessor :error
 
-    # Checks if the request is valid.
-    # @return [Boolean] true if the request is valid, false otherwise.
-    def valid?
-      validate unless validated?
-      error.nil?
-    end
-
     # Checks if the path and request method are known.
     # @return [Boolean] true if the path and request method are known, false otherwise.
     def known?
@@ -60,12 +50,6 @@ module OpenapiFirst
     # @return [Boolean] true if the request method is known, false otherwise.
     def known_request_method?
       !!operation
-    end
-
-    # Returns the merged path and query parameters.
-    # @return [Hash] The merged path and query parameters.
-    def params
-      @params ||= query.merge(path_parameters)
     end
 
     # Returns the parsed path parameters of the request.
@@ -87,8 +71,6 @@ module OpenapiFirst
         parameters ? OpenapiParameters::Query.new(parameters).unpack(request.env[Rack::QUERY_STRING]) : {}
       end
     end
-
-    alias query_parameters query
 
     # Returns the parsed header parameters.
     # This only includes parameters that are defined in the API description.
@@ -116,47 +98,6 @@ module OpenapiFirst
     # @return [Hash, Array, String, nil] The parsed body of the request.
     def body
       @body ||= BodyParser.new.parse(request, request.media_type)
-    end
-
-    alias parsed_body body
-
-    # Validates the request.
-    # @return [Failure, nil] The Failure object if validation failed.
-    # @deprecated Please use {Definition#validate_request} instead
-    def validate
-      warn '[DEPRECATION] `validate` is deprecated. Please use ' \
-           "`OpenapiFirst.load('openapi.yaml').validate_request(rack_request)` instead."
-      @validated = true
-      @error = @validator.call(self)
-    end
-
-    # Validates the request and raises an error if validation fails.
-    def validate!
-      warn '[DEPRECATION] `validate!` is deprecated. Please use ' \
-           "`OpenapiFirst.load('openapi.yaml').validate_request(rack_request, raise_error: true)` instead."
-      error = validate
-      error&.raise!
-    end
-
-    # Validates the response.
-    # @param rack_response [Rack::Response] The rack response object.
-    # @param raise_error [Boolean] Whether to raise an error if validation fails.
-    # @return [RuntimeResponse] The validated response object.
-    def validate_response(rack_response, raise_error: false)
-      warn '[DEPRECATION] `validate_response!` is deprecated. Please use ' \
-           "`OpenapiFirst.load('openapi.yaml').validate_response(request, response, raise_error: false)` instead."
-      validated = response(rack_response).tap(&:validate)
-      validated.error&.raise! if raise_error
-      validated
-    end
-
-    # Creates a new RuntimeResponse object.
-    # @param rack_response [Rack::Response] The rack response object.
-    # @return [RuntimeResponse] The RuntimeResponse object.
-    def response(rack_response)
-      warn '[DEPRECATION] `response` is deprecated. Please use ' \
-           "`OpenapiFirst.load('openapi.yaml').validate_response(request, response, raise_error: false)` instead."
-      RuntimeResponse.new(operation, rack_response, validator: @response_validator)
     end
 
     private

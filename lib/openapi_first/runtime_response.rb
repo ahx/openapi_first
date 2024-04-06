@@ -8,18 +8,10 @@ module OpenapiFirst
   class RuntimeResponse
     extend Forwardable
 
-    def initialize(operation, rack_response, validator:)
+    def initialize(operation, rack_response)
       @operation = operation
       @rack_response = rack_response
-      @error = nil
-      @validator = validator
     end
-
-    # @return [Failure, nil] Error object if validation failed.
-    attr_accessor :error
-
-    # @visibility private
-    attr_accessor :operation
 
     # @attr_reader [Integer] status The HTTP status code of this response.
     # @attr_reader [String] content_type The content_type of the Rack::Response.
@@ -28,13 +20,6 @@ module OpenapiFirst
     # @return [String] name The name of the operation. Used for generating error messages.
     def name
       "#{@operation.name} response status: #{status}"
-    end
-
-    # Checks if the response is valid. Runs the validation unless it has been run before.
-    # @return [Boolean]
-    def valid?
-      validate unless validated?
-      @error.nil?
     end
 
     # Checks if the response is defined in the API description.
@@ -66,23 +51,6 @@ module OpenapiFirst
     # @return [Hash] Returns the headers of the response.
     def headers
       @headers ||= unpack_response_headers
-    end
-
-    # Validates the response.
-    # @return [Failure, nil] Returns the validation error, or nil if the response is valid.
-    # @deprecated Please use {Definition#validate_response} instead
-    def validate
-      warn '[DEPRECATION] `validate` is deprecated. ' \
-           "Please use `OpenapiFirst.load('openapi.yaml').validate_response(rack_request, rack_response)` instead."
-      @validated = true
-      @error = @validator.call(self)
-    end
-
-    # Validates the response and raises an error if invalid.
-    # @raise [ResponseNotFoundError, ResponseInvalidError] Raises an error if the response is invalid.
-    def validate!
-      error = validate
-      error&.raise!
     end
 
     # Returns the response definition associated with the response.
