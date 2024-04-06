@@ -60,6 +60,82 @@ RSpec.describe OpenapiFirst::Definition do
         end.to raise_error(OpenapiFirst::RequestInvalidError)
       end
     end
+
+    context 'with a matching path and request method' do
+      let(:definition) { OpenapiFirst.load('./spec/data/incompatible-routes.yaml') }
+      let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/foo/1')) }
+
+      it 'is a known request' do
+        expect(definition.validate_request(request)).to be_known
+      end
+    end
+
+    context 'with different variables in common nested routes' do
+      let(:definition) { OpenapiFirst.load('./spec/data/incompatible-routes.yaml') }
+
+      it 'finds a match' do
+        request = definition.validate_request(build_request('/foo/1'))
+        expect(request.path_parameters).to eq({ 'fooId' => '1' })
+
+        request = definition.validate_request(build_request('/foo/1/bar'))
+        expect(request.path_parameters).to eq({ 'id' => '1' })
+
+        request = definition.validate_request(build_request('/foo/special'))
+        expect(request.path_parameters).to eq({})
+      end
+    end
+
+    context 'with different patterns on the same path' do
+      let(:definition) { OpenapiFirst.load('./spec/data/parameters-path.yaml') }
+
+      it 'supports /{date}' do
+        runtime_request = definition.validate_request(build_request('/info/2020-01-01'))
+        operation_id = runtime_request.operation_id
+
+        expect(operation_id).to eq 'info_date'
+        expect(runtime_request.path_parameters['date']).to eq('2020-01-01')
+      end
+
+      it 'supports /{start_date}..{end_date}' do
+        runtime_request = definition.validate_request(build_request('/info/2020-01-01..2020-01-02'))
+        operation_id = runtime_request.operation_id
+        expect(operation_id).to eq 'info_date_range'
+
+        expect(runtime_request.path_parameters['start_date']).to eq('2020-01-01')
+        expect(runtime_request.path_parameters['end_date']).to eq('2020-01-02')
+      end
+
+      it 'still works without parameters' do
+        runtime_request = definition.validate_request(build_request('/info'))
+        operation_id = runtime_request.operation_id
+        expect(operation_id).to eq 'info'
+        expect(runtime_request.path_parameters).to be_empty
+      end
+    end
+
+    context 'with a matching path but unknown request method' do
+      let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+      let(:rack_request) { build_request('/pets', method: 'PATCH') }
+
+      it 'has a known path' do
+        expect(definition.validate_request(rack_request)).to be_known_path
+      end
+
+      it 'has no known request method' do
+        expect(definition.validate_request(rack_request)).not_to be_known_request_method
+      end
+    end
+
+    context 'with SCRIPT_NAME' do
+      let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+      let(:rack_request) { Rack::Request.new(Rack::MockRequest.env_for('/42', script_name: '/pets')) }
+
+      it 'respects SCRIPT_NAME to build the whole path' do
+        validated = definition.validate_request(rack_request)
+        expect(validated).to be_valid
+        expect(validated.operation_id).to eq('showPetById')
+      end
+    end
   end
 
   describe '#validate_response' do
@@ -117,87 +193,6 @@ RSpec.describe OpenapiFirst::Definition do
         expect do
           definition.validate_response(request, response, raise_error: true)
         end.to raise_error(OpenapiFirst::ResponseInvalidError)
-      end
-    end
-  end
-
-  describe '#request' do
-    context 'with a matching path and request method' do
-      let(:definition) { OpenapiFirst.load('./spec/data/incompatible-routes.yaml') }
-      let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/foo/1')) }
-
-      it 'returns a Definition::RuntimeRequest' do
-        expect(definition.request(request)).to be_a(OpenapiFirst::RuntimeRequest)
-      end
-
-      it 'is a known request' do
-        expect(definition.request(request)).to be_known
-      end
-    end
-
-    context 'with different variables in common nested routes' do
-      let(:definition) { OpenapiFirst.load('./spec/data/incompatible-routes.yaml') }
-
-      it 'finds a match' do
-        request = definition.request(build_request('/foo/1'))
-        expect(request.path_parameters).to eq({ 'fooId' => '1' })
-
-        request = definition.request(build_request('/foo/1/bar'))
-        expect(request.path_parameters).to eq({ 'id' => '1' })
-
-        request = definition.request(build_request('/foo/special'))
-        expect(request.path_parameters).to eq({})
-      end
-    end
-
-    context 'with different patterns on the same path' do
-      let(:definition) { OpenapiFirst.load('./spec/data/parameters-path.yaml') }
-
-      it 'supports /{date}' do
-        runtime_request = definition.request(build_request('/info/2020-01-01'))
-        operation_id = runtime_request.operation_id
-
-        expect(operation_id).to eq 'info_date'
-        expect(runtime_request.path_parameters['date']).to eq('2020-01-01')
-      end
-
-      it 'supports /{start_date}..{end_date}' do
-        runtime_request = definition.request(build_request('/info/2020-01-01..2020-01-02'))
-        operation_id = runtime_request.operation_id
-        expect(operation_id).to eq 'info_date_range'
-
-        expect(runtime_request.path_parameters['start_date']).to eq('2020-01-01')
-        expect(runtime_request.path_parameters['end_date']).to eq('2020-01-02')
-      end
-
-      it 'still works without parameters' do
-        runtime_request = definition.request(build_request('/info'))
-        operation_id = runtime_request.operation_id
-        expect(operation_id).to eq 'info'
-        expect(runtime_request.path_parameters).to be_empty
-      end
-    end
-
-    context 'with a matching path but unknown request method' do
-      let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
-      let(:rack_request) { build_request('/pets', method: 'PATCH') }
-
-      it 'has a known path' do
-        expect(definition.request(rack_request)).to be_known_path
-      end
-
-      it 'has no known request method' do
-        expect(definition.request(rack_request)).not_to be_known_request_method
-      end
-    end
-
-    context 'with SCRIPT_NAME' do
-      let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
-      let(:rack_request) { Rack::Request.new(Rack::MockRequest.env_for('/42', script_name: '/pets')) }
-
-      it 'respects SCRIPT_NAME to build the whole path' do
-        expect(definition.request(rack_request)).to be_known_path
-        expect(definition.request(rack_request).operation_id).to eq('showPetById')
       end
     end
   end

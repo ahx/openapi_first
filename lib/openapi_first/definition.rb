@@ -29,7 +29,7 @@ module OpenapiFirst
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [RuntimeRequest] The validated request object.
     def validate_request(rack_request, raise_error: false)
-      runtime_request = request(rack_request)
+      runtime_request = find_request(rack_request)
       validator = build_request_validator(runtime_request.path_item, runtime_request.operation)
 
       error = validator.call(runtime_request)
@@ -45,7 +45,7 @@ module OpenapiFirst
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [RuntimeResponse] The validated response object.
     def validate_response(rack_request, rack_response, raise_error: false)
-      operation = request(rack_request).operation
+      operation = find_request(rack_request).operation
       runtime_response = RuntimeResponse.new(operation, rack_response)
       validator = ResponseValidation::Validator.new(operation, openapi_version: @openapi_version)
       error = validator.call(runtime_response)
@@ -53,20 +53,6 @@ module OpenapiFirst
       @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
       validated
-    end
-
-    # Builds a RuntimeRequest object based on the Rack request.
-    # @param rack_request [Rack::Request] The Rack request object.
-    # @return [RuntimeRequest] The RuntimeRequest object.
-    def request(rack_request)
-      path_item, path_params = find_path_item_and_params(rack_request.path)
-      operation = path_item&.operation(rack_request.request_method.downcase)
-      RuntimeRequest.new(
-        request: rack_request,
-        path_item:,
-        operation:,
-        path_params:
-      )
     end
 
     # Gets all the operations defined in the API description.
@@ -87,6 +73,20 @@ module OpenapiFirst
     end
 
     private
+
+    # Builds a RuntimeRequest object based on the Rack request.
+    # @param rack_request [Rack::Request] The Rack request object.
+    # @return [RuntimeRequest] The RuntimeRequest object.
+    def find_request(rack_request)
+      path_item, path_params = find_path_item_and_params(rack_request.path)
+      operation = path_item&.operation(rack_request.request_method.downcase)
+      RuntimeRequest.new(
+        request: rack_request,
+        path_item:,
+        operation:,
+        path_params:
+      )
+    end
 
     def build_request_validator(path_item, operation)
       @build_request_validator ||= Hash.new do |hash, key|

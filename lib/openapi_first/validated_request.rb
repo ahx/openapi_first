@@ -12,7 +12,8 @@ module OpenapiFirst
     end
 
     def_delegators :@request, :content_type, :media_type, :operation, :path, :path_item, :path_parameters, :query,
-                   :headers, :cookies, :body, :operation_id, :request_method
+                   :headers, :cookies, :body, :operation_id, :request_method,
+                   :known?, :known_path?, :known_request_method?
 
     alias query_parameters query
     alias parsed_body body
