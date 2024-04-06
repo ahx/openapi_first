@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Changed
+
+- The interface to validate requests and responses has been reduced to two methods: `Definition#validate_request` and `Definition#validate_response`. These now return an instance of `ValidatedRequest`, `ValidatedResponse`.
+- `RuntimeRequest#validate` and `RuntimeResponse#validate` have been removed.
+
 ### New Features
 
 - Hooks:
