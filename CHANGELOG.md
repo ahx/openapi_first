@@ -2,14 +2,16 @@
 
 ## Unreleased
 
+## 1.4.0
+
 ### Changed
+
+Some redundant methods to validate or inspect requests/responses will be removed in 2.0. So this release deprecates these methods.
 
 - Deprecate `OpenapiFirst::RuntimeRequest#validate`, `#validate!`, `#validate_response`, `#response`.
   Use `OpenapiFirst.load('openapi.yaml').validate_request(rack_request, raise_error: true/false)` instead
 - Deprecate `OpenapiFirst::RuntimeResponse#validate`.
   Use `OpenapiFirst.load('openapi.yaml').validate_response(rack_request, rack_response, raise_error: true/false)` instead.
-
-These deprecated methods will be removed in version 2.0.
 
 ## 1.3.6
 
