@@ -120,13 +120,18 @@ module OpenapiFirst
 
     # Validates the request.
     # @return [Failure, nil] The Failure object if validation failed.
+    # @deprecated Please use {Definition#validate_request} instead
     def validate
+      warn '[DEPRECATION] `validate` is deprecated. Please use ' \
+           "`OpenapiFirst.load('openapi.yaml').validate_request(rack_request)` instead."
       @validated = true
       @error = RequestValidation::Validator.new(operation).validate(self)
     end
 
     # Validates the request and raises an error if validation fails.
     def validate!
+      warn '[DEPRECATION] `validate!` is deprecated. Please use ' \
+           "`OpenapiFirst.load('openapi.yaml').validate_request(rack_request, raise_error: true)` instead."
       error = validate
       error&.raise!
     end
@@ -136,6 +141,8 @@ module OpenapiFirst
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [RuntimeResponse] The validated response object.
     def validate_response(rack_response, raise_error: false)
+      warn '[DEPRECATION] `validate_response!` is deprecated. Please use ' \
+           "`OpenapiFirst.load('openapi.yaml').validate_response(request, response, raise_error: false)` instead."
       validated = response(rack_response).tap(&:validate)
       validated.error&.raise! if raise_error
       validated
@@ -145,6 +152,8 @@ module OpenapiFirst
     # @param rack_response [Rack::Response] The rack response object.
     # @return [RuntimeResponse] The RuntimeResponse object.
     def response(rack_response)
+      warn '[DEPRECATION] `response` is deprecated. Please use ' \
+           "`OpenapiFirst.load('openapi.yaml').validate_response(request, response, raise_error: false)` instead."
       RuntimeResponse.new(operation, rack_response)
     end
 

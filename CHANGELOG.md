@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Changed
+
+- Deprecate `OpenapiFirst::RuntimeRequest#validate`, `#validate!`, `#validate_response`, `#response`.
+  Use `OpenapiFirst.load('openapi.yaml').validate_request(rack_request, raise_error: true/false)` instead
+- Deprecate `OpenapiFirst::RuntimeResponse#validate`.
+  Use `OpenapiFirst.load('openapi.yaml').validate_response(rack_request, rack_response, raise_error: true/false)` instead.
+
+These deprecated methods will be removed in version 2.0.
+
 ## 1.3.6
 
 - FIx Rack 2 / Rails 6 compatibility ([#246](https://github.com/ahx/openapi_first/issues/246)

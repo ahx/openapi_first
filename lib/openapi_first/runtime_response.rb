@@ -67,7 +67,10 @@ module OpenapiFirst
 
     # Validates the response.
     # @return [Failure, nil] Returns the validation error, or nil if the response is valid.
+    # @deprecated Please use {Definition#validate_response} instead
     def validate
+      warn '[DEPRECATION] `validate` is deprecated. ' \
+           "Please use `OpenapiFirst.load('openapi.yaml').validate_response(rack_request, rack_response)` instead."
       @validated = true
       @error = ResponseValidation::Validator.new(@operation).validate(self)
     end

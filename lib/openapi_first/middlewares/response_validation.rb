@@ -22,10 +22,10 @@ module OpenapiFirst
       attr_reader :app
 
       def call(env)
-        request = find_request(env)
         status, headers, body = @app.call(env)
         body = read_body(body)
-        request.validate_response(Rack::Response[status, headers, body], raise_error: true)
+        @definition.validate_response(Rack::Request.new(env), Rack::Response[status, headers, body], raise_error: true)
+        env[REQUEST] ||= @definition.request(Rack::Request.new(env))
         [status, headers, body]
       end
 
@@ -37,10 +37,6 @@ module OpenapiFirst
         result = []
         body.each { |part| result << part }
         result
-      end
-
-      def find_request(env)
-        env[REQUEST] ||= @definition.request(Rack::Request.new(env))
       end
     end
   end
