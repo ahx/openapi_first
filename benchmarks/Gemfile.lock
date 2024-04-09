@@ -36,6 +36,10 @@ GEM
     openapi_parameters (0.3.3)
       rack (>= 2.2)
     openapi_parser (2.1.0)
+    optparse (0.5.0)
+    profile-viewer (0.0.2)
+      optparse
+      webrick
     puma (6.4.2)
       nio4r (~> 2.0)
     rack (3.0.10)
@@ -58,11 +62,12 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.9.1)
+    vernier (0.7.0)
+    webrick (1.8.1)
 
 PLATFORMS
-  arm64-darwin-21
-  arm64-darwin-22
   arm64-darwin-23
+  ruby
   x86_64-linux
 
 DEPENDENCIES
@@ -71,8 +76,10 @@ DEPENDENCIES
   committee
   multi_json
   openapi_first!
+  profile-viewer
   puma
   sinatra
+  vernier
 
 BUNDLED WITH
-   2.3.10
+   2.5.9
