@@ -24,6 +24,12 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
   #     end
   #   end
 
+  describe '#operation' do
+    it 'returns the operation that was found for the request' do
+      expect(response.operation.operation_id).to eq('showPetById')
+    end
+  end
+
   #   context 'if response is invalid' do
   #     let(:rack_response) { Rack::Response.new(JSON.dump('foo'), 200, { 'Content-Type' => 'application/json' }) }
 
