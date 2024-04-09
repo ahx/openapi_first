@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.4.1
+
+- Fixed: Don't call deprecated methods in middlewares
+
 ## 1.4.0
 
 ### Changed
