@@ -12,11 +12,10 @@ module OpenapiFirst
     def initialize(operation, rack_response)
       @operation = operation
       @rack_response = rack_response
-      @error = nil
     end
 
     # @return [Failure, nil] Error object if validation failed.
-    attr_reader :error
+    attr_accessor :error
 
     # @attr_reader [Integer] status The HTTP status code of this response.
     # @attr_reader [String] content_type The content_type of the Rack::Response.
@@ -30,7 +29,7 @@ module OpenapiFirst
     # Checks if the response is valid. Runs the validation unless it has been run before.
     # @return [Boolean]
     def valid?
-      validate unless @validated
+      validate unless validated?
       @error.nil?
     end
 
@@ -71,7 +70,6 @@ module OpenapiFirst
     def validate
       warn '[DEPRECATION] `validate` is deprecated. ' \
            "Please use `OpenapiFirst.load('openapi.yaml').validate_response(rack_request, rack_response)` instead."
-      @validated = true
       @error = ResponseValidation::Validator.new(@operation).validate(self)
     end
 
@@ -89,6 +87,10 @@ module OpenapiFirst
     end
 
     private
+
+    def validated?
+      defined?(@error)
+    end
 
     # Usually the body responds to #each, but when using manual response validation without the middleware
     # in Rails request specs the body is a String. So this code handles both cases.

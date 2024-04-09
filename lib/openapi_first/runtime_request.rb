@@ -16,7 +16,6 @@ module OpenapiFirst
       @path_item = path_item
       @operation = operation
       @original_path_params = path_params
-      @error = nil
       @validated = false
     end
 
@@ -34,12 +33,12 @@ module OpenapiFirst
 
     # Returns the error object if validation failed.
     # @return [Failure, nil]
-    attr_reader :error
+    attr_accessor :error
 
     # Checks if the request is valid.
     # @return [Boolean] true if the request is valid, false otherwise.
     def valid?
-      validate unless @validated
+      validate unless validated?
       error.nil?
     end
 
@@ -124,7 +123,6 @@ module OpenapiFirst
     def validate
       warn '[DEPRECATION] `validate` is deprecated. Please use ' \
            "`OpenapiFirst.load('openapi.yaml').validate_request(rack_request)` instead."
-      @validated = true
       @error = RequestValidation::Validator.new(operation).validate(self)
     end
 
@@ -158,6 +156,10 @@ module OpenapiFirst
     end
 
     private
+
+    def validated?
+      defined?(@error)
+    end
 
     attr_reader :request
   end
