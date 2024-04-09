@@ -4,7 +4,7 @@ require 'action_dispatch'
 
 RSpec.describe OpenapiFirst::RuntimeResponse do
   subject(:response) do
-    definition.request(rack_request).response(rack_response)
+    definition.response(rack_request, rack_response)
   end
 
   let(:rack_request) do
@@ -16,6 +16,12 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
   end
 
   let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+
+  describe '#operation' do
+    it 'returns the operation that was found for the request' do
+      expect(response.operation.operation_id).to eq('showPetById')
+    end
+  end
 
   describe '#validate!' do
     context 'if response is valid' do

@@ -17,6 +17,9 @@ module OpenapiFirst
     # @return [Failure, nil] Error object if validation failed.
     attr_accessor :error
 
+    # @visibility private
+    attr_accessor :operation
+
     # @attr_reader [Integer] status The HTTP status code of this response.
     # @attr_reader [String] content_type The content_type of the Rack::Response.
     def_delegators :@rack_response, :status, :content_type
