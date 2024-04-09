@@ -12,7 +12,7 @@ module OpenapiFirst
       @error = error
     end
 
-    def_delegators :@response, :body, :headers, :status, :content_type, :name
+    def_delegators :@response, :body, :headers, :status, :content_type, :name, :operation, :known?, :known_status?
 
     # Returns the error object if validation failed.
     # @return [Failure, nil]

@@ -2,7 +2,7 @@
 
 require 'action_dispatch'
 
-RSpec.describe OpenapiFirst::RuntimeResponse do
+RSpec.describe OpenapiFirst::ValidatedResponse do
   subject(:response) do
     definition.validate_response(rack_request, rack_response)
   end
@@ -17,47 +17,11 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
 
   let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
 
-  # describe 'valid?' do
-  #   context 'if response is valid' do
-  #     it 'returns true' do
-  #       expect(response).to be_valid
-  #     end
-  #   end
-
   describe '#operation' do
     it 'returns the operation that was found for the request' do
       expect(response.operation.operation_id).to eq('showPetById')
     end
   end
-
-  #   context 'if response is invalid' do
-  #     let(:rack_response) { Rack::Response.new(JSON.dump('foo'), 200, { 'Content-Type' => 'application/json' }) }
-
-  #     it 'returns false' do
-  #       expect(response).not_to be_valid
-  #     end
-  #   end
-  # end
-
-  # describe '#error' do
-  #   context 'if response is valid' do
-  #     it 'returns nil' do
-  #       response.validate
-  #       expect(response.error).to be_nil
-  #     end
-  #   end
-
-  #   context 'if response is invalid' do
-  #     let(:rack_response) { Rack::Response.new(JSON.dump('foo'), 200, { 'Content-Type' => 'application/json' }) }
-
-  #     it 'returns a Failure' do
-  #       response.validate
-  #       result = response.error
-  #       expect(result).to be_a(OpenapiFirst::Failure)
-  #       expect(result.type).to eq :invalid_response_body
-  #     end
-  #   end
-  # end
 
   describe '#status' do
     it 'returns the HTTP status code of the response' do
@@ -133,44 +97,43 @@ RSpec.describe OpenapiFirst::RuntimeResponse do
     end
   end
 
-  # describe '#known?' do
-  #   it 'returns true' do
-  #     expect(response.known?).to be true
-  #   end
+  describe '#known?' do
+    it 'returns true' do
+      expect(response.known?).to be true
+    end
 
-  #   context 'when response is not defined' do
-  #     let(:rack_response) do
-  #       Rack::Response.new('', 209)
-  #     end
+    context 'when response is not defined' do
+      let(:rack_response) do
+        Rack::Response.new('', 209)
+      end
 
-  #     it 'returns false' do
-  #       expect(response.known?).to be false
-  #     end
-  #   end
-  # end
+      it 'returns false' do
+        expect(response.known?).to be false
+      end
+    end
+  end
 
-  # describe '#known_status?' do
-  #   it 'returns true' do
-  #     expect(response.known_status?).to be true
-  #   end
+  describe '#known_status?' do
+    it 'returns true' do
+      expect(response.known_status?).to be true
+    end
 
-  #   context 'when status is not defined' do
-  #     let(:rack_response) do
-  #       Rack::Response.new('', 209)
-  #     end
+    context 'when status is not defined' do
+      let(:rack_response) do
+        Rack::Response.new('', 209)
+      end
 
-  #     it 'returns false' do
-  #       expect(response.known_status?).to be false
-  #     end
-  #   end
-  # end
+      it 'returns false' do
+        expect(response.known_status?).to be false
+      end
+    end
+  end
 
   describe '#headers' do
     let(:definition) { OpenapiFirst.load('./spec/data/response-header.yaml') }
 
-    subject(:response) do
-      operation = definition.path('/echo').operation('post')
-      described_class.new(operation, rack_response)
+    let(:rack_request) do
+      Rack::Request.new(Rack::MockRequest.env_for('/echo', method: 'POST'))
     end
 
     let(:rack_response) do

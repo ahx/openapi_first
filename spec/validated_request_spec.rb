@@ -33,37 +33,37 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
   end
 
-  # describe '#known?' do
-  #   context 'with known path and request method' do
-  #     let(:rack_request) do
-  #       Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-  #     end
+  describe '#known?' do
+    context 'with known path and request method' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/pets'))
+      end
 
-  #     it 'returns true' do
-  #       expect(request).to be_known
-  #     end
-  #   end
+      it 'returns true' do
+        expect(request).to be_known
+      end
+    end
 
-  #   context 'with known path, but unknown request method' do
-  #     let(:rack_request) do
-  #       Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'PATCH'))
-  #     end
+    context 'with known path, but unknown request method' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'PATCH'))
+      end
 
-  #     it 'returns false' do
-  #       expect(request).not_to be_known
-  #     end
-  #   end
+      it 'returns false' do
+        expect(request).not_to be_known
+      end
+    end
 
-  #   context 'with unknown path' do
-  #     let(:rack_request) do
-  #       Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
-  #     end
+    context 'with unknown path' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
+      end
 
-  #     it 'returns false' do
-  #       expect(request).not_to be_known
-  #     end
-  #   end
-  # end
+      it 'returns false' do
+        expect(request).not_to be_known
+      end
+    end
+  end
 
   # describe '#known_path?' do
   #   context 'with known path' do
