@@ -38,9 +38,8 @@ module OpenapiFirst
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [RuntimeResponse] The validated response object.
     def validate_response(rack_request, rack_response, raise_error: false)
-      runtime_request = request(rack_request)
-      validator = ResponseValidation::Validator.new(runtime_request.operation)
-      runtime_response = RuntimeResponse.new(runtime_request.operation, rack_response)
+      runtime_response = response(rack_request, rack_response)
+      validator = ResponseValidation::Validator.new(runtime_response.operation)
       validation_error = validator.validate(runtime_response)
       validation_error.raise! if validation_error && raise_error
       runtime_response.error = validation_error
@@ -66,7 +65,8 @@ module OpenapiFirst
     # @param rack_response [Rack::Response] The Rack response object.
     # @return [RuntimeResponse] The RuntimeResponse object.
     def response(rack_request, rack_response)
-      request(rack_request).response(rack_response)
+      runtime_request = request(rack_request)
+      RuntimeResponse.new(runtime_request.operation, rack_response)
     end
 
     # Gets all the operations defined in the API description.
