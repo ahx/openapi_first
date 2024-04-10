@@ -13,10 +13,11 @@ module OpenapiFirst
         @config = config
         @openapi_version = openapi_version
         @validators = []
-        @validators << method(:validate_path_params!) if path_parameters
-        @validators << method(:validate_query_params!) if query_parameters
-        @validators << method(:validate_header_params!) if header_parameters
-        @validators << method(:validate_cookie_params!) if cookie_parameters
+        @parameter_schemas = build_parameter_schemas
+        @validators << method(:validate_path_params!) if parameter_schemas[:path]
+        @validators << method(:validate_query_params!) if parameter_schemas[:query]
+        @validators << method(:validate_header_params!) if parameter_schemas[:header]
+        @validators << method(:validate_cookie_params!) if parameter_schemas[:cookie]
         @validators << method(:validate_request_body!) if operation&.request_body
       end
 
@@ -30,7 +31,32 @@ module OpenapiFirst
 
       private
 
-      attr_reader :operation, :path_item, :config, :openapi_version
+      attr_reader :operation, :path_item, :config, :openapi_version, :parameter_schemas
+
+      def build_parameter_schemas
+        schemas = {}
+        add_parameters_to_schemas(operation['parameters'], schemas) if operation
+        add_parameters_to_schemas(path_item['parameters'], schemas) if path_item
+        after_property_validation = config.hooks[:after_request_parameter_property_validation]
+        schemas.transform_values! { Schema.new(_1, openapi_version:, after_property_validation:) }
+      end
+
+      def add_parameters_to_schemas(parameters, schemas)
+        return schemas if parameters.nil?
+
+        parameters.each_with_object(schemas) do |parameter_def, _result|
+          parameter = OpenapiParameters::Parameter.new(parameter_def)
+          next if parameter.location == 'header' && IGNORED_HEADERS.include?(parameter.name)
+
+          params = schemas[parameter.location&.to_sym] ||= {
+            'type' => 'object',
+            'properties' => {},
+            'required' => []
+          }
+          params['properties'][parameter.name] = parameter.schema if parameter.schema
+          params['required'] << parameter.name if parameter.required?
+        end
+      end
 
       def validate_defined(request)
         return if request.known?
@@ -40,59 +66,25 @@ module OpenapiFirst
       end
 
       def validate_path_params!(request)
-        @path_parameters_schema ||= build_parameters_schema(path_parameters)
-
-        validation = @path_parameters_schema.validate(request.path_parameters)
+        validation = parameter_schemas[:path].validate(request.path_parameters)
         Failure.fail!(:invalid_path, errors: validation.errors) if validation.error?
       end
 
       def validate_query_params!(request)
-        @query_parameters_schema ||= build_parameters_schema(query_parameters)
-
-        validation = @query_parameters_schema.validate(request.query)
+        validation = parameter_schemas[:query].validate(request.query)
         Failure.fail!(:invalid_query, errors: validation.errors) if validation.error?
       end
 
       def validate_cookie_params!(request)
-        @cookie_parameters_schema ||= build_parameters_schema(cookie_parameters)
-
-        validation = @cookie_parameters_schema.validate(request.cookies)
+        validation = parameter_schemas[:cookie].validate(request.cookies)
         Failure.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
       end
 
       IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
       private_constant :IGNORED_HEADERS
 
-      def header_parameters
-        return unless operation&.header_parameters || path_item&.header_parameters
-
-        Array(operation.header_parameters).concat(Array(path_item.header_parameters)).reject do |p|
-          IGNORED_HEADERS.include?(p['name'])
-        end
-      end
-
-      def path_parameters
-        return unless operation&.path_parameters || path_item&.path_parameters
-
-        Array(operation.path_parameters).concat(Array(path_item.path_parameters))
-      end
-
-      def query_parameters
-        return unless operation&.query_parameters || path_item&.query_parameters
-
-        Array(operation.query_parameters).concat(Array(path_item.query_parameters))
-      end
-
-      def cookie_parameters
-        return unless operation&.cookie_parameters || path_item&.cookie_parameters
-
-        Array(operation.cookie_parameters).concat(Array(path_item.cookie_parameters))
-      end
-
       def validate_header_params!(request)
-        @header_parameters_schema ||= build_parameters_schema(header_parameters)
-
-        validation = @header_parameters_schema.validate(request.headers)
+        validation = parameter_schemas[:header].validate(request.headers)
         Failure.fail!(:invalid_header, errors: validation.errors) if validation.error?
       end
 
@@ -103,22 +95,6 @@ module OpenapiFirst
                             .validate!(request.body, request.content_type)
       rescue ParseError => e
         Failure.fail!(:invalid_body, message: e.message)
-      end
-
-      def build_parameters_schema(parameters) # rubocop:disable Metrics/AbcSize
-        return unless parameters&.any?
-
-        schema = parameters.each_with_object({
-                                               'type' => 'object',
-                                               'properties' => {},
-                                               'required' => []
-                                             }) do |parameter_def, result|
-          parameter = OpenapiParameters::Parameter.new(parameter_def)
-          result['properties'][parameter.name] = parameter.schema if parameter.schema
-          result['required'] << parameter.name if parameter.required?
-        end
-        after_property_validation = config.hooks[:after_request_parameter_property_validation]
-        Schema.new(schema, openapi_version:, after_property_validation:)
       end
     end
   end

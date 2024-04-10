@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../spec_helper'
 require 'rack'
 require 'rack/test'
 require 'openapi_first'
@@ -11,7 +10,7 @@ RSpec.describe 'Cookie Parameter validation' do
   let(:app) do
     Rack::Builder.app do
       use OpenapiFirst::Middlewares::RequestValidation,
-          spec: File.expand_path('../data/cookie-parameter-validation.yaml', __dir__)
+          spec: File.expand_path('spec/data/cookie-parameter-validation.yaml')
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
@@ -50,7 +49,7 @@ RSpec.describe 'Cookie Parameter validation' do
     context 'when raising' do
       let(:app) do
         Rack::Builder.app do
-          spec_file = File.expand_path('../data/cookie-parameter-validation.yaml', __dir__)
+          spec_file = File.expand_path('spec/data/cookie-parameter-validation.yaml')
           use OpenapiFirst::Middlewares::RequestValidation, raise_error: true,
                                                             spec: spec_file
           run lambda { |_env|

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../spec_helper'
 require 'rack'
 require 'rack/test'
 require 'openapi_first'
@@ -14,7 +13,7 @@ RSpec.describe 'Path Parameter validation' do
     raise_error = raise_error_option
     Rack::Builder.app do
       use OpenapiFirst::Middlewares::RequestValidation, {
-        spec: File.expand_path('../data/path-parameter-validation.yaml', __dir__),
+        spec: File.expand_path('spec/data/path-parameter-validation.yaml'),
         raise_error:
       }
       run lambda { |_env|

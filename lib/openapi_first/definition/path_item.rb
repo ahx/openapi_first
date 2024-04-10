@@ -21,6 +21,9 @@ module OpenapiFirst
 
       def_delegator :@path_template, :match
 
+      def_delegators :@path_item_object,
+                     :[]
+
       def operation(request_method)
         operation_object = @path_item_object[request_method]
         return unless operation_object

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../spec_helper'
 require 'rack'
 require 'rack/test'
 require 'openapi_first'
@@ -8,7 +7,7 @@ require 'openapi_first'
 RSpec.describe 'Query Parameter validation' do
   include Rack::Test::Methods
 
-  let(:spec) { OpenapiFirst.load('./spec/data/query-parameter-validation.yaml') }
+  let(:spec) { OpenapiFirst.load('spec/data/query-parameter-validation.yaml') }
 
   let(:raise_error_option) { false }
 
@@ -75,6 +74,10 @@ RSpec.describe 'Query Parameter validation' do
       get '/search', params
 
       expect(last_response.status).to be 400
+      expect(response_body[:errors]).to eq [{ code: 'pattern',
+                                              message:
+                'string at `/include` does not match pattern: (parents|children)+(,(parents|children))*',
+                                              parameter: 'include' }]
     end
 
     it 'adds parsed query parameters to env ' do
