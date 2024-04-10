@@ -371,43 +371,6 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
   end
 
-  # describe '#response' do
-  #   let(:response) { Rack::Response.new('', 200, { 'Content-Type' => 'application/json' }) }
-
-  #   it 'returns a Definition::RuntimeResponse' do
-  #     result = request.response(response)
-  #     expect(result).to be_a(OpenapiFirst::RuntimeResponse)
-  #     expect(result.description).to eq('Expected response to a valid request')
-  #   end
-
-  #   context 'when API description has integers as status' do
-  #     let(:definition) do
-  #       hash = {
-  #         'openapi' => '3.1.0',
-  #         'paths' => {
-  #           '/pets/{petId}' => {
-  #             'parameters' => [
-  #               { 'name' => 'petId', 'in' => 'path', 'required' => true, 'schema' => { 'type' => 'integer' } }
-  #             ],
-  #             'get' => {
-  #               'responses' => {
-  #                 200 => { 'description' => 'Expected response to a valid request' }
-  #               }
-  #             }
-  #           }
-  #         }
-  #       }
-  #       OpenapiFirst.parse(hash)
-  #     end
-
-  #     it 'just works, even though OAS wants strings' do
-  #       result = request.response(response)
-  #       expect(result).to be_a(OpenapiFirst::RuntimeResponse)
-  #       expect(result.description).to eq('Expected response to a valid request')
-  #     end
-  #   end
-  # end
-
   describe '#operation' do
     it 'returns the request operation' do
       expect(request.operation.path).to eq('/pets/{petId}')

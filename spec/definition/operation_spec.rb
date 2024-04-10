@@ -149,6 +149,36 @@ RSpec.describe OpenapiFirst::Definition::Operation do
       end
     end
 
+    context 'when API description has integers as status' do
+      let(:operation) do
+        operation_object = {
+          'operationId' => 'get_pet',
+          'parameters' => [
+            { 'name' => 'limit', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
+          ],
+          'responses' => {
+            200 => {
+              'description' => 'Expected response',
+              'content' => {
+                'application/json' => {
+                  'schema' => { 'type' => 'array' }
+                }
+              }
+            },
+            'default' => {
+              'description' => 'unexpected error'
+            }
+          }
+        }
+        described_class.new('/pets/{pet_id}', 'get', operation_object)
+      end
+
+      it 'just works, even though OAS wants strings' do
+        response = operation.response_for(200, 'application/json')
+        expect(response.description).to eq('Expected response')
+      end
+    end
+
     context 'when content type cannot be found' do
       let(:spec) { OpenapiFirst.load('./spec/data/petstore.yaml') }
       let(:operation) { spec.path('/pets/{petId}').operation('get') }
