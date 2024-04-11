@@ -78,7 +78,7 @@ module OpenapiFirst
         @name ||= "#{method.upcase} #{path}".freeze
       end
 
-      %w[query path header cookie].each do |location|
+      %i[query path header cookie].each do |location|
         define_method("#{location}_parameters") do
           all_parameters[location]
         end
@@ -95,7 +95,7 @@ module OpenapiFirst
       attr_reader :operation_object, :responses
 
       def all_parameters
-        @all_parameters ||= operation_object.fetch('parameters', []).group_by { _1['in'] }.freeze
+        @all_parameters ||= operation_object.fetch('parameters', []).group_by { _1['in']&.to_sym }.freeze
       end
 
       def build_parameters(parameters, klass)
