@@ -14,19 +14,18 @@ module OpenapiFirst
     class Operation
       extend Forwardable
 
-      def_delegators :operation_object,
-                     :[]
+      def_delegators :operation_object, :[]
 
-      def initialize(path, request_method, operation_object)
-        @path = path
+      def initialize(path_item, request_method, operation_object)
+        @path_item = path_item
         @method = request_method
         @operation_object = operation_object
         @responses = Responses.new(self, operation_object['responses'])
         @request_body = RequestBody.new(operation_object['requestBody']) if operation_object['requestBody']
       end
 
-      # @attr_reader [String] path The path of the operation as in the API description.
-      attr_reader :path
+      # @return [String] path The path of the operation as in the API description.
+      def_delegator :@path_item, :path
 
       # @attr_reader [String] method The (downcased) request method of the operation.
       # Example: "get"
@@ -95,11 +94,16 @@ module OpenapiFirst
       attr_reader :operation_object, :responses
 
       def all_parameters
-        @all_parameters ||= operation_object.fetch('parameters', []).group_by { _1['in']&.to_sym }.freeze
-      end
-
-      def build_parameters(parameters, klass)
-        klass.new(parameters) if parameters.any?
+        @all_parameters ||= begin
+          hash = {}
+          @path_item['parameters']&.each do |parameter|
+            (hash[parameter['in'].to_sym] ||= []) << parameter
+          end
+          self['parameters']&.each do |parameter|
+            (hash[parameter['in'].to_sym] ||= []) << parameter
+          end
+          hash
+        end
       end
     end
   end

@@ -56,7 +56,7 @@ module OpenapiFirst
     # @return [Hash]
     def path_parameters
       @path_parameters ||= begin
-        parameters = Array(path_item&.path_parameters) + Array(operation&.path_parameters)
+        parameters = operation&.path_parameters
         parameters ? OpenapiParameters::Path.new(parameters).unpack(@original_path_params) : {}
       end
     end
@@ -67,7 +67,7 @@ module OpenapiFirst
     # @return [Hash]
     def query
       @query ||= begin
-        parameters = Array(path_item&.query_parameters) + Array(operation&.query_parameters)
+        parameters = operation&.query_parameters
         parameters ? OpenapiParameters::Query.new(parameters).unpack(request.env[Rack::QUERY_STRING]) : {}
       end
     end
@@ -77,8 +77,8 @@ module OpenapiFirst
     # @return [Hash]
     def headers
       @headers ||= begin
-        parameters = Array(path_item&.header_parameters) + Array(operation&.header_parameters)
-        OpenapiParameters::Header.new(parameters).unpack_env(request.env) || {}
+        parameters = operation&.header_parameters
+        parameters ? OpenapiParameters::Header.new(parameters).unpack_env(request.env) : {}
       end
     end
 
@@ -87,7 +87,7 @@ module OpenapiFirst
     # @return [Hash]
     def cookies
       @cookies ||= begin
-        parameters = Array(path_item&.cookie_parameters) + Array(operation&.cookie_parameters)
+        parameters = operation&.cookie_parameters
         parameters ? OpenapiParameters::Cookie.new(parameters).unpack(request.env[Rack::HTTP_COOKIE]) : {}
       end
     end
