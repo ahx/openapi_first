@@ -76,6 +76,7 @@ DEPENDENCIES
   committee
   multi_json
   openapi_first!
+  openapi_parameters (= 0.3.3)
   profile-viewer
   puma
   sinatra

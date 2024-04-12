@@ -55,10 +55,7 @@ module OpenapiFirst
     # Returns the parsed path parameters of the request.
     # @return [Hash]
     def path_parameters
-      @path_parameters ||= begin
-        parameters = operation&.path_parameters
-        parameters ? OpenapiParameters::Path.new(parameters).unpack(@original_path_params) : {}
-      end
+      @path_parameters ||= operation&.path_unpacker&.unpack(@original_path_params) || {}
     end
 
     # Returns the parsed query parameters.
@@ -66,30 +63,21 @@ module OpenapiFirst
     # @note This method is aliased as query_parameters.
     # @return [Hash]
     def query
-      @query ||= begin
-        parameters = operation&.query_parameters
-        parameters ? OpenapiParameters::Query.new(parameters).unpack(request.env[Rack::QUERY_STRING]) : {}
-      end
+      @query ||= operation&.query_unpacker&.unpack(request.env[Rack::QUERY_STRING]) || {}
     end
 
     # Returns the parsed header parameters.
     # This only includes parameters that are defined in the API description.
     # @return [Hash]
     def headers
-      @headers ||= begin
-        parameters = operation&.header_parameters
-        parameters ? OpenapiParameters::Header.new(parameters).unpack_env(request.env) : {}
-      end
+      @headers ||= operation&.header_unpacker&.unpack_env(request.env) || {}
     end
 
     # Returns the parsed cookie parameters.
     # This only includes parameters that are defined in the API description.
     # @return [Hash]
     def cookies
-      @cookies ||= begin
-        parameters = operation&.cookie_parameters
-        parameters ? OpenapiParameters::Cookie.new(parameters).unpack(request.env[Rack::HTTP_COOKIE]) : {}
-      end
+      @cookies ||= operation&.cookie_unpacker&.unpack(request.env[Rack::HTTP_COOKIE]) || {}
     end
 
     # Returns the parsed request body.

@@ -77,10 +77,26 @@ module OpenapiFirst
         @name ||= "#{method.upcase} #{path}".freeze
       end
 
-      %i[query path header cookie].each do |location|
+      %i[path query header cookie].each do |location|
         define_method("#{location}_parameters") do
           all_parameters[location]
         end
+      end
+
+      def query_unpacker
+        @query_unpacker ||= query_parameters && OpenapiParameters::Query.new(query_parameters)
+      end
+
+      def path_unpacker
+        @path_unpacker ||= path_parameters && OpenapiParameters::Path.new(path_parameters)
+      end
+
+      def header_unpacker
+        @header_unpacker ||= header_parameters && OpenapiParameters::Header.new(header_parameters)
+      end
+
+      def cookie_unpacker
+        @cookie_unpacker ||= cookie_parameters && OpenapiParameters::Cookie.new(cookie_parameters)
       end
 
       private
