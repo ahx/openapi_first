@@ -3,7 +3,7 @@
 require 'forwardable'
 
 module OpenapiFirst
-  # A validated response (see RuntimeResponse). It can be valid or not.
+  # A validated response (see Response). It can be valid or not.
   class ValidatedResponse
     extend Forwardable
 

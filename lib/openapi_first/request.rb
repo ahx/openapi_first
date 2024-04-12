@@ -2,13 +2,13 @@
 
 require 'forwardable'
 require 'openapi_parameters'
-require_relative 'runtime_response'
+require_relative 'response'
 require_relative 'body_parser'
 require_relative 'response_validation/validator'
 
 module OpenapiFirst
   # RuntimeRequest represents how an incoming request (Rack::Request) matches a request definition.
-  class RuntimeRequest
+  class Request
     extend Forwardable
 
     def initialize(request:, path_item:, operation:, path_params:)

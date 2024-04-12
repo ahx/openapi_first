@@ -5,7 +5,7 @@ require_relative 'request_body_validator'
 
 module OpenapiFirst
   module RequestValidation
-    # Validates a RuntimeRequest against an Operation.
+    # Validates a Request against an Operation.
     class Validator
       def initialize(path_item, operation, config:, openapi_version:)
         @path_item = path_item
@@ -21,10 +21,10 @@ module OpenapiFirst
         @validators << method(:validate_request_body!) if operation&.request_body
       end
 
-      def call(runtime_request)
+      def call(request)
         catch Failure::FAILURE do
-          validate_defined(runtime_request)
-          @validators.each { |v| v.call(runtime_request) }
+          validate_defined(request)
+          @validators.each { |v| v.call(request) }
           nil
         end
       end

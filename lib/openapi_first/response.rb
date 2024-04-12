@@ -5,7 +5,7 @@ require_relative 'body_parser'
 
 module OpenapiFirst
   # Represents a response returned by the Rack application and how it relates to the API description.
-  class RuntimeResponse
+  class Response
     extend Forwardable
 
     def initialize(operation, rack_response)

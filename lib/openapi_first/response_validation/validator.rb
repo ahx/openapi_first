@@ -4,21 +4,21 @@ require_relative '../failure'
 
 module OpenapiFirst
   module ResponseValidation
-    # Validates a RuntimeResponse against an Operation.
+    # Validates a Response against an Operation.
     class Validator
       def initialize(operation, openapi_version:)
         @operation = operation
         @openapi_version = openapi_version
       end
 
-      def call(runtime_response)
+      def call(response)
         return unless operation
 
         catch Failure::FAILURE do
-          validate_defined(runtime_response)
-          response_definition = runtime_response.response_definition
-          validate_response_body(response_definition.content_schema, runtime_response)
-          validate_response_headers(response_definition.headers, runtime_response.headers)
+          validate_defined(response)
+          response_definition = response.response_definition
+          validate_response_body(response_definition.content_schema, response)
+          validate_response_headers(response_definition.headers, response.headers)
           nil
         end
       end
@@ -27,29 +27,29 @@ module OpenapiFirst
 
       attr_reader :operation
 
-      def validate_defined(runtime_response)
-        return if runtime_response.known?
+      def validate_defined(response)
+        return if response.known?
 
-        unless runtime_response.known_status?
-          message = "Response status '#{runtime_response.status}' not found for '#{runtime_response.name}'"
+        unless response.known_status?
+          message = "Response status '#{response.status}' not found for '#{response.name}'"
           Failure.fail!(:response_not_found, message:)
         end
 
-        content_type = runtime_response.content_type
+        content_type = response.content_type
         if content_type.nil? || content_type.empty?
-          message = "Content-Type for '#{runtime_response.name}' must not be empty"
+          message = "Content-Type for '#{response.name}' must not be empty"
           Failure.fail!(:invalid_response_header, message:)
         end
 
-        message = "Content-Type '#{content_type}' is not defined for '#{runtime_response.name}'"
+        message = "Content-Type '#{content_type}' is not defined for '#{response.name}'"
         Failure.fail!(:invalid_response_header, message:)
       end
 
-      def validate_response_body(schema, runtime_response)
+      def validate_response_body(schema, response)
         return unless schema
 
         begin
-          parsed_body = runtime_response.body
+          parsed_body = response.body
         rescue ParseError => e
           Failure.fail!(:invalid_response_body, message: e.message)
         end

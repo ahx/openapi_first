@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'definition/path_item'
-require_relative 'runtime_request'
+require_relative 'request'
 require_relative 'validated_request'
 require_relative 'validated_response'
 require_relative 'request_validation/validator'
@@ -27,13 +27,13 @@ module OpenapiFirst
     # Validates the request against the API description.
     # @param rack_request [Rack::Request] The Rack request object.
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
-    # @return [RuntimeRequest] The validated request object.
+    # @return [Request] The validated request object.
     def validate_request(rack_request, raise_error: false)
-      runtime_request = find_request(rack_request)
-      validator = build_request_validator(runtime_request.path_item, runtime_request.operation)
+      request = find_request(rack_request)
+      validator = build_request_validator(request.path_item, request.operation)
 
-      error = validator.call(runtime_request)
-      validated = ValidatedRequest.new(runtime_request, error)
+      error = validator.call(request)
+      validated = ValidatedRequest.new(request, error)
       @config.hooks[:after_request_validation]&.each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
       validated
@@ -43,13 +43,13 @@ module OpenapiFirst
     # @param rack_request [Rack::Request] The Rack request object.
     # @param rack_response [Rack::Response] The Rack response object.
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
-    # @return [RuntimeResponse] The validated response object.
+    # @return [Response] The validated response object.
     def validate_response(rack_request, rack_response, raise_error: false)
       operation = find_request(rack_request).operation
-      runtime_response = RuntimeResponse.new(operation, rack_response)
+      response = OpenapiFirst::Response.new(operation, rack_response)
       validator = ResponseValidation::Validator.new(operation, openapi_version: @openapi_version)
-      error = validator.call(runtime_response)
-      validated = ValidatedResponse.new(runtime_response, error)
+      error = validator.call(response)
+      validated = ValidatedResponse.new(response, error)
       @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
       validated
@@ -74,13 +74,13 @@ module OpenapiFirst
 
     private
 
-    # Builds a RuntimeRequest object based on the Rack request.
+    # Builds a Request object based on the Rack request.
     # @param rack_request [Rack::Request] The Rack request object.
-    # @return [RuntimeRequest] The RuntimeRequest object.
+    # @return [Request] The Request object.
     def find_request(rack_request)
       path_item, path_params = find_path_item_and_params(rack_request.path)
       operation = path_item&.operation(rack_request.request_method.downcase)
-      RuntimeRequest.new(
+      OpenapiFirst::Request.new(
         request: rack_request,
         path_item:,
         operation:,

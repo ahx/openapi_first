@@ -29,7 +29,7 @@ module OpenapiFirst
     end
   end
 
-  # Key in rack to find instance of RuntimeRequest
+  # Key in rack to find instance of Request
   REQUEST = 'openapi.request'
 
   # Load and dereference an OpenAPI spec file

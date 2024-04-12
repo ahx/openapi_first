@@ -14,7 +14,7 @@ RSpec.describe OpenapiFirst::ResponseValidation::Validator do
   let(:headers) { { Rack::CONTENT_TYPE => 'application/json' } }
 
   let(:response) do
-    OpenapiFirst::RuntimeResponse.new(
+    OpenapiFirst::Response.new(
       operation,
       rack_response
     )

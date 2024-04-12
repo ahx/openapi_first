@@ -89,27 +89,27 @@ RSpec.describe OpenapiFirst::Definition do
       let(:definition) { OpenapiFirst.load('./spec/data/parameters-path.yaml') }
 
       it 'supports /{date}' do
-        runtime_request = definition.validate_request(build_request('/info/2020-01-01'))
-        operation_id = runtime_request.operation_id
+        request = definition.validate_request(build_request('/info/2020-01-01'))
+        operation_id = request.operation_id
 
         expect(operation_id).to eq 'info_date'
-        expect(runtime_request.path_parameters['date']).to eq('2020-01-01')
+        expect(request.path_parameters['date']).to eq('2020-01-01')
       end
 
       it 'supports /{start_date}..{end_date}' do
-        runtime_request = definition.validate_request(build_request('/info/2020-01-01..2020-01-02'))
-        operation_id = runtime_request.operation_id
+        request = definition.validate_request(build_request('/info/2020-01-01..2020-01-02'))
+        operation_id = request.operation_id
         expect(operation_id).to eq 'info_date_range'
 
-        expect(runtime_request.path_parameters['start_date']).to eq('2020-01-01')
-        expect(runtime_request.path_parameters['end_date']).to eq('2020-01-02')
+        expect(request.path_parameters['start_date']).to eq('2020-01-01')
+        expect(request.path_parameters['end_date']).to eq('2020-01-02')
       end
 
       it 'still works without parameters' do
-        runtime_request = definition.validate_request(build_request('/info'))
-        operation_id = runtime_request.operation_id
+        request = definition.validate_request(build_request('/info'))
+        operation_id = request.operation_id
         expect(operation_id).to eq 'info'
-        expect(runtime_request.path_parameters).to be_empty
+        expect(request.path_parameters).to be_empty
       end
     end
 
