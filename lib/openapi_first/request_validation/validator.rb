@@ -60,9 +60,9 @@ module OpenapiFirst
 
       def validate_defined(request)
         return if request.known?
-        return Failure.fail!(:not_found) unless request.known_path?
+        return Failure.fail!(:not_found) unless request.path_item
 
-        Failure.fail!(:method_not_allowed) unless request.known_request_method?
+        Failure.fail!(:method_not_allowed) unless request.operation
       end
 
       def validate_path_params!(request)

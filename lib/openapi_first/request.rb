@@ -34,21 +34,9 @@ module OpenapiFirst
     # @return [Failure, nil]
     attr_accessor :error
 
-    # Checks if the path and request method are known.
+    # Checks if the request is defined in the API description
     # @return [Boolean] true if the path and request method are known, false otherwise.
     def known?
-      known_path? && known_request_method?
-    end
-
-    # Checks if the path is known.
-    # @return [Boolean] true if the path is known, false otherwise.
-    def known_path?
-      !!path_item
-    end
-
-    # Checks if the request method is known.
-    # @return [Boolean] true if the request method is known, false otherwise.
-    def known_request_method?
       !!operation
     end
 
