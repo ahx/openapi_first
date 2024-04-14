@@ -88,9 +88,9 @@ module OpenapiFirst
       )
     end
 
-    def build_request_validator(path_item, operation)
+    def build_request_validator(_path_item, operation)
       @build_request_validator ||= Hash.new do |hash, key|
-        hash[key] = RequestValidation::Validator.new(path_item, operation, config:, openapi_version:)
+        hash[key] = RequestValidation::Validator.new(operation)
       end[operation&.name]
     end
 

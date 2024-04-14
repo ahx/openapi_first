@@ -5,6 +5,8 @@ require 'set'
 require 'openapi_parameters'
 require_relative 'request_body'
 require_relative 'responses'
+require_relative 'parameter'
+require_relative '../parameters_schema'
 
 module OpenapiFirst
   class Definition
@@ -77,9 +79,22 @@ module OpenapiFirst
         @name ||= "#{method.upcase} #{path}".freeze
       end
 
-      %i[path query header cookie].each do |location|
+      %i[path query cookie].each do |location|
         define_method("#{location}_parameters") do
           all_parameters[location]
+        end
+      end
+
+      IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
+      private_constant :IGNORED_HEADERS
+
+      def header_parameters
+        all_parameters[:header]&.reject { IGNORED_HEADERS.include?(_1['name']) }
+      end
+
+      %i[path query header cookie].each do |location|
+        define_method("#{location}_schema") do
+          ParametersSchema.for(send("#{location}_parameters"))
         end
       end
 

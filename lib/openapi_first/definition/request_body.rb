@@ -23,10 +23,13 @@ module OpenapiFirst
         content = @request_body_object['content']
         return unless content&.any?
 
-        content&.fetch(content_type) do
+        schema = content&.fetch(content_type) do
           type = content_type.split(';')[0]
           content[type] || content["#{type.split('/')[0]}/*"] || content['*/*']
         end&.fetch('schema', nil)
+        return unless schema
+
+        Schema.new(schema)
       end
     end
   end
