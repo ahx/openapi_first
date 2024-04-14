@@ -13,8 +13,7 @@ module OpenapiFirst
       '3.0' => 'json-schemer://openapi30/schema'
     }.freeze
 
-    def initialize(schema, openapi_version:, write: true, after_property_validation: nil)
-      @schema = schema
+    def initialize(schema, openapi_version: '3.1', write: true, after_property_validation: nil)
       @schemer = JSONSchemer.schema(
         schema,
         access_mode: write ? 'write' : 'read',

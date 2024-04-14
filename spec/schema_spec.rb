@@ -207,10 +207,4 @@ RSpec.describe OpenapiFirst::Schema do
       expect(validate(data).data).to be data
     end
   end
-
-  describe 'validate.schema' do
-    it 'returns the original schema' do
-      expect(validate(data).schema).to be schema
-    end
-  end
 end
