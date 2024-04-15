@@ -6,7 +6,6 @@ require 'openapi_parameters'
 require_relative 'request_body'
 require_relative 'responses'
 require_relative 'parameter'
-require_relative '../parameters_schema'
 
 module OpenapiFirst
   class Definition
@@ -79,6 +78,7 @@ module OpenapiFirst
         @name ||= "#{method.upcase} #{path}".freeze
       end
 
+      # These return [Hash]
       %i[path query cookie].each do |location|
         define_method("#{location}_parameters") do
           all_parameters[location]
@@ -92,9 +92,10 @@ module OpenapiFirst
         all_parameters[:header]&.reject { IGNORED_HEADERS.include?(_1['name']) }
       end
 
+      # These return a Schema instance for each type of parameters
       %i[path query header cookie].each do |location|
         define_method("#{location}_schema") do
-          ParametersSchema.for(send("#{location}_parameters"))
+          build_parameters_schema(send("#{location}_parameters"))
         end
       end
 
@@ -124,16 +125,35 @@ module OpenapiFirst
 
       attr_reader :operation_object, :responses
 
+      def build_parameters_schema(parameters)
+        return unless parameters
+
+        properties = {}
+        required = []
+        parameters.each do |parameter|
+          schema = parameter['schema']
+          name = parameter['name']
+          properties[name] = schema if schema
+          required << name if parameter['required']
+        end
+
+        schema_hash = {
+          'properties' => properties,
+          'required' => required
+        }
+        Schema.new(schema_hash)
+      end
+
       def all_parameters
         @all_parameters ||= begin
-          hash = {}
-          @path_item['parameters']&.each do |parameter|
-            (hash[parameter['in'].to_sym] ||= []) << parameter
+          result = {}
+          @path_item['parameters']&.each do |parameter, result|
+            (result[parameter['in'].to_sym] ||= []) << parameter
           end
           self['parameters']&.each do |parameter|
-            (hash[parameter['in'].to_sym] ||= []) << parameter
+            (result[parameter['in'].to_sym] ||= []) << parameter
           end
-          hash
+          result
         end
       end
     end
