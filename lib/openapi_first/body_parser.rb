@@ -5,13 +5,6 @@ require 'multi_json'
 module OpenapiFirst
   # @!visibility private
   class BodyParser
-    def self.const_missing(const_name)
-      super unless const_name == :ParsingError
-      warn 'DEPRECATION WARNING: OpenapiFirst::BodyParser::ParsingError is deprecated. ' \
-           'Use OpenapiFirst::ParseError instead.'
-      OpenapiFirst::ParseError
-    end
-
     def parse(request, content_type)
       body = read_body(request)
       return if body.empty?
