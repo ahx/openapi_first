@@ -147,7 +147,7 @@ module OpenapiFirst
       def all_parameters
         @all_parameters ||= begin
           result = {}
-          @path_item['parameters']&.each do |parameter, result|
+          @path_item['parameters']&.each do |parameter|
             (result[parameter['in'].to_sym] ||= []) << parameter
           end
           self['parameters']&.each do |parameter|
