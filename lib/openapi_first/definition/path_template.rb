@@ -9,10 +9,18 @@ module OpenapiFirst
       TEMPLATE_EXPRESSION_NAME = /\{([^}]+)\}/
       ALLOWED_PARAMETER_CHARACTERS = %r{([^/?#]+)}
 
+      def self.template?(string)
+        string.include?('{')
+      end
+
       def initialize(template)
         @template = template
         @names = template.scan(TEMPLATE_EXPRESSION_NAME).flatten
         @pattern = build_pattern(template)
+      end
+
+      def to_s
+        @template
       end
 
       def match(path)

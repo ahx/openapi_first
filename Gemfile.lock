@@ -122,6 +122,9 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.31.3)
       parser (>= 3.3.1.0)
+    rubocop-performance (1.21.0)
+      rubocop (>= 1.48.1, < 2.0)
+      rubocop-ast (>= 1.31.1, < 2.0)
     ruby-progressbar (1.13.0)
     simplecov (0.22.0)
       docile (~> 1.1)
@@ -156,6 +159,7 @@ DEPENDENCIES
   rake
   rspec
   rubocop
+  rubocop-performance
   simplecov
 
 BUNDLED WITH
