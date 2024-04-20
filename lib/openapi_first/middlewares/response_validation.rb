@@ -34,7 +34,9 @@ module OpenapiFirst
       def read_body(body)
         return body.to_ary if body.respond_to?(:to_ary)
 
-        body.map { |part| part }
+        result = []
+        body.each { |part| result << part }
+        result
       end
     end
   end
