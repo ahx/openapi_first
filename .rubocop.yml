@@ -9,6 +9,8 @@ Style/Documentation:
     - "lib/openapi_first/json_refs.rb"
 Style/ExponentialNotation:
   Enabled: true
+Style/MapIntoArray:
+  Enabled: false
 Metrics/BlockLength:
   Exclude:
     - "spec/**/*.rb"
