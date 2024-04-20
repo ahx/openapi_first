@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.4.2
+
+- Fix Rack 2 compatibility
+
 ## 1.4.1
 
 - Fixed: Don't call deprecated methods in middlewares
@@ -19,7 +23,7 @@ Some redundant methods to validate or inspect requests/responses will be removed
 
 ## 1.3.6
 
-- FIx Rack 2 / Rails 6 compatibility ([#246](https://github.com/ahx/openapi_first/issues/246)
+- Fix Rack 2 / Rails 6 compatibility ([#246](https://github.com/ahx/openapi_first/issues/246)
 
 ## 1.3.5
 
