@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../schema'
-
 module OpenapiFirst
   class Definition
     # Represents a request body definition in the OpenAPI document that belongs to an operation.
@@ -23,13 +21,10 @@ module OpenapiFirst
         content = @request_body_object['content']
         return unless content&.any?
 
-        schema = content&.fetch(content_type) do
+        content&.fetch(content_type) do
           type = content_type.split(';')[0]
           content[type] || content["#{type.split('/')[0]}/*"] || content['*/*']
         end&.fetch('schema', nil)
-        return unless schema
-
-        Schema.new(schema)
       end
     end
   end

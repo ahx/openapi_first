@@ -4,7 +4,7 @@ module OpenapiFirst
   module RequestValidation
     module Validators
       class Path
-        def self.for(_request_definition)
+        def self.for(_request_definition, hooks: {})
           self
         end
 

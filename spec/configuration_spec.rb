@@ -39,9 +39,9 @@ RSpec.describe OpenapiFirst::Configuration do
 
     it 'clones empty configs' do
       config = OpenapiFirst::Configuration.new
-      expect(config.hooks).to be_empty
+      expect(config.hooks.values.all?(&:empty?)).to be(true)
       cloned = config.clone
-      expect(cloned.hooks).to be_empty
+      expect(cloned.hooks.values.all?(&:empty?)).to be(true)
     end
   end
 end

@@ -90,7 +90,7 @@ module OpenapiFirst
 
     def build_request_validator(_path_item, operation)
       @build_request_validator ||= Hash.new do |hash, key|
-        hash[key] = RequestValidation::Validator.new(operation)
+        hash[key] = RequestValidation::Validator.new(operation, hooks: @config.hooks)
       end[operation&.name]
     end
 

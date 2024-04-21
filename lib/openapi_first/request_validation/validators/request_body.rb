@@ -4,18 +4,20 @@ module OpenapiFirst
   module RequestValidation
     module Validators
       class RequestBody
-        def self.for(request_definition)
+        def self.for(request_definition, hooks: {})
           request_body_def = request_definition&.request_body
           return unless request_body_def
 
-          new(request_body_def)
+          after_property_validation = hooks[:after_request_body_property_validation]
+          new(request_body_def, after_property_validation:)
         end
 
-        def initialize(request_body_def)
+        def initialize(request_body_def, after_property_validation:)
           @request_body_def = request_body_def
+          @after_property_validation = after_property_validation
         end
 
-        attr_reader :request_body_def
+        attr_reader :request_body_def, :after_property_validation
 
         def required?
           request_body_def.required?
@@ -36,7 +38,7 @@ module OpenapiFirst
                           message: "Unsupported Media Type '#{request.content_type}'")
           end
 
-          validation = schema.validate(request_body)
+          validation = Schema.new(schema, after_property_validation:).validate(request_body)
           Failure.fail!(:invalid_body, errors: validation.errors) if validation.error?
         end
 

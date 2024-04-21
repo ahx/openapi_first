@@ -137,11 +137,10 @@ module OpenapiFirst
           required << name if parameter['required']
         end
 
-        schema_hash = {
+        {
           'properties' => properties,
           'required' => required
         }
-        Schema.new(schema_hash)
       end
 
       def all_parameters

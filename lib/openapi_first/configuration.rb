@@ -3,10 +3,17 @@
 module OpenapiFirst
   # Global configuration. Currently only used for the request validation middleware.
   class Configuration
+    HOOKS = %i[
+      after_request_validation
+      after_response_validation
+      after_request_parameter_property_validation
+      after_request_body_property_validation
+    ].freeze
+
     def initialize
       @request_validation_error_response = OpenapiFirst.find_plugin(:default)::ErrorResponse
       @request_validation_raise_error = false
-      @hooks = {}
+      @hooks = (HOOKS.map { [_1, []] }).to_h
     end
 
     attr_reader :request_validation_error_response, :hooks
@@ -18,14 +25,8 @@ module OpenapiFirst
       copy
     end
 
-    %i[
-      after_request_validation
-      after_response_validation
-      after_request_parameter_property_validation
-      after_request_body_property_validation
-    ].each do |hook|
+    HOOKS.each do |hook|
       define_method(hook) do |&block|
-        @hooks[hook] ||= []
         hooks[hook] << block
       end
     end
