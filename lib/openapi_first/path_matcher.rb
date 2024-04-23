@@ -3,15 +3,15 @@
 module OpenapiFirst
   # Indexes the given path objects and returns the first object that matches
   class PathMatcher
-    def initialize(paths, template_class: Definition::PathTemplate)
+    def initialize(requests, template_class: Definition::PathTemplate)
       @static = {}
-      @dynamic = []
-      paths.each do |path|
-        pathname = path.to_s
+      @dynamic = {}
+      requests.each do |request|
+        pathname = request.path
         if template_class.template?(pathname)
-          @dynamic << template_class.new(pathname)
+          @dynamic[template_class.new(pathname)] = request
         else
-          @static[pathname] = path
+          @static[pathname] = request
         end
       end
     end
@@ -23,9 +23,9 @@ module OpenapiFirst
       found = @static[pathname]
       return [found, {}] if found
 
-      @dynamic.find do |path|
-        params = path.match(pathname)
-        return [path.to_s, params] if params
+      @dynamic.find do |template, request|
+        params = template.match(pathname)
+        return [request, params] if params
       end
     end
   end

@@ -4,8 +4,8 @@ RSpec.describe OpenapiFirst::PathMatcher do
   describe '#call' do
     let(:paths) do
       [
-        '/simple/path',
-        '/path/with/{variable}'
+        double(path: '/simple/path'),
+        double(path: '/path/with/{variable}')
       ]
     end
 
@@ -19,11 +19,13 @@ RSpec.describe OpenapiFirst::PathMatcher do
     end
 
     it 'finds a /path/with/{variable}' do
-      expect(matcher.call('/path/with/123')).to eq(['/path/with/{variable}', { 'variable' => '123' }])
+      path, params = matcher.call('/path/with/123')
+      expect(path).to be(paths[1])
+      expect(params).to eq({ 'variable' => '123' })
     end
 
     it 'finds a /simple/path' do
-      expect(matcher.call('/simple/path')).to eq(['/simple/path', {}])
+      expect(matcher.call('/simple/path')).to eq([paths[0], {}])
     end
 
     it 'returns nil if no path is found' do
@@ -33,9 +35,9 @@ RSpec.describe OpenapiFirst::PathMatcher do
     context 'with different variables in common nested routes' do
       let(:paths) do
         [
-          '/foo/{fooId}',
-          '/foo/special',
-          '/foo/{id}/bar'
+          double(path: '/foo/{fooId}'),
+          double(path: '/foo/special'),
+          double(path: '/foo/{id}/bar')
         ]
       end
 
