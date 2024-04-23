@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  # Indexes the given path objects by `#to_s` and matches by `#match`
+  # Indexes the given path objects and returns the first object that matches
   class PathMatcher
     def initialize(paths, template_class: Definition::PathTemplate)
       @static = {}
