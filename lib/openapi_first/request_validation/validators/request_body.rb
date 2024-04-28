@@ -5,11 +5,11 @@ module OpenapiFirst
     module Validators
       class RequestBody
         def self.for(request_definition, hooks: {})
-          request_body_def = request_definition&.request_body
-          return unless request_body_def
+          request_body = request_definition&.request_body
+          return unless request_body
 
           after_property_validation = hooks[:after_request_body_property_validation]
-          new(request_body_def, after_property_validation:)
+          new(request_body, after_property_validation:)
         end
 
         def initialize(request_body_def, after_property_validation:)
