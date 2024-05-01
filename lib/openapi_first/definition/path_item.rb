@@ -15,9 +15,10 @@ module OpenapiFirst
         @path_item_object = path_item_object
         @path_template = PathTemplate.new(path)
         @all_parameters = @path_item_object.fetch('parameters', []).group_by { _1['in'] }.freeze
+        @requests = operations.each_with_object({}) { |op, result| result[op.request_method.upcase] = op }
       end
 
-      attr_reader :path
+      attr_reader :path, :requests
 
       def_delegator :@path_template, :match
 

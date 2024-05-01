@@ -3,19 +3,15 @@
 require_relative '../failure'
 require_relative 'validators/cookies'
 require_relative 'validators/headers'
-require_relative 'validators/path'
 require_relative 'validators/path_parameters'
 require_relative 'validators/query'
 require_relative 'validators/request_body'
-require_relative 'validators/request_method'
 
 module OpenapiFirst
   module RequestValidation
     # Validates a Request against an Operation.
     class Validator
       VALIDATORS = [
-        Validators::Path,
-        Validators::RequestMethod,
         Validators::PathParameters,
         Validators::Query,
         Validators::Headers,
@@ -23,15 +19,15 @@ module OpenapiFirst
         Validators::RequestBody
       ].freeze
 
-      def initialize(request_definition, hooks: {})
+      def initialize(operation, hooks: {})
         @validators = VALIDATORS.filter_map do |klass|
-          klass.for(request_definition, hooks:)
+          klass.for(operation, hooks:)
         end
       end
 
-      def call(request)
+      def call(parsed_request)
         catch Failure::FAILURE do
-          @validators.each { |v| v.call(request) }
+          @validators.each { |v| v.call(parsed_request) }
           nil
         end
       end

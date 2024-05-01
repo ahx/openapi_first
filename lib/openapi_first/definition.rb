@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 require_relative 'definition/path_item'
+require_relative 'failure'
+require_relative 'router'
 require_relative 'request'
+require_relative 'request_parser'
 require_relative 'validated_request'
 require_relative 'validated_response'
 require_relative 'request_validation/validator'
@@ -18,6 +21,8 @@ module OpenapiFirst
     def initialize(resolved, filepath = nil)
       @filepath = filepath
       @paths = resolved['paths']
+      path_items = @paths.map { |path, item| PathItem.new(path, item) }
+      @router = Router.new(path_items)
       @openapi_version = detect_version(resolved)
       @config = OpenapiFirst.configuration.clone
       yield @config if block_given?
@@ -28,12 +33,17 @@ module OpenapiFirst
     # @param rack_request [Rack::Request] The Rack request object.
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [Request] The validated request object.
-    def validate_request(rack_request, raise_error: false)
-      request = find_request(rack_request)
-      validator = build_request_validator(request.path_item, request.operation)
-
-      error = validator.call(request)
-      validated = ValidatedRequest.new(request, error)
+    def validate_request(request, raise_error: false)
+      route = @router.match(request.request_method, request.path)
+      if route.error?
+        route.error.raise! if raise_error
+        return ValidatedRequest.new(request, route.error)
+      end
+      operation = route.operation
+      validator = build_request_validator(operation)
+      parsed = RequestParser.new(operation).parse(request, route_params: route.params)
+      error = validator.call(parsed)
+      validated = ValidatedRequest.new(parsed, error)
       @config.hooks[:after_request_validation]&.each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
       validated
@@ -88,7 +98,7 @@ module OpenapiFirst
       )
     end
 
-    def build_request_validator(_path_item, operation)
+    def build_request_validator(operation)
       @build_request_validator ||= Hash.new do |hash, key|
         hash[key] = RequestValidation::Validator.new(operation, hooks: @config.hooks)
       end[operation&.name]
