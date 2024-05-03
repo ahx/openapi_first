@@ -94,32 +94,6 @@ RSpec.describe OpenapiFirst::Definition::Operation do
     end
   end
 
-  describe '#read?' do
-    it 'returns true if write? returns false' do
-      operation = OpenapiFirst::Definition::Operation.new('/', 'get', {})
-      expect(operation.read?).to be true
-    end
-
-    it 'returns false if write? returns true' do
-      operation = OpenapiFirst::Definition::Operation.new('/', 'post', {})
-      expect(operation.read?).to be false
-    end
-  end
-
-  describe 'write?' do
-    %w[POST PUT PATCH DELETE].each do |http_method|
-      it "returns true for #{http_method}" do
-        operation = OpenapiFirst::Definition::Operation.new('/', http_method.downcase, {})
-        expect(operation.write?).to be true
-      end
-    end
-
-    it 'returns false for GET' do
-      operation = OpenapiFirst::Definition::Operation.new('/', 'get', {})
-      expect(operation.write?).to be false
-    end
-  end
-
   describe '#response_for' do
     let(:spec) { OpenapiFirst.load('./spec/data/content-types.yaml') }
     let(:operation) { spec.operations.first }

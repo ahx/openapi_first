@@ -42,21 +42,6 @@ module OpenapiFirst
         operation_object['operationId']
       end
 
-      # Checks if the operation is a read operation.
-      # This is the case for all request methods except POST, PUT, PATCH and DELETE.
-      # @return [Boolean] `true` if the operation is a read operation, `false` otherwise.
-      def read?
-        !write?
-      end
-
-      # Checks if the operation is a write operation.
-      # This is the case for POST, PUT, PATCH and DELETE request methods.
-      # @return [Boolean] `true` if the operation is a write operation, `false` otherwise.
-      # @deprecated Use {#write?} instead.
-      def write?
-        WRITE_METHODS.include?(method)
-      end
-
       # Checks if a response status is defined for this operation.
       # @param status [Integer, String] The response status to check.
       # @return [Boolean] `true` if the response status is defined, `false` otherwise.
