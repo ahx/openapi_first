@@ -5,7 +5,7 @@ module OpenapiFirst
     module Validators
       class PathParameters
         def self.for(request_definition, hooks: {})
-          schema = request_definition&.path_schema
+          schema = request_definition.path_schema
           return unless schema
 
           after_property_validation = hooks[:after_request_parameter_property_validation]
