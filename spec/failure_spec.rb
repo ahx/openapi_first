@@ -38,7 +38,7 @@ RSpec.describe OpenapiFirst::Failure do
 
     context 'with a lot of errors' do
       let(:failure) do
-        errors = 100.times.map do |i|
+        errors = Array.new(100) do |i|
           instance_double(OpenapiFirst::Schema::ValidationError, error: "something is wrong over there #{i}")
         end
         described_class.new(:invalid_body, errors:)

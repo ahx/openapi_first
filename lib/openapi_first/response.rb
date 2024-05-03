@@ -46,7 +46,7 @@ module OpenapiFirst
     # Returns the parsed (JSON) body of the response.
     # @return [Hash, String] Returns the body of the response.
     def body
-      @body ||= content_type =~ /json/i ? load_json(original_body) : original_body
+      @body ||= /json/i.match?(content_type) ? load_json(original_body) : original_body
     end
 
     # Returns the headers of the response as defined in the API description.
@@ -71,7 +71,7 @@ module OpenapiFirst
     # Usually the body responds to #each, but when using manual response validation without the middleware
     # in Rails request specs the body is a String. So this code handles both cases.
     def original_body
-      buffered_body = String.new
+      buffered_body = +''
       if @rack_response.body.respond_to?(:each)
         @rack_response.body.each { |chunk| buffered_body.to_s << chunk }
         return buffered_body

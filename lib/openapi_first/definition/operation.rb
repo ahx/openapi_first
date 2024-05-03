@@ -65,7 +65,7 @@ module OpenapiFirst
 
       # These return [Hash]
       %i[path query cookie].each do |location|
-        define_method("#{location}_parameters") do
+        define_method(:"#{location}_parameters") do
           all_parameters[location]
         end
       end
@@ -79,8 +79,8 @@ module OpenapiFirst
 
       # These return a Schema instance for each type of parameters
       %i[path query header cookie].each do |location|
-        define_method("#{location}_schema") do
-          build_parameters_schema(send("#{location}_parameters"))
+        define_method(:"#{location}_schema") do
+          build_parameters_schema(send(:"#{location}_parameters"))
         end
       end
 
