@@ -9,10 +9,6 @@ module OpenapiFirst
         freeze
       end
 
-      def description
-        @request_body_object['description']
-      end
-
       def required?
         !!@request_body_object['required']
       end
