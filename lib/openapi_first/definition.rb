@@ -36,17 +36,8 @@ module OpenapiFirst
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [Request] The validated request object.
     def validate_request(request, raise_error: false)
-      route = @router.match(request.request_method, request.path)
-      operation = route.operation
-      path_item = route.path_item
-      validated = if route.error
-                    ValidatedRequest.new(request, error: route.error, operation:, path_item:)
-                  else
-                    parsed = @request_parsers[operation].parse(request, route_params: route.params)
-                    error = @request_validators[operation].call(parsed)
-                    ValidatedRequest.new(parsed, error:, operation:, path_item:)
-                  end
-      @config.hooks[:after_request_validation]&.each { |hook| hook.call(validated) }
+      validated = route_and_validate(request)
+      @config.hooks[:after_request_validation].each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
       validated
     end
@@ -78,6 +69,17 @@ module OpenapiFirst
     end
 
     private
+
+    def route_and_validate(request)
+      route = @router.match(request.request_method, request.path)
+      operation = route.operation
+      path_item = route.path_item
+      return ValidatedRequest.new(request, error: route.error, operation:, path_item:) if route.error
+
+      parsed = @request_parsers[operation].parse(request, route_params: route.params)
+      error = @request_validators[operation].call(parsed)
+      ValidatedRequest.new(parsed, error:, operation:, path_item:)
+    end
 
     # Builds a Request object based on the Rack request.
     # @param rack_request [Rack::Request] The Rack request object.
