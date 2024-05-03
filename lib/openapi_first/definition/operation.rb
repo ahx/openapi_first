@@ -99,22 +99,6 @@ module OpenapiFirst
         end
       end
 
-      def query_unpacker
-        @query_unpacker ||= query_parameters && OpenapiParameters::Query.new(query_parameters)
-      end
-
-      def path_unpacker
-        @path_unpacker ||= path_parameters && OpenapiParameters::Path.new(path_parameters)
-      end
-
-      def header_unpacker
-        @header_unpacker ||= header_parameters && OpenapiParameters::Header.new(header_parameters)
-      end
-
-      def cookie_unpacker
-        @cookie_unpacker ||= cookie_parameters && OpenapiParameters::Cookie.new(cookie_parameters)
-      end
-
       private
 
       WRITE_METHODS = Set.new(%w[post put patch delete]).freeze
