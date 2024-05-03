@@ -221,9 +221,9 @@ RSpec.describe OpenapiFirst::Definition do
       expect(path).to be_nil
     end
 
-    it 'does not evaluate URI templates' do
+    it 'does evaluates URI templates' do
       path = definition.path('/pets/1')
-      expect(path).to be_nil
+      expect(path).to be_a(OpenapiFirst::Definition::PathItem)
     end
   end
 

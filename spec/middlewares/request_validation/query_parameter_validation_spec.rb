@@ -82,7 +82,7 @@ RSpec.describe 'Query Parameter validation' do
 
     it 'adds parsed query parameters to env ' do
       get '/search', params
-      expect(last_request.env[OpenapiFirst::REQUEST].params).to eq expected_params
+      expect(last_request.env[OpenapiFirst::REQUEST].query).to eq expected_params
     end
 
     it 'skips parameter validation if no parameters are defined' do
@@ -101,7 +101,7 @@ RSpec.describe 'Query Parameter validation' do
       get '/search', params.merge(foo: 'bar')
 
       expect(last_response.status).to eq 200
-      expect(last_request.env[OpenapiFirst::REQUEST].params).to eq expected_params
+      expect(last_request.env[OpenapiFirst::REQUEST].query).to eq expected_params
     end
 
     context 'with array query parameters' do
@@ -114,8 +114,9 @@ RSpec.describe 'Query Parameter validation' do
             integers: '2,3,4'
           }
           get '/default-style', params
+
           expect(last_response.status).to eq(200), last_response.body
-          parsed_parameters = last_request.env[OpenapiFirst::REQUEST].params
+          parsed_parameters = last_request.env[OpenapiFirst::REQUEST].query
           expect(parsed_parameters['strings']).to eq %w[a b c]
           expect(parsed_parameters['integers']).to eq [2, 3, 4]
         end
@@ -123,14 +124,14 @@ RSpec.describe 'Query Parameter validation' do
         it 'parses nested array' do
           get '/default-style?nested[integers]=2,3,4'
           expect(last_response.status).to eq(200), last_response.body
-          parsed_parameters = last_request.env[OpenapiFirst::REQUEST].params
+          parsed_parameters = last_request.env[OpenapiFirst::REQUEST].query
           expect(parsed_parameters['nested[integers]']).to eq [2, 3, 4]
         end
 
         it 'ignores empty query params' do
           get '/default-style'
           expect(last_response.status).to eq(200), last_response.body
-          parsed_parameters = last_request.env[OpenapiFirst::REQUEST].params
+          parsed_parameters = last_request.env[OpenapiFirst::REQUEST].query
           expect(parsed_parameters['strings']).to be_nil
         end
 
@@ -157,7 +158,7 @@ RSpec.describe 'Query Parameter validation' do
         params = {}
         get '/with-default-query-param', params
         expect(last_response.status).to eq(200)
-        parsed_parameters = last_request.env[OpenapiFirst::REQUEST].params
+        parsed_parameters = last_request.env[OpenapiFirst::REQUEST].query
         expect(parsed_parameters['has_default']).to eq true
       end
 
@@ -173,7 +174,7 @@ RSpec.describe 'Query Parameter validation' do
         params = { has_default: false }
         get '/with-default-query-param', params
         expect(last_response.status).to eq(200)
-        parsed_parameters = last_request.env[OpenapiFirst::REQUEST].params
+        parsed_parameters = last_request.env[OpenapiFirst::REQUEST].query
         expect(parsed_parameters['has_default']).to eq false
       end
     end
@@ -253,7 +254,7 @@ RSpec.describe 'Query Parameter validation' do
 
     describe 'type conversion' do
       def last_params
-        last_request.env[OpenapiFirst::REQUEST].params
+        last_request.env[OpenapiFirst::REQUEST].query
       end
 
       it 'converts to integer' do

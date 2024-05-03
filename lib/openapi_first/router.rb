@@ -5,19 +5,13 @@ require_relative 'path_matcher'
 module OpenapiFirst
   # Indexes OpenapiFirst::Request objects by path and request method
   class Router
-    Match = Data.define(:path_item, :operation, :params) do
+    Match = Data.define(:path_item, :operation, :params, :error) do
       def error?
-        false
+        !error.nil?
       end
     end
 
-    Mismatch = Data.define(:error) do
-      def error?
-        true
-      end
-    end
-
-    PATH_NOT_FOUND = Mismatch.new(Failure.new(:not_found))
+    PATH_NOT_FOUND = Match.new(error: Failure.new(:not_found), path_item: nil, operation: nil, params: nil)
 
     # @param requests List of path item definitions
     def initialize(path_items)
@@ -30,12 +24,9 @@ module OpenapiFirst
       return PATH_NOT_FOUND unless match
 
       path_item, params = match
-      request = path_item.requests[request_method]
-      if request
-        Match.new(path_item, request, params)
-      else
-        Mismatch.new(Failure.new(:method_not_allowed))
-      end
+      operation = path_item.requests[request_method]
+      error = Failure.new(:method_not_allowed) unless operation
+      Match.new(path_item:, operation:, params:, error:)
     end
   end
 end

@@ -65,60 +65,6 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
   end
 
-  # describe '#known_path?' do
-  #   context 'with known path' do
-  #     let(:rack_request) do
-  #       Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-  #     end
-
-  #     it 'returns true' do
-  #       expect(request).to be_known_path
-  #     end
-  #   end
-
-  #   context 'with unknown path' do
-  #     let(:rack_request) do
-  #       Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
-  #     end
-
-  #     it 'returns false' do
-  #       expect(request).not_to be_known_path
-  #     end
-  #   end
-  # end
-
-  # describe '#known_request_method?' do
-  #   context 'with known request method' do
-  #     let(:rack_request) do
-  #       Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-  #     end
-
-  #     it 'returns true' do
-  #       expect(request).to be_known_request_method
-  #     end
-  #   end
-
-  #   context 'with unknown request method' do
-  #     let(:rack_request) do
-  #       Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'PATCH'))
-  #     end
-
-  #     it 'returns false' do
-  #       expect(request).not_to be_known_request_method
-  #     end
-  #   end
-
-  #   context 'with known request method, but unknown path' do
-  #     let(:rack_request) do
-  #       Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
-  #     end
-
-  #     it 'returns false' do
-  #       expect(request).not_to be_known_request_method
-  #     end
-  #   end
-  # end
-
   describe '#operation_id' do
     let(:rack_request) do
       Rack::Request.new(Rack::MockRequest.env_for('/pets'))
@@ -126,34 +72,6 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
 
     it 'returns the operation ID' do
       expect(request.operation_id).to eq('listPets')
-    end
-  end
-
-  describe '#content_type' do
-    let(:definition) { OpenapiFirst.load('./spec/data/petstore-expanded.yaml') }
-
-    let(:rack_request) do
-      Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST')).tap do |r|
-        r.add_header 'CONTENT_TYPE', 'application/json; charset=UTF8'
-      end
-    end
-
-    it 'returns the content type of the original request' do
-      expect(request.content_type).to eq('application/json; charset=UTF8')
-    end
-  end
-
-  describe '#media_type' do
-    let(:definition) { OpenapiFirst.load('./spec/data/petstore-expanded.yaml') }
-
-    let(:rack_request) do
-      Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST')).tap do |r|
-        r.add_header 'CONTENT_TYPE', 'application/json; charset=UTF8'
-      end
-    end
-
-    it 'returns the content type without parameters' do
-      expect(request.media_type).to eq('application/json')
     end
   end
 
@@ -347,27 +265,9 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
   end
 
-  describe '#path' do
-    it 'returns the path of the request' do
-      expect(subject.path).to eq('/pets/42')
-    end
-  end
-
   describe '#path_item' do
     it 'returns the path item definition for the request' do
       expect(subject.path_item.path).to eq('/pets/{petId}')
-    end
-  end
-
-  # describe '#path_definition' do
-  #   it 'returns the path item definition for the request' do
-  #     expect(subject.path_definition).to eq('/pets/{petId}')
-  #   end
-  # end
-
-  describe '#request_method' do
-    it 'returns the request_method of the request' do
-      expect(subject.request_method).to eq('get')
     end
   end
 

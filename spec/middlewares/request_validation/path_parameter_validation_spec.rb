@@ -31,7 +31,7 @@ RSpec.describe 'Path Parameter validation' do
 
     it 'adds the converted path parameter to env' do
       get '/pets/42'
-      expect(last_request.env[OpenapiFirst::REQUEST].params['petId']).to eq 42
+      expect(last_request.env[OpenapiFirst::REQUEST].path_parameters['petId']).to eq 42
     end
 
     context 'with valid parameters' do
