@@ -81,26 +81,6 @@ module OpenapiFirst
       ValidatedRequest.new(parsed, error:, operation:, path_item:)
     end
 
-    # Builds a Request object based on the Rack request.
-    # @param rack_request [Rack::Request] The Rack request object.
-    # @return [Request] The Request object.
-    def find_request(rack_request)
-      path_item, path_params = find_path_item_and_params(rack_request.path)
-      operation = path_item&.operation(rack_request.request_method.downcase)
-      OpenapiFirst::Request.new(
-        request: rack_request,
-        path_item:,
-        operation:,
-        path_params:
-      )
-    end
-
-    def build_request_validator(operation)
-      @build_request_validator ||= Hash.new do |hash, key|
-        hash[key] = RequestValidation::Validator.new(operation, hooks: @config.hooks)
-      end[operation&.name]
-    end
-
     def detect_version(resolved)
       (resolved['openapi'] || resolved['swagger'])[0..2]
     end
