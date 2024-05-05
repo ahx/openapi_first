@@ -7,14 +7,14 @@ module OpenapiFirst
   class ValidatedRequest
     extend Forwardable
 
-    def initialize(request_values, error:, operation: nil, path_item: nil)
-      @request_values = request_values
+    def initialize(parsed_request, error:, operation: nil, path_item: nil)
+      @parsed_request = parsed_request
       @error = error
       @operation = operation
       @path_item = path_item
     end
 
-    def_delegators :@request_values, :path_parameters, :query, :headers, :cookies, :body
+    def_delegators :@parsed_request, :path_parameters, :query, :headers, :cookies, :body
     def_delegators :@operation, :operation_id
 
     # Returns the error object if validation failed.
