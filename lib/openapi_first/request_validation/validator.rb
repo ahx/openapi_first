@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../failure'
-require_relative 'validators/cookies'
-require_relative 'validators/headers'
-require_relative 'validators/path_parameters'
-require_relative 'validators/query'
+require_relative 'validators/parameters'
 require_relative 'validators/request_body'
 
 module OpenapiFirst
@@ -12,10 +9,7 @@ module OpenapiFirst
     # Validates a Request against an Operation.
     class Validator
       VALIDATORS = [
-        Validators::PathParameters,
-        Validators::Query,
-        Validators::Headers,
-        Validators::Cookies,
+        Validators::Parameters,
         Validators::RequestBody
       ].freeze
 
