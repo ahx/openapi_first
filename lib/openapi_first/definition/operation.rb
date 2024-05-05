@@ -5,7 +5,6 @@ require 'set'
 require 'openapi_parameters'
 require_relative 'request_body'
 require_relative 'responses'
-require_relative 'parameter'
 
 module OpenapiFirst
   class Definition
