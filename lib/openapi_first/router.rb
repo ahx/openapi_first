@@ -3,7 +3,7 @@
 require_relative 'path_matcher'
 
 module OpenapiFirst
-  # Indexes OpenapiFirst::Request objects by path and request method
+  # Router maps requests to a PathItem and Operation in the OpenAPI API description.
   class Router
     Match = Data.define(:path_item, :operation, :params, :error) do
       def error?
