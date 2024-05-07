@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.4.3
+
+- Allow using json_schemer 2...3
+
 ## 1.4.2
 
 - Fix Rack 2 compatibility
