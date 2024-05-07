@@ -172,7 +172,7 @@ RSpec.describe OpenapiFirst::Schema do
       expect(error.instance_location).to eq('/data/additional')
       expect(error.schema_location).to eq('/properties/data/additionalProperties')
       expect(error.error).to eq(
-        'object property at `/data/additional` is not defined and schema does not allow additional properties'
+        'object property at `/data/additional` is a disallowed additional property'
       )
       expect(error.type).to eq('schema')
       expect(error.details).to be_nil
