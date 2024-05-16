@@ -5,7 +5,7 @@ RSpec.describe OpenapiFirst::Failure do
     it 'throws a failure' do
       expect do
         described_class.fail!(:invalid_body)
-      end.to throw_symbol(described_class::FAILURE, instance_of(described_class))
+      end.to throw_symbol(OpenapiFirst::FAILURE, instance_of(described_class))
     end
 
     context 'with an unknown argument' do

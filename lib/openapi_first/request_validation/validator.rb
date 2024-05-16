@@ -20,7 +20,7 @@ module OpenapiFirst
       end
 
       def call(parsed_request)
-        catch Failure::FAILURE do
+        catch FAILURE do
           @validators.each { |v| v.call(parsed_request) }
           nil
         end

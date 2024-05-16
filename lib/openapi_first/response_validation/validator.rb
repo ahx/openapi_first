@@ -14,7 +14,7 @@ module OpenapiFirst
       def call(response)
         return unless operation
 
-        catch Failure::FAILURE do
+        catch FAILURE do
           validate_defined(response)
           response_definition = response.response_definition
           validate_response_body(response_definition.content_schema, response)

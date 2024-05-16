@@ -3,8 +3,6 @@
 module OpenapiFirst
   # A failure object returned when validation of request or response has failed.
   class Failure
-    FAILURE = :openapi_first_validation_failure
-
     TYPES = {
       not_found: [NotFoundError, 'Request path is not defined.'],
       method_not_allowed: [RequestInvalidError, 'Request method is not defined.'],

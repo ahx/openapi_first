@@ -32,6 +32,7 @@ module OpenapiFirst
 
   # Key in rack to find instance of Request
   REQUEST = 'openapi.request'
+  FAILURE = :openapi_first_validation_failure
 
   # Load and dereference an OpenAPI spec file
   # @return [Definition]
