@@ -1,32 +1,53 @@
 # frozen_string_literal: true
 
-require_relative 'path_matcher'
+require_relative 'definition/path_template'
 
 module OpenapiFirst
-  # Router maps requests to a PathItem and Operation in the OpenAPI API description.
+  # Router maps a request (method, path) to a PathItem and Operation in the OpenAPI API description.
   class Router
-    Match = Data.define(:path_item, :operation, :params, :error) do
-      def error?
-        !error.nil?
-      end
-    end
+    Template = Definition::PathTemplate
 
-    PATH_NOT_FOUND = Match.new(error: Failure.new(:not_found), path_item: nil, operation: nil, params: nil)
+    Match = Data.define(:route, :params, :error)
+    NOT_FOUND = Match.new(route: nil, params: nil, error: Failure.new(:not_found))
 
     # @param requests List of path item definitions
-    def initialize(path_items)
-      @path_matcher = PathMatcher.new(path_items)
+    def initialize
+      @static = {}
+      @dynamic = {}
+      @templates = {}
+    end
+
+    def add_route(request_method, path, route)
+      path_item = if Template.template?(path)
+                    @templates[path] ||= Template.new(path)
+                    @dynamic[path] ||= {}
+                  else
+                    @static[path] ||= {}
+                  end
+      path_item[request_method.upcase] ||= route
     end
 
     # Return all request objects that match the given path and request method
     def match(request_method, path)
-      match = @path_matcher.call(path)
-      return PATH_NOT_FOUND unless match
+      path_item, params = find_path_item(path)
+      return NOT_FOUND unless path_item
 
-      path_item, params = match
-      operation = path_item.requests[request_method]
-      error = Failure.new(:method_not_allowed) unless operation
-      Match.new(path_item:, operation:, params:, error:)
+      route = path_item[request_method]
+      return Match.new(route:, params:, error: Failure.new(:method_not_allowed)) unless route
+
+      Match.new(route:, params:, error: nil)
+    end
+
+    private
+
+    def find_path_item(path)
+      found = @static[path]
+      return [found, {}] if found
+
+      @dynamic.find do |template_string, request|
+        params = @templates[template_string].match(path)
+        return [request, params] if params
+      end
     end
   end
 end

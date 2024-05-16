@@ -12,39 +12,52 @@ RSpec.describe OpenapiFirst::Router do
       ]
     end
 
-    let(:path_items) do
-      [
-        double(path: '/{id}', requests: { 'GET' => requests[0], 'PATCH' => requests[1] }),
-        double(path: '/a', requests: { 'GET' => requests[2] })
-      ]
-    end
-
     subject(:router) do
-      described_class.new(path_items)
+      described_class.new.tap do |router|
+        requests.each do |request|
+          router.add_route(request.request_method, request.path, request)
+        end
+      end
     end
 
     it 'returns a match with params' do
       match = router.match('PATCH', '/b')
-      expect(match.operation).to be(requests[1])
+      expect(match.route).to be(requests[1])
       expect(match.params).to eq('id' => 'b')
-      expect(match.error?).to eq(false)
     end
 
     it 'returns an incomplete match for unknown path' do
-      match = router.match('GET', '/c/d')
-      expect(match.error?).to eq(true)
-      expect(match.error.type).to eq(:not_found)
+      expect(router.match('GET', '/c/d').error).to have_attributes(error_type: :not_found)
     end
 
     it 'returns an incomplete match for unknown request method' do
-      match = router.match('DELETE', '/b')
-      expect(match.error?).to eq(true)
-      expect(match.error.type).to eq(:method_not_allowed)
+      expect(router.match('DELETE', '/b').error).to have_attributes(error_type: :method_not_allowed)
     end
 
     pending 'return what methods are allowed for unknown request method' do
       match = router.match('DELETE', '/b')
       expect(match.error.allowed_methods).to eq(%w[GET PATCH])
+    end
+
+    context 'with different variables in common nested routes' do
+      let(:requests) do
+        [
+          double(path: '/foo/{fooId}', request_method: 'get'),
+          double(path: '/foo/special', request_method: 'get'),
+          double(path: '/foo/{id}/bar', request_method: 'get')
+        ]
+      end
+
+      it 'finds matches' do
+        match = router.match('GET', '/foo/1')
+        expect(match.params).to eq({ 'fooId' => '1' })
+
+        match = router.match('GET', '/foo/1/bar')
+        expect(match.params).to eq({ 'id' => '1' })
+
+        match = router.match('GET', '/foo/special')
+        expect(match.params).to eq({})
+      end
     end
   end
 end
