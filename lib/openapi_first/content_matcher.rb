@@ -1,18 +1,24 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  # Finds the request objects that matches the content type.
+  # Finds the object that matches the content type.
   class ContentMatcher
-    def initialize(requests)
-      @requests = requests.each_with_object({}) do |req, result|
-        result[req.content_type] = req
-      end
+    def initialize
+      @results = {}
     end
 
-    def call(content_type)
-      @requests.fetch(content_type) do
+    def add(content_type, object)
+      @results[content_type] = object
+    end
+
+    def defined_content_types
+      @results.keys
+    end
+
+    def match(content_type)
+      @results.fetch(content_type) do
         type = content_type.split(';')[0]
-        @requests[type] || @requests["#{type.split('/')[0]}/*"] || @requests['*/*']
+        @results[type] || @results["#{type.split('/')[0]}/*"] || @results['*/*'] || @results[nil]
       end
     end
   end
