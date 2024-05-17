@@ -7,8 +7,8 @@ module OpenapiFirst
   class Router
     Template = Definition::PathTemplate
 
-    Match = Data.define(:route, :params, :error)
-    NOT_FOUND = Match.new(route: nil, params: nil, error: Failure.new(:not_found))
+    Match = Data.define(:operation, :params, :error)
+    NOT_FOUND = Match.new(operation: nil, params: nil, error: Failure.new(:not_found))
 
     # @param requests List of path item definitions
     def initialize
@@ -32,10 +32,10 @@ module OpenapiFirst
       path_item, params = find_path_item(path)
       return NOT_FOUND unless path_item
 
-      route = path_item[request_method]
-      return Match.new(route:, params:, error: Failure.new(:method_not_allowed)) unless route
+      operation = path_item[request_method]
+      return Match.new(operation:, params:, error: Failure.new(:method_not_allowed)) unless operation
 
-      Match.new(route:, params:, error: nil)
+      Match.new(operation:, params:, error: nil)
     end
 
     private

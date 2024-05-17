@@ -117,10 +117,6 @@ RSpec.describe OpenapiFirst::Definition do
       let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
       let(:rack_request) { build_request('/pets', method: 'PATCH') }
 
-      it 'has a path_item' do
-        expect(definition.validate_request(rack_request).path_item).to be_truthy
-      end
-
       it 'has no operation' do
         expect(definition.validate_request(rack_request).operation).to be_nil
       end

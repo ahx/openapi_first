@@ -22,7 +22,7 @@ RSpec.describe OpenapiFirst::Router do
 
     it 'returns a match with params' do
       match = router.match('PATCH', '/b')
-      expect(match.route).to be(requests[1])
+      expect(match.operation).to be(requests[1])
       expect(match.params).to eq('id' => 'b')
     end
 

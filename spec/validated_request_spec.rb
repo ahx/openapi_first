@@ -265,12 +265,6 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
   end
 
-  describe '#path_item' do
-    it 'returns the path item definition for the request' do
-      expect(subject.path_item.path).to eq('/pets/{petId}')
-    end
-  end
-
   describe '#operation' do
     it 'returns the request operation' do
       expect(request.operation.path).to eq('/pets/{petId}')

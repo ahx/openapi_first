@@ -33,6 +33,12 @@ RSpec.describe OpenapiFirst::Definition::Operation do
     end
   end
 
+  describe '#path_item' do
+    it 'returns the path item' do
+      expect(operation.path_item).to be_a(OpenapiFirst::Definition::PathItem)
+    end
+  end
+
   describe '#query_parameters' do
     it 'returns the query parameters of path and operation level' do
       path_item_object = {

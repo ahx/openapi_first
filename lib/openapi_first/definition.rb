@@ -21,10 +21,13 @@ module OpenapiFirst
     def initialize(resolved, filepath = nil)
       @filepath = filepath
       path_items = resolved['paths'].map { |path, item| PathItem.new(path, item) }
-      @router = Router.new(path_items)
+      @operations = path_items.flat_map(&:operations)
+      @router = Router.new
+      @operations.each do |op|
+        @router.add_route(op.request_method, op.path, op)
+      end
       @openapi_version = detect_version(resolved)
       @config = OpenapiFirst.configuration.clone
-      @operations = path_items.flat_map(&:operations)
       @request_parsers = operations.to_h { |op| [op, RequestParser.new(op)] }
       @request_validators = operations.to_h { |op| [op, RequestValidation::Validator.new(op, hooks: @config.hooks)] }
       yield @config if block_given?
@@ -65,7 +68,7 @@ module OpenapiFirst
     # Example:
     #   definition.path('/pets/{id}')
     def path(pathname)
-      @router.match('GET', pathname).path_item
+      @router.match('GET', pathname).operation&.path_item
     end
 
     private
@@ -73,12 +76,11 @@ module OpenapiFirst
     def route_and_validate(request)
       route = @router.match(request.request_method, request.path)
       operation = route.operation
-      path_item = route.path_item
-      return ValidatedRequest.new(request, error: route.error, operation:, path_item:) if route.error
+      return ValidatedRequest.new(request, error: route.error, operation:) if route.error
 
       parsed = @request_parsers[operation].parse(request, route_params: route.params)
       error = @request_validators[operation].call(parsed)
-      ValidatedRequest.new(parsed, error:, operation:, path_item:)
+      ValidatedRequest.new(parsed, error:, operation:)
     end
 
     def detect_version(resolved)

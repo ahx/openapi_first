@@ -27,6 +27,8 @@ module OpenapiFirst
       # @return [String] path The path of the operation as in the API description.
       def_delegator :@path_item, :path
 
+      attr_reader :path_item
+
       # @attr_reader [String] method The (downcased) request method of the operation.
       # Example: "get"
       attr_reader :method
