@@ -41,10 +41,10 @@ RSpec.describe OpenapiFirst::ResponseValidation do
     end
 
     it 'returns an error' do
-      msg = "Response header is invalid: Content-Type for 'GET /pets response status: 200' must not be empty"
+      msg = 'Response is not defined. Content-Type must not be empty. Content-Type should be application/json.'
       expect do
         get '/pets'
-      end.to raise_error OpenapiFirst::ResponseInvalidError, msg
+      end.to raise_error OpenapiFirst::ResponseNotFoundError, msg
     end
   end
 

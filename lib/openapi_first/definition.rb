@@ -4,6 +4,8 @@ require_relative 'definition/path_item'
 require_relative 'failure'
 require_relative 'router'
 require_relative 'response'
+require_relative 'response_matcher'
+require_relative 'response_parser'
 require_relative 'request_parser'
 require_relative 'validated_request'
 require_relative 'validated_response'
@@ -20,16 +22,26 @@ module OpenapiFirst
     # @param filepath [String] The file path of the OpenAPI document.
     def initialize(resolved, filepath = nil)
       @filepath = filepath
-      path_items = resolved['paths'].map { |path, item| PathItem.new(path, item) }
-      @operations = path_items.flat_map(&:operations)
-      @router = Router.new
-      @operations.each do |op|
-        @router.add_route(op.request_method, op.path, op)
-      end
-      @openapi_version = detect_version(resolved)
       @config = OpenapiFirst.configuration.clone
+      path_items = resolved['paths'].map { |path, item| PathItem.new(path, item) }
+      @openapi_version = detect_version(resolved)
+      @operations = path_items.flat_map(&:operations)
+      @router = Router.new.tap do |router|
+        @operations.each do |op|
+          router.add_route(op.request_method, op.path, op)
+        end
+      end
       @request_parsers = operations.to_h { |op| [op, RequestParser.new(op)] }
       @request_validators = operations.to_h { |op| [op, RequestValidation::Validator.new(op, hooks: @config.hooks)] }
+      @response_validators = {}
+      @response_matchers = operations.to_h do |op|
+        matcher = ResponseMatcher.new
+        op.responses.each do |response|
+          matcher.add_response(response.status, response.content_type, response)
+          @response_validators[response] = ResponseValidation::Validator.new(response)
+        end
+        [op, matcher]
+      end
       yield @config if block_given?
       @config.freeze
     end
@@ -50,13 +62,22 @@ module OpenapiFirst
     # @param rack_response [Rack::Response] The Rack response object.
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [Response] The validated response object.
-    def validate_response(request, rack_response, raise_error: false)
-      route = @router.match(request.request_method, request.path)
+    def validate_response(rack_request, rack_response, raise_error: false)
+      route = @router.match(rack_request.request_method, rack_request.path)
+      return if route.error # Skip response validation for unknown requests
+
       operation = route.operation
-      response = OpenapiFirst::Response.new(operation, rack_response)
-      validator = ResponseValidation::Validator.new(operation, openapi_version: @openapi_version)
-      error = validator.call(response)
-      validated = ValidatedResponse.new(response, error)
+      response_match = @response_matchers[operation].match(rack_response.status, rack_response.content_type)
+      error = response_match.error
+      validated = if error
+                    ValidatedResponse.new(rack_response, error)
+                  else
+                    response_definition = response_match.response
+                    validator = @response_validators[response_definition]
+                    parsed_response = ResponseParser.new(response_definition).parse(rack_response)
+                    error = validator.call(parsed_response)
+                    ValidatedResponse.new(parsed_response, error)
+                  end
       @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
       validated
@@ -72,6 +93,15 @@ module OpenapiFirst
     end
 
     private
+
+    def find_response_definition(rack_request, rack_response)
+      route = @router.match(rack_request.request_method, rack_request.path)
+      return [rack_response, route.error] if route.error
+
+      operation = route.operation
+      response_match = @response_matchers[operation].match(rack_response.status, rack_response.content_type)
+      [response_match.response, response_match.error]
+    end
 
     def route_and_validate(request)
       route = @router.match(request.request_method, request.path)

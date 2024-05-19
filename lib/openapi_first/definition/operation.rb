@@ -4,7 +4,7 @@ require 'forwardable'
 require 'set'
 require 'openapi_parameters'
 require_relative 'request_body'
-require_relative 'responses'
+require_relative 'response'
 
 module OpenapiFirst
   class Definition
@@ -20,7 +20,6 @@ module OpenapiFirst
         @path_item = path_item
         @method = request_method
         @operation_object = operation_object
-        @responses = Responses.new(self, operation_object['responses'])
         @request_body = RequestBody.new(operation_object['requestBody']) if operation_object['requestBody']
       end
 
@@ -43,19 +42,17 @@ module OpenapiFirst
         operation_object['operationId']
       end
 
-      # Checks if a response status is defined for this operation.
-      # @param status [Integer, String] The response status to check.
-      # @return [Boolean] `true` if the response status is defined, `false` otherwise.
-      def response_status_defined?(status)
-        responses.status_defined?(status)
-      end
-
-      # Returns the response object for a given status.
-      # @param status [Integer, String] The response status.
-      # @param content_type [String] Content-Type of the current response.
-      # @return [Response, nil] The response object for the given status, or `nil` if not found.
-      def response_for(status, content_type)
-        responses.response_for(status, content_type)
+      # Returns all responses this operation can produce.
+      # This will list one Response instance per status and content-type.
+      # @return [[Response]]
+      def responses
+        Array(operation_object['responses']).flat_map do |status, response_object|
+          response_object['content']&.map do |content_type, content_object|
+            content_schema = content_object['schema']
+            Response.new(operation: self, status:, response_object:, content_type:, content_schema:)
+          end || Response.new(operation: self, status:, response_object:, content_type: nil,
+                              content_schema: nil)
+        end
       end
 
       # Returns a unique name for this operation. Used for generating error messages.
@@ -93,7 +90,7 @@ module OpenapiFirst
       IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
       private_constant :IGNORED_HEADERS
 
-      attr_reader :operation_object, :responses
+      attr_reader :operation_object
 
       def build_parameters_schema(parameters)
         return unless parameters

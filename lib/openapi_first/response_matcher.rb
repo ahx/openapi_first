@@ -22,10 +22,9 @@ module OpenapiFirst
         message = "Response status #{status} is not defined. Defined statuses are: #{@responses.keys.join(', ')}."
         return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
       end
-
       response = content.match(content_type)
       if response.nil?
-        message = "Content-Type '#{content_type}' is not defined. Defined content-types are: #{content.defined_content_types.join(', ')}."
+        message = "#{content_type_err(content_type)} Content-Type should be #{content.defined_content_types.join(' or ')}."
         return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
       end
 
@@ -33,6 +32,12 @@ module OpenapiFirst
     end
 
     private
+
+    def content_type_err(content_type)
+      return 'Content-Type must not be empty.' if content_type.nil? || content_type.empty?
+
+      "Content-Type #{content_type} is not defined."
+    end
 
     def [](status)
       # According to OAS status has to be a string,
