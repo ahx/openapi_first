@@ -3,6 +3,7 @@
 module OpenapiFirst
   ParsedResponse = Data.define(:body, :headers)
 
+  # Parse a response
   class ResponseParser
     def initialize(response_definition)
       @response_definition = response_definition

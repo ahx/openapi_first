@@ -4,6 +4,7 @@ require 'openapi_parameters'
 require_relative 'parsed_request'
 
 module OpenapiFirst
+  # Parse a request
   class RequestParser
     def initialize(operation)
       parameters = operation.query_parameters

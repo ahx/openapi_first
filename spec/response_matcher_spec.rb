@@ -93,10 +93,10 @@ RSpec.describe OpenapiFirst::ResponseMatcher do
           double(status: '200', content_type: 'application/xml')
         ]
         matcher = build_matcher(responses)
+        message = 'Content-Type application/json is not defined. Content-Type should be application/text or application/xml.'
         expect(matcher.match(200, 'application/json')).to have_attributes(
           response: nil,
-          error: have_attributes(error_type: :response_not_found,
-                                 message: 'Content-Type application/json is not defined. Content-Type should be application/text or application/xml.')
+          error: have_attributes(error_type: :response_not_found, message:)
         )
       end
     end
