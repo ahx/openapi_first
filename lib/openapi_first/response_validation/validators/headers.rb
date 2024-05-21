@@ -4,11 +4,11 @@ module OpenapiFirst
   module ResponseValidation
     module Validators
       class Headers
-        def self.for(response_definition)
+        def self.for(response_definition, openapi_version:)
           schema = response_definition&.headers_schema
           return unless schema
 
-          new(Schema.new(schema))
+          new(Schema.new(schema, openapi_version:))
         end
 
         def initialize(schema)

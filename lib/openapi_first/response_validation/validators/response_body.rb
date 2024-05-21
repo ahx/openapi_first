@@ -4,11 +4,11 @@ module OpenapiFirst
   module ResponseValidation
     module Validators
       class ResponseBody
-        def self.for(response_definition)
+        def self.for(response_definition, openapi_version:)
           schema = response_definition&.content_schema
           return unless schema
 
-          new(Schema.new(schema, write: false))
+          new(Schema.new(schema, write: false, openapi_version:))
         end
 
         def initialize(schema)

@@ -39,11 +39,11 @@ module OpenapiFirst
           cookie_schema: Cookies
         }.freeze
 
-        def self.for(operation, hooks: {})
+        def self.for(operation, openapi_version:, hooks: {})
           after_property_validation = hooks[:after_request_parameter_property_validation]
           validators = VALIDATORS.filter_map do |key, klass|
             schema = operation.send(key)
-            klass.new(Schema.new(schema, after_property_validation:)) if schema
+            klass.new(Schema.new(schema, after_property_validation:, openapi_version:)) if schema
           end
           return if validators.empty?
 

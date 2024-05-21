@@ -32,13 +32,15 @@ module OpenapiFirst
         end
       end
       @request_parsers = operations.to_h { |op| [op, RequestParser.new(op)] }
-      @request_validators = operations.to_h { |op| [op, RequestValidation::Validator.new(op, hooks: @config.hooks)] }
+      @request_validators = operations.to_h do |op|
+        [op, RequestValidation::Validator.new(op, hooks: @config.hooks, openapi_version:)]
+      end
       @response_validators = {}
       @response_matchers = operations.to_h do |op|
         matcher = ResponseMatcher.new
         op.responses.each do |response|
           matcher.add_response(response.status, response.content_type, response)
-          @response_validators[response] = ResponseValidation::Validator.new(response)
+          @response_validators[response] = ResponseValidation::Validator.new(response, openapi_version:)
         end
         [op, matcher]
       end

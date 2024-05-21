@@ -13,9 +13,9 @@ module OpenapiFirst
         Validators::RequestBody
       ].freeze
 
-      def initialize(operation, hooks: {})
+      def initialize(operation, openapi_version:, hooks: {})
         @validators = VALIDATORS.filter_map do |klass|
-          klass.for(operation, hooks:)
+          klass.for(operation, hooks:, openapi_version:)
         end
       end
 

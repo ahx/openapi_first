@@ -11,9 +11,9 @@ module OpenapiFirst
         Validators::ResponseBody
       ].freeze
 
-      def initialize(response_definition)
+      def initialize(response_definition, openapi_version:)
         @validators = VALIDATORS.filter_map do |klass|
-          klass.for(response_definition)
+          klass.for(response_definition, openapi_version:)
         end
       end
 

@@ -5,9 +5,8 @@ require 'action_dispatch'
 RSpec.describe OpenapiFirst::ResponseParser do
   let(:response_definition) do
     instance_double(OpenapiFirst::Definition::Response,
-      content_type: 'application/json',
-      headers: {},
-    )
+                    content_type: 'application/json',
+                    headers: {})
   end
 
   subject(:parsed) do
@@ -73,28 +72,27 @@ RSpec.describe OpenapiFirst::ResponseParser do
   describe '#headers' do
     let(:response_definition) do
       instance_double(OpenapiFirst::Definition::Response,
-        content_type: nil,
-        headers: {
-          'OptionalWithoutSchema' => { description: "optonal" },
-          'Content-Type' => {
-            'required' => true,
-            'schema' => {
-              'type' => 'string',
-              'const' => "this should be ignored"
-            }
-          },
-          'Location' => {
-            'required' => true,
-            'schema' => {
-              'type' => 'string',
-              'format': 'uri-reference'
-            }
-          },
-          'X-Id' => {
-            'schema' => { 'type' => 'integer' }
-            }
-        },
-      )
+                      content_type: nil,
+                      headers: {
+                        'OptionalWithoutSchema' => { description: 'optonal' },
+                        'Content-Type' => {
+                          'required' => true,
+                          'schema' => {
+                            'type' => 'string',
+                            'const' => 'this should be ignored'
+                          }
+                        },
+                        'Location' => {
+                          'required' => true,
+                          'schema' => {
+                            'type' => 'string',
+                            format: 'uri-reference'
+                          }
+                        },
+                        'X-Id' => {
+                          'schema' => { 'type' => 'integer' }
+                        }
+                      })
     end
 
     let(:rack_response) do
