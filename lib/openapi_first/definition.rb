@@ -26,15 +26,15 @@ module OpenapiFirst
       path_items = resolved['paths'].map { |path, item| PathItem.new(path, item) }
       @openapi_version = detect_version(resolved)
       @operations = path_items.flat_map(&:operations)
-      @router = Router.new.tap do |router|
-        @operations.each do |op|
-          router.add_route(op.request_method, op.path, op)
+      @router = Router.new
+      @request_validators = {}
+      @operations.each do |op|
+        op.requests.each do |request|
+          @router.route(request.request_method, request.path, content_type: request.content_type, to: request)
+          @request_validators[request] = RequestValidation::Validator.new(request, hooks: @config.hooks, openapi_version:)
         end
       end
       @request_parsers = operations.to_h { |op| [op, RequestParser.new(op)] }
-      @request_validators = operations.to_h do |op|
-        [op, RequestValidation::Validator.new(op, hooks: @config.hooks, openapi_version:)]
-      end
       @response_validators = {}
       @response_matchers = operations.to_h do |op|
         matcher = ResponseMatcher.new
@@ -65,10 +65,10 @@ module OpenapiFirst
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [Response] The validated response object.
     def validate_response(rack_request, rack_response, raise_error: false)
-      route = @router.match(rack_request.request_method, rack_request.path)
+      route = @router.match(rack_request.request_method, rack_request.path, content_type: rack_request.content_type)
       return if route.error # Skip response validation for unknown requests
 
-      operation = route.operation
+      operation = route.request_definition.operation
       response_match = @response_matchers[operation].match(rack_response.status, rack_response.content_type)
       error = response_match.error
       validated = if error
@@ -91,27 +91,19 @@ module OpenapiFirst
     # Example:
     #   definition.path('/pets/{id}')
     def path(pathname)
-      @router.match('GET', pathname).operation&.path_item
+      @router.match('GET', pathname).request_definition&.path_item
     end
 
     private
 
-    def find_response_definition(rack_request, rack_response)
-      route = @router.match(rack_request.request_method, rack_request.path)
-      return [rack_response, route.error] if route.error
-
-      operation = route.operation
-      response_match = @response_matchers[operation].match(rack_response.status, rack_response.content_type)
-      [response_match.response, response_match.error]
-    end
-
     def route_and_validate(request)
-      route = @router.match(request.request_method, request.path)
-      operation = route.operation
-      return ValidatedRequest.new(request, error: route.error, operation:) if route.error
+      route = @router.match(request.request_method, request.path, content_type: request.content_type)
+      request_definition = route.request_definition
+      return ValidatedRequest.new(request, error: route.error, operation: request_definition) if route.error
 
+      operation = request_definition.operation
       parsed = @request_parsers[operation].parse(request, route_params: route.params)
-      error = @request_validators[operation].call(parsed)
+      error = @request_validators[request_definition].call(parsed)
       ValidatedRequest.new(parsed, error:, operation:)
     end
 

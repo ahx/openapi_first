@@ -2,16 +2,27 @@
 
 RSpec.describe OpenapiFirst::Definition::Operation do
   let(:operation) do
-    path_item = OpenapiFirst::Definition::PathItem.new('/pets/{pet_id}', { 'get' => operation_object })
-    described_class.new(path_item, 'get', operation_object)
+    path_item = OpenapiFirst::Definition::PathItem.new('/pets/{pet_id}', { 'post' => operation_object })
+    described_class.new(path_item, 'post', operation_object)
   end
 
   let(:operation_object) do
     {
-      'operationId' => 'get_pet',
+      'operationId' => 'create_pet',
       'parameters' => [
         { 'name' => 'limit', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
       ],
+      'requestBody' => {
+        'required' => true,
+        'content' => {
+          'application/json' => {
+            'schema' => { 'type' => 'object' }
+          },
+          'application/xml' => {
+            'schema' => { 'type' => 'object' }
+          }
+        }
+      },
       'responses' => {
         '200' => {
           'content' => {
@@ -32,13 +43,71 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#operation_id' do
     it 'returns the operationId' do
-      expect(operation.operation_id).to eq 'get_pet'
+      expect(operation.operation_id).to eq 'create_pet'
     end
   end
 
   describe '#path_item' do
     it 'returns the path item' do
       expect(operation.path_item).to be_a(OpenapiFirst::Definition::PathItem)
+    end
+  end
+
+  describe '#requests' do
+    it 'returns one object per content-type' do
+      json_request, xml_request = operation.requests
+      expect(json_request).to have_attributes(
+        content_type: 'application/json',
+        content_schema: { 'type' => 'object' },
+        path: '/pets/{pet_id}',
+        request_method: 'post',
+        operation:
+      )
+      expect(xml_request).to have_attributes(
+        content_type: 'application/xml',
+        content_schema: { 'type' => 'object' },
+        path: '/pets/{pet_id}',
+        request_method: 'post',
+        operation:
+      )
+    end
+
+    context 'when requestBody is not required' do
+      before do
+        operation_object['requestBody']['required'] = false
+      end
+
+      it 'returns one extra object without content_type' do
+        json_request, xml_request, empty_request = operation.requests
+        expect(json_request).to have_attributes(
+          content_type: 'application/json'
+        )
+        expect(xml_request).to have_attributes(
+          content_type: 'application/xml'
+        )
+        expect(empty_request).to have_attributes(
+          content_type: nil,
+          content_schema: nil,
+          path: '/pets/{pet_id}',
+          request_method: 'post'
+        )
+      end
+    end
+
+    context 'when requestBody is not defined' do
+      before do
+        operation_object.delete('requestBody')
+      end
+
+      it 'returns only one object' do
+        expect(operation.requests.length).to eq(1)
+        expect(operation.requests.first).to have_attributes(
+          content_type: nil,
+          content_schema: nil,
+          path: '/pets/{pet_id}',
+          request_method: 'post'
+        )
+      end
     end
   end
 
@@ -97,7 +166,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#[]' do
     it 'allows to access the resolved hash' do
-      expect(operation['operationId']).to eq 'get_pet'
+      expect(operation['operationId']).to eq 'create_pet'
       expect(operation['responses'].dig('200', 'content', 'application/json', 'schema', 'type')).to eq 'array'
       expect(operation['responses'].dig('default', 'description')).to eq 'unexpected error'
     end
@@ -105,7 +174,7 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#name' do
     it 'returns a human readable name' do
-      expect(operation.name).to eq 'GET /pets/{pet_id}'
+      expect(operation.name).to eq 'POST /pets/{pet_id}'
     end
   end
 

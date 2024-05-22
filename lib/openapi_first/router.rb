@@ -3,12 +3,12 @@
 require_relative 'definition/path_template'
 
 module OpenapiFirst
-  # Router maps a request (method, path) to a PathItem and Operation in the OpenAPI API description.
+  # Router maps a request (method, path, content_type) to a request definition.
   class Router
     Template = Definition::PathTemplate
 
-    Match = Data.define(:operation, :params, :error)
-    NOT_FOUND = Match.new(operation: nil, params: nil, error: Failure.new(:not_found))
+    Match = Data.define(:request_definition, :params, :error)
+    NOT_FOUND = Match.new(request_definition: nil, params: nil, error: Failure.new(:not_found))
 
     # @param requests List of path item definitions
     def initialize
@@ -17,28 +17,41 @@ module OpenapiFirst
       @templates = {}
     end
 
-    def add_route(request_method, path, route)
+    def route(request_method, path, to:, content_type: nil)
       path_item = if Template.template?(path)
                     @templates[path] ||= Template.new(path)
                     @dynamic[path] ||= {}
                   else
                     @static[path] ||= {}
                   end
-      path_item[request_method.upcase] ||= route
+      (path_item[request_method.upcase] ||= ContentMatcher.new).add(content_type, to)
     end
 
     # Return all request objects that match the given path and request method
-    def match(request_method, path)
+    def match(request_method, path, content_type: nil)
       path_item, params = find_path_item(path)
       return NOT_FOUND unless path_item
 
-      operation = path_item[request_method]
-      return Match.new(operation:, params:, error: Failure.new(:method_not_allowed)) unless operation
+      content = path_item[request_method]
+      return Match.new(request_definition: nil, params:, error: Failure.new(:method_not_allowed)) unless content
 
-      Match.new(operation:, params:, error: nil)
+      request_definition = content&.match(content_type)
+      unless request_definition
+        message = "#{content_type_err(content_type)} Content-Type should be #{content.defined_content_types.join(' or ')}."
+        error = Failure.new(:unsupported_media_type, message:)
+        return Match.new(request_definition: nil, params:, error:)
+      end
+
+      Match.new(request_definition:, params:, error: nil)
     end
 
     private
+
+    def content_type_err(content_type)
+      return 'Content-Type must not be empty.' if content_type.nil? || content_type.empty?
+
+      "Content-Type #{content_type} is not defined."
+    end
 
     def find_path_item(path)
       found = @static[path]

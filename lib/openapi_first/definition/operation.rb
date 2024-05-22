@@ -3,7 +3,7 @@
 require 'forwardable'
 require 'set'
 require 'openapi_parameters'
-require_relative 'request_body'
+require_relative 'request'
 require_relative 'response'
 
 module OpenapiFirst
@@ -20,7 +20,6 @@ module OpenapiFirst
         @path_item = path_item
         @method = request_method
         @operation_object = operation_object
-        @request_body = RequestBody.new(operation_object['requestBody']) if operation_object['requestBody']
       end
 
       # @return [String] path The path of the operation as in the API description.
@@ -32,9 +31,6 @@ module OpenapiFirst
       # Example: "get"
       attr_reader :method
       alias request_method method
-
-      # @attr_reader [RequestBody, nil] request_body The request body of the operation, or `nil` if not present.
-      attr_reader :request_body
 
       # Returns the operation ID as defined in the API description.
       # @return [String, nil]
@@ -53,6 +49,15 @@ module OpenapiFirst
           end || Response.new(operation: self, status:, response_object:, content_type: nil,
                               content_schema: nil)
         end
+      end
+
+      def requests
+        required_body = operation_object.dig('requestBody', 'required') == true
+        result = operation_object.dig('requestBody', 'content')&.map do |content_type, content|
+          Request.new(operation: self, content_type:, content_schema: content['schema'], required_body:)
+        end || []
+        result << Request.new(operation: self, content_type: nil, content_schema: nil, required_body:) unless required_body
+        result
       end
 
       # Returns a unique name for this operation. Used for generating error messages.

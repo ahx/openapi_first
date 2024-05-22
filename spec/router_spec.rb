@@ -4,7 +4,7 @@ require_relative '../lib/openapi_first/router'
 
 RSpec.describe OpenapiFirst::Router do
   describe '#match' do
-    let(:requests) do
+    let(:operations) do
       [
         double(path: '/{id}', request_method: 'get'),
         double(path: '/{id}', request_method: 'patch'),
@@ -14,15 +14,15 @@ RSpec.describe OpenapiFirst::Router do
 
     subject(:router) do
       described_class.new.tap do |router|
-        requests.each do |request|
-          router.add_route(request.request_method, request.path, request)
+        operations.each do |request|
+          router.route(request.request_method, request.path, to: request)
         end
       end
     end
 
     it 'returns a match with params' do
       match = router.match('PATCH', '/b')
-      expect(match.operation).to be(requests[1])
+      expect(match.request_definition).to be(operations[1])
       expect(match.params).to eq('id' => 'b')
     end
 
@@ -39,8 +39,60 @@ RSpec.describe OpenapiFirst::Router do
       expect(match.error.allowed_methods).to eq(%w[GET PATCH])
     end
 
+    context 'with matching content_type' do
+      subject(:router) do
+        described_class.new.tap do |router|
+          router.route('post', '/stations', content_type: 'application/json', to: 1)
+          router.route('post', '/stations', content_type: 'text/*', to: 2)
+        end
+      end
+
+      it 'returns a match with matching content-type' do
+        match = router.match('POST', '/stations', content_type: 'application/json')
+        expect(match.request_definition).to eq(1)
+
+        match = router.match('POST', '/stations', content_type: 'text/html')
+        expect(match.request_definition).to eq(2)
+      end
+    end
+
+    context 'with empty content-type' do
+      subject(:router) do
+        described_class.new.tap do |router|
+          router.route('post', '/stations', content_type: 'application/json', to: 1)
+          router.route('post', '/stations', to: 2)
+        end
+      end
+
+      it 'matches with content-type nil' do
+        match = router.match('POST', '/stations', content_type: '')
+        expect(match.request_definition).to eq(2)
+
+        match = router.match('POST', '/stations', content_type: nil)
+        expect(match.request_definition).to eq(2)
+
+        match = router.match('POST', '/stations', content_type: 'application/json')
+        expect(match.request_definition).to eq(1)
+      end
+    end
+
+    context 'without acceptable content-type' do
+      subject(:router) do
+        described_class.new.tap do |router|
+          router.route('post', '/stations', content_type: 'application/xml', to: 1)
+        end
+      end
+
+      it 'returns an error' do
+        match = router.match('POST', '/stations', content_type: 'application/json')
+
+        message = 'Content-Type application/json is not defined. Content-Type should be application/xml.'
+        expect(match.error).to have_attributes(error_type: :unsupported_media_type, message:)
+      end
+    end
+
     context 'with different variables in common nested routes' do
-      let(:requests) do
+      let(:operations) do
         [
           double(path: '/foo/{fooId}', request_method: 'get'),
           double(path: '/foo/special', request_method: 'get'),

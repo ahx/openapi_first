@@ -375,7 +375,7 @@ RSpec.describe 'Request body validation' do
         expect do
           post path, '<xml />'
         end.to raise_error OpenapiFirst::RequestInvalidError,
-                           %(Request content type is not defined. Unsupported Media Type 'application/xml')
+                           %(Request content type is not defined. Content-Type application/xml is not defined. Content-Type should be application/json or multipart/form-data or text/plain.)
       end
     end
   end
