@@ -92,15 +92,6 @@ module OpenapiFirst
       validated
     end
 
-    # Gets the PathItem object for the specified path.
-    # @param pathname [String] The path template string.
-    # @return [PathItem] The PathItem object.
-    # Example:
-    #   definition.path('/pets/{id}')
-    def path(pathname)
-      @router.match('GET', pathname).request_definition&.path_item
-    end
-
     private
 
     def route_and_validate(request)

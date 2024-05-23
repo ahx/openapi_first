@@ -26,20 +26,21 @@ RSpec.describe OpenapiFirst do
   describe '.parse' do
     it 'loads a Hash' do
       definition = OpenapiFirst.parse(YAML.safe_load_file('./spec/data/petstore.yaml'))
-      expect(definition.path('/pets').operation('get').operation_id).to eq('listPets')
+      expect(definition.operations.first.operation_id).to eq('listPets')
     end
 
     it 'supports :only' do
       hash = YAML.safe_load_file('./spec/data/petstore.yaml')
       only = ->(path) { path == '/pets' }
       definition = OpenapiFirst.parse(hash, only:)
-      expect(definition.path('/pets')).to be_truthy
-      expect(definition.path('/pets/{petId}')).to be_nil
+      paths = definition.operations.map(&:path)
+      expect(paths).to include('/pets')
+      expect(paths).not_to include('/pets/{petId}')
     end
 
     it 'loads a Hash' do
       definition = OpenapiFirst.parse(YAML.safe_load_file('./spec/data/petstore.yaml'))
-      expect(definition.path('/pets').operation('get').operation_id).to eq('listPets')
+      expect(definition.operations.map(&:path)).to include('/pets')
     end
   end
 
@@ -50,12 +51,12 @@ RSpec.describe OpenapiFirst do
 
     it 'works with YAML' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml')
-      expect(definition.path('/pets').operation('get').operation_id).to eq('listPets')
+      expect(definition.operations.map(&:path)).to include('/pets')
     end
 
     it 'works with JSON' do
       definition = OpenapiFirst.load('./spec/data/petstore.json')
-      expect(definition.path('/pets').operation('get').operation_id).to eq('listPets')
+      expect(definition.operations.map(&:path)).to include('/pets')
     end
 
     describe 'only option' do

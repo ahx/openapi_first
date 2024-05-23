@@ -203,26 +203,6 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
-  describe '#path' do
-    let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
-
-    it 'finds a path item' do
-      path = definition.path('/pets')
-      expect(path.path).to eq '/pets'
-      expect(path).to be_a(OpenapiFirst::Definition::PathItem)
-    end
-
-    it 'returns nil if path is unknown' do
-      path = definition.path('/fats')
-      expect(path).to be_nil
-    end
-
-    it 'does evaluates URI templates' do
-      path = definition.path('/pets/1')
-      expect(path).to be_a(OpenapiFirst::Definition::PathItem)
-    end
-  end
-
   describe '#filepath' do
     let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
 
