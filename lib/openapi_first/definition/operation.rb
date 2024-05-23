@@ -3,8 +3,8 @@
 require 'forwardable'
 require 'set'
 require 'openapi_parameters'
-require_relative 'request'
-require_relative 'response'
+require_relative '../request'
+require_relative '../response'
 
 module OpenapiFirst
   class Definition

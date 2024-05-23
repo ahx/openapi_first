@@ -1,97 +1,41 @@
 # frozen_string_literal: true
 
-require 'forwardable'
-require_relative 'body_parser'
-
 module OpenapiFirst
-  # Represents a response returned by the Rack application and how it relates to the API description.
+  # Represents a response definition in the OpenAPI document.
+  # This is not a direct reflecton of the OpenAPI 3.X response definition, but a combination of
+  # status, content type and content schema.
   class Response
-    extend Forwardable
-
-    def initialize(operation, rack_response)
-      @operation = operation
-      @rack_response = rack_response
+    def initialize(status:, response_object:, content_type:, content_schema:)
+      @status = status
+      @content_type = content_type
+      @content_schema = content_schema
+      @headers = response_object['headers']
+      @headers_schema = build_headers_schema(response_object['headers'])
     end
 
-    # @visibility private
-    attr_accessor :operation
-
-    # @attr_reader [Integer] status The HTTP status code of this response.
-    # @attr_reader [String] content_type The content_type of the Rack::Response.
-    def_delegators :@rack_response, :status, :content_type
-
-    # @return [String] name The name of the operation. Used for generating error messages.
-    def name
-      "#{@operation.name} response status: #{status}"
-    end
-
-    # Checks if the response is defined in the API description.
-    # @return [Boolean] Returns true if the response is known, false otherwise.
-    def known?
-      !!response_definition
-    end
-
-    # Checks if the response status is defined in the API description.
-    # @return [Boolean] Returns true if the response status is known, false otherwise.
-    def known_status?
-      @operation.response_status_defined?(status)
-    end
-
-    # Returns the description of the response definition if available.
-    # @return [String, nil] Returns the description of the response, or nil if not available.
-    def description
-      response_definition&.description
-    end
-
-    # Returns the parsed (JSON) body of the response.
-    # @return [Hash, String] Returns the body of the response.
-    def body
-      @body ||= /json/i.match?(content_type) ? load_json(original_body) : original_body
-    end
-
-    # Returns the headers of the response as defined in the API description.
-    # This only returns the headers that are defined in the API description.
-    # @return [Hash] Returns the headers of the response.
-    def headers
-      @headers ||= unpack_response_headers
-    end
-
-    # Returns the response definition associated with the response.
-    # @return [Definition::Response, nil] Returns the response definition, or nil if not found.
-    def response_definition
-      @response_definition ||= @operation.response_for(status, content_type)
-    end
+    # @attr_reader [Integer] status The HTTP status code of the response definition.
+    # @attr_reader [String, nil] content_type Content type of this response.
+    # @attr_reader [Schema, nil] content_schema the Schema of the response body.
+    attr_reader :status, :content_type, :content_schema, :headers, :headers_schema
 
     private
 
-    def validated?
-      defined?(@error)
-    end
+    def build_headers_schema(headers_object)
+      return unless headers_object&.any?
 
-    # Usually the body responds to #each, but when using manual response validation without the middleware
-    # in Rails request specs the body is a String. So this code handles both cases.
-    def original_body
-      buffered_body = +''
-      if @rack_response.body.respond_to?(:each)
-        @rack_response.body.each { |chunk| buffered_body.to_s << chunk }
-        return buffered_body
+      properties = {}
+      required = []
+      headers_object.each do |name, header|
+        schema = header['schema']
+        next if name.casecmp('content-type').zero?
+
+        properties[name] = schema if schema
+        required << name if header['required']
       end
-      @rack_response.body
-    end
-
-    def load_json(string)
-      MultiJson.load(string)
-    rescue MultiJson::ParseError
-      raise ParseError, 'Failed to parse response body as JSON'
-    end
-
-    def unpack_response_headers
-      return {} if response_definition&.headers.nil?
-
-      headers_as_parameters = response_definition.headers.map do |name, definition|
-        definition.merge('name' => name, 'in' => 'header')
-      end
-      OpenapiParameters::Header.new(headers_as_parameters).unpack(@rack_response.headers)
+      {
+        'properties' => properties,
+        'required' => required
+      }
     end
   end
 end

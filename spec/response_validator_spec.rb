@@ -6,7 +6,7 @@ require 'openapi_first/response_validation/validator'
 
 RSpec.describe OpenapiFirst::ResponseValidation::Validator do
   subject(:validator) do
-    response_definition = instance_double(OpenapiFirst::Definition::Response,
+    response_definition = instance_double(OpenapiFirst::Response,
                                           status: '200',
                                           content_type: 'application/json',
                                           content_schema: {
