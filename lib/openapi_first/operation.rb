@@ -3,8 +3,8 @@
 require 'forwardable'
 require 'set'
 require 'openapi_parameters'
-require_relative '../request'
-require_relative '../response'
+require_relative 'request'
+require_relative 'response'
 
 module OpenapiFirst
   class Definition
@@ -16,16 +16,15 @@ module OpenapiFirst
 
       def_delegators :operation_object, :[]
 
-      def initialize(path_item, request_method, operation_object)
-        @path_item = path_item
+      def initialize(path, request_method, operation_object, path_item_parameters:)
+        @path = path
         @method = request_method
         @operation_object = operation_object
+        @path_item_parameters = path_item_parameters
       end
 
       # @return [String] path The path of the operation as in the API description.
-      def_delegator :@path_item, :path
-
-      attr_reader :path_item
+      attr_reader :path
 
       # @attr_reader [String] method The (downcased) request method of the operation.
       # Example: "get"
@@ -118,7 +117,7 @@ module OpenapiFirst
       def all_parameters
         @all_parameters ||= begin
           result = {}
-          @path_item['parameters']&.each do |parameter|
+          @path_item_parameters&.each do |parameter|
             (result[parameter['in'].to_sym] ||= []) << parameter
           end
           self['parameters']&.each do |parameter|

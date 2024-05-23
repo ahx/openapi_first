@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'definition/path_item'
+require_relative 'operation'
 require_relative 'failure'
 require_relative 'router'
 require_relative 'response'
@@ -18,14 +18,22 @@ module OpenapiFirst
   class Definition
     attr_reader :filepath, :openapi_version, :config, :operations
 
+    REQUEST_METHODS = %w[get head post put patch delete trace options].freeze
+    private_constant :REQUEST_METHODS
+
     # @param resolved [Hash] The resolved OpenAPI document.
     # @param filepath [String] The file path of the OpenAPI document.
     def initialize(resolved, filepath = nil)
       @filepath = filepath
       @config = OpenapiFirst.configuration.clone
-      path_items = resolved['paths'].map { |path, item| PathItem.new(path, item) }
       @openapi_version = detect_version(resolved)
-      @operations = path_items.flat_map(&:operations)
+      @operations = resolved['paths'].flat_map do |path, path_item_object|
+        path_item_object.slice(*REQUEST_METHODS).keys.map do |request_method|
+          operation_object = path_item_object[request_method]
+          path_item_parameters = path_item_object['parameters']
+          Operation.new(path, request_method, operation_object, path_item_parameters:)
+        end
+      end
       @router = Router.new
       @request_parsers = {}
       @request_validators = {}

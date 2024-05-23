@@ -2,8 +2,7 @@
 
 RSpec.describe OpenapiFirst::Definition::Operation do
   let(:operation) do
-    path_item = OpenapiFirst::Definition::PathItem.new('/pets/{pet_id}', { 'post' => operation_object })
-    described_class.new(path_item, 'post', operation_object)
+    described_class.new('/pets/{pet_id}', 'post', operation_object, path_item_parameters: {})
   end
 
   let(:operation_object) do
@@ -44,12 +43,6 @@ RSpec.describe OpenapiFirst::Definition::Operation do
   describe '#operation_id' do
     it 'returns the operationId' do
       expect(operation.operation_id).to eq 'create_pet'
-    end
-  end
-
-  describe '#path_item' do
-    it 'returns the path item' do
-      expect(operation.path_item).to be_a(OpenapiFirst::Definition::PathItem)
     end
   end
 
@@ -131,17 +124,13 @@ RSpec.describe OpenapiFirst::Definition::Operation do
 
   describe '#query_parameters' do
     it 'returns the query parameters of path and operation level' do
-      path_item_object = {
-        'get' => operation_object,
-        'parameters' => [
-          {
-            'in' => 'query',
-            'name' => 'other'
-          }
-        ]
-      }
-      path_item = OpenapiFirst::Definition::PathItem.new('/pets/{pet_id}', path_item_object)
-      operation = described_class.new(path_item, 'get', operation_object)
+      path_item_parameters = [
+        {
+          'in' => 'query',
+          'name' => 'other'
+        }
+      ]
+      operation = described_class.new('/pets/{pet_id}', 'get', operation_object, path_item_parameters:)
       expect(operation.query_parameters.map { |p| p['name'] }).to eq %w[other limit]
     end
   end

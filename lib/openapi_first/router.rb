@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'definition/path_template'
+require_relative 'path_template'
 
 module OpenapiFirst
   # Router maps a request (method, path, content_type) to a request definition.
