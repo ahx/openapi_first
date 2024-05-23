@@ -45,8 +45,8 @@ module OpenapiFirst
         Array(operation_object['responses']).flat_map do |status, response_object|
           response_object['content']&.map do |content_type, content_object|
             content_schema = content_object['schema']
-            Response.new(operation: self, status:, response_object:, content_type:, content_schema:)
-          end || Response.new(operation: self, status:, response_object:, content_type: nil,
+            Response.new(status:, response_object:, content_type:, content_schema:)
+          end || Response.new(status:, response_object:, content_type: nil,
                               content_schema: nil)
         end
       end

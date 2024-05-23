@@ -6,8 +6,7 @@ module OpenapiFirst
     # This is not a direct reflecton of the OpenAPI 3.X response definition, but a combination of
     # status, content type and content schema.
     class Response
-      def initialize(operation:, status:, response_object:, content_type:, content_schema:)
-        @operation = operation
+      def initialize(status:, response_object:, content_type:, content_schema:)
         @status = status
         @content_type = content_type
         @content_schema = content_schema
@@ -15,11 +14,10 @@ module OpenapiFirst
         @headers_schema = build_headers_schema(response_object['headers'])
       end
 
-      # @attr_reader [Operation] operation The operation this response belongs to.
       # @attr_reader [Integer] status The HTTP status code of the response definition.
       # @attr_reader [String, nil] content_type Content type of this response.
       # @attr_reader [Schema, nil] content_schema the Schema of the response body.
-      attr_reader :operation, :status, :content_type, :content_schema, :headers, :headers_schema
+      attr_reader :status, :content_type, :content_schema, :headers, :headers_schema
 
       private
 
