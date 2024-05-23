@@ -6,18 +6,16 @@ require_relative 'parsed_request'
 module OpenapiFirst
   # Parse a request
   class RequestParser
-    def initialize(operation)
-      parameters = operation.query_parameters
-      @query = OpenapiParameters::Query.new(operation.query_parameters) if parameters
-
-      parameters = operation.path_parameters
-      @path = OpenapiParameters::Path.new(parameters) if parameters
-
-      parameters = operation.header_parameters
-      @headers = OpenapiParameters::Header.new(parameters) if parameters
-
-      parameters = operation.cookie_parameters
-      @cookies = OpenapiParameters::Cookie.new(parameters) if parameters
+    def initialize(
+      query_parameters:,
+      path_parameters:,
+      header_parameters:,
+      cookie_parameters:
+    )
+      @query = OpenapiParameters::Query.new(query_parameters) if query_parameters
+      @path = OpenapiParameters::Path.new(path_parameters) if path_parameters
+      @headers = OpenapiParameters::Header.new(header_parameters) if header_parameters
+      @cookies = OpenapiParameters::Cookie.new(cookie_parameters) if cookie_parameters
     end
 
     attr_reader :query, :path, :headers, :cookies

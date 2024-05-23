@@ -166,20 +166,18 @@ request = definition.validate_request(rack_request)
 definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if request is invalid
 
 # Inspect the request and access parsed parameters
-request.known? # Is the request defined in the API description?
+# request.known? # Is the request defined in the API description?
 request.valid? # => true / false
 request.error # => Failure object if request is invalid
-request.body # alias: parsed_body
+request.params # Merged parameters and request body. Priority is path, query, headers, cookies, body
+request.parsed_body
 request.path_parameters # => { "pet_id" => 42 }
-request.query # alias: query_parameters
-request.params # Merged path and query parameters
-request.headers
-request.cookies
-request.content_type
-request.request_method # => "get"
-request.path # => "/pets/42"
+request.parsed_headers
+request.parsed_cookies
+request.parsed_query # alias: query_parameters
+request.operation.path # => "/pets/{petId}"
 request.operation.operation_id # => "showPetById"
-request.definition.filepath # => '/absolute/path/openapi.yaml'
+request.operation.definition.filepath # => '/absolute/path/openapi.yaml'
 ```
 
 ### Validate response
@@ -213,6 +211,7 @@ OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 You can integrate your code at certain points during request/response validation via hooks.
 
 Available hooks:
+
 - `after_request_validation`
 - `after_response_validation`
 - `after_request_parameter_property_validation`
@@ -222,9 +221,10 @@ Setup per per instance:
 
 ```ruby
 OpenapiFirst.load('openapi.yaml') do |config|
-  config.after_response_validation do |response, validation_result|
-    # validation.
-    # response.operation
+  config.after_request_validation do |request, error, definition|
+    definition.operation_id
+  end
+  config.after_response_validation do |response, error, definition|
   end
 end
 ```

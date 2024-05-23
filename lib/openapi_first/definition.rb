@@ -27,22 +27,29 @@ module OpenapiFirst
       @openapi_version = detect_version(resolved)
       @operations = path_items.flat_map(&:operations)
       @router = Router.new
+      @request_parsers = {}
       @request_validators = {}
+      @response_parsers = {}
+      @response_validators = {}
+      @response_matchers = {}
       @operations.each do |op|
+        @request_parsers[op] = RequestParser.new(
+          query_parameters: op.query_parameters,
+          path_parameters: op.path_parameters,
+          header_parameters: op.header_parameters,
+          cookie_parameters: op.cookie_parameters
+        )
         op.requests.each do |request|
           @router.route(request.request_method, request.path, content_type: request.content_type, to: request)
           @request_validators[request] = RequestValidation::Validator.new(request, hooks: @config.hooks, openapi_version:)
         end
-      end
-      @request_parsers = operations.to_h { |op| [op, RequestParser.new(op)] }
-      @response_validators = {}
-      @response_matchers = operations.to_h do |op|
-        matcher = ResponseMatcher.new
+        response_matcher = ResponseMatcher.new
         op.responses.each do |response|
-          matcher.add_response(response.status, response.content_type, response)
           @response_validators[response] = ResponseValidation::Validator.new(response, openapi_version:)
+          response_matcher.add_response(response.status, response.content_type, response)
+          @response_parsers[response] = ResponseParser.new(headers: response.headers, content_type: response.content_type)
         end
-        [op, matcher]
+        @response_matchers[op] = response_matcher
       end
       yield @config if block_given?
       @config.freeze
@@ -76,7 +83,7 @@ module OpenapiFirst
                   else
                     response_definition = response_match.response
                     validator = @response_validators[response_definition]
-                    parsed_response = ResponseParser.new(response_definition).parse(rack_response)
+                    parsed_response = @response_parsers[response_definition].parse(rack_response)
                     error = validator.call(parsed_response)
                     ValidatedResponse.new(parsed_response, error)
                   end

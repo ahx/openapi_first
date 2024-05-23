@@ -5,11 +5,12 @@ module OpenapiFirst
 
   # Parse a response
   class ResponseParser
-    def initialize(response_definition)
-      @response_definition = response_definition
+    def initialize(headers:, content_type:)
+      @headers = headers
+      @content_type = content_type
     end
 
-    attr_reader :response_definition
+    attr_reader :headers, :content_type
 
     def parse(rack_response)
       ParsedResponse.new(
@@ -21,7 +22,7 @@ module OpenapiFirst
     private
 
     def parse_body(rack_response)
-      MultiJson.load(read_body(rack_response)) if /json/i.match?(@response_definition.content_type)
+      MultiJson.load(read_body(rack_response)) if /json/i.match?(content_type)
     rescue MultiJson::ParseError
       raise ResponseInvalidError, 'Response body is invalid: Failed to parse response body as JSON'
     end
@@ -36,10 +37,10 @@ module OpenapiFirst
     end
 
     def parse_headers(rack_response)
-      return {} if response_definition&.headers.nil?
+      return {} if headers.nil?
 
       # TODO: memoize unpacker
-      headers_as_parameters = response_definition.headers.map do |name, definition|
+      headers_as_parameters = headers.map do |name, definition|
         definition.merge('name' => name, 'in' => 'header')
       end
       OpenapiParameters::Header.new(headers_as_parameters).unpack(rack_response.headers)

@@ -3,14 +3,11 @@
 require 'action_dispatch'
 
 RSpec.describe OpenapiFirst::ResponseParser do
-  let(:response_definition) do
-    instance_double(OpenapiFirst::Definition::Response,
-                    content_type: 'application/json',
-                    headers: {})
-  end
+  let(:content_type) { 'application/json' }
+  let(:headers) { {} }
 
   subject(:parsed) do
-    described_class.new(response_definition).parse(rack_response)
+    described_class.new(content_type:, headers:).parse(rack_response)
   end
 
   describe '#body' do
@@ -70,29 +67,29 @@ RSpec.describe OpenapiFirst::ResponseParser do
   end
 
   describe '#headers' do
-    let(:response_definition) do
-      instance_double(OpenapiFirst::Definition::Response,
-                      content_type: nil,
-                      headers: {
-                        'OptionalWithoutSchema' => { description: 'optonal' },
-                        'Content-Type' => {
-                          'required' => true,
-                          'schema' => {
-                            'type' => 'string',
-                            'const' => 'this should be ignored'
-                          }
-                        },
-                        'Location' => {
-                          'required' => true,
-                          'schema' => {
-                            'type' => 'string',
-                            format: 'uri-reference'
-                          }
-                        },
-                        'X-Id' => {
-                          'schema' => { 'type' => 'integer' }
-                        }
-                      })
+    let(:content_type) { nil }
+
+    let(:headers) do
+      {
+        'OptionalWithoutSchema' => { description: 'optonal' },
+        'Content-Type' => {
+          'required' => true,
+          'schema' => {
+            'type' => 'string',
+            'const' => 'this should be ignored'
+          }
+        },
+        'Location' => {
+          'required' => true,
+          'schema' => {
+            'type' => 'string',
+            format: 'uri-reference'
+          }
+        },
+        'X-Id' => {
+          'schema' => { 'type' => 'integer' }
+        }
+      }
     end
 
     let(:rack_response) do
