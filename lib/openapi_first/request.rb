@@ -2,7 +2,7 @@
 
 require 'forwardable'
 require_relative 'request_parser'
-require_relative 'request_validation/validator'
+require_relative 'request_validator'
 require_relative 'validated_request'
 
 module OpenapiFirst
@@ -21,7 +21,7 @@ module OpenapiFirst
         header_parameters: operation.header_parameters,
         cookie_parameters: operation.cookie_parameters
       )
-      @validator = RequestValidation::Validator.new(self, hooks:, openapi_version: '3.1')
+      @validator = RequestValidator.new(self, hooks:, openapi_version: '3.1')
     end
 
     def_delegators :@operation, :path_item, :path, :request_method, :path_schema, :query_schema, :cookie_schema,

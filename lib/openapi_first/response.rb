@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'response_parser'
-require_relative 'response_validation/validator'
+require_relative 'response_validator'
 require_relative 'validated_response'
 
 module OpenapiFirst
@@ -16,7 +16,7 @@ module OpenapiFirst
       @headers = response_object['headers']
       @headers_schema = build_headers_schema(response_object['headers'])
       @parser = ResponseParser.new(headers: response_object['headers'], content_type:)
-      @validator = ResponseValidation::Validator.new(self, openapi_version: '3.1')
+      @validator = ResponseValidator.new(self, openapi_version: '3.1')
     end
 
     # @attr_reader [Integer] status The HTTP status code of the response definition.

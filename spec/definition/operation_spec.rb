@@ -46,24 +46,6 @@ RSpec.describe OpenapiFirst::Definition::Operation do
     end
   end
 
-  describe '#responses' do
-    it 'returns all response definitions' do
-      responses = operation.responses
-      ok_response, jsonapi_response, default_response = responses.to_a
-
-      expect(ok_response.status).to eq('200')
-      expect(ok_response.content_type).to eq('application/json')
-      expect(ok_response.content_schema).to eq({ 'type' => 'array' })
-
-      expect(jsonapi_response.status).to eq('200')
-      expect(jsonapi_response.content_type).to eq('application/vnd.api+json')
-      expect(jsonapi_response.content_schema).to eq({ 'type' => 'object', required: ['data'] })
-
-      expect(default_response.status).to eq('default')
-      expect(default_response.content_type).to be_nil
-    end
-  end
-
   describe '#query_parameters' do
     it 'returns the query parameters of path and operation level' do
       path_item_parameters = [

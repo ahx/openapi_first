@@ -3,6 +3,7 @@
 require_relative 'operation'
 require_relative 'failure'
 require_relative 'router'
+require_relative 'request'
 require_relative 'response'
 require_relative 'response_matcher'
 
@@ -30,13 +31,12 @@ module OpenapiFirst
       end
       @router = Router.new
       @response_matchers = {}
-      @requests = {}
       @operations.each do |op|
         build_requests(op).each do |request|
           @router.route(request.request_method, request.path, content_type: request.content_type, to: request)
         end
         response_matcher = ResponseMatcher.new
-        op.responses.each do |response|
+        build_responses(op).each do |response|
           response_matcher.add_response(response.status, response.content_type, response)
         end
         @response_matchers[op] = response_matcher
@@ -91,6 +91,16 @@ module OpenapiFirst
                               hooks:)
       end
       result
+    end
+
+    def build_responses(operation)
+      Array(operation['responses']).flat_map do |status, response_object|
+        response_object['content']&.map do |content_type, content_object|
+          content_schema = content_object['schema']
+          Response.new(status:, response_object:, content_type:, content_schema:)
+        end || Response.new(status:, response_object:, content_type: nil,
+                            content_schema: nil)
+      end
     end
 
     def route_and_validate(request)

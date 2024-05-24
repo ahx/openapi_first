@@ -8,10 +8,9 @@ AllCops:
 Style/Documentation:
   Exclude:
     - "spec/**/*"
-    - "lib/openapi_first/response_validation/validators/*.rb"
+    - "lib/openapi_first/validators/*.rb"
     - "benchmarks/**/*"
     - "lib/openapi_first/json_refs.rb"
-    - "lib/openapi_first/request_validation/validators/*.rb"
 Style/ExponentialNotation:
   Enabled: true
 Style/MapIntoArray:

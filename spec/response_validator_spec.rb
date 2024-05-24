@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'spec_helper'
-require 'rack'
-require 'openapi_first/response_validation/validator'
-
-RSpec.describe OpenapiFirst::ResponseValidation::Validator do
+RSpec.describe OpenapiFirst::ResponseValidator do
   subject(:validator) do
     response_definition = instance_double(OpenapiFirst::Response,
                                           status: '200',

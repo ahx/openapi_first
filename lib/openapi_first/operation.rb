@@ -3,8 +3,6 @@
 require 'forwardable'
 require 'set'
 require 'openapi_parameters'
-require_relative 'request'
-require_relative 'response'
 
 module OpenapiFirst
   class Definition
@@ -35,19 +33,6 @@ module OpenapiFirst
       # @return [String, nil]
       def operation_id
         operation_object['operationId']
-      end
-
-      # Returns all responses this operation can produce.
-      # This will list one Response instance per status and content-type.
-      # @return [[Response]]
-      def responses
-        Array(operation_object['responses']).flat_map do |status, response_object|
-          response_object['content']&.map do |content_type, content_object|
-            content_schema = content_object['schema']
-            Response.new(status:, response_object:, content_type:, content_schema:)
-          end || Response.new(status:, response_object:, content_type: nil,
-                              content_schema: nil)
-        end
       end
 
       # Returns a unique name for this operation. Used for generating error messages.
