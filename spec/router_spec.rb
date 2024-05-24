@@ -4,7 +4,7 @@ require_relative '../lib/openapi_first/router'
 
 RSpec.describe OpenapiFirst::Router do
   describe '#match' do
-    let(:operations) do
+    let(:requests) do
       [
         double(path: '/{id}', request_method: 'get'),
         double(path: '/{id}', request_method: 'patch'),
@@ -14,15 +14,15 @@ RSpec.describe OpenapiFirst::Router do
 
     subject(:router) do
       described_class.new.tap do |router|
-        operations.each do |request|
-          router.route(request.request_method, request.path, to: request)
+        requests.each do |request|
+          router.add_request(request, request_method: request.request_method, path: request.path)
         end
       end
     end
 
     it 'returns a match with params' do
       match = router.match('PATCH', '/b')
-      expect(match.request_definition).to be(operations[1])
+      expect(match.request_definition).to be(requests[1])
       expect(match.params).to eq('id' => 'b')
     end
 
@@ -42,8 +42,8 @@ RSpec.describe OpenapiFirst::Router do
     context 'with matching content_type' do
       subject(:router) do
         described_class.new.tap do |router|
-          router.route('post', '/stations', content_type: 'application/json', to: 1)
-          router.route('post', '/stations', content_type: 'text/*', to: 2)
+          router.add_request(1, request_method: 'post', path: '/stations', content_type: 'application/json')
+          router.add_request(2, request_method: 'post', path: '/stations', content_type: 'text/*')
         end
       end
 
@@ -59,8 +59,8 @@ RSpec.describe OpenapiFirst::Router do
     context 'with empty content-type' do
       subject(:router) do
         described_class.new.tap do |router|
-          router.route('post', '/stations', content_type: 'application/json', to: 1)
-          router.route('post', '/stations', to: 2)
+          router.add_request(1, request_method: 'post', path: '/stations', content_type: 'application/json')
+          router.add_request(2, request_method: 'post', path: '/stations')
         end
       end
 
@@ -79,7 +79,7 @@ RSpec.describe OpenapiFirst::Router do
     context 'without acceptable content-type' do
       subject(:router) do
         described_class.new.tap do |router|
-          router.route('post', '/stations', content_type: 'application/xml', to: 1)
+          router.add_request(1, request_method: 'post', path: '/stations', content_type: 'application/xml')
         end
       end
 
@@ -92,7 +92,7 @@ RSpec.describe OpenapiFirst::Router do
     end
 
     context 'with different variables in common nested routes' do
-      let(:operations) do
+      let(:requests) do
         [
           double(path: '/foo/{fooId}', request_method: 'get'),
           double(path: '/foo/special', request_method: 'get'),

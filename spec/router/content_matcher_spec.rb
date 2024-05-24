@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../lib/openapi_first/content_matcher'
-
-RSpec.describe OpenapiFirst::ContentMatcher do
+RSpec.describe OpenapiFirst::Router::ContentMatcher do
   describe '#match' do
     let(:requests) do
       [

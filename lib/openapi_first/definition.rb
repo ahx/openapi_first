@@ -5,7 +5,6 @@ require_relative 'failure'
 require_relative 'router'
 require_relative 'request'
 require_relative 'response'
-require_relative 'response_matcher'
 
 module OpenapiFirst
   # Represents an OpenAPI API Description document
@@ -36,13 +35,22 @@ module OpenapiFirst
       @response_matchers = {}
       @operations.each do |op|
         build_requests(op).each do |request|
-          @router.route(request.request_method, request.path, content_type: request.content_type, to: request)
+          @router.add_request(
+            request,
+            request_method: request.request_method,
+            path: request.path,
+            content_type: request.content_type
+          )
         end
-        response_matcher = ResponseMatcher.new
         build_responses(op).each do |response|
-          response_matcher.add_response(response.status, response.content_type, response)
+          @router.add_response(
+            response,
+            request_method: op.request_method,
+            path: op.path,
+            status: response.status,
+            response_content_type: response.content_type
+          )
         end
-        @response_matchers[op] = response_matcher
       end
       yield @config if block_given?
       @config.freeze
@@ -68,8 +76,7 @@ module OpenapiFirst
       route = @router.match(rack_request.request_method, rack_request.path, content_type: rack_request.content_type)
       return if route.error # Skip response validation for unknown requests
 
-      operation = route.request_definition.operation
-      response_match = @response_matchers[operation].match(rack_response.status, rack_response.content_type)
+      response_match = route.match_response(status: rack_response.status, content_type: rack_response.content_type)
       error = response_match.error
       validated = if error
                     ValidatedResponse.new(rack_response, error)

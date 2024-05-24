@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../lib/openapi_first/response_matcher'
-
-RSpec.describe OpenapiFirst::ResponseMatcher do
+RSpec.describe OpenapiFirst::Router::ResponseMatcher do
   def build_matcher(responses)
     described_class.new.tap do |matcher|
       responses.each do |response|
