@@ -10,7 +10,7 @@ RSpec.describe 'Hooks' do
     let(:definition) do
       OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
         config.after_request_validation do |request|
-          called << [request.operation.operation_id, request.valid?]
+          called << [request.operation_id, request.valid?]
         end
       end
     end

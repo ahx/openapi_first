@@ -5,12 +5,6 @@ require_relative 'failure'
 require_relative 'router'
 require_relative 'response'
 require_relative 'response_matcher'
-require_relative 'response_parser'
-require_relative 'request_parser'
-require_relative 'validated_request'
-require_relative 'validated_response'
-require_relative 'request_validation/validator'
-require_relative 'response_validation/validator'
 
 module OpenapiFirst
   # Represents an OpenAPI API Description document
@@ -35,27 +29,15 @@ module OpenapiFirst
         end
       end
       @router = Router.new
-      @request_parsers = {}
-      @request_validators = {}
-      @response_parsers = {}
-      @response_validators = {}
       @response_matchers = {}
+      @requests = {}
       @operations.each do |op|
-        @request_parsers[op] = RequestParser.new(
-          query_parameters: op.query_parameters,
-          path_parameters: op.path_parameters,
-          header_parameters: op.header_parameters,
-          cookie_parameters: op.cookie_parameters
-        )
-        op.requests.each do |request|
+        build_requests(op).each do |request|
           @router.route(request.request_method, request.path, content_type: request.content_type, to: request)
-          @request_validators[request] = RequestValidation::Validator.new(request, hooks: @config.hooks, openapi_version:)
         end
         response_matcher = ResponseMatcher.new
         op.responses.each do |response|
-          @response_validators[response] = ResponseValidation::Validator.new(response, openapi_version:)
           response_matcher.add_response(response.status, response.content_type, response)
-          @response_parsers[response] = ResponseParser.new(headers: response.headers, content_type: response.content_type)
         end
         @response_matchers[op] = response_matcher
       end
@@ -89,11 +71,7 @@ module OpenapiFirst
       validated = if error
                     ValidatedResponse.new(rack_response, error)
                   else
-                    response_definition = response_match.response
-                    validator = @response_validators[response_definition]
-                    parsed_response = @response_parsers[response_definition].parse(rack_response)
-                    error = validator.call(parsed_response)
-                    ValidatedResponse.new(parsed_response, error)
+                    response_match.response.validate(rack_response)
                   end
       @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
@@ -102,15 +80,24 @@ module OpenapiFirst
 
     private
 
+    def build_requests(operation)
+      hooks = @config.hooks
+      required_body = operation.dig('requestBody', 'required') == true
+      result = operation.dig('requestBody', 'content')&.map do |content_type, content|
+        Request.new(operation:, content_type:, content_schema: content['schema'], required_body:, hooks:)
+      end || []
+      unless required_body
+        result << Request.new(operation:, content_type: nil, content_schema: nil, required_body:,
+                              hooks:)
+      end
+      result
+    end
+
     def route_and_validate(request)
       route = @router.match(request.request_method, request.path, content_type: request.content_type)
-      request_definition = route.request_definition
-      return ValidatedRequest.new(request, error: route.error, operation: request_definition) if route.error
+      return ValidatedRequest.new(request, error: route.error, request_definition: nil) if route.error
 
-      operation = request_definition.operation
-      parsed = @request_parsers[operation].parse(request, route_params: route.params)
-      error = @request_validators[request_definition].call(parsed)
-      ValidatedRequest.new(parsed, error:, operation:)
+      route.request_definition.validate(request, route_params: route.params)
     end
 
     def detect_version(resolved)

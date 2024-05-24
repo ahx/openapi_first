@@ -65,16 +65,6 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
   end
 
-  describe '#operation_id' do
-    let(:rack_request) do
-      Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-    end
-
-    it 'returns the operation ID' do
-      expect(request.operation_id).to eq('listPets')
-    end
-  end
-
   describe '#params' do
     let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
 
@@ -83,8 +73,8 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns path and query params' do
-      expect(subject.params['id']).to eq(42)
-      expect(subject.params['version']).to eq(2)
+      expect(request.params['id']).to eq(42)
+      expect(request.params['version']).to eq(2)
     end
   end
 
@@ -96,7 +86,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns the path param' do
-      expect(subject.path_parameters['id']).to eq(42)
+      expect(request.path_parameters['id']).to eq(42)
     end
 
     context 'without defined parameters' do
@@ -105,7 +95,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'returns an empty Hash' do
-        expect(subject.path_parameters).to eq({})
+        expect(request.path_parameters).to eq({})
       end
     end
 
@@ -144,8 +134,8 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'parses path parameters' do
-        expect(subject.path_parameters['ke-bab']).to eq('one')
-        expect(subject.path_parameters['under_score']).to eq('two')
+        expect(request.path_parameters['ke-bab']).to eq('one')
+        expect(request.path_parameters['under_score']).to eq('two')
       end
     end
   end
@@ -156,11 +146,11 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns defined params' do
-      expect(subject.query['limit']).to eq(3)
+      expect(request.query['limit']).to eq(3)
     end
 
     it 'does not include unknown params' do
-      expect(subject.query['unknown']).to be_nil
+      expect(request.query['unknown']).to be_nil
     end
 
     context 'without defined parameters' do
@@ -169,12 +159,12 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'returns an empty Hash' do
-        expect(subject.query).to eq({})
+        expect(request.query).to eq({})
       end
     end
 
     it 'aliases to query_parameters' do
-      expect(subject.query_parameters['limit']).to eq(3)
+      expect(request.query_parameters['limit']).to eq(3)
     end
   end
 
@@ -189,11 +179,11 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns defined params' do
-      expect(subject.headers['header']).to eq('something')
+      expect(request.headers['header']).to eq('something')
     end
 
     it 'does not include unknown params' do
-      expect(subject.headers['unknown']).to be_nil
+      expect(request.headers['unknown']).to be_nil
     end
 
     context 'without defined parameters' do
@@ -204,7 +194,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'returns an empty Hash' do
-        expect(subject.headers).to eq({})
+        expect(request.headers).to eq({})
       end
     end
   end
@@ -219,7 +209,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns defined params' do
-      expect(subject.cookies['knusper']).to eq(42)
+      expect(request.cookies['knusper']).to eq(42)
     end
 
     context 'without defined parameters' do
@@ -230,7 +220,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'returns an empty Hash' do
-        expect(subject.cookies).to eq({})
+        expect(request.cookies).to eq({})
       end
     end
   end
@@ -245,7 +235,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns the parsed body' do
-      expect(subject.body).to eq('foo' => 'bar')
+      expect(request.body).to eq('foo' => 'bar')
     end
 
     context 'with invalid JSON' do
@@ -256,12 +246,12 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'raises a ParseError' do
-        expect { subject.body }.to raise_error(OpenapiFirst::ParseError, 'Failed to parse body as JSON')
+        expect { request.body }.to raise_error(OpenapiFirst::ParseError, 'Failed to parse body as JSON')
       end
     end
 
     it 'is aliased with parsed_body' do
-      expect(subject.parsed_body).to eq('foo' => 'bar')
+      expect(request.parsed_body).to eq('foo' => 'bar')
     end
   end
 

@@ -7,24 +7,31 @@ module OpenapiFirst
   class ValidatedRequest
     extend Forwardable
 
-    def initialize(parsed_request, error:, operation: nil, path_item: nil)
-      @parsed_request = parsed_request
+    def initialize(parsed_values, error:, request_definition:)
+      @parsed_values = parsed_values
       @error = error
-      @operation = operation
-      @path_item = path_item
+      @request_definition = request_definition
     end
 
-    def_delegators :@parsed_request, :path_parameters, :query, :headers, :cookies, :body
-    def_delegators :@operation, :operation_id
+    def_delegators :@parsed_values, :path_parameters, :query, :headers, :cookies, :body
+
+    alias parsed_body body
+    alias query_parameters query
+
+    # OpenAPI 3 specific Operation
+    def operation
+      @request_definition&.operation
+    end
+
+    def operation_id
+      operation&.operation_id
+    end
 
     # Returns the error object if validation failed.
     # @return [Failure, nil]
     attr_reader :error
 
-    attr_reader :operation, :path_item
-
-    alias parsed_body body
-    alias query_parameters query
+    attr_reader :request_definition
 
     # Checks if the request is valid.
     # @return [Boolean] true if the request is valid, false otherwise.
@@ -32,12 +39,12 @@ module OpenapiFirst
       error.nil?
     end
 
-    def params
-      @params ||= query.merge(path_parameters)
+    def known?
+      request_definition != nil
     end
 
-    def known?
-      !@operation.nil?
+    def params
+      @params ||= query.merge(path_parameters)
     end
   end
 end

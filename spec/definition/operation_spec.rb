@@ -46,64 +46,6 @@ RSpec.describe OpenapiFirst::Definition::Operation do
     end
   end
 
-  describe '#requests' do
-    it 'returns one object per content-type' do
-      json_request, xml_request = operation.requests
-      expect(json_request).to have_attributes(
-        content_type: 'application/json',
-        content_schema: { 'type' => 'object' },
-        path: '/pets/{pet_id}',
-        request_method: 'post',
-        operation:
-      )
-      expect(xml_request).to have_attributes(
-        content_type: 'application/xml',
-        content_schema: { 'type' => 'object' },
-        path: '/pets/{pet_id}',
-        request_method: 'post',
-        operation:
-      )
-    end
-
-    context 'when requestBody is not required' do
-      before do
-        operation_object['requestBody']['required'] = false
-      end
-
-      it 'returns one extra object without content_type' do
-        json_request, xml_request, empty_request = operation.requests
-        expect(json_request).to have_attributes(
-          content_type: 'application/json'
-        )
-        expect(xml_request).to have_attributes(
-          content_type: 'application/xml'
-        )
-        expect(empty_request).to have_attributes(
-          content_type: nil,
-          content_schema: nil,
-          path: '/pets/{pet_id}',
-          request_method: 'post'
-        )
-      end
-    end
-
-    context 'when requestBody is not defined' do
-      before do
-        operation_object.delete('requestBody')
-      end
-
-      it 'returns only one object' do
-        expect(operation.requests.length).to eq(1)
-        expect(operation.requests.first).to have_attributes(
-          content_type: nil,
-          content_schema: nil,
-          path: '/pets/{pet_id}',
-          request_method: 'post'
-        )
-      end
-    end
-  end
-
   describe '#responses' do
     it 'returns all response definitions' do
       responses = operation.responses

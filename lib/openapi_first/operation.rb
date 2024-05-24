@@ -14,7 +14,7 @@ module OpenapiFirst
     class Operation
       extend Forwardable
 
-      def_delegators :operation_object, :[]
+      def_delegators :operation_object, :[], :dig
 
       def initialize(path, request_method, operation_object, path_item_parameters:)
         @path = path
@@ -48,15 +48,6 @@ module OpenapiFirst
           end || Response.new(status:, response_object:, content_type: nil,
                               content_schema: nil)
         end
-      end
-
-      def requests
-        required_body = operation_object.dig('requestBody', 'required') == true
-        result = operation_object.dig('requestBody', 'content')&.map do |content_type, content|
-          Request.new(operation: self, content_type:, content_schema: content['schema'], required_body:)
-        end || []
-        result << Request.new(operation: self, content_type: nil, content_schema: nil, required_body:) unless required_body
-        result
       end
 
       # Returns a unique name for this operation. Used for generating error messages.
