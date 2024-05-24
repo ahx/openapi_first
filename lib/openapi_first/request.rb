@@ -10,7 +10,7 @@ module OpenapiFirst
   class Request
     extend Forwardable
 
-    def initialize(operation:, content_type:, content_schema:, required_body:, hooks:)
+    def initialize(operation:, content_type:, content_schema:, required_body:, hooks:, openapi_version:)
       @operation = operation
       @content_type = content_type
       @content_schema = content_schema
@@ -21,7 +21,7 @@ module OpenapiFirst
         header_parameters: operation.header_parameters,
         cookie_parameters: operation.cookie_parameters
       )
-      @validator = RequestValidator.new(self, hooks:, openapi_version: '3.1')
+      @validator = RequestValidator.new(self, hooks:, openapi_version:)
     end
 
     def_delegators :@operation, :path_item, :path, :request_method, :path_schema, :query_schema, :cookie_schema,

@@ -94,11 +94,11 @@ module OpenapiFirst
       hooks = @config.hooks
       required_body = operation.dig('requestBody', 'required') == true
       result = operation.dig('requestBody', 'content')&.map do |content_type, content|
-        Request.new(operation:, content_type:, content_schema: content['schema'], required_body:, hooks:)
+        Request.new(operation:, content_type:, content_schema: content['schema'], required_body:, hooks:, openapi_version:)
       end || []
       unless required_body
         result << Request.new(operation:, content_type: nil, content_schema: nil, required_body:,
-                              hooks:)
+                              hooks:, openapi_version:)
       end
       result
     end
@@ -107,9 +107,9 @@ module OpenapiFirst
       Array(operation['responses']).flat_map do |status, response_object|
         response_object['content']&.map do |content_type, content_object|
           content_schema = content_object['schema']
-          Response.new(status:, response_object:, content_type:, content_schema:)
+          Response.new(status:, response_object:, content_type:, content_schema:, openapi_version:)
         end || Response.new(status:, response_object:, content_type: nil,
-                            content_schema: nil)
+                            content_schema: nil, openapi_version:)
       end
     end
 
