@@ -11,7 +11,9 @@ module OpenapiFirst
   # Represents an OpenAPI API Description document
   # This is returned by OpenapiFirst.load.
   class Definition
-    attr_reader :filepath, :openapi_version, :config, :operations
+    attr_reader :filepath, :openapi_version, :config, :paths
+    # Openapi 3 specific
+    attr_reader :operations
 
     REQUEST_METHODS = %w[get head post put patch delete trace options].freeze
     private_constant :REQUEST_METHODS
@@ -29,6 +31,7 @@ module OpenapiFirst
           Operation.new(path, request_method, operation_object, path_item_parameters:)
         end
       end
+      @paths = resolved['paths'].keys
       @router = Router.new
       @response_matchers = {}
       @operations.each do |op|

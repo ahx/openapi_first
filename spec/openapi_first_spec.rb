@@ -26,21 +26,21 @@ RSpec.describe OpenapiFirst do
   describe '.parse' do
     it 'loads a Hash' do
       definition = OpenapiFirst.parse(YAML.safe_load_file('./spec/data/petstore.yaml'))
-      expect(definition.operations.first.operation_id).to eq('listPets')
+      expect(definition.paths.first).to eq('/pets')
     end
 
     it 'supports :only' do
       hash = YAML.safe_load_file('./spec/data/petstore.yaml')
       only = ->(path) { path == '/pets' }
       definition = OpenapiFirst.parse(hash, only:)
-      paths = definition.operations.map(&:path)
+      paths = definition.paths
       expect(paths).to include('/pets')
       expect(paths).not_to include('/pets/{petId}')
     end
 
     it 'loads a Hash' do
       definition = OpenapiFirst.parse(YAML.safe_load_file('./spec/data/petstore.yaml'))
-      expect(definition.operations.map(&:path)).to include('/pets')
+      expect(definition.paths).to include('/pets')
     end
   end
 
@@ -51,25 +51,25 @@ RSpec.describe OpenapiFirst do
 
     it 'works with YAML' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml')
-      expect(definition.operations.map(&:path)).to include('/pets')
+      expect(definition.paths).to include('/pets')
     end
 
     it 'works with JSON' do
       definition = OpenapiFirst.load('./spec/data/petstore.json')
-      expect(definition.operations.map(&:path)).to include('/pets')
+      expect(definition.paths).to include('/pets')
     end
 
     describe 'only option' do
       specify 'with empty filter' do
         definition = OpenapiFirst.load(spec_path, only: nil)
         expected = %w[/pets /pets/{id}]
-        expect(definition.operations.map(&:path).uniq).to eq expected
+        expect(definition.paths).to eq expected
       end
 
       specify 'filtering paths' do
         definition = OpenapiFirst.load spec_path, only: ->(path) { path == '/pets' }
         expected = %w[/pets]
-        expect(definition.operations.map(&:path).uniq).to eq expected
+        expect(definition.paths).to eq expected
       end
     end
   end

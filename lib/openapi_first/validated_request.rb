@@ -18,7 +18,7 @@ module OpenapiFirst
     alias parsed_body body
     alias query_parameters query
 
-    # OpenAPI 3 specific Operation
+    # OpenAPI 3 specific
     def operation
       @request_definition&.operation
     end

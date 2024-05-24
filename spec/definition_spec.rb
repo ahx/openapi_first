@@ -12,6 +12,13 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe '#paths' do
+    it 'returns all paths' do
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml')
+      expect(definition.paths).to eq(['/pets', '/pets/{petId}'])
+    end
+  end
+
   describe '#validate_request' do
     let(:definition) do
       OpenapiFirst.parse({
