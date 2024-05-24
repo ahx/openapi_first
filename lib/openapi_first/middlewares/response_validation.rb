@@ -8,14 +8,14 @@ module OpenapiFirst
     class ResponseValidation
       # @param app The parent Rack application
       # @param options Hash
-      #   :spec    Path to the OpenAPI file or an instance of Definition
+      #   :spec    Path to the OpenAPI file or an instance of Doc
       def initialize(app, options = {})
         @app = app
 
         spec = options.fetch(:spec)
         raise "You have to pass spec: when initializing #{self.class}" unless spec
 
-        @definition = spec.is_a?(Definition) ? spec : OpenapiFirst.load(spec)
+        @definition = spec.is_a?(Doc) ? spec : OpenapiFirst.load(spec)
       end
 
       # @attr_reader [Proc] app The upstream Rack application

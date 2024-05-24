@@ -6,7 +6,7 @@ require_relative 'openapi_first/json_refs'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'
 require_relative 'openapi_first/plugins'
-require_relative 'openapi_first/definition'
+require_relative 'openapi_first/doc'
 require_relative 'openapi_first/version'
 require_relative 'openapi_first/schema'
 require_relative 'openapi_first/error_response'
@@ -35,17 +35,17 @@ module OpenapiFirst
   FAILURE = :openapi_first_validation_failure
 
   # Load and dereference an OpenAPI spec file
-  # @return [Definition]
+  # @return [Doc]
   def self.load(filepath, only: nil, &block)
     resolved = Bundle.resolve(filepath)
     parse(resolved, only:, filepath:, &block)
   end
 
   # Parse a dereferenced Hash
-  # @return [Definition]
+  # @return [Doc]
   def self.parse(resolved, only: nil, filepath: nil, &block)
     resolved['paths'].filter!(&->(key, _) { only.call(key) }) if only
-    Definition.new(resolved, filepath, &block)
+    Doc.new(resolved, filepath, &block)
   end
 
   # @!visibility private

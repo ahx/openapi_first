@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  class Definition
+  class Router
     # @visibility private
     class PathTemplate
       # See also https://spec.openapis.org/oas/v3.1.0#path-templating

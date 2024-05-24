@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Definition::Operation do
+RSpec.describe OpenapiFirst::Operation do
   let(:operation) do
     described_class.new('/pets/{pet_id}', 'post', operation_object, path_item_parameters: {})
   end

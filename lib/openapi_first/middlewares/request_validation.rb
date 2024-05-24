@@ -19,7 +19,7 @@ module OpenapiFirst
         spec = options.fetch(:spec)
         raise "You have to pass spec: when initializing #{self.class}" unless spec
 
-        @definition = spec.is_a?(Definition) ? spec : OpenapiFirst.load(spec)
+        @definition = spec.is_a?(Doc) ? spec : OpenapiFirst.load(spec)
       end
 
       # @attr_reader [Proc] app The upstream Rack application

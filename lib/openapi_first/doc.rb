@@ -9,7 +9,7 @@ require_relative 'response'
 module OpenapiFirst
   # Represents an OpenAPI API Description document
   # This is returned by OpenapiFirst.load.
-  class Definition
+  class Doc
     attr_reader :filepath, :openapi_version, :config, :paths
     # Openapi 3 specific
     attr_reader :operations

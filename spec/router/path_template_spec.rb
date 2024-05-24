@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Definition::PathTemplate do
+RSpec.describe OpenapiFirst::Router::PathTemplate do
   describe '.template?' do
     specify do
       expect(described_class.template?('/totally/static')).to be(false)

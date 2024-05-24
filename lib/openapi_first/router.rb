@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require_relative 'path_template'
+require_relative 'router/path_template'
 require_relative 'router/response_matcher'
 
 module OpenapiFirst
   # Router can map requests / responses to their API definition
   class Router
-    Template = Definition::PathTemplate
-
     # @visibility private
     class RequestMatch < Data.define(:request_definition, :params, :error, :responses)
       def match_response(status:, content_type:)
@@ -56,8 +54,8 @@ module OpenapiFirst
     private
 
     def node_at(path, request_method)
-      path_item = if Template.template?(path)
-                    @templates[path] ||= Template.new(path)
+      path_item = if PathTemplate.template?(path)
+                    @templates[path] ||= PathTemplate.new(path)
                     @dynamic[path] ||= {}
                   else
                     @static[path] ||= {}

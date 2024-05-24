@@ -45,8 +45,8 @@ RSpec.describe OpenapiFirst do
   end
 
   describe '.load' do
-    it 'returns a Definition' do
-      expect(OpenapiFirst.load(spec_path)).to be_a OpenapiFirst::Definition
+    it 'returns a Doc' do
+      expect(OpenapiFirst.load(spec_path)).to be_a OpenapiFirst::Doc
     end
 
     it 'works with YAML' do
