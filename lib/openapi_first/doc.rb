@@ -61,7 +61,12 @@ module OpenapiFirst
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [Request] The validated request object.
     def validate_request(request, raise_error: false)
-      validated = route_and_validate(request)
+      route = @router.match(request.request_method, request.path, content_type: request.content_type)
+      validated = if route.error
+                    ValidatedRequest.new(request, error: route.error, request_definition: nil)
+                  else
+                    route.request_definition.validate(request, route_params: route.params)
+                  end
       @config.hooks[:after_request_validation].each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
       validated
@@ -111,13 +116,6 @@ module OpenapiFirst
         end || Response.new(status:, response_object:, content_type: nil,
                             content_schema: nil, openapi_version:)
       end
-    end
-
-    def route_and_validate(request)
-      route = @router.match(request.request_method, request.path, content_type: request.content_type)
-      return ValidatedRequest.new(request, error: route.error, request_definition: nil) if route.error
-
-      route.request_definition.validate(request, route_params: route.params)
     end
 
     def detect_version(resolved)
