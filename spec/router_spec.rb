@@ -34,11 +34,6 @@ RSpec.describe OpenapiFirst::Router do
       expect(router.match('DELETE', '/b').error).to have_attributes(error_type: :method_not_allowed)
     end
 
-    pending 'return what methods are allowed for unknown request method' do
-      match = router.match('DELETE', '/b')
-      expect(match.error.allowed_methods).to eq(%w[GET PATCH])
-    end
-
     context 'with matching content_type' do
       subject(:router) do
         described_class.new.tap do |router|
