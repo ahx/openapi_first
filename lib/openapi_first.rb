@@ -36,16 +36,16 @@ module OpenapiFirst
 
   # Load and dereference an OpenAPI spec file
   # @return [Doc]
-  def self.load(filepath, only: nil, &block)
+  def self.load(filepath, only: nil, &)
     resolved = Bundle.resolve(filepath)
-    parse(resolved, only:, filepath:, &block)
+    parse(resolved, only:, filepath:, &)
   end
 
   # Parse a dereferenced Hash
   # @return [Doc]
-  def self.parse(resolved, only: nil, filepath: nil, &block)
+  def self.parse(resolved, only: nil, filepath: nil, &)
     resolved['paths'].filter!(&->(key, _) { only.call(key) }) if only
-    Doc.new(resolved, filepath, &block)
+    Doc.new(resolved, filepath, &)
   end
 
   # @!visibility private

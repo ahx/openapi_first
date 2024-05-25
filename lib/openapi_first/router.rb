@@ -8,7 +8,7 @@ module OpenapiFirst
   # Router can map requests / responses to their API definition
   class Router
     # @visibility private
-    class RequestMatch < Data.define(:request_definition, :params, :error, :responses)
+    RequestMatch = Data.define(:request_definition, :params, :error, :responses) do
       def match_response(status:, content_type:)
         responses&.match(status, content_type)
       end
