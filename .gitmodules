@@ -1,0 +1,3 @@
+[submodule "spec/data/train-travel-api"]
+	path = spec/data/train-travel-api
+	url = https://github.com/bump-sh-examples/train-travel-api.git
