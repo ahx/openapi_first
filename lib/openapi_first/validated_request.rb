@@ -14,18 +14,10 @@ module OpenapiFirst
     end
 
     def_delegators :@parsed_values, :path_parameters, :query, :headers, :cookies, :body
+    def_delegators :@request_definition, :operation_id
 
     alias parsed_body body
     alias query_parameters query
-
-    # OpenAPI 3 specific
-    def operation
-      @request_definition&.operation
-    end
-
-    def operation_id
-      operation&.operation_id
-    end
 
     # Returns the error object if validation failed.
     # @return [Failure, nil]

@@ -10,24 +10,25 @@ module OpenapiFirst
   class Request
     extend Forwardable
 
-    def initialize(operation:, content_type:, content_schema:, required_body:, hooks:, openapi_version:)
-      @operation = operation
+    def initialize(path:, request_method:, operation_id:, parameters:, content_type:, content_schema:, required_body:,
+                   hooks:, openapi_version:)
+      @path = path
+      @request_method = request_method
       @content_type = content_type
       @content_schema = content_schema
       @required_request_body = required_body == true
+      @operation_id = operation_id
+      @parameters = build_parameters(parameters)
       @parser = RequestParser.new(
-        query_parameters: operation.query_parameters,
-        path_parameters: operation.path_parameters,
-        header_parameters: operation.header_parameters,
-        cookie_parameters: operation.cookie_parameters
+        query_parameters: @parameters[:query],
+        path_parameters: @parameters[:path],
+        header_parameters: @parameters[:header],
+        cookie_parameters: @parameters[:cookie]
       )
       @validator = RequestValidator.new(self, hooks:, openapi_version:)
     end
 
-    def_delegators :@operation, :path_item, :path, :path_schema, :query_schema, :cookie_schema,
-                   :header_schema, :path_parameters, :query_parameters, :cookie_parameters, :header_parameters
-
-    attr_reader :content_type, :content_schema, :operation
+    attr_reader :content_type, :content_schema, :operation_id, :request_method
 
     def validate(request, route_params:)
       parsed = @parser.parse(request, route_params:)
@@ -35,18 +36,53 @@ module OpenapiFirst
       ValidatedRequest.new(parsed, error:, request_definition: self)
     end
 
+    # These return a Schema instance for each type of parameters
+    %i[path query header cookie].each do |location|
+      define_method(:"#{location}_schema") do
+        build_parameters_schema(@parameters[location])
+      end
+    end
+
     def required_request_body?
       @required_request_body
     end
 
     def inspect
-      result = "Request:#{request_method} #{operation.path}"
+      result = "Request:#{request_method} #{path}"
       result << ":#{content_type}" if content_type
       result
     end
 
-    def request_method
-      @operation&.request_method&.upcase
+    private
+
+    IGNORED_HEADERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
+    private_constant :IGNORED_HEADERS
+
+    def build_parameters(parameter_definitions)
+      result = {}
+      parameter_definitions&.each do |parameter|
+        (result[parameter['in'].to_sym] ||= []) << parameter
+      end
+      result[:header]&.reject! { IGNORED_HEADERS.include?(_1['name']) }
+      result
+    end
+
+    def build_parameters_schema(parameters)
+      return unless parameters
+
+      properties = {}
+      required = []
+      parameters.each do |parameter|
+        schema = parameter['schema']
+        name = parameter['name']
+        properties[name] = schema if schema
+        required << name if parameter['required']
+      end
+
+      {
+        'properties' => properties,
+        'required' => required
+      }
     end
   end
 end

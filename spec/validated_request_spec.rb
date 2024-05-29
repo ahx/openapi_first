@@ -255,9 +255,9 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
   end
 
-  describe '#operation' do
-    it 'returns the request operation' do
-      expect(request.operation.path).to eq('/pets/{petId}')
+  describe '#operation_id' do
+    specify do
+      expect(request.operation_id).to eq('showPetById')
     end
   end
 end

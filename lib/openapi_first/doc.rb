@@ -23,25 +23,26 @@ module OpenapiFirst
       @filepath = filepath
       @config = OpenapiFirst.configuration.clone
       @openapi_version = detect_version(resolved)
+      @router = Router.new
+
       @operations = resolved['paths'].flat_map do |path, path_item_object|
         path_item_object.slice(*REQUEST_METHODS).keys.map do |request_method|
           operation_object = path_item_object[request_method]
           path_item_parameters = path_item_object['parameters']
+          build_requests(path, request_method, operation_object, path_item_parameters).each do |request|
+            @router.add_request(
+              request,
+              request_method:,
+              path:,
+              content_type: request.content_type
+            )
+          end
           Operation.new(path, request_method, operation_object, path_item_parameters:)
         end
       end
       @paths = resolved['paths'].keys
-      @router = Router.new
       @response_matchers = {}
       @operations.each do |op|
-        build_requests(op).each do |request|
-          @router.add_request(
-            request,
-            request_method: request.request_method,
-            path: request.path,
-            content_type: request.content_type
-          )
-        end
         build_responses(op).each do |response|
           @router.add_response(
             response,
@@ -95,15 +96,18 @@ module OpenapiFirst
 
     private
 
-    def build_requests(operation)
+    def build_requests(path, request_method, operation_object, path_item_parameters)
       hooks = @config.hooks
-      required_body = operation.dig('requestBody', 'required') == true
-      result = operation.dig('requestBody', 'content')&.map do |content_type, content|
-        Request.new(operation:, content_type:, content_schema: content['schema'], required_body:, hooks:, openapi_version:)
+      parameters = [].concat(operation_object['parameters'].to_a, path_item_parameters.to_a)
+      required_body = operation_object.dig('requestBody', 'required') == true
+      operation_id = operation_object['operationId']
+      result = operation_object.dig('requestBody', 'content')&.map do |content_type, content|
+        Request.new(path:, request_method:, operation_id:, parameters:, content_type:,
+                    content_schema: content['schema'], required_body:, hooks:, openapi_version:)
       end || []
       unless required_body
-        result << Request.new(operation:, content_type: nil, content_schema: nil, required_body:,
-                              hooks:, openapi_version:)
+        result << Request.new(path:, request_method:, operation_id:, parameters:, content_type: nil, content_schema: nil,
+                              required_body:, hooks:, openapi_version:)
       end
       result
     end
