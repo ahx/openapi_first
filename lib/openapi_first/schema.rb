@@ -26,11 +26,7 @@ module OpenapiFirst
     end
 
     def validate(data)
-      ValidationResult.new(
-        @schemer.validate(data),
-        schema:,
-        data:
-      )
+      ValidationResult.new(@schemer.validate(data))
     end
 
     private

@@ -6,13 +6,9 @@ module OpenapiFirst
   class Schema
     # Result of validating data against a schema. Return value of Schema#validate.
     class ValidationResult
-      def initialize(validation, schema:, data:)
+      def initialize(validation)
         @validation = validation
-        @schema = schema
-        @data = data
       end
-
-      attr_reader :schema, :data
 
       def error? = @validation.any?
 

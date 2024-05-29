@@ -201,10 +201,4 @@ RSpec.describe OpenapiFirst::Schema do
       expect(error.details).to be_nil
     end
   end
-
-  describe 'validate.data' do
-    it 'returns the original data' do
-      expect(validate(data).data).to be data
-    end
-  end
 end
