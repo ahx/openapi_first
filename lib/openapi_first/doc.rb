@@ -37,22 +37,20 @@ module OpenapiFirst
               content_type: request.content_type
             )
           end
+          build_responses(operation_object).each do |response|
+            @router.add_response(
+              response,
+              request_method:,
+              path:,
+              status: response.status,
+              response_content_type: response.content_type
+            )
+          end
           Operation.new(path, request_method, operation_object, path_item_parameters:)
         end
       end
       @paths = resolved['paths'].keys
       @response_matchers = {}
-      @operations.each do |op|
-        build_responses(op).each do |response|
-          @router.add_response(
-            response,
-            request_method: op.request_method,
-            path: op.path,
-            status: response.status,
-            response_content_type: response.content_type
-          )
-        end
-      end
       yield @config if block_given?
       @config.freeze
     end
@@ -112,8 +110,8 @@ module OpenapiFirst
       result
     end
 
-    def build_responses(operation)
-      Array(operation['responses']).flat_map do |status, response_object|
+    def build_responses(operation_object)
+      Array(operation_object['responses']).flat_map do |status, response_object|
         response_object['content']&.map do |content_type, content_object|
           content_schema = content_object['schema']
           Response.new(status:, response_object:, content_type:, content_schema:, openapi_version:)
