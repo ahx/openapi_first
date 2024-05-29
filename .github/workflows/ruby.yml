@@ -10,6 +10,10 @@ jobs:
         ruby:
           - "3.2"
           - "3.3"
+        gemfiles:
+          - Gemfile
+          - Gemfile.rack2
+          - Gemfile.rails6
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -19,10 +23,4 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - run: bundle lock --add-platform x86_64-linux && bundle install && bundle exec rake
         env:
-          BUNDLE_GEMFILE: Gemfile
-      - run: bundle lock --add-platform x86_64-linux && bundle install && bundle exec rake
-        env:
-          BUNDLE_GEMFILE: Gemfile.rack2
-      - run: bundle lock --add-platform x86_64-linux && bundle install && bundle exec rake
-        env:
-          BUNDLE_GEMFILE: Gemfile.rails6
+          BUNDLE_GEMFILE: ${{ matrix.gemfile }}
