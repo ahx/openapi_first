@@ -2,35 +2,35 @@
 
 module OpenapiFirst
   module Validators
-    RequestHeaders = Data.define(:schema) do
-      def call(request)
-        validation = schema.validate(request.headers)
-        Failure.fail!(:invalid_header, errors: validation.errors) if validation.error?
-      end
-    end
-
-    Path = Data.define(:schema) do
-      def call(request)
-        validation = schema.validate(request.path_parameters)
-        Failure.fail!(:invalid_path, errors: validation.errors) if validation.error?
-      end
-    end
-
-    Query = Data.define(:schema) do
-      def call(request)
-        validation = schema.validate(request.query)
-        Failure.fail!(:invalid_query, errors: validation.errors) if validation.error?
-      end
-    end
-
-    RequestCookies = Data.define(:schema) do
-      def call(request)
-        validation = schema.validate(request.cookies)
-        Failure.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
-      end
-    end
-
     class RequestParameters
+      RequestHeaders = Data.define(:schema) do
+        def call(request)
+          validation = schema.validate(request.headers)
+          Failure.fail!(:invalid_header, errors: validation.errors) if validation.error?
+        end
+      end
+
+      Path = Data.define(:schema) do
+        def call(request)
+          validation = schema.validate(request.path_parameters)
+          Failure.fail!(:invalid_path, errors: validation.errors) if validation.error?
+        end
+      end
+
+      Query = Data.define(:schema) do
+        def call(request)
+          validation = schema.validate(request.query)
+          Failure.fail!(:invalid_query, errors: validation.errors) if validation.error?
+        end
+      end
+
+      RequestCookies = Data.define(:schema) do
+        def call(request)
+          validation = schema.validate(request.cookies)
+          Failure.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
+        end
+      end
+
       VALIDATORS = {
         path_schema: Path,
         query_schema: Query,
