@@ -4,19 +4,17 @@ module OpenapiFirst
   class Router
     # Finds the object that matches the content type.
     class ContentMatcher
+      include Enumerable
+
       def initialize
         @results = {}
       end
 
-      def add(content_type, object)
-        @results[content_type] = object
-      end
+      extend Forwardable
+      def_delegators :@results, :values, :keys, :[]=
+      def_delegator :@results, :each_value, :each
 
-      def defined_content_types
-        @results.keys
-      end
-
-      def match(content_type)
+      def [](content_type)
         return @results[nil] if content_type.nil? || content_type.empty?
 
         @results.fetch(content_type) do

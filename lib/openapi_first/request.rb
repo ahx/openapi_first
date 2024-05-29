@@ -24,7 +24,7 @@ module OpenapiFirst
       @validator = RequestValidator.new(self, hooks:, openapi_version:)
     end
 
-    def_delegators :@operation, :path_item, :path, :request_method, :path_schema, :query_schema, :cookie_schema,
+    def_delegators :@operation, :path_item, :path, :path_schema, :query_schema, :cookie_schema,
                    :header_schema, :path_parameters, :query_parameters, :cookie_parameters, :header_parameters
 
     attr_reader :content_type, :content_schema, :operation
@@ -37,6 +37,16 @@ module OpenapiFirst
 
     def required_request_body?
       @required_request_body
+    end
+
+    def inspect
+      result = "Request:#{request_method} #{operation.path}"
+      result << ":#{content_type}" if content_type
+      result
+    end
+
+    def request_method
+      @operation&.request_method&.upcase
     end
   end
 end

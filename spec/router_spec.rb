@@ -107,4 +107,43 @@ RSpec.describe OpenapiFirst::Router do
       end
     end
   end
+
+  describe '#routes' do
+    subject(:router) do
+      described_class.new.tap do |router|
+        router.add_request(:request_get_a, request_method: 'get', path: '/a')
+        router.add_request(:request_post_a_json, request_method: 'post', path: '/a', content_type: 'application/json')
+        router.add_request(:request_post_a_xml, request_method: 'post', path: '/a', content_type: 'application/xml')
+
+        router.add_response(:response_get_a, request_method: 'get', path: '/a', status: 200)
+        router.add_response(:response_post_a_json, request_method: 'post', path: '/a', status: 201, response_content_type: 'application/json')
+        router.add_response(:response_post_a_xml, request_method: 'post', path: '/a', status: 201, response_content_type: 'application/xml')
+
+        router.add_request(:request_get_a_id, request_method: 'get', path: '/a/{id}')
+      end
+    end
+
+    it 'returns all routes' do
+      routes = router.routes.to_a
+      expect(routes.size).to eq(3)
+
+      get_route = routes[0]
+      expect(get_route.requests).to contain_exactly(:request_get_a)
+      expect(get_route.responses).to contain_exactly(:response_get_a)
+      expect(get_route.request_method).to eq('GET')
+      expect(get_route.path).to eq('/a')
+
+      post_route = routes[1]
+      expect(post_route.requests).to contain_exactly(:request_post_a_json, :request_post_a_xml)
+      expect(post_route.responses).to contain_exactly(:response_post_a_json, :response_post_a_xml)
+      expect(post_route.request_method).to eq('POST')
+      expect(post_route.path).to eq('/a')
+
+      get_dynamic_route = routes[2]
+      expect(get_dynamic_route.requests).to contain_exactly(:request_get_a_id)
+      expect(get_dynamic_route.responses.to_a).to be_empty
+      expect(get_dynamic_route.request_method).to eq('GET')
+      expect(get_dynamic_route.path).to eq('/a/{id}')
+    end
+  end
 end

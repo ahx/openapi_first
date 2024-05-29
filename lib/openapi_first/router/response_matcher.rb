@@ -8,24 +8,32 @@ module OpenapiFirst
     class ResponseMatcher
       Match = Data.define(:response, :error)
 
+      include Enumerable
+
       def initialize
         @responses = {}
       end
 
       def add_response(status, content_type, response)
         content_matcher = (@responses[status.to_s] ||= ContentMatcher.new)
-        content_matcher.add(content_type, response)
+        content_matcher[content_type] = response
+      end
+
+      def each(&block)
+        @responses.each_value do |content|
+          content.values.each(&block)
+        end
       end
 
       def match(status, content_type)
-        content = self[status]
-        if content.nil?
+        contents = self[status]
+        if contents.nil?
           message = "Response status #{status} is not defined. Defined statuses are: #{@responses.keys.join(', ')}."
           return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
         end
-        response = content.match(content_type)
+        response = contents[content_type]
         if response.nil?
-          message = "#{content_error(content_type)} Content-Type should be #{content.defined_content_types.join(' or ')}."
+          message = "#{content_error(content_type)} Content-Type should be #{contents.keys.join(' or ')}."
           return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
         end
 
