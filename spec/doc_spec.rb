@@ -200,13 +200,12 @@ RSpec.describe OpenapiFirst::Doc do
     end
   end
 
-  describe '#operations' do
-    let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+  describe '#routes' do
+    let(:definition) { OpenapiFirst.load('./spec/data/train-travel-api/openapi.yaml') }
 
-    it 'returns a list of operations' do
-      expect(definition.operations.length).to eq 3
-      expected_ids = %w[listPets createPets showPetById]
-      expect(definition.operations.map(&:operation_id)).to eq expected_ids
+    it 'returns routes' do
+      routes = definition.routes.map { |route| "#{route.request_method} #{route.path}" }
+      expect(routes).to match_array ['GET /stations', 'GET /trips', 'GET /bookings', 'POST /bookings', 'GET /bookings/{bookingId}', 'DELETE /bookings/{bookingId}', 'POST /bookings/{bookingId}/payment']
     end
   end
 

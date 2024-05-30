@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'operation'
 require_relative 'failure'
 require_relative 'router'
 require_relative 'request'
@@ -11,8 +10,6 @@ module OpenapiFirst
   # This is returned by OpenapiFirst.load.
   class Doc
     attr_reader :filepath, :openapi_version, :config, :paths
-    # Openapi 3 specific
-    attr_reader :operations
 
     REQUEST_METHODS = %w[get head post put patch delete trace options].freeze
     private_constant :REQUEST_METHODS
@@ -25,7 +22,7 @@ module OpenapiFirst
       @openapi_version = detect_version(resolved)
       @router = Router.new
 
-      @operations = resolved['paths'].flat_map do |path, path_item_object|
+      resolved['paths'].each do |path, path_item_object|
         path_item_object.slice(*REQUEST_METHODS).keys.map do |request_method|
           operation_object = path_item_object[request_method]
           path_item_parameters = path_item_object['parameters']
@@ -46,13 +43,16 @@ module OpenapiFirst
               response_content_type: response.content_type
             )
           end
-          Operation.new(path, request_method, operation_object, path_item_parameters:)
         end
       end
       @paths = resolved['paths'].keys
       @response_matchers = {}
       yield @config if block_given?
       @config.freeze
+    end
+
+    def routes
+      @router.routes
     end
 
     # Validates the request against the API description.

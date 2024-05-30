@@ -28,7 +28,7 @@ module OpenapiFirst
       @validator = RequestValidator.new(self, hooks:, openapi_version:)
     end
 
-    attr_reader :content_type, :content_schema, :operation_id, :request_method
+    attr_reader :content_type, :content_schema, :operation_id, :request_method, :path
 
     def validate(request, route_params:)
       parsed = @parser.parse(request, route_params:)
@@ -45,12 +45,6 @@ module OpenapiFirst
 
     def required_request_body?
       @required_request_body
-    end
-
-    def inspect
-      result = "Request:#{request_method} #{path}"
-      result << ":#{content_type}" if content_type
-      result
     end
 
     private

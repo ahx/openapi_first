@@ -10,6 +10,12 @@
   - after_request_body_property_validation
   - after_request_parameter_property_validation
 
+### Breaking Changes
+
+- `Definition` was renamed to `Doc`
+- `Operation` was removed
+- Instead of `Doc#operations` you can use `Doc#routes`, which returns a list of routes. Routes have a `#path`, `#request_method`, `#requests` and `#responses`.
+
 ## 1.4.3
 
 - Allow using json_schemer 2...3
