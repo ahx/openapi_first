@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'forwardable'
 require_relative 'router/path_template'
 require_relative 'router/response_matcher'
 
