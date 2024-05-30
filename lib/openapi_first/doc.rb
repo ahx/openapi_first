@@ -4,51 +4,23 @@ require_relative 'failure'
 require_relative 'router'
 require_relative 'request'
 require_relative 'response'
+require_relative 'builder'
 
 module OpenapiFirst
   # Represents an OpenAPI API Description document
   # This is returned by OpenapiFirst.load.
   class Doc
-    attr_reader :filepath, :openapi_version, :config, :paths
-
-    REQUEST_METHODS = %w[get head post put patch delete trace options].freeze
-    private_constant :REQUEST_METHODS
+    attr_reader :filepath, :config, :paths
 
     # @param resolved [Hash] The resolved OpenAPI document.
     # @param filepath [String] The file path of the OpenAPI document.
     def initialize(resolved, filepath = nil)
       @filepath = filepath
       @config = OpenapiFirst.configuration.clone
-      @openapi_version = detect_version(resolved)
-      @router = Router.new
-
-      resolved['paths'].each do |path, path_item_object|
-        path_item_object.slice(*REQUEST_METHODS).keys.map do |request_method|
-          operation_object = path_item_object[request_method]
-          path_item_parameters = path_item_object['parameters']
-          build_requests(path, request_method, operation_object, path_item_parameters).each do |request|
-            @router.add_request(
-              request,
-              request_method:,
-              path:,
-              content_type: request.content_type
-            )
-          end
-          build_responses(operation_object).each do |response|
-            @router.add_response(
-              response,
-              request_method:,
-              path:,
-              status: response.status,
-              response_content_type: response.content_type
-            )
-          end
-        end
-      end
-      @paths = resolved['paths'].keys
-      @response_matchers = {}
       yield @config if block_given?
       @config.freeze
+      @router = Builder.build_router(resolved, @config)
+      @paths = resolved['paths'].keys # TODO: Move into builder as well
     end
 
     def routes
@@ -90,38 +62,6 @@ module OpenapiFirst
       @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated) }
       validated.error&.raise! if raise_error
       validated
-    end
-
-    private
-
-    def build_requests(path, request_method, operation_object, path_item_parameters)
-      hooks = @config.hooks
-      parameters = [].concat(operation_object['parameters'].to_a, path_item_parameters.to_a)
-      required_body = operation_object.dig('requestBody', 'required') == true
-      operation_id = operation_object['operationId']
-      result = operation_object.dig('requestBody', 'content')&.map do |content_type, content|
-        Request.new(path:, request_method:, operation_id:, parameters:, content_type:,
-                    content_schema: content['schema'], required_body:, hooks:, openapi_version:)
-      end || []
-      unless required_body
-        result << Request.new(path:, request_method:, operation_id:, parameters:, content_type: nil, content_schema: nil,
-                              required_body:, hooks:, openapi_version:)
-      end
-      result
-    end
-
-    def build_responses(operation_object)
-      Array(operation_object['responses']).flat_map do |status, response_object|
-        response_object['content']&.map do |content_type, content_object|
-          content_schema = content_object['schema']
-          Response.new(status:, response_object:, content_type:, content_schema:, openapi_version:)
-        end || Response.new(status:, response_object:, content_type: nil,
-                            content_schema: nil, openapi_version:)
-      end
-    end
-
-    def detect_version(resolved)
-      (resolved['openapi'] || resolved['swagger'])[0..2]
     end
   end
 end
