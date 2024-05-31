@@ -31,6 +31,10 @@ module OpenapiFirst
       error.nil?
     end
 
+    def invalid?
+      !valid?
+    end
+
     def known?
       request_definition != nil
     end

@@ -39,7 +39,8 @@ module OpenapiFirst
                     route.request_definition.validate(request, route_params: route.params)
                   end
       @config.hooks[:after_request_validation].each { |hook| hook.call(validated) }
-      validated.error&.raise! if raise_error
+      raise validated.error.exception if validated.error && raise_error
+
       validated
     end
 
@@ -60,7 +61,8 @@ module OpenapiFirst
                     response_match.response.validate(rack_response)
                   end
       @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated) }
-      validated.error&.raise! if raise_error
+      raise validated.error.exception if raise_error && validated.invalid?
+
       validated
     end
   end

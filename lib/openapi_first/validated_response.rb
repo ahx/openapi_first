@@ -23,5 +23,9 @@ module OpenapiFirst
     def valid?
       error.nil?
     end
+
+    def invalid?
+      !valid?
+    end
   end
 end

@@ -54,19 +54,17 @@ module OpenapiFirst
     # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>] errors Schema validation errors
     attr_reader :errors
 
-    # Raise an exception that fits the failure.
-    def raise!
-      exception, = TYPES.fetch(error_type)
-      raise exception, exception_message
+    def exception
+      TYPES.fetch(error_type).first.new(exception_message)
     end
+
+    private
 
     def exception_message
       _, message_prefix = TYPES.fetch(error_type)
 
       "#{message_prefix} #{@message || generate_message}"
     end
-
-    private
 
     def generate_message
       messages = errors&.take(3)&.map(&:error)

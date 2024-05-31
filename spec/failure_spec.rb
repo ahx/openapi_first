@@ -29,11 +29,10 @@ RSpec.describe OpenapiFirst::Failure do
     end
   end
 
-  describe '#raise!' do
-    it 'raises an error' do
-      expect do
-        described_class.new(:invalid_body).raise!
-      end.to raise_error(OpenapiFirst::RequestInvalidError)
+  describe '#exception' do
+    it 'returns an exception' do
+      exception = described_class.new(:invalid_body).exception
+      expect(exception).to be_a(OpenapiFirst::RequestInvalidError)
     end
 
     context 'with a lot of errors' do
@@ -45,11 +44,10 @@ RSpec.describe OpenapiFirst::Failure do
       end
 
       it 'raises an error with a reduced message' do
-        expect do
-          failure.raise!
-        end.to raise_error(OpenapiFirst::RequestInvalidError,
-                           'Request body invalid: something is wrong over there 0. something is wrong over there 1. ' \
-                           'something is wrong over there 2. ... (100 errors total)')
+        expect(failure.exception.message).to eq(
+          'Request body invalid: something is wrong over there 0. something is wrong over there 1. ' \
+          'something is wrong over there 2. ... (100 errors total)'
+        )
       end
     end
   end
