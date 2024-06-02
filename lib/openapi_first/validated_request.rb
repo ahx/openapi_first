@@ -1,29 +1,24 @@
 # frozen_string_literal: true
 
 require 'forwardable'
+require 'delegate'
 
 module OpenapiFirst
   # A validated request. It can be valid or not.
-  class ValidatedRequest
+  class ValidatedRequest < SimpleDelegator
     extend Forwardable
 
-    def initialize(parsed_values, error:, request_definition:)
+    def initialize(original_request, error:, parsed_values: nil, request_definition: nil)
+      super(original_request)
       @parsed_values = parsed_values
       @error = error
       @request_definition = request_definition
     end
 
-    def_delegators :@parsed_values, :path_parameters, :query, :headers, :cookies, :body
-    def_delegators :@request_definition, :operation_id
+    attr_reader :parsed_values, :error, :request_definition
 
-    alias parsed_body body
-    alias query_parameters query
-
-    # Returns the error object if validation failed.
-    # @return [Failure, nil]
-    attr_reader :error
-
-    attr_reader :request_definition
+    def_delegators :request_definition, :operation_id
+    def_delegators :parsed_values, :parsed_path_parameters, :parsed_query, :parsed_headers, :parsed_cookies, :parsed_body
 
     # Checks if the request is valid.
     # @return [Boolean] true if the request is valid, false otherwise.
@@ -39,8 +34,8 @@ module OpenapiFirst
       request_definition != nil
     end
 
-    def params
-      @params ||= query.merge(path_parameters)
+    def parsed_params
+      @parsed_params ||= parsed_query.merge(parsed_path_parameters)
     end
   end
 end

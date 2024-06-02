@@ -16,24 +16,24 @@ module OpenapiFirst
       request.content_type
     end
 
-    def path_parameters
-      @path_parameters ||= @parsers.path&.unpack(route_params) || {}
+    def parsed_path_parameters
+      @parsed_path_parameters ||= @parsers.path&.unpack(route_params) || {}
     end
 
-    def query
-      @query ||= @parsers.query&.unpack(request.env[Rack::QUERY_STRING]) || {}
+    def parsed_query
+      @parsed_query ||= @parsers.query&.unpack(request.env[Rack::QUERY_STRING]) || {}
     end
 
-    def headers
-      @headers ||= @parsers.headers&.unpack_env(request.env) || {}
+    def parsed_headers
+      @parsed_headers ||= @parsers.headers&.unpack_env(request.env) || {}
     end
 
-    def cookies
-      @cookies ||= @parsers.cookies&.unpack(request.env[Rack::HTTP_COOKIE]) || {}
+    def parsed_cookies
+      @parsed_cookies ||= @parsers.cookies&.unpack(request.env[Rack::HTTP_COOKIE]) || {}
     end
 
-    def body
-      @body ||= BodyParser.new.parse(request, request.media_type)
+    def parsed_body
+      @parsed_body ||= BodyParser.new.parse(request, request.media_type)
     end
 
     private

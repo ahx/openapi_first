@@ -34,7 +34,7 @@ module OpenapiFirst
     def validate_request(request, raise_error: false)
       route = @router.match(request.request_method, request.path, content_type: request.content_type)
       validated = if route.error
-                    ValidatedRequest.new(request, error: route.error, request_definition: nil)
+                    ValidatedRequest.new(request, error: route.error)
                   else
                     route.request_definition.validate(request, route_params: route.params)
                   end

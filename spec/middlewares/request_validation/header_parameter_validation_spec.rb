@@ -40,7 +40,7 @@ RSpec.describe 'Header Parameter validation' do
     it 'adds the converted header parameter to env ' do
       header 'Accept-Version', '1'
       get '/pets'
-      expect(last_request.env[OpenapiFirst::REQUEST].headers['Accept-Version']).to eq 1
+      expect(last_request.env[OpenapiFirst::REQUEST].parsed_headers['Accept-Version']).to eq 1
     end
 
     context 'when raising' do

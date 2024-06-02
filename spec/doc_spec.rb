@@ -48,7 +48,7 @@ RSpec.describe OpenapiFirst::Doc do
       it 'returns a valid request' do
         validated = definition.validate_request(request)
         expect(validated).to be_valid
-        expect(validated.path_parameters).to eq({ 'id' => 42 })
+        expect(validated.parsed_path_parameters).to eq({ 'id' => 42 })
       end
     end
 
@@ -58,7 +58,7 @@ RSpec.describe OpenapiFirst::Doc do
       it 'returns an invalid request' do
         validated = definition.validate_request(request)
         expect(validated).not_to be_valid
-        expect(validated.path_parameters).to eq({ 'id' => 'foo' })
+        expect(validated.parsed_path_parameters).to eq({ 'id' => 'foo' })
       end
 
       it 'raises an error with raise_error: true' do
@@ -82,13 +82,13 @@ RSpec.describe OpenapiFirst::Doc do
 
       it 'finds a match' do
         request = definition.validate_request(build_request('/foo/1'))
-        expect(request.path_parameters).to eq({ 'fooId' => '1' })
+        expect(request.parsed_path_parameters).to eq({ 'fooId' => '1' })
 
         request = definition.validate_request(build_request('/foo/1/bar'))
-        expect(request.path_parameters).to eq({ 'id' => '1' })
+        expect(request.parsed_path_parameters).to eq({ 'id' => '1' })
 
         request = definition.validate_request(build_request('/foo/special'))
-        expect(request.path_parameters).to eq({})
+        expect(request.parsed_path_parameters).to eq({})
       end
     end
 
@@ -100,7 +100,7 @@ RSpec.describe OpenapiFirst::Doc do
         operation_id = request.operation_id
 
         expect(operation_id).to eq 'info_date'
-        expect(request.path_parameters['date']).to eq('2020-01-01')
+        expect(request.parsed_path_parameters['date']).to eq('2020-01-01')
       end
 
       it 'supports /{start_date}..{end_date}' do
@@ -108,15 +108,15 @@ RSpec.describe OpenapiFirst::Doc do
         operation_id = request.operation_id
         expect(operation_id).to eq 'info_date_range'
 
-        expect(request.path_parameters['start_date']).to eq('2020-01-01')
-        expect(request.path_parameters['end_date']).to eq('2020-01-02')
+        expect(request.parsed_path_parameters['start_date']).to eq('2020-01-01')
+        expect(request.parsed_path_parameters['end_date']).to eq('2020-01-02')
       end
 
       it 'still works without parameters' do
         request = definition.validate_request(build_request('/info'))
         operation_id = request.operation_id
         expect(operation_id).to eq 'info'
-        expect(request.path_parameters).to be_empty
+        expect(request.parsed_path_parameters).to be_empty
       end
     end
 

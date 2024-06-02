@@ -65,7 +65,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
   end
 
-  describe '#params' do
+  describe '#parsed_params' do
     let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
 
     let(:rack_request) do
@@ -73,12 +73,12 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns path and query params' do
-      expect(request.params['id']).to eq(42)
-      expect(request.params['version']).to eq(2)
+      expect(request.parsed_params['id']).to eq(42)
+      expect(request.parsed_params['version']).to eq(2)
     end
   end
 
-  describe '#path_parameters' do
+  describe '#parsed_path_parameters' do
     let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
 
     let(:rack_request) do
@@ -86,7 +86,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns the path param' do
-      expect(request.path_parameters['id']).to eq(42)
+      expect(request.parsed_path_parameters['id']).to eq(42)
     end
 
     context 'without defined parameters' do
@@ -95,7 +95,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'returns an empty Hash' do
-        expect(request.path_parameters).to eq({})
+        expect(request.parsed_path_parameters).to eq({})
       end
     end
 
@@ -134,23 +134,23 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'parses path parameters' do
-        expect(request.path_parameters['ke-bab']).to eq('one')
-        expect(request.path_parameters['under_score']).to eq('two')
+        expect(request.parsed_path_parameters['ke-bab']).to eq('one')
+        expect(request.parsed_path_parameters['under_score']).to eq('two')
       end
     end
   end
 
-  describe '#query' do
+  describe '#parsed_query' do
     let(:rack_request) do
       Rack::Request.new(Rack::MockRequest.env_for('/pets?limit=3&unknown=5'))
     end
 
     it 'returns defined params' do
-      expect(request.query['limit']).to eq(3)
+      expect(request.parsed_query['limit']).to eq(3)
     end
 
     it 'does not include unknown params' do
-      expect(request.query['unknown']).to be_nil
+      expect(request.parsed_query['unknown']).to be_nil
     end
 
     context 'without defined parameters' do
@@ -159,16 +159,12 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'returns an empty Hash' do
-        expect(request.query).to eq({})
+        expect(request.parsed_query).to eq({})
       end
-    end
-
-    it 'aliases to query_parameters' do
-      expect(request.query_parameters['limit']).to eq(3)
     end
   end
 
-  describe '#headers' do
+  describe '#parsed_headers' do
     let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
 
     let(:rack_request) do
@@ -179,11 +175,11 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns defined params' do
-      expect(request.headers['header']).to eq('something')
+      expect(request.parsed_headers['header']).to eq('something')
     end
 
     it 'does not include unknown params' do
-      expect(request.headers['unknown']).to be_nil
+      expect(request.parsed_headers['unknown']).to be_nil
     end
 
     context 'without defined parameters' do
@@ -194,12 +190,12 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'returns an empty Hash' do
-        expect(request.headers).to eq({})
+        expect(request.parsed_headers).to eq({})
       end
     end
   end
 
-  describe '#cookies' do
+  describe '#parsed_cookies' do
     let(:definition) { OpenapiFirst.load('./spec/data/cookie-parameter-validation.yaml') }
 
     let(:rack_request) do
@@ -209,7 +205,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns defined params' do
-      expect(request.cookies['knusper']).to eq(42)
+      expect(request.parsed_cookies['knusper']).to eq(42)
     end
 
     context 'without defined parameters' do
@@ -220,12 +216,12 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'returns an empty Hash' do
-        expect(request.cookies).to eq({})
+        expect(request.parsed_cookies).to eq({})
       end
     end
   end
 
-  describe '#body' do
+  describe '#parsed_body' do
     let(:definition) { OpenapiFirst.load('./spec/data/petstore-expanded.yaml') }
 
     let(:rack_request) do
@@ -235,7 +231,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
 
     it 'returns the parsed body' do
-      expect(request.body).to eq('foo' => 'bar')
+      expect(request.parsed_body).to eq('foo' => 'bar')
     end
 
     context 'with invalid JSON' do
@@ -246,7 +242,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       end
 
       it 'raises a ParseError' do
-        expect { request.body }.to raise_error(OpenapiFirst::ParseError, 'Failed to parse body as JSON')
+        expect { request.parsed_body }.to raise_error(OpenapiFirst::ParseError, 'Failed to parse body as JSON')
       end
     end
 

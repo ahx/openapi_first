@@ -118,7 +118,7 @@ RSpec.describe 'Hooks' do
         end
       end
       validated = definition.validate_request(build_request('/blue?page=2'))
-      expect(validated.query['page']).to eq('two')
+      expect(validated.parsed_query['page']).to eq('two')
       expect(validated).to be_valid
     end
   end

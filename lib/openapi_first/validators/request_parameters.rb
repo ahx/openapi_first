@@ -5,28 +5,28 @@ module OpenapiFirst
     class RequestParameters
       RequestHeaders = Data.define(:schema) do
         def call(request)
-          validation = schema.validate(request.headers)
+          validation = schema.validate(request.parsed_headers)
           Failure.fail!(:invalid_header, errors: validation.errors) if validation.error?
         end
       end
 
       Path = Data.define(:schema) do
         def call(request)
-          validation = schema.validate(request.path_parameters)
+          validation = schema.validate(request.parsed_path_parameters)
           Failure.fail!(:invalid_path, errors: validation.errors) if validation.error?
         end
       end
 
       Query = Data.define(:schema) do
         def call(request)
-          validation = schema.validate(request.query)
+          validation = schema.validate(request.parsed_query)
           Failure.fail!(:invalid_query, errors: validation.errors) if validation.error?
         end
       end
 
       RequestCookies = Data.define(:schema) do
         def call(request)
-          validation = schema.validate(request.cookies)
+          validation = schema.validate(request.parsed_cookies)
           Failure.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
         end
       end

@@ -28,9 +28,9 @@ module OpenapiFirst
     attr_reader :content_type, :content_schema, :operation_id, :request_method, :path
 
     def validate(request, route_params:)
-      parsed = @parser.parse(request, route_params:)
-      error = @validator.call(parsed)
-      ValidatedRequest.new(parsed, error:, request_definition: self)
+      parsed_values = @parser.parse(request, route_params:)
+      error = @validator.call(parsed_values)
+      ValidatedRequest.new(request, parsed_values:, error:, request_definition: self)
     end
 
     # These return a Schema instance for each type of parameters

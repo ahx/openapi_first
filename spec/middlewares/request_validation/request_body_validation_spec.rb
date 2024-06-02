@@ -55,7 +55,7 @@ RSpec.describe 'Request body validation' do
       post path, request_body
 
       expect(last_response.status).to be(200), last_response.body
-      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq request_body
     end
 
     it 'succeeds with multipart form data file binary upload' do
@@ -64,7 +64,7 @@ RSpec.describe 'Request body validation' do
       post '/multipart-with-file', 'file' => uploaded_file
       expect(last_response.status).to eq(200)
 
-      uploaded_file = last_request.env[OpenapiFirst::REQUEST].body['file']
+      uploaded_file = last_request.env[OpenapiFirst::REQUEST].parsed_body['file']
       expect(uploaded_file).to eq File.read(fixture_path('foo.txt'))
     end
 
@@ -73,7 +73,7 @@ RSpec.describe 'Request body validation' do
       post '/multipart-with-file', 'petId' => '12'
       expect(last_response.status).to eq(200)
 
-      expect(last_request.env[OpenapiFirst::REQUEST].body['petId']).to eq('12')
+      expect(last_request.env[OpenapiFirst::REQUEST].parsed_body['petId']).to eq('12')
     end
 
     it 'supports text/plain content type' do
@@ -81,7 +81,7 @@ RSpec.describe 'Request body validation' do
       post path, 'Cat!'
 
       expect(last_response.status).to be(200), last_response.body
-      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq 'Cat!'
+      expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq 'Cat!'
     end
 
     it 'works with % in request body' do
@@ -110,7 +110,7 @@ RSpec.describe 'Request body validation' do
       post '/json_api', json_dump(request_body)
 
       expect(last_response.status).to be 200
-      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq request_body
     end
 
     it 'works with a custom json media type' do
@@ -118,7 +118,7 @@ RSpec.describe 'Request body validation' do
       post '/custom-json-type', json_dump(request_body)
 
       expect(last_response.status).to be 200
-      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq request_body
     end
 
     it 'adds parsed request body to env' do
@@ -126,14 +126,14 @@ RSpec.describe 'Request body validation' do
       post path, json_dump(request_body)
 
       expect(last_response.status).to be 200
-      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq request_body
     end
 
     it 'updates REQUEST_BODY' do
       header Rack::CONTENT_TYPE, 'application/json'
       post path, json_dump(request_body)
 
-      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq request_body
     end
 
     it 'returns 400 if request body is not valid' do
@@ -191,7 +191,7 @@ RSpec.describe 'Request body validation' do
         params = {}
         post '/with-default-body-value', json_dump(params)
         expect(last_response.status).to eq(200)
-        values = last_request.env[OpenapiFirst::REQUEST].body
+        values = last_request.env[OpenapiFirst::REQUEST].parsed_body
         expect(values['has_default']).to eq true
       end
 
@@ -207,7 +207,7 @@ RSpec.describe 'Request body validation' do
         params = { has_default: false }
         post '/with-default-body-value', json_dump(params)
         expect(last_response.status).to eq(200)
-        values = last_request.env[OpenapiFirst::REQUEST].body
+        values = last_request.env[OpenapiFirst::REQUEST].parsed_body
         expect(values['has_default']).to eq false
       end
     end
@@ -224,7 +224,7 @@ RSpec.describe 'Request body validation' do
       post '/with-form-urlencoded', request_body
 
       expect(last_response.status).to be(200), last_response.body
-      expect(last_request.env[OpenapiFirst::REQUEST].body).to eq request_body
+      expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq request_body
     end
 
     it 'returns 400 if required request body is missing' do
