@@ -56,7 +56,7 @@ module OpenapiFirst
       response_match = route.match_response(status: rack_response.status, content_type: rack_response.content_type)
       error = response_match.error
       validated = if error
-                    ValidatedResponse.new(rack_response, error)
+                    ValidatedResponse.new(rack_response, error:)
                   else
                     response_match.response.validate(rack_response)
                   end

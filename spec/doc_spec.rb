@@ -179,7 +179,7 @@ RSpec.describe OpenapiFirst::Doc do
       it 'returns a valid response' do
         validated = definition.validate_response(request, response)
         expect(validated).to be_valid
-        expect(validated.body).to eq({ 'id' => 42 })
+        expect(validated.parsed_body).to eq({ 'id' => 42 })
       end
     end
 
@@ -189,7 +189,7 @@ RSpec.describe OpenapiFirst::Doc do
       it 'returns an invalid response' do
         validated = definition.validate_response(request, response)
         expect(validated).not_to be_valid
-        expect(validated.body).to eq({ 'id' => 'foo' })
+        expect(validated.parsed_body).to eq({ 'id' => 'foo' })
       end
 
       it 'raises an error with raise_error: true' do

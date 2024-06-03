@@ -1,22 +1,24 @@
 # frozen_string_literal: true
 
 require 'forwardable'
+require 'delegate'
 
 module OpenapiFirst
-  # A validated response (see Response). It can be valid or not.
-  class ValidatedResponse
+  # A validated response. It can be valid or not.
+  class ValidatedResponse < SimpleDelegator
     extend Forwardable
 
-    def initialize(response, error)
-      @response = response
+    def initialize(original_response, error:, parsed_values: nil, response_definition: nil)
+      super(original_response)
       @error = error
+      @parsed_values = parsed_values
+      @response_definition = response_definition
     end
 
-    def_delegators :@response, :body, :headers, :status, :content_type, :name, :operation, :known?, :known_status?
+    attr_reader :parsed_values, :error, :response_definition
 
-    # Returns the error object if validation failed.
-    # @return [Failure, nil]
-    attr_reader :error
+    def_delegator :parsed_values, :headers, :parsed_headers
+    def_delegator :parsed_values, :body, :parsed_body
 
     # Checks if the response is valid.
     # @return [Boolean] true if the response is valid, false otherwise.
