@@ -45,7 +45,7 @@ module OpenapiFirst
       def build_requests(path, request_method, operation_object, path_item_object)
         hooks = config.hooks
         path_item_parameters = path_item_object['parameters']
-        parameters = [].concat(operation_object['parameters'].to_a, path_item_parameters.to_a)
+        parameters = operation_object['parameters'].to_a.chain(path_item_parameters.to_a)
         required_body = operation_object.dig('requestBody', 'required') == true
         operation_id = operation_object['operationId']
         result = operation_object.dig('requestBody', 'content')&.map do |content_type, content|

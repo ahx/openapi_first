@@ -16,28 +16,6 @@ module OpenapiFirst
     # Returned by {#routes} to introspect all routes
     Route = Data.define(:path, :request_method, :requests, :responses)
 
-    # @visibility private
-    class Routes
-      include Enumerable
-
-      def initialize(static, dynamic)
-        @static = static
-        @dynamic = dynamic
-      end
-
-      def each
-        [@static, @dynamic].each do |index|
-          index.each do |path, request_methods|
-            request_methods.each do |request_method, content|
-              next if request_method == :template
-
-              yield(Route.new(path, request_method, content[:requests], content[:responses]))
-            end
-          end
-        end
-      end
-    end
-
     NOT_FOUND = RequestMatch.new(request_definition: nil, params: nil, responses: nil, error: Failure.new(:not_found))
     private_constant :NOT_FOUND
 
@@ -48,7 +26,13 @@ module OpenapiFirst
 
     # Returns an enumerator of all routes
     def routes
-      Routes.new(@static, @dynamic)
+      @static.chain(@dynamic).lazy.flat_map do |path, request_methods|
+        request_methods.filter_map do |request_method, content|
+          next if request_method == :template
+
+          Route.new(path, request_method, content[:requests], content[:responses])
+        end
+      end
     end
 
     # Add a request definition
