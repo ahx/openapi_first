@@ -5,7 +5,7 @@ require_relative 'request_validator'
 require_relative 'validated_request'
 
 module OpenapiFirst
-  # Represents one request definition derived from operation and requestBody definition
+  # Represents one request definition of an OpenAPI description
   class Request
     def initialize(path:, request_method:, operation_id:, parameters:, content_type:, content_schema:, required_body:,
                    hooks:, openapi_version:)
