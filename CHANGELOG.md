@@ -12,9 +12,12 @@
 
 ### Breaking Changes
 
-- `Definition` was renamed to `Doc`
-- `Operation` was removed
-- Instead of `Doc#operations` you can use `Doc#routes`, which returns a list of routes. Routes have a `#path`, `#request_method`, `#requests` and `#responses`.
+- Instead of `Definition#operations` you can use `Definition#routes`, which returns a list of routes. Routes have a `#path`, `#request_method`, `#requests` and `#responses`.
+A route has one path and one request method, but can have multiple requests (one for each supported content-type) and responses (statuses + content-type).
+
+- Several internal changes to make the code more maintainable, more performant , support hooks and prepare for OpenAPI 4. If you have monkey-patched OpenapiFirst, you might need to adjust your code. Please contact me if you need help.
+- `Operation` was removed.
+
 
 ## 1.4.3
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Doc do
+RSpec.describe OpenapiFirst::Definition do
   def build_request(path, method: 'GET')
     Rack::Request.new(Rack::MockRequest.env_for(path, method:))
   end
@@ -217,7 +217,7 @@ RSpec.describe OpenapiFirst::Doc do
     end
 
     context 'when initialized with a hash' do
-      let(:definition) { OpenapiFirst::Doc.new(YAML.load_file('./spec/data/petstore.yaml')) }
+      let(:definition) { OpenapiFirst::Definition.new(YAML.load_file('./spec/data/petstore.yaml')) }
 
       it 'returns nil' do
         expect(definition.filepath).to be_nil

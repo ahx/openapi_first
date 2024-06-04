@@ -3,7 +3,7 @@
 module OpenapiFirst
   # TODO: Move more Openapi 3 specifc code into this module
   module Openapi3
-    # Builds parts of an Openapi 3.x Doc
+    # Builds parts of an Openapi 3.x Definition
     class Builder
       def initialize(resolved, config, openapi_version)
         @resolved = resolved

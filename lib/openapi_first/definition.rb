@@ -9,7 +9,7 @@ require_relative 'builder'
 module OpenapiFirst
   # Represents an OpenAPI API Description document
   # This is returned by OpenapiFirst.load.
-  class Doc
+  class Definition
     attr_reader :filepath, :config, :paths
 
     # @param resolved [Hash] The resolved OpenAPI document.

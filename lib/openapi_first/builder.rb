@@ -3,7 +3,7 @@
 require_relative 'openapi3/builder'
 
 module OpenapiFirst
-  # Builds parts of a Doc
+  # Builds parts of a Definition
   module Builder
     BUILDERS = {
       '3.0' => OpenapiFirst::Openapi3::Builder,
