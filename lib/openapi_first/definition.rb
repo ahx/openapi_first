@@ -10,7 +10,7 @@ module OpenapiFirst
   # Represents an OpenAPI API Description document
   # This is returned by OpenapiFirst.load.
   class Definition
-    attr_reader :filepath, :config, :paths
+    attr_reader :filepath, :config, :paths, :router
 
     # @param resolved [Hash] The resolved OpenAPI document.
     # @param filepath [String] The file path of the OpenAPI document.

@@ -209,6 +209,14 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe '#router' do
+    let(:definition) { OpenapiFirst.load('./spec/data/train-travel-api/openapi.yaml') }
+
+    it 'returns the router' do
+      expect(definition.router).to be_a OpenapiFirst::Router
+    end
+  end
+
   describe '#filepath' do
     let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
 
