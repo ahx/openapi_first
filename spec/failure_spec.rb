@@ -17,6 +17,34 @@ RSpec.describe OpenapiFirst::Failure do
     end
   end
 
+  describe '#message' do
+    it 'returns a generated message if not defined' do
+      failure = described_class.new(:invalid_body, errors: [double(error: 'something is wrong')])
+      expect(failure.message).to eq('Request body invalid: something is wrong')
+    end
+
+    it 'returns the specified message' do
+      failure = described_class.new(:invalid_body, message: 'custom message')
+      expect(failure.message).to eq('custom message')
+    end
+
+    context 'with a lot of errors' do
+      let(:failure) do
+        errors = Array.new(100) do |i|
+          instance_double(OpenapiFirst::Schema::ValidationError, error: "something is wrong over there #{i}")
+        end
+        described_class.new(:invalid_body, errors:)
+      end
+
+      it 'returns a reduced message' do
+        expect(failure.message).to eq(
+          'Request body invalid: something is wrong over there 0. something is wrong over there 1. ' \
+          'something is wrong over there 2. ... (100 errors total)'
+        )
+      end
+    end
+  end
+
   describe '#type' do
     it 'returns the error type' do
       expect(described_class.new(:invalid_body).type).to eq(:invalid_body)

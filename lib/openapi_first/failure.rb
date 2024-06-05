@@ -48,23 +48,25 @@ module OpenapiFirst
     attr_reader :error_type
     alias type error_type
 
-    # @attr_reader [String] message A generic error message
-    attr_reader :message
-
     # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>] errors Schema validation errors
     attr_reader :errors
+
+    # A generic error message
+    def message
+      @message ||= exception_message
+    end
 
     def exception
       TYPES.fetch(error_type).first.new(exception_message)
     end
-
-    private
 
     def exception_message
       _, message_prefix = TYPES.fetch(error_type)
 
       "#{message_prefix} #{@message || generate_message}"
     end
+
+    private
 
     def generate_message
       messages = errors&.take(3)&.map(&:error)
