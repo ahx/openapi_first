@@ -26,6 +26,16 @@ RSpec.describe 'Hooks' do
 
       expect(called).to eq([['listPets', false]])
     end
+
+    it 'can pass the doc as a second argument' do
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+        config.after_request_validation do |request, doc|
+          called << [request.path, doc]
+        end
+      end
+      definition.validate_request(build_request('/pets'))
+      expect(called).to eq([['/pets', definition]])
+    end
   end
 
   describe 'after_response_validation' do
@@ -51,6 +61,17 @@ RSpec.describe 'Hooks' do
       definition.validate_response(build_request('/pets/42'), response)
 
       expect(called).to eq([false])
+    end
+
+    it 'can pass the request and doc as arguments' do
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+        config.after_response_validation do |response, request, doc|
+          called << [response.status, request.path, doc]
+        end
+      end
+      response = Rack::Response.new('{"foo": "bar"}', 200, { 'Content-Type' => 'application/json' })
+      definition.validate_response(build_request('/pets'), response)
+      expect(called).to eq([[200, '/pets', definition]])
     end
   end
 
