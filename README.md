@@ -166,18 +166,18 @@ request = definition.validate_request(rack_request)
 definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if request is invalid
 
 # Inspect the request and access parsed parameters
-# request.known? # Is the request defined in the API description?
+request.known? # Is the request defined in the API description?
 request.valid? # => true / false
+request.invalid? # => true / false
 request.error # => Failure object if request is invalid
 request.params # Merged parameters and request body. Priority is path, query, headers, cookies, body
 request.parsed_body
-request.path_parameters # => { "pet_id" => 42 }
+request.parsed_path_parameters # => { "pet_id" => 42 }
 request.parsed_headers
 request.parsed_cookies
 request.parsed_query # alias: query_parameters
-request.operation.path # => "/pets/{petId}"
-request.operation.operation_id # => "showPetById"
-request.operation.definition.filepath # => '/absolute/path/openapi.yaml'
+request.request_definition.path # => "/pets/{petId}"
+request.request_definition.operation_id # => "showPetById"
 ```
 
 ### Validate response
@@ -185,21 +185,19 @@ request.operation.definition.filepath # => '/absolute/path/openapi.yaml'
 ```ruby
 # Find and validate the response
 rack_response = Rack::Response[*app.call(env)]
-response = definition.validate_response(rack_request, rack_response)
+validated_response = definition.validate_response(rack_request, rack_response)
 
 # Raise an exception if validation fails:
-response = definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
-# Or you can also call a method on the request object mentioned above
-request.validate_response(rack_response)
+definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
 
 # Inspect the response and access parsed parameters and
 response.known? # Is the response defined in the API description?
 response.valid? # => true / false
+response.invalid? # => true / false
 response.error # => Failure object if response is invalid
-response.body
-request.headers
 response.status # => 200
-response.content_type
+response.parsed_body
+response.parsed_headers
 ```
 
 OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
