@@ -5,16 +5,20 @@ require 'multi_json'
 module OpenapiFirst
   # @!visibility private
   class BodyParser
-    def parse(request, content_type)
+    def initialize(content_type)
+      @is_json = :json if /json/i.match?(content_type)
+    end
+
+    def parse(request)
       body = read_body(request)
       return if body.empty?
 
-      return MultiJson.load(body) if content_type =~ (/json/i) && (content_type =~ /json/i)
+      return MultiJson.load(body) if @is_json
       return request.POST if request.form_data?
 
       body
     rescue MultiJson::ParseError
-      raise ParseError, 'Failed to parse body as JSON'
+      Failure.fail!(:invalid_body, message: 'Failed to parse request body as JSON')
     end
 
     private
