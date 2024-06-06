@@ -8,18 +8,37 @@ module OpenapiFirst
   class ValidatedRequest < SimpleDelegator
     extend Forwardable
 
-    def initialize(original_request, error:, parsed_values: nil, request_definition: nil)
+    def initialize(original_request, error:, parsed_values: {}, request_definition: nil)
       super(original_request)
-      @parsed_values = parsed_values
+      @parsed_values = Hash.new({}).merge(parsed_values)
       @error = error
       @request_definition = request_definition
     end
 
     attr_reader :parsed_values, :error, :request_definition
-    def_delegators :parsed_values, :parsed_path_parameters, :parsed_query, :parsed_headers, :parsed_cookies, :parsed_body
 
     # Openapi 3 specific
     def_delegators :request_definition, :operation_id, :operation
+
+    def parsed_path_parameters
+      parsed_values[:path]
+    end
+
+    def parsed_query
+      parsed_values[:query]
+    end
+
+    def parsed_headers
+      parsed_values[:headers]
+    end
+
+    def parsed_cookies
+      parsed_values[:cookies]
+    end
+
+    def parsed_body
+      parsed_values[:body]
+    end
 
     # Checks if the request is valid.
     # @return [Boolean] true if the request is valid, false otherwise.
@@ -35,8 +54,9 @@ module OpenapiFirst
       request_definition != nil
     end
 
+    # Merge path, query, body
     def parsed_params
-      @parsed_params ||= parsed_query.merge(parsed_path_parameters)
+      @parsed_params ||= parsed_body.merge(parsed_query, parsed_path_parameters)
     end
   end
 end

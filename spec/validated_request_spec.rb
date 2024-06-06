@@ -1,283 +1,218 @@
 # frozen_string_literal: true
 
 RSpec.describe OpenapiFirst::ValidatedRequest do
-  subject(:request) do
-    definition.validate_request(rack_request)
+  let(:valid_request) do
+    described_class.new(
+      Rack::Request.new(Rack::MockRequest.env_for('/')),
+      parsed_values: {},
+      error: nil,
+      request_definition: double(:request_definition)
+    )
   end
 
-  let(:rack_request) do
-    Rack::Request.new(Rack::MockRequest.env_for('/pets/42'))
+  let(:invalid_request) do
+    described_class.new(
+      Rack::Request.new(Rack::MockRequest.env_for('/')),
+      error: OpenapiFirst::Failure.new(:invalid_body)
+    )
   end
 
-  let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+  let(:unknown_request) do
+    described_class.new(
+      Rack::Request.new(Rack::MockRequest.env_for('/')),
+      error: OpenapiFirst::Failure.new(:not_found),
+      request_definition: nil
+    )
+  end
+
+  let(:request_with_values) do
+    described_class.new(
+      Rack::Request.new(Rack::MockRequest.env_for('/')),
+      parsed_values: {
+        path: { 'name' => 42 },
+        query: { 'name' => 42 },
+        headers: { 'name' => 42 },
+        cookies: { 'name' => 42 },
+        body: { 'name' => 42 }
+      },
+      error: nil
+    )
+  end
 
   describe '#valid?' do
-    context 'with valid request' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{}'))
-      end
-
-      it 'returns true' do
-        expect(request).to be_valid
-      end
+    it 'returns true if request is valid' do
+      expect(valid_request).to be_valid
     end
 
-    context 'with invalid request' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets/23', method: 'POST', input: '[]'))
-      end
+    it 'returns false if request is not valid' do
+      expect(invalid_request).not_to be_valid
+    end
+  end
 
-      it 'returns false' do
-        expect(request).not_to be_valid
-      end
+  describe '#invalid?' do
+    it 'returns true if request is valid' do
+      expect(valid_request).not_to be_invalid
+    end
+
+    it 'returns false if request is not valid' do
+      expect(invalid_request).to be_invalid
     end
   end
 
   describe '#known?' do
-    context 'with known path and request method' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-      end
-
-      it 'returns true' do
-        expect(request).to be_known
-      end
+    it 'returns true if request is known' do
+      expect(valid_request).to be_known
     end
 
-    context 'with known path, but unknown request method' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'PATCH'))
-      end
-
-      it 'returns false' do
-        expect(request).not_to be_known
-      end
-    end
-
-    context 'with unknown path' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/unknown'))
-      end
-
-      it 'returns false' do
-        expect(request).not_to be_known
-      end
+    it 'returns false if request is not known' do
+      expect(unknown_request).not_to be_known
     end
   end
 
   describe '#parsed_params' do
-    let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
-
-    let(:rack_request) do
-      Rack::Request.new(Rack::MockRequest.env_for('/stuff/42?version=2'))
+    it 'returns merged path, query and body params' do
+      parsed_values = {
+        path: { 'winner' => 'path' },
+        query: { 'winner' => 'query', 'my-query' => 'query' },
+        headers: { 'winner' => 'headers', 'my-header' => 'header' },
+        cookies: { 'winner' => 'cookies', 'my-cookie' => 'cookie' },
+        body: { 'winner' => 'body', 'my-body' => 'body' }
+      }
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        parsed_values:,
+        error: nil
+      )
+      expect(request.parsed_params).to eq({
+                                            'winner' => 'path',
+                                            'my-query' => 'query',
+                                            'my-body' => 'body'
+                                          })
     end
 
-    it 'returns path and query params' do
-      expect(request.parsed_params['id']).to eq(42)
-      expect(request.parsed_params['version']).to eq(2)
+    it 'is empty if no parsed values are given' do
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        error: nil
+      )
+      expect(request.parsed_params).to be_empty
     end
   end
 
   describe '#parsed_path_parameters' do
-    let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
-
-    let(:rack_request) do
-      Rack::Request.new(Rack::MockRequest.env_for('/stuff/42'))
+    it 'returns the parameters' do
+      expect(request_with_values.parsed_path_parameters['name']).to eq(42)
     end
 
-    it 'returns the path param' do
-      expect(request.parsed_path_parameters['id']).to eq(42)
-    end
-
-    context 'without defined parameters' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/search'))
-      end
-
-      it 'returns an empty Hash' do
-        expect(request.parsed_path_parameters).to eq({})
-      end
-    end
-
-    context 'with kebab-case path params' do
-      let(:definition) do
-        OpenapiFirst.parse({
-                             'openapi' => '3.1.0',
-                             'paths' => {
-                               '/ke-bab/{ke-bab}/{under_score}' => {
-                                 'get' => {
-                                   'parameters' => [
-                                     {
-                                       'name' => 'ke-bab',
-                                       'in' => 'path',
-                                       'required' => true,
-                                       'schema' => {
-                                         'type' => 'string'
-                                       }
-                                     }, {
-                                       'name' => 'under_score',
-                                       'in' => 'path',
-                                       'required' => true,
-                                       'schema' => {
-                                         'type' => 'string'
-                                       }
-                                     }
-                                   ]
-                                 }
-                               }
-                             }
-                           })
-      end
-
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/ke-bab/one/two'))
-      end
-
-      it 'parses path parameters' do
-        expect(request.parsed_path_parameters['ke-bab']).to eq('one')
-        expect(request.parsed_path_parameters['under_score']).to eq('two')
-      end
+    it 'returns an empty hash if no path params are given' do
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        error: nil
+      )
+      expect(request.parsed_path_parameters).to eq({})
     end
   end
 
   describe '#parsed_query' do
-    let(:rack_request) do
-      Rack::Request.new(Rack::MockRequest.env_for('/pets?limit=3&unknown=5'))
+    it 'returns the parameters' do
+      expect(request_with_values.parsed_query['name']).to eq(42)
     end
 
-    it 'returns defined params' do
-      expect(request.parsed_query['limit']).to eq(3)
-    end
-
-    it 'does not include unknown params' do
-      expect(request.parsed_query['unknown']).to be_nil
-    end
-
-    context 'without defined parameters' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets/42'))
-      end
-
-      it 'returns an empty Hash' do
-        expect(request.parsed_query).to eq({})
-      end
+    it 'returns an empty hash if no query params are given' do
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        error: nil
+      )
+      expect(request.parsed_query).to eq({})
     end
   end
 
   describe '#parsed_headers' do
-    let(:definition) { OpenapiFirst.load('./spec/data/parameters.yaml') }
-
-    let(:rack_request) do
-      env = Rack::MockRequest.env_for('/search')
-      env['HTTP_HEADER'] = 'something'
-      env['HTTP_UNKNOWN'] = '5'
-      Rack::Request.new(env)
+    it 'returns the parameters' do
+      expect(request_with_values.parsed_headers['name']).to eq(42)
     end
 
-    it 'returns defined params' do
-      expect(request.parsed_headers['header']).to eq('something')
-    end
-
-    it 'does not include unknown params' do
-      expect(request.parsed_headers['unknown']).to be_nil
-    end
-
-    context 'without defined parameters' do
-      let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
-
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-      end
-
-      it 'returns an empty Hash' do
-        expect(request.parsed_headers).to eq({})
-      end
+    it 'returns an empty hash if no path params are given' do
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        error: nil
+      )
+      expect(request.parsed_headers).to eq({})
     end
   end
 
   describe '#parsed_cookies' do
-    let(:definition) { OpenapiFirst.load('./spec/data/cookie-parameter-validation.yaml') }
-
-    let(:rack_request) do
-      env = Rack::MockRequest.env_for('/')
-      env['HTTP_COOKIE'] = 'knusper=42'
-      Rack::Request.new(env)
+    it 'returns the parameters' do
+      expect(request_with_values.parsed_cookies['name']).to eq(42)
     end
 
-    it 'returns defined params' do
-      expect(request.parsed_cookies['knusper']).to eq(42)
-    end
-
-    context 'without defined parameters' do
-      let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
-
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets'))
-      end
-
-      it 'returns an empty Hash' do
-        expect(request.parsed_cookies).to eq({})
-      end
+    it 'returns an empty hash if no path params are given' do
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        error: nil
+      )
+      expect(request.parsed_cookies).to eq({})
     end
   end
 
   describe '#parsed_body' do
-    let(:definition) { OpenapiFirst.load('./spec/data/petstore-expanded.yaml') }
-
-    let(:rack_request) do
-      env = Rack::MockRequest.env_for('/pets', method: 'POST', input: JSON.dump(foo: 'bar'))
-      env['CONTENT_TYPE'] = 'application/json'
-      Rack::Request.new(env)
+    it 'returns the parameters' do
+      expect(request_with_values.parsed_body['name']).to eq(42)
     end
 
-    it 'returns the parsed body' do
-      expect(request.parsed_body).to eq('foo' => 'bar')
+    it 'returns an empty hash if no path params are given' do
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        error: nil
+      )
+      expect(request.parsed_body).to eq({})
     end
 
-    context 'with invalid JSON' do
-      let(:rack_request) do
-        env = Rack::MockRequest.env_for('/pets', method: 'POST', input: '{foobar}')
-        env['CONTENT_TYPE'] = 'application/json'
-        Rack::Request.new(env)
-      end
-
-      it 'raises a ParseError' do
-        expect { request.parsed_body }.to raise_error(OpenapiFirst::ParseError, 'Failed to parse body as JSON')
-      end
-    end
-
-    it 'is aliased with parsed_body' do
-      expect(request.parsed_body).to eq('foo' => 'bar')
+    it 'can return falsy values' do
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        parsed_values: { body: false },
+        error: nil
+      )
+      expect(request.parsed_body).to eq(false)
     end
   end
 
   describe '#operation_id' do
-    specify do
-      expect(request.operation_id).to eq('showPetById')
+    it 'returns the operationId value of the operation' do
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        parsed_values: {},
+        error: nil,
+        request_definition: instance_double(OpenapiFirst::Request, operation_id: 'createPets')
+      )
+      expect(request.operation_id).to eq('createPets')
     end
   end
 
   describe '#request_definition' do
-    context 'with valid request' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{}'))
-      end
-
-      it 'returns true' do
-        expect(request.request_definition).to be_a(OpenapiFirst::Request)
-      end
+    it 'returns the given request_definition' do
+      request_definition = double(:request_definition)
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        parsed_values: {},
+        error: nil,
+        request_definition:
+      )
+      expect(request.request_definition).to be(request_definition)
     end
   end
 
   describe '#operation' do
-    context 'with valid request' do
-      let(:rack_request) do
-        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{}'))
-      end
-
-      it 'returns returns the operation object Hash of the Openapi document' do
-        expect(request.operation['operationId']).to eq('createPets')
-      end
+    it 'returns returns the operation object Hash of the Openapi document' do
+      operation = { 'operationId' => 'createPets' }
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        parsed_values: {},
+        error: nil,
+        request_definition: instance_double(OpenapiFirst::Request, operation:)
+      )
+      expect(request.operation).to be(operation)
     end
   end
 end
