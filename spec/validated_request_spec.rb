@@ -256,4 +256,28 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       expect(request.operation_id).to eq('showPetById')
     end
   end
+
+  describe '#request_definition' do
+    context 'with valid request' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{}'))
+      end
+
+      it 'returns true' do
+        expect(request.request_definition).to be_a(OpenapiFirst::Request)
+      end
+    end
+  end
+
+  describe '#operation' do
+    context 'with valid request' do
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{}'))
+      end
+
+      it 'returns returns the operation object Hash of the Openapi document' do
+        expect(request.operation['operationId']).to eq('createPets')
+      end
+    end
+  end
 end

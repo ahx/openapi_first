@@ -30,7 +30,7 @@ module OpenapiFirst
     # Validates the request against the API description.
     # @param rack_request [Rack::Request] The Rack request object.
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
-    # @return [Request] The validated request object.
+    # @return [ValidatedRequest] The validated request object.
     def validate_request(request, raise_error: false)
       route = @router.match(request.request_method, request.path, content_type: request.content_type)
       validated = if route.error
@@ -48,7 +48,7 @@ module OpenapiFirst
     # @param rack_request [Rack::Request] The Rack request object.
     # @param rack_response [Rack::Response] The Rack response object.
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
-    # @return [Response] The validated response object.
+    # @return [ValidatedResponse] The validated response object.
     def validate_response(rack_request, rack_response, raise_error: false)
       route = @router.match(rack_request.request_method, rack_request.path, content_type: rack_request.content_type)
       return if route.error # Skip response validation for unknown requests

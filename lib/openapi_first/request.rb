@@ -7,14 +7,14 @@ require_relative 'validated_request'
 module OpenapiFirst
   # Represents one request definition of an OpenAPI description
   class Request
-    def initialize(path:, request_method:, operation_id:, parameters:, content_type:, content_schema:, required_body:,
+    def initialize(path:, request_method:, operation_object:, parameters:, content_type:, content_schema:, required_body:,
                    hooks:, openapi_version:)
       @path = path
       @request_method = request_method
       @content_type = content_type
       @content_schema = content_schema
       @required_request_body = required_body == true
-      @operation_id = operation_id
+      @operation = operation_object
       @parameters = build_parameters(parameters)
       @parser = RequestParser.new(
         query_parameters: @parameters[:query],
@@ -25,7 +25,7 @@ module OpenapiFirst
       @validator = RequestValidator.new(self, hooks:, openapi_version:)
     end
 
-    attr_reader :content_type, :content_schema, :operation_id, :request_method, :path
+    attr_reader :content_type, :content_schema, :operation, :request_method, :path
 
     def validate(request, route_params:)
       parsed_values = @parser.parse(request, route_params:)
@@ -42,6 +42,10 @@ module OpenapiFirst
 
     def required_request_body?
       @required_request_body
+    end
+
+    def operation_id
+      @operation['operationId']
     end
 
     private

@@ -16,9 +16,10 @@ module OpenapiFirst
     end
 
     attr_reader :parsed_values, :error, :request_definition
-
-    def_delegators :request_definition, :operation_id
     def_delegators :parsed_values, :parsed_path_parameters, :parsed_query, :parsed_headers, :parsed_cookies, :parsed_body
+
+    # Openapi 3 specific
+    def_delegators :request_definition, :operation_id, :operation
 
     # Checks if the request is valid.
     # @return [Boolean] true if the request is valid, false otherwise.
