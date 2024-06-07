@@ -12,6 +12,9 @@
 
 ### Breaking Changes
 
+
+- `Definition#validate_request` now returns a `ValidatedRequest` which delgates all methods to the original request, except for `#parsed_body`. `#parsed_query` etc.
+
 - Instead of `Definition#operations` you can use `Definition#routes`, which returns a list of routes. Routes have a `#path`, `#request_method`, `#requests` and `#responses`.
 A route has one path and one request method, but can have multiple requests (one for each supported content-type) and responses (statuses + content-type).
 

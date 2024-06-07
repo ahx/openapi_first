@@ -161,23 +161,29 @@ definition = OpenapiFirst.load('openapi.yaml')
 ```ruby
 # Find and validate request
 rack_request = Rack::Request.new(env)
-request = definition.validate_request(rack_request)
+validated_request = definition.validate_request(rack_request)
 # Or raise an exception if validation fails:
 definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if request is invalid
 
 # Inspect the request and access parsed parameters
-request.known? # Is the request defined in the API description?
-request.valid? # => true / false
-request.invalid? # => true / false
-request.error # => Failure object if request is invalid
-request.params # Merged parameters and request body. Priority is path, query, headers, cookies, body
-request.parsed_body
-request.parsed_path_parameters # => { "pet_id" => 42 }
-request.parsed_headers
-request.parsed_cookies
-request.parsed_query # alias: query_parameters
-request.request_definition.path # => "/pets/{petId}"
-request.request_definition.operation_id # => "showPetById"
+validated_request.known? # Is the request defined in the API description?
+validated_request.valid? # => true / false
+validated_request.invalid? # => true / false
+validated_request.error # => Failure object if request is invalid
+validated_request.parsed_params # Merged parsed path, query parameters and request body
+validated_request.parsed_body
+validated_request.parsed_path_parameters # => { "pet_id" => 42 }
+validated_request.parsed_headers
+validated_request.parsed_cookies
+validated_request.parsed_query
+
+# Access the plain Openapi 3 operation object Hash
+validated_request.operation['x-foo']
+validated_request.operation['operationId']
+
+# openapi_first specific
+validated_request.request_definition.path # => "/pets/{petId}"
+validated_request.request_definition.operation_id # => "showPetById"
 ```
 
 ### Validate response
