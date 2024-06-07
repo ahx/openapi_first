@@ -2,6 +2,9 @@
 
 OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.openapis.org/) API description. It supports OpenAPI 3.0 and 3.1. It offers request and response validation and it ensures that your implementation follows exactly the API description.
 
+> [!IMPORTANT]
+> This Readme is about an upcoming 2.0 release. For the current version see the [v1 branch](../v1).
+
 ## Contents
 
 <!-- TOC -->
@@ -25,13 +28,9 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
 
 ## Rack Middlewares
 
-All middlewares add a _request_ object to the current Rack env at `env[OpenapiFirst::REQUEST]`), which is in an instance of `OpenapiFirst::RuntimeRequest` that responds to `.params`, `.parsed_body` etc.
-
-This gives you access to the converted request parameters and body exaclty as described in your API description instead of relying on Rack alone to parse the request. This only includes query parameters that are defined in the API description. It supports every [`style` and `explode` value as described](https://spec.openapis.org/oas/latest.html#style-examples) in the OpenAPI 3.0 and 3.1 specs.
-
 ### Request validation
 
-The request validation middleware returns a 4xx if the request is invalid or not defined in the API description.
+The request validation middleware returns a 4xx if the request is invalid or not defined in the API description. It adds a request object to the current Rack environment at `env[OpenapiFirst::REQUEST]` with the request parameters parsed exaclty as described in your API description plus access to meta information from your API description. See _[Manual use](#manual-use)_ for more details about that object.
 
 ```ruby
 use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml'
