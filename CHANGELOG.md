@@ -5,21 +5,28 @@
 ### New Features
 
 - Hooks:
-  - after_request_validation
-  - after_response_validation
-  - after_request_body_property_validation
-  - after_request_parameter_property_validation
+  - `after_request_validation`
+  - `after_response_validation`
+  - `after_request_body_property_validation`
+  - `after_request_parameter_property_validation`
+
+- Validation failures returned by `ValidatedRequest#error` always returns a `#message`. So you can call `my_validated_request.error.message if validated_request.invalid?` and always get a human-readable error message.
+
+- Performance improvements.
 
 ### Breaking Changes
 
+#### Manual validation
+- `Definition#request.validate` was removed. Please use `Definition#validate_request` instead.
+- `Definition#validate_request` returns a `ValidatedRequest` which delgates all methods to the original (rack) request, except for `#valid?` `#parsed_body`. `#parsed_query`, `#operation` etc. See Readme for details.
+- The `Operation` class was removed. `ValidatedRequest#operation` now returns the OpenAPI 3 operation object as a plain Hash. So you can still call `ValidatedRequest#operation['x-foo']`. You can call `ValidatedRequest#operation_id` if you just need the _operationId_.
 
-- `Definition#validate_request` now returns a `ValidatedRequest` which delgates all methods to the original request, except for `#parsed_body`. `#parsed_query` etc.
+#### Inspecting OpenAPI files
 
-- Instead of `Definition#operations` you can use `Definition#routes`, which returns a list of routes. Routes have a `#path`, `#request_method`, `#requests` and `#responses`.
+- `Definition#operations` has been removed. Please use `Definition#routes`, which returns a list of routes. Routes have a `#path`, `#request_method`, `#requests` and `#responses`.
 A route has one path and one request method, but can have multiple requests (one for each supported content-type) and responses (statuses + content-type).
 
 - Several internal changes to make the code more maintainable, more performant , support hooks and prepare for OpenAPI 4. If you have monkey-patched OpenapiFirst, you might need to adjust your code. Please contact me if you need help.
-- `Operation` was removed.
 
 
 ## 1.4.3

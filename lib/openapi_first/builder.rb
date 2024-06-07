@@ -2,9 +2,13 @@
 
 module OpenapiFirst
   # Builds parts of a Definition
+  # This knows how to read a resolved OpenAPI document and build {Request} and {Response} objects.
   class Builder
     REQUEST_METHODS = %w[get head post put patch delete trace options].freeze
 
+    # Builds a router from a resolved OpenAPI document.
+    # @param resolved [Hash] The resolved OpenAPI document.
+    # @param config [OpenapiFirst::Configuration] The configuration object.
     def self.build_router(resolved, config)
       openapi_version = (resolved['openapi'] || resolved['swagger'])[0..2]
       new(resolved, config, openapi_version).router

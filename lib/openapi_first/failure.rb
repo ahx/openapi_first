@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  # A failure object returned when validation of request or response has failed.
+  # A failure object returned when validation or parsing of a request or response has failed.
+  # This returned in ValidatedRequest#error and ValidatedResponse#error.
   class Failure
     TYPES = {
       not_found: [NotFoundError, 'Request path is not defined.'],
@@ -43,7 +44,6 @@ module OpenapiFirst
     end
 
     # @attr_reader [Symbol] error_type The type of the failure. See TYPES.keys.
-    # @alias type error_type
     # Example: :invalid_body
     attr_reader :error_type
     alias type error_type

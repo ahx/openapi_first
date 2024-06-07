@@ -28,8 +28,8 @@ module OpenapiFirst
     end
 
     # Validates the request against the API description.
-    # @param rack_request [Rack::Request] The Rack request object.
-    # @param raise_error [Boolean] Whether to raise an error if validation fails.
+    # @param [Rack::Request] rack_request The Rack request object.
+    # @param [Boolean] raise_error Whether to raise an error if validation fails.
     # @return [ValidatedRequest] The validated request object.
     def validate_request(request, raise_error: false)
       route = @router.match(request.request_method, request.path, content_type: request.content_type)
