@@ -13,11 +13,12 @@ module OpenapiFirst
     def initialize
       @request_validation_error_response = OpenapiFirst.find_plugin(:default)::ErrorResponse
       @request_validation_raise_error = false
+      @response_validation_raise_error = true
       @hooks = (HOOKS.map { [_1, []] }).to_h
     end
 
     attr_reader :request_validation_error_response, :hooks
-    attr_accessor :request_validation_raise_error
+    attr_accessor :request_validation_raise_error, :response_validation_raise_error
 
     def clone
       copy = super

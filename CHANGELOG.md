@@ -4,7 +4,9 @@
 
 ### New Features
 
-- Hooks:
+- New option for `Middlewares::ResponseValidation`: `:raise_error` (default: true). If set to `false`, the middleware will not aise an error if the response is invalid.
+
+- Hooks (see Readme for details):
   - `after_request_validation`
   - `after_response_validation`
   - `after_request_body_property_validation`

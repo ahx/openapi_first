@@ -26,6 +26,30 @@ RSpec.describe OpenapiFirst::Configuration do
     end
   end
 
+  describe '#request_validation_raise_error' do
+    specify do
+      expect(OpenapiFirst.configuration.request_validation_raise_error).to be(false)
+    end
+
+    it 'can be set to true' do
+      config = OpenapiFirst::Configuration.new
+      config.request_validation_raise_error = true
+      expect(config.request_validation_raise_error).to be(true)
+    end
+  end
+
+  describe '#response_validation_raise_error' do
+    specify do
+      expect(OpenapiFirst.configuration.response_validation_raise_error).to be(true)
+    end
+
+    it 'can be set to false' do
+      config = OpenapiFirst::Configuration.new
+      config.response_validation_raise_error = false
+      expect(config.response_validation_raise_error).to be(false)
+    end
+  end
+
   describe '#clone' do
     it 'clones actions' do
       config = OpenapiFirst::Configuration.new

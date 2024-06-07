@@ -133,7 +133,7 @@ Response validation fails if response body includes a property with `writeOnly: 
 
 ### Response validation
 
-This middleware is especially useful when testing. It _always_ raises an error if the response is not valid.
+This middleware is especially useful when testing. It raises an error by default if the response is not valid.
 
 ```ruby
 use OpenapiFirst::Middlewares::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] == 'test'
@@ -144,6 +144,7 @@ use OpenapiFirst::Middlewares::ResponseValidation, spec: 'openapi.yaml' if ENV['
 | Name    | Possible values | Description                                                      |
 | :------ | --------------- | ---------------------------------------------------------------- |
 | `spec:` |                 | The path to the spec file or spec loaded via `OpenapiFirst.load` |
+| `raise_error:`    | `true` (default), `false`                                                | If set to true the middleware raises `OpenapiFirst::ResponseInvalidError` or `OpenapiFirst::ResonseNotFoundError` if the response does not match the API description. |
 
 ## Manual use
 
@@ -176,11 +177,10 @@ validated_request.parsed_headers
 validated_request.parsed_cookies
 validated_request.parsed_query
 
-# Access the plain Openapi 3 operation object Hash
+# Access the Openapi 3 Operation Object Hash
 validated_request.operation['x-foo']
 validated_request.operation['operationId']
-
-# openapi_first specific
+# or the whole request definition
 validated_request.request_definition.path # => "/pets/{petId}"
 validated_request.request_definition.operation_id # => "showPetById"
 ```

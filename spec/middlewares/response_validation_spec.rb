@@ -255,6 +255,23 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
         get '/pets'
       end.to raise_error OpenapiFirst::ResponseInvalidError, 'Response body is invalid: value at root is not an array'
     end
+
+    context 'with raise_error: false' do
+      let(:app) do
+        Rack::Builder.new.tap do |builder|
+          builder.use(described_class, spec: './spec/data/petstore.yaml', raise_error: false)
+          builder.run lambda { |_env|
+            Rack::Response.new('{"foo": "bar"}', 200, { 'Content-Type' => 'application/json' }).finish
+          }
+        end.to_app
+      end
+
+      it 'does not raise an error' do
+        get '/pets'
+
+        expect(last_response.status).to eq 200
+      end
+    end
   end
 
   context 'when response is not valid JSON' do
