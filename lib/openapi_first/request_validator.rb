@@ -5,7 +5,7 @@ require_relative 'validators/request_parameters'
 require_relative 'validators/request_body'
 
 module OpenapiFirst
-  # Validates a Request against an Operation.
+  # Validates a Request against a request definition.
   class RequestValidator
     VALIDATORS = [
       Validators::RequestParameters,
@@ -19,10 +19,7 @@ module OpenapiFirst
     end
 
     def call(parsed_request)
-      catch FAILURE do
-        @validators.each { |v| v.call(parsed_request) }
-        nil
-      end
+      @validators.each { |v| v.call(parsed_request) }
     end
   end
 end

@@ -32,9 +32,7 @@ module OpenapiFirst
       private
 
       def read_body(request)
-        request.parsed_body
-      rescue ParseError => e
-        Failure.fail!(:invalid_body, message: e.message)
+        request[:body]
       end
     end
   end

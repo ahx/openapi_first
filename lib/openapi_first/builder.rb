@@ -50,15 +50,17 @@ module OpenapiFirst
       path_item_parameters = path_item_object['parameters']
       parameters = operation_object['parameters'].to_a.chain(path_item_parameters.to_a)
       required_body = operation_object.dig('requestBody', 'required') == true
-      operation_id = operation_object['operationId']
       result = operation_object.dig('requestBody', 'content')&.map do |content_type, content|
         Request.new(path:, request_method:, operation_object:, parameters:, content_type:,
                     content_schema: content['schema'], required_body:, hooks:, openapi_version:)
       end || []
       return result if required_body
 
-      result << Request.new(path:, request_method:, operation_object:, parameters:, content_type: nil, content_schema: nil,
-                            required_body:, hooks:, openapi_version:)
+      result << Request.new(
+        path:, request_method:, operation_object:,
+        parameters:, content_type: nil, content_schema: nil,
+        required_body:, hooks:, openapi_version:
+      )
     end
 
     def build_responses(operation_object)

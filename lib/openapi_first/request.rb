@@ -5,9 +5,13 @@ require_relative 'request_validator'
 require_relative 'validated_request'
 
 module OpenapiFirst
-  # Represents one request definition of an OpenAPI description
+  # Represents one request definition of an OpenAPI description.
+  # Note that this is not the same as an OpenAPI 3.x Operation.
+  # An 3.x Operation object can accept multiple requests, because it can handle multiple content-types.
+  # This class represents one of those requests.
   class Request
-    def initialize(path:, request_method:, operation_object:, parameters:, content_type:, content_schema:, required_body:,
+    def initialize(path:, request_method:, operation_object:,
+                   parameters:, content_type:, content_schema:, required_body:,
                    hooks:, openapi_version:)
       @path = path
       @request_method = request_method
@@ -16,11 +20,12 @@ module OpenapiFirst
       @required_request_body = required_body == true
       @operation = operation_object
       @parameters = build_parameters(parameters)
-      @parser = RequestParser.new(
+      @request_parser = RequestParser.new(
         query_parameters: @parameters[:query],
         path_parameters: @parameters[:path],
         header_parameters: @parameters[:header],
-        cookie_parameters: @parameters[:cookie]
+        cookie_parameters: @parameters[:cookie],
+        content_type:
       )
       @validator = RequestValidator.new(self, hooks:, openapi_version:)
     end
@@ -28,8 +33,12 @@ module OpenapiFirst
     attr_reader :content_type, :content_schema, :operation, :request_method, :path
 
     def validate(request, route_params:)
-      parsed_values = @parser.parse(request, route_params:)
-      error = @validator.call(parsed_values)
+      parsed_values = {}
+      error = catch FAILURE do
+        parsed_values = @request_parser.parse(request, route_params:)
+        @validator.call(parsed_values)
+        nil
+      end
       ValidatedRequest.new(request, parsed_values:, error:, request_definition: self)
     end
 

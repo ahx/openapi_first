@@ -367,7 +367,7 @@ RSpec.describe 'Request body validation' do
         expect do
           post path, '{fo},'
         end.to raise_error OpenapiFirst::RequestInvalidError,
-                           'Request body invalid: Failed to parse body as JSON'
+                           'Request body invalid: Failed to parse request body as JSON'
       end
 
       it 'raises error if request content-type does not match' do

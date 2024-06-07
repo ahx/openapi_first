@@ -106,6 +106,18 @@ RSpec.describe OpenapiFirst::Router do
         expect(match.params).to eq({})
       end
     end
+
+    context 'with kebab-case path params' do
+      let(:requests) do
+        [
+          double(path: '/foo/{ke-bab}', request_method: 'get')
+        ]
+      end
+      it 'parses path parameters' do
+        match = router.match('GET', '/foo/1')
+        expect(match.params).to eq({ 'ke-bab' => '1' })
+      end
+    end
   end
 
   describe '#routes' do
