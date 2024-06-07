@@ -224,10 +224,13 @@ Setup per per instance:
 
 ```ruby
 OpenapiFirst.load('openapi.yaml') do |config|
-  config.after_request_validation do |request, error, definition|
-    definition.operation_id
+  config.after_request_validation do |validated_request|
+    validated_request.valid? # => true / false
   end
-  config.after_response_validation do |response, error, definition|
+  config.after_response_validation do |validated_response, request|
+    if validated_response.invalid?
+      warn "#{request.request_method} #{request.path}: #{validated_response.error.message}"
+    end
   end
 end
 ```
