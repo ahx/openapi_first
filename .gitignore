@@ -7,5 +7,6 @@
 /spec/reports/
 /tmp/
 /benchmarks/profiles
+.tool-versions
 # rspec failure tracking
 .rspec_status
