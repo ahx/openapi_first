@@ -4,6 +4,8 @@ module OpenapiFirst
   # @!visibility private
   class Error < StandardError; end
   # @!visibility private
+  class FileNotFoundError < Error; end
+  # @!visibility private
   class ParseError < Error; end
   # @!visibility private
   class NotFoundError < Error; end

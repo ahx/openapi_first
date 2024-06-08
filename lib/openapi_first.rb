@@ -37,6 +37,8 @@ module OpenapiFirst
   # Load and dereference an OpenAPI spec file
   # @return [Definition]
   def self.load(filepath, only: nil, &)
+    raise FileNotFoundError, "File not found: #{filepath}" unless File.exist?(filepath)
+
     resolved = Bundle.resolve(filepath)
     parse(resolved, only:, filepath:, &)
   end
