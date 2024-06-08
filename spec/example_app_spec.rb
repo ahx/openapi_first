@@ -2,7 +2,7 @@
 
 require 'rack/test'
 require_relative 'spec_helper'
-require_relative '../examples/app'
+require_relative '../examples/rack_handler'
 
 RSpec.describe 'Example App' do
   include Rack::Test::Methods
