@@ -10,8 +10,10 @@ module OpenapiFirst
 
       include Enumerable
 
-      def initialize
+      def initialize(path:, request_method:)
         @responses = {}
+        @path = path
+        @request_method = request_method
       end
 
       def add_response(status, content_type, response)
@@ -28,7 +30,8 @@ module OpenapiFirst
       def match(status, content_type)
         contents = self[status]
         if contents.nil?
-          message = "Response status #{status} is not defined. Defined statuses are: #{@responses.keys.join(', ')}."
+          message = "Status #{status} is not defined for #{@request_method} #{@path}. " \
+                    "Defined statuses are: #{@responses.keys.join(', ')}."
           return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
         end
         response = contents[content_type]
@@ -43,9 +46,9 @@ module OpenapiFirst
       private
 
       def content_error(content_type)
-        return 'Content-Type must not be empty.' if content_type.nil? || content_type.empty?
+        return 'Response Content-Type must not be empty.' if content_type.nil? || content_type.empty?
 
-        "Content-Type #{content_type} is not defined."
+        "Response Content-Type #{content_type} is not defined for #{@request_method} #{@path}."
       end
 
       def [](status)

@@ -2,7 +2,7 @@
 
 RSpec.describe OpenapiFirst::Router::ResponseMatcher do
   def build_matcher(responses)
-    described_class.new.tap do |matcher|
+    described_class.new(path: '/stations', request_method: 'GET').tap do |matcher|
       responses.each do |response|
         matcher.add_response(response.status, response.content_type, response)
       end
@@ -65,7 +65,7 @@ RSpec.describe OpenapiFirst::Router::ResponseMatcher do
         expect(matcher.match(409, 'application/json')).to have_attributes(
           response: nil, error: have_attributes(
             error_type: :response_not_found,
-            message: 'Response status 409 is not defined. Defined statuses are: 200, 201.'
+            message: 'Status 409 is not defined for GET /stations. Defined statuses are: 200, 201.'
           )
         )
       end
@@ -91,7 +91,7 @@ RSpec.describe OpenapiFirst::Router::ResponseMatcher do
           double(status: '200', content_type: 'application/xml')
         ]
         matcher = build_matcher(responses)
-        message = 'Content-Type application/json is not defined. Content-Type should be application/text or application/xml.'
+        message = 'Response Content-Type application/json is not defined for GET /stations. Content-Type should be application/text or application/xml.'
         expect(matcher.match(200, 'application/json')).to have_attributes(
           response: nil,
           error: have_attributes(error_type: :response_not_found, message:)

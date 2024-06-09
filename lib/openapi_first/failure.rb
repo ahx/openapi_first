@@ -13,7 +13,7 @@ module OpenapiFirst
       invalid_header: [RequestInvalidError, 'Request header is invalid:'],
       invalid_path: [RequestInvalidError, 'Path segment is invalid:'],
       invalid_cookie: [RequestInvalidError, 'Cookie value is invalid:'],
-      response_not_found: [ResponseNotFoundError, 'Response is not defined.'],
+      response_not_found: [ResponseNotFoundError],
       invalid_response_body: [ResponseInvalidError, 'Response body is invalid:'],
       invalid_response_header: [ResponseInvalidError, 'Response header is invalid:']
     }.freeze
@@ -63,7 +63,7 @@ module OpenapiFirst
     def exception_message
       _, message_prefix = TYPES.fetch(error_type)
 
-      "#{message_prefix} #{@message || generate_message}"
+      [message_prefix, @message || generate_message].compact.join(' ')
     end
 
     private

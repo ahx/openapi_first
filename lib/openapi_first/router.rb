@@ -66,14 +66,15 @@ module OpenapiFirst
     private
 
     def route_at(path, request_method)
+      request_method = request_method.upcase
       path_item = if PathTemplate.template?(path)
                     @dynamic[path] ||= { template: PathTemplate.new(path) }
                   else
                     @static[path] ||= {}
                   end
-      path_item[request_method.upcase] ||= {
+      path_item[request_method] ||= {
         requests: ContentMatcher.new,
-        responses: ResponseMatcher.new
+        responses: ResponseMatcher.new(path:, request_method:)
       }
     end
 
