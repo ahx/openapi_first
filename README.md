@@ -18,6 +18,7 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
 - [Configuration](#configuration)
   - [Hooks](#hooks)
   - [Defaults](#defaults)
+- [Test assertions](#test-assertions)
 - [Framework integration](#framework-integration)
 - [Alternatives](#alternatives)
 - [Development](#development)
@@ -258,7 +259,7 @@ OpenapiFirst.configure do |config|
 end
 ```
 
-## Test Assrtions
+## Test assrtions
 
 openapi_first ships with a simple but powerful Test module to run request and response validation in your tests without using the middlewares. This is design to be used in rack-test or Ruby on Rails integration tests.
 Please create an issue if you need deeper test / framework integration.
