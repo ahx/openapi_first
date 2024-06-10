@@ -4,6 +4,8 @@
 
 ### New Features
 
+- Test Assertions! You can now use `assert_api_conform`  to do contract testing in your rack-test / Rails integration tests. See Readme for details.
+
 - New option for `Middlewares::ResponseValidation`: `:raise_error` (default: true). If set to `false`, the middleware will not aise an error if the response is invalid.
 
 - Hooks (see Readme for details):

@@ -258,6 +258,36 @@ OpenapiFirst.configure do |config|
 end
 ```
 
+## Test Assrtions
+
+openapi_first ships with a simple but powerful Test module to run request and response validation in your tests without using the middlewares. This is design to be used in rack-test or Ruby on Rails integration tests.
+Please create an issue if you need deeper test / framework integration.
+Here is how to set it up for Rails integration tests:
+
+```ruby
+# test_helper.rb
+require 'openapi_first/test'
+OpenapiFirst::Test.register('openapi/v1.openapi.yaml')
+```
+
+Inside your test
+```ruby
+# test/integration/trips_api_test.rb
+require 'test_helper'
+
+class TripsApiTest < ActionDispatch::IntegrationTest
+  include OpenapiFirst::Test::Methods
+
+  test 'GET /trips' do
+    get '/v1/trips',
+        params: { origin: 'efdbb9d1-02c2-4bc3-afb7-6788d8782b1e', destination: 'b2e783e1-c824-4d63-b37a-d8d698862f1d',
+                  date: '2024-07-02T09:00:00Z' }
+
+    assert_api_conform(status: 200)
+  end
+end
+```
+
 ## Framework integration
 
 Using rack middlewares is supported in probably all Ruby web frameworks.
