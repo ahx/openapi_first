@@ -147,7 +147,7 @@ use OpenapiFirst::Middlewares::ResponseValidation, spec: 'openapi.yaml' if ENV['
 | `spec:` |                 | The path to the spec file or spec loaded via `OpenapiFirst.load` |
 | `raise_error:`    | `true` (default), `false`                                                | If set to true the middleware raises `OpenapiFirst::ResponseInvalidError` or `OpenapiFirst::ResonseNotFoundError` if the response does not match the API description. |
 
-## Test assrtions
+## Test assertions
 
 openapi_first ships with a simple but powerful Test module to run request and response validation in your tests without using the middlewares. This is design to be used in rack-test or Ruby on Rails integration tests.
 
