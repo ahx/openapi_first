@@ -13,24 +13,20 @@ module OpenapiFirst
       '3.0' => 'json-schemer://openapi30/schema'
     }.freeze
 
-    def initialize(schema, openapi_version:, write: true)
-      @schema = schema
+    def initialize(schema, openapi_version: '3.1', write: true, after_property_validation: nil)
       @schemer = JSONSchemer.schema(
         schema,
         access_mode: write ? 'write' : 'read',
         meta_schema: SCHEMAS.fetch(openapi_version),
         insert_property_defaults: true,
         output_format: 'classic',
-        before_property_validation: method(:before_property_validation)
+        before_property_validation: method(:before_property_validation),
+        after_property_validation:
       )
     end
 
     def validate(data)
-      ValidationResult.new(
-        @schemer.validate(data),
-        schema:,
-        data:
-      )
+      ValidationResult.new(@schemer.validate(data))
     end
 
     private

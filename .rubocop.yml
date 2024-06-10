@@ -1,10 +1,19 @@
+inherit_from: .rubocop_todo.yml
+inherit_mode:
+  merge:
+    - Exclude
+
+require: rubocop-performance
 AllCops:
-  TargetRubyVersion: 3.1.1
+  TargetRubyVersion: 3.2.0
   NewCops: enable
   SuggestExtensions: false
+  Exclude:
+    - "examples/rails_app/**/*"
 Style/Documentation:
   Exclude:
     - "spec/**/*"
+    - "lib/openapi_first/validators/*.rb"
     - "benchmarks/**/*"
     - "lib/openapi_first/json_refs.rb"
 Style/ExponentialNotation:
@@ -15,5 +24,8 @@ Metrics/BlockLength:
   Exclude:
     - "spec/**/*.rb"
     - "*.gemspec"
+Layout/LineLength:
+  Exclude:
+    - "spec/**/*.rb"
 Metrics/MethodLength:
   Max: 20

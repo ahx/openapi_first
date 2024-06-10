@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  # A failure object returned when validation of request or response has failed.
+  # A failure object returned when validation or parsing of a request or response has failed.
+  # This returned in ValidatedRequest#error and ValidatedResponse#error.
   class Failure
-    FAILURE = :openapi_first_validation_failure
-
     TYPES = {
       not_found: [NotFoundError, 'Request path is not defined.'],
       method_not_allowed: [RequestInvalidError, 'Request method is not defined.'],
@@ -14,7 +13,7 @@ module OpenapiFirst
       invalid_header: [RequestInvalidError, 'Request header is invalid:'],
       invalid_path: [RequestInvalidError, 'Path segment is invalid:'],
       invalid_cookie: [RequestInvalidError, 'Cookie value is invalid:'],
-      response_not_found: [ResponseNotFoundError, 'Response is not defined.'],
+      response_not_found: [ResponseNotFoundError],
       invalid_response_body: [ResponseInvalidError, 'Response body is invalid:'],
       invalid_response_header: [ResponseInvalidError, 'Response header is invalid:']
     }.freeze
@@ -45,27 +44,26 @@ module OpenapiFirst
     end
 
     # @attr_reader [Symbol] error_type The type of the failure. See TYPES.keys.
-    # @alias type error_type
     # Example: :invalid_body
     attr_reader :error_type
     alias type error_type
 
-    # @attr_reader [String] message A generic error message
-    attr_reader :message
-
     # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>] errors Schema validation errors
     attr_reader :errors
 
-    # Raise an exception that fits the failure.
-    def raise!
-      exception, = TYPES.fetch(error_type)
-      raise exception, exception_message
+    # A generic error message
+    def message
+      @message ||= exception_message
+    end
+
+    def exception
+      TYPES.fetch(error_type).first.new(exception_message)
     end
 
     def exception_message
       _, message_prefix = TYPES.fetch(error_type)
 
-      "#{message_prefix} #{@message || generate_message}"
+      [message_prefix, @message || generate_message].compact.join(' ')
     end
 
     private

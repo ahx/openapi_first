@@ -33,9 +33,7 @@ require 'json'
 require 'yaml'
 
 module OpenapiFirst
-  class FileNotFoundError < StandardError; end
-
-  module JsonRefs
+  module JsonRefs # :nodoc:
     class << self
       def dereference(doc)
         file_cache = {}

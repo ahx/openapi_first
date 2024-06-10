@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.files         = Dir['{lib}/**/*.rb', 'LICENSE.txt', 'README.md', 'CHANGELOG.md']
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '>= 3.1.1'
+  spec.required_ruby_version = '>= 3.2.0'
 
   spec.add_runtime_dependency 'hana', '~> 1.3'
   spec.add_runtime_dependency 'json_schemer', '>= 2.1', '< 3.0'

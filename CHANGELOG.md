@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+### New Features
+
+- Test Assertions! You can now use `assert_api_conform`  to do contract testing in your rack-test / Rails integration tests. See Readme for details.
+
+- New option for `Middlewares::ResponseValidation`: `:raise_error` (default: true). If set to `false`, the middleware will not aise an error if the response is invalid.
+
+- Hooks (see Readme for details):
+  - `after_request_validation`
+  - `after_response_validation`
+  - `after_request_body_property_validation`
+  - `after_request_parameter_property_validation`
+
+- Validation failures returned by `ValidatedRequest#error` always returns a `#message`. So you can call `my_validated_request.error.message if validated_request.invalid?` and always get a human-readable error message.
+
+- Performance improvements.
+
+### Breaking Changes
+
+#### Manual validation
+- `Definition#request.validate` was removed. Please use `Definition#validate_request` instead.
+- `Definition#validate_request` returns a `ValidatedRequest` which delgates all methods to the original (rack) request, except for `#valid?` `#parsed_body`. `#parsed_query`, `#operation` etc. See Readme for details.
+- The `Operation` class was removed. `ValidatedRequest#operation` now returns the OpenAPI 3 operation object as a plain Hash. So you can still call `ValidatedRequest#operation['x-foo']`. You can call `ValidatedRequest#operation_id` if you just need the _operationId_.
+
+#### Inspecting OpenAPI files
+
+- `Definition#operations` has been removed. Please use `Definition#routes`, which returns a list of routes. Routes have a `#path`, `#request_method`, `#requests` and `#responses`.
+A route has one path and one request method, but can have multiple requests (one for each supported content-type) and responses (statuses + content-type).
+
+- Several internal changes to make the code more maintainable, more performant , support hooks and prepare for OpenAPI 4. If you have monkey-patched OpenapiFirst, you might need to adjust your code. Please contact me if you need help.
+
+
 ## 1.4.3
 
 - Allow using json_schemer 2...3
@@ -27,7 +58,7 @@ Some redundant methods to validate or inspect requests/responses will be removed
 
 ## 1.3.6
 
-- Fix Rack 2 / Rails 6 compatibility ([#246](https://github.com/ahx/openapi_first/issues/246)
+- Fixed Rack 2 / Rails 6 compatibility ([#246](https://github.com/ahx/openapi_first/issues/246)
 
 ## 1.3.5
 
@@ -37,6 +68,7 @@ Some redundant methods to validate or inspect requests/responses will be removed
 
 - Fixed handling "binary" format in optional multipart file uploads
 - Cache the resolved OAD. This especially makes things run faster in tests.
+- Internally used `Operation#query_parameters`, `Operation#path_parameters` etc. now only returns parameters that are defined on the operation level not on the PathItem. Use `PathItem#query_parameters` to get those.
 
 ## 1.3.3 (yanked)
 

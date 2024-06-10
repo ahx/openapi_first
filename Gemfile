@@ -14,5 +14,6 @@ group :test, :development do
   gem 'rake'
   gem 'rspec'
   gem 'rubocop'
+  gem 'rubocop-performance'
   gem 'simplecov'
 end

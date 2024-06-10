@@ -1,125 +1,69 @@
 # frozen_string_literal: true
 
-require_relative 'definition/path_item'
-require_relative 'runtime_request'
-require_relative 'request_validation/validator'
-require_relative 'response_validation/validator'
+require_relative 'failure'
+require_relative 'router'
+require_relative 'request'
+require_relative 'response'
+require_relative 'builder'
 
 module OpenapiFirst
   # Represents an OpenAPI API Description document
   # This is returned by OpenapiFirst.load.
   class Definition
-    attr_reader :filepath, :paths, :openapi_version
+    attr_reader :filepath, :config, :paths, :router
 
     # @param resolved [Hash] The resolved OpenAPI document.
     # @param filepath [String] The file path of the OpenAPI document.
     def initialize(resolved, filepath = nil)
       @filepath = filepath
-      @paths = resolved['paths']
-      @openapi_version = detect_version(resolved)
+      @config = OpenapiFirst.configuration.clone
+      yield @config if block_given?
+      @config.freeze
+      @router = Builder.build_router(resolved, @config)
+      @paths = resolved['paths'].keys # TODO: Move into builder as well
+    end
+
+    def routes
+      @router.routes
     end
 
     # Validates the request against the API description.
-    # @param rack_request [Rack::Request] The Rack request object.
-    # @param raise_error [Boolean] Whether to raise an error if validation fails.
-    # @return [RuntimeRequest] The validated request object.
-    def validate_request(rack_request, raise_error: false)
-      runtime_request = request(rack_request)
-      validator = RequestValidation::Validator.new(runtime_request.operation)
-      validation_error = validator.validate(runtime_request)
-      validation_error.raise! if validation_error && raise_error
-      runtime_request.error = validation_error
-      runtime_request
+    # @param [Rack::Request] rack_request The Rack request object.
+    # @param [Boolean] raise_error Whether to raise an error if validation fails.
+    # @return [ValidatedRequest] The validated request object.
+    def validate_request(request, raise_error: false)
+      route = @router.match(request.request_method, request.path, content_type: request.content_type)
+      validated = if route.error
+                    ValidatedRequest.new(request, error: route.error)
+                  else
+                    route.request_definition.validate(request, route_params: route.params)
+                  end
+      @config.hooks[:after_request_validation].each { |hook| hook.call(validated, self) }
+      raise validated.error.exception if validated.error && raise_error
+
+      validated
     end
 
     # Validates the response against the API description.
     # @param rack_request [Rack::Request] The Rack request object.
     # @param rack_response [Rack::Response] The Rack response object.
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
-    # @return [RuntimeResponse] The validated response object.
+    # @return [ValidatedResponse] The validated response object.
     def validate_response(rack_request, rack_response, raise_error: false)
-      runtime_response = response(rack_request, rack_response)
-      validator = ResponseValidation::Validator.new(runtime_response.operation)
-      validation_error = validator.validate(runtime_response)
-      validation_error.raise! if validation_error && raise_error
-      runtime_response.error = validation_error
-      runtime_response
-    end
+      route = @router.match(rack_request.request_method, rack_request.path, content_type: rack_request.content_type)
+      return if route.error # Skip response validation for unknown requests
 
-    # Builds a RuntimeRequest object based on the Rack request.
-    # @param rack_request [Rack::Request] The Rack request object.
-    # @return [RuntimeRequest] The RuntimeRequest object.
-    def request(rack_request)
-      path_item, path_params = find_path_item_and_params(rack_request.path)
-      operation = path_item&.operation(rack_request.request_method.downcase)
-      RuntimeRequest.new(
-        request: rack_request,
-        path_item:,
-        operation:,
-        path_params:
-      )
-    end
+      response_match = route.match_response(status: rack_response.status, content_type: rack_response.content_type)
+      error = response_match.error
+      validated = if error
+                    ValidatedResponse.new(rack_response, error:)
+                  else
+                    response_match.response.validate(rack_response)
+                  end
+      @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated, rack_request, self) }
+      raise validated.error.exception if raise_error && validated.invalid?
 
-    # Builds a RuntimeResponse object based on the Rack request and response.
-    # @param rack_request [Rack::Request] The Rack request object.
-    # @param rack_response [Rack::Response] The Rack response object.
-    # @return [RuntimeResponse] The RuntimeResponse object.
-    def response(rack_request, rack_response)
-      runtime_request = request(rack_request)
-      RuntimeResponse.new(runtime_request.operation, rack_response)
-    end
-
-    # Gets all the operations defined in the API description.
-    # @return [Array<Operation>] An array of Operation objects.
-    def operations
-      @operations ||= path_items.flat_map(&:operations)
-    end
-
-    # Gets the PathItem object for the specified path.
-    # @param pathname [String] The path template string.
-    # @return [PathItem] The PathItem object.
-    # Example:
-    #   definition.path('/pets/{id}')
-    def path(pathname)
-      return unless paths.key?(pathname)
-
-      PathItem.new(pathname, paths[pathname], openapi_version:)
-    end
-
-    private
-
-    # Gets all the PathItem objects defined in the API description.
-    # @return [Array] An array of PathItem objects.
-    def path_items
-      @path_items ||= paths.flat_map do |path, path_item_object|
-        PathItem.new(path, path_item_object, openapi_version:)
-      end
-    end
-
-    def find_path_item_and_params(request_path)
-      if paths.key?(request_path)
-        return [
-          PathItem.new(request_path, paths[request_path], openapi_version:),
-          {}
-        ]
-      end
-      search_for_path_item(request_path)
-    end
-
-    def search_for_path_item(request_path)
-      path_items.find do |path_item|
-        path_params = path_item.match(request_path)
-        next unless path_params
-
-        return [
-          path_item,
-          path_params
-        ]
-      end
-    end
-
-    def detect_version(resolved)
-      (resolved['openapi'] || resolved['swagger'])[0..2]
+      validated
     end
   end
 end
