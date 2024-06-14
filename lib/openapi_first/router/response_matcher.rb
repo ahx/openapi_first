@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'content_matcher'
+require_relative 'content'
 
 module OpenapiFirst
   class Router
@@ -17,8 +17,8 @@ module OpenapiFirst
       end
 
       def add_response(status, content_type, response)
-        content_matcher = (@responses[status.to_s] ||= ContentMatcher.new)
-        content_matcher[content_type] = response
+        contents = (@responses[status.to_s] ||= {})
+        contents[content_type] = response
       end
 
       def each(&block)
@@ -34,7 +34,7 @@ module OpenapiFirst
                     "Defined statuses are: #{@responses.keys.join(', ')}."
           return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
         end
-        response = contents[content_type]
+        response = Content.find(contents, content_type)
         if response.nil?
           message = "#{content_error(content_type)} Content-Type should be #{contents.keys.join(' or ')}."
           return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
