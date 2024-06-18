@@ -3,8 +3,8 @@
 module OpenapiFirst
   class Router
     # @visibility private
-    module Content
-      def self.find(contents, content_type)
+    module FindContent
+      def self.call(contents, content_type)
         return contents[nil] if content_type.nil? || content_type.empty?
 
         contents.fetch(content_type) do

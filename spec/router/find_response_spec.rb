@@ -1,22 +1,20 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Router::ResponseMatcher do
-  def build_matcher(responses)
-    described_class.new(path: '/stations', request_method: 'GET').tap do |matcher|
-      responses.each do |response|
-        matcher.add_response(response.status, response.content_type, response)
+RSpec.describe OpenapiFirst::Router::FindResponse do
+  describe '.find' do
+    def find(responses, status, content_type)
+      groups = responses.each_with_object({}) do |response, hash|
+        (hash[response.status] ||= {})[response.content_type] = response
       end
+      described_class.call(groups, status, content_type, request_method: 'GET', path: '/stations')
     end
-  end
 
-  describe '#match' do
     it 'finds the matching response object for a status code' do
       responses = [
         double(status: '200', content_type: 'application/json'),
         double(status: '201', content_type: 'application/json')
       ]
-      matcher = build_matcher(responses)
-      expect(matcher.match(200, 'application/json').response).to eq(responses[0])
+      expect(find(responses, 200, 'application/json').response).to eq(responses[0])
     end
 
     it 'finds a default status' do
@@ -24,8 +22,7 @@ RSpec.describe OpenapiFirst::Router::ResponseMatcher do
         double(status: 'default', content_type: 'application/json'),
         double(status: '201', content_type: 'application/json')
       ]
-      matcher = build_matcher(responses)
-      expect(matcher.match(400, 'application/json').response).to eq(responses[0])
+      expect(find(responses, 400, 'application/json').response).to eq(responses[0])
     end
 
     it 'finds a YXX status' do
@@ -33,8 +30,7 @@ RSpec.describe OpenapiFirst::Router::ResponseMatcher do
         double(status: '200', content_type: 'application/json'),
         double(status: '2XX', content_type: 'application/json')
       ]
-      matcher = build_matcher(responses)
-      expect(matcher.match(201, 'application/json').response).to eq(responses[1])
+      expect(find(responses, 201, 'application/json').response).to eq(responses[1])
     end
 
     it 'finds a Yxx status' do
@@ -42,8 +38,7 @@ RSpec.describe OpenapiFirst::Router::ResponseMatcher do
         double(status: '200', content_type: 'application/json'),
         double(status: '2xx', content_type: 'application/json')
       ]
-      matcher = build_matcher(responses)
-      expect(matcher.match(201, 'application/json').response).to eq(responses[1])
+      expect(find(responses, 201, 'application/json').response).to eq(responses[1])
     end
 
     it 'finds text/* wildcard content-type matcher' do
@@ -51,8 +46,7 @@ RSpec.describe OpenapiFirst::Router::ResponseMatcher do
         double(status: '200', content_type: 'application/json'),
         double(status: '200', content_type: 'text/*')
       ]
-      matcher = build_matcher(responses)
-      expect(matcher.match(200, 'text/markdown').response).to eq(responses[1])
+      expect(find(responses, 200, 'text/markdown').response).to eq(responses[1])
     end
 
     context 'when status code cannot be found' do
@@ -61,8 +55,7 @@ RSpec.describe OpenapiFirst::Router::ResponseMatcher do
           double(status: '200', content_type: nil),
           double(status: '201', content_type: nil)
         ]
-        matcher = build_matcher(responses)
-        expect(matcher.match(409, 'application/json')).to have_attributes(
+        expect(find(responses, 409, 'application/json')).to have_attributes(
           response: nil, error: have_attributes(
             error_type: :response_not_found,
             message: 'Status 409 is not defined for GET /stations. Defined statuses are: 200, 201.'
@@ -77,8 +70,7 @@ RSpec.describe OpenapiFirst::Router::ResponseMatcher do
           double(status: 200, content_type: 'application/json'),
           double(status: '201', content_type: 'application/json')
         ]
-        matcher = build_matcher(responses)
-        expect(matcher.match(200, 'application/json')).to have_attributes(
+        expect(find(responses, 200, 'application/json')).to have_attributes(
           response: responses[0]
         )
       end
@@ -90,9 +82,8 @@ RSpec.describe OpenapiFirst::Router::ResponseMatcher do
           double(status: '200', content_type: 'application/text'),
           double(status: '200', content_type: 'application/xml')
         ]
-        matcher = build_matcher(responses)
         message = 'Response Content-Type application/json is not defined for GET /stations. Content-Type should be application/text or application/xml.'
-        expect(matcher.match(200, 'application/json')).to have_attributes(
+        expect(find(responses, 200, 'application/json')).to have_attributes(
           response: nil,
           error: have_attributes(error_type: :response_not_found, message:)
         )
@@ -105,8 +96,7 @@ RSpec.describe OpenapiFirst::Router::ResponseMatcher do
           double(status: '204', content_type: nil),
           double(status: 'default', content_type: 'application/json')
         ]
-        matcher = build_matcher(responses)
-        expect(matcher.match(204, nil).response).to be(responses[0])
+        expect(find(responses, 204, nil).response).to be(responses[0])
       end
     end
   end

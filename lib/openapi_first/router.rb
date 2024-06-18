@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require_relative 'router/path_template'
-require_relative 'router/response_matcher'
+require_relative 'router/find_content'
+require_relative 'router/find_response'
 
 module OpenapiFirst
   # Router can map requests / responses to their API definition
@@ -9,7 +10,8 @@ module OpenapiFirst
     # Returned by {#match}
     RequestMatch = Data.define(:request_definition, :params, :error, :responses) do
       def match_response(status:, content_type:)
-        responses&.match(status, content_type)
+        FindResponse.call(responses, status, content_type, request_method: request_definition.request_method,
+                                                           path: request_definition.path)
       end
     end
 
@@ -30,7 +32,8 @@ module OpenapiFirst
         request_methods.filter_map do |request_method, content|
           next if request_method == :template
 
-          Route.new(path, request_method, content[:requests].each_value, content[:responses])
+          Route.new(path:, request_method:, requests: content[:requests].each_value,
+                    responses: content[:responses].each_value.lazy.flat_map(&:values))
         end
       end
     end
@@ -42,7 +45,7 @@ module OpenapiFirst
 
     # Add a response definition
     def add_response(response, request_method:, path:, status:, response_content_type: nil)
-      route_at(path, request_method)[:responses].add_response(status, response_content_type, response)
+      (route_at(path, request_method)[:responses][status] ||= {})[response_content_type] = response
     end
 
     # Return all request objects that match the given path and request method
@@ -53,7 +56,7 @@ module OpenapiFirst
       contents = path_item.dig(request_method, :requests)
       return NOT_FOUND.with(error: Failure.new(:method_not_allowed)) unless contents
 
-      request_definition = Content.find(contents, content_type)
+      request_definition = FindContent.call(contents, content_type)
       unless request_definition
         message = "#{content_type_err(content_type)} Content-Type should be #{contents.keys.join(' or ')}."
         return NOT_FOUND.with(error: Failure.new(:unsupported_media_type, message:))
@@ -74,7 +77,7 @@ module OpenapiFirst
                   end
       path_item[request_method] ||= {
         requests: {},
-        responses: ResponseMatcher.new(path:, request_method:)
+        responses: {}
       }
     end
 
