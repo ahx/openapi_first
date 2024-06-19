@@ -12,12 +12,12 @@ tags:
 paths:
   /hello/{id}:
     parameters:
-    - name: id
-      description: ID of the thing to get
-      in: path
-      required: true
-      schema:
-        type: string
+      - name: id
+        description: ID of the thing to get
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       operationId: find_thing
       description: Get one thing
@@ -41,17 +41,17 @@ paths:
       description: Get multiple things
       tags: ["Metadata"]
       parameters:
-      - name: filter
-        description: filter things
-        in: query
-        required: false
-        schema:
-          type: object
-          required: [id]
-          properties:
-            id:
-              type: string
-              description: Comma separated list of thing-IDs
+        - name: filter
+          description: filter things
+          in: query
+          required: false
+          schema:
+            type: object
+            required: [id]
+            properties:
+              id:
+                type: string
+                description: Comma separated list of thing-IDs
 
       responses:
         "200":
@@ -120,20 +120,20 @@ paths:
             type: integer
             format: int32
       responses:
-        '200':
+        "200":
           description: pet response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Pet'
+                  $ref: "#/components/schemas/Pet"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     post:
       description: Creates a new pet in the store.  Duplicates are allowed
       operationId: create_pet
@@ -143,20 +143,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewPet'
+              $ref: "#/components/schemas/NewPet"
       responses:
-        '200':
+        "200":
           description: pet response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pet'
+                $ref: "#/components/schemas/Pet"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /pets/{id}:
     parameters:
       - name: id
@@ -170,18 +170,18 @@ paths:
       description: Returns a user based on a single ID, if the user does not have access to the pet
       operationId: find_pet
       responses:
-        '200':
+        "200":
           description: pet response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pet'
+                $ref: "#/components/schemas/Pet"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     delete:
       description: deletes a single pet based on the ID supplied
       operationId: delete_pet
@@ -194,14 +194,14 @@ paths:
             type: integer
             format: int64
       responses:
-        '204':
+        "204":
           description: pet deleted
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     patch:
       description: Updates a pet
       operationId: update_pet
@@ -211,28 +211,712 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewPet'
+              $ref: "#/components/schemas/NewPet"
       responses:
-        '200':
+        "200":
           description: pet response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pet'
+                $ref: "#/components/schemas/Pet"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
+  /users:
+    get:
+      summary: Get all users
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new user
+      responses:
+        "201":
+          description: User created
+  /users/{userId}:
+    get:
+      summary: Get a user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User updated
+    delete:
+      summary: Delete a user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: User deleted
+  /products:
+    get:
+      summary: Get all products
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new product
+      responses:
+        "201":
+          description: Product created
+  /products/{productId}:
+    get:
+      summary: Get a product by ID
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a product by ID
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product updated
+    delete:
+      summary: Delete a product by ID
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Product deleted
+  /orders:
+    get:
+      summary: Get all orders
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new order
+      responses:
+        "201":
+          description: Order created
+  /orders/{orderId}:
+    get:
+      summary: Get an order by ID
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update an order by ID
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order updated
+    delete:
+      summary: Delete an order by ID
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Order deleted
+  /customers:
+    get:
+      summary: Get all customers
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new customer
+      responses:
+        "201":
+          description: Customer created
+  /customers/{customerId}:
+    get:
+      summary: Get a customer by ID
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a customer by ID
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Customer updated
+    delete:
+      summary: Delete a customer by ID
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Customer deleted
+  /categories:
+    get:
+      summary: Get all categories
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new category
+      responses:
+        "201":
+          description: Category created
+  /categories/{categoryId}:
+    get:
+      summary: Get a category by ID
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a category by ID
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Category updated
+    delete:
+      summary: Delete a category by ID
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Category deleted
+  /reviews:
+    get:
+      summary: Get all reviews
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new review
+      responses:
+        "201":
+          description: Review created
+  /reviews/{reviewId}:
+    get:
+      summary: Get a review by ID
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a review by ID
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Review updated
+    delete:
+      summary: Delete a review by ID
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Review deleted
+  /invoices:
+    get:
+      summary: Get all invoices
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new invoice
+      responses:
+        "201":
+          description: Invoice created
+  /invoices/{invoiceId}:
+    get:
+      summary: Get an invoice by ID
+      parameters:
+        - name: invoiceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update an invoice by ID
+      parameters:
+        - name: invoiceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Invoice updated
+    delete:
+      summary: Delete an invoice by ID
+      parameters:
+        - name: invoiceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Invoice deleted
+  /suppliers:
+    get:
+      summary: Get all suppliers
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new supplier
+      responses:
+        "201":
+          description: Supplier created
+  /suppliers/{supplierId}:
+    get:
+      summary: Get a supplier by ID
+      parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a supplier by ID
+      parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Supplier updated
+    delete:
+      summary: Delete a supplier by ID
+      parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Supplier deleted
+  /payments:
+    get:
+      summary: Get all payments
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new payment
+      responses:
+        "201":
+          description: Payment created
+  /payments/{paymentId}:
+    get:
+      summary: Get a payment by ID
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a payment by ID
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment updated
+    delete:
+      summary: Delete a payment by ID
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Payment deleted
+  /shipments:
+    get:
+      summary: Get all shipments
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new shipment
+      responses:
+        "201":
+          description: Shipment created
+  /shipments/{shipmentId}:
+    get:
+      summary: Get a shipment by ID
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a shipment by ID
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Shipment updated
+    delete:
+      summary: Delete a shipment by ID
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Shipment deleted
+  /warehouses:
+    get:
+      summary: Get all warehouses
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new warehouse
+      responses:
+        "201":
+          description: Warehouse created
+  /warehouses/{warehouseId}:
+    get:
+      summary: Get a warehouse by ID
+      parameters:
+        - name: warehouseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a warehouse by ID
+      parameters:
+        - name: warehouseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Warehouse updated
+    delete:
+      summary: Delete a warehouse by ID
+      parameters:
+        - name: warehouseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Warehouse deleted
+  /branches:
+    get:
+      summary: Get all branches
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new branch
+      responses:
+        "201":
+          description: Branch created
+  /branches/{branchId}:
+    get:
+      summary: Get a branch by ID
+      parameters:
+        - name: branchId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a branch by ID
+      parameters:
+        - name: branchId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Branch updated
+    delete:
+      summary: Delete a branch by ID
+      parameters:
+        - name: branchId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Branch deleted
+  /stores:
+    get:
+      summary: Get all stores
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new store
+      responses:
+        "201":
+          description: Store created
+  /stores/{storeId}:
+    get:
+      summary: Get a store by ID
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a store by ID
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Store updated
+    delete:
+      summary: Delete a store by ID
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Store deleted
+  /returns:
+    get:
+      summary: Get all returns
+      responses:
+        "200":
+          description: Successful response
+    post:
+      summary: Create a new return
+      responses:
+        "201":
+          description: Return created
+  /returns/{returnId}:
+    get:
+      summary: Get a return by ID
+      parameters:
+        - name: returnId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+    put:
+      summary: Update a return by ID
+      parameters:
+        - name: returnId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Return updated
+    delete:
+      summary: Delete a return by ID
+      parameters:
+        - name: returnId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Return deleted
+  /logs:
+    get:
+      summary: Get all logs
+      responses:
+        "200":
+          description: Successful response
+  /logs/{logId}:
+    get:
+      summary: Get a log by ID
+      parameters:
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+  /reports:
+    get:
+      summary: Get all reports
+      responses:
+        "200":
+          description: Successful response
+  /reports/{reportId}:
+    get:
+      summary: Get a report by ID
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+  /notifications:
+    get:
+      summary: Get all notifications
+      responses:
+        "200":
+          description: Successful response
+  /notifications/{notificationId}:
+    get:
+      summary: Get a notification by ID
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
 
 components:
   schemas:
     Pet:
       allOf:
-        - $ref: '#/components/schemas/NewPet'
+        - $ref: "#/components/schemas/NewPet"
         - required:
-          - id
+            - id
           properties:
             id:
               type: integer
