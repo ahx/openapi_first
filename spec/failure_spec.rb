@@ -19,7 +19,7 @@ RSpec.describe OpenapiFirst::Failure do
 
   describe '#message' do
     it 'returns a generated message if not defined' do
-      failure = described_class.new(:invalid_body, errors: [double(error: 'something is wrong')])
+      failure = described_class.new(:invalid_body, errors: [double(message: 'something is wrong')])
       expect(failure.message).to eq('Request body invalid: something is wrong')
     end
 
@@ -31,7 +31,7 @@ RSpec.describe OpenapiFirst::Failure do
     context 'with a lot of errors' do
       let(:failure) do
         errors = Array.new(100) do |i|
-          instance_double(OpenapiFirst::Schema::ValidationError, error: "something is wrong over there #{i}")
+          instance_double(OpenapiFirst::Schema::ValidationError, message: "something is wrong over there #{i}")
         end
         described_class.new(:invalid_body, errors:)
       end
@@ -66,7 +66,7 @@ RSpec.describe OpenapiFirst::Failure do
     context 'with a lot of errors' do
       let(:failure) do
         errors = Array.new(100) do |i|
-          instance_double(OpenapiFirst::Schema::ValidationError, error: "something is wrong over there #{i}")
+          instance_double(OpenapiFirst::Schema::ValidationError, message: "something is wrong over there #{i}")
         end
         described_class.new(:invalid_body, errors:)
       end

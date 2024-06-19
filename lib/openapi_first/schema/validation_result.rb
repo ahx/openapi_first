@@ -15,7 +15,13 @@ module OpenapiFirst
       # Returns an array of ValidationError objects.
       def errors
         @errors ||= @validation.map do |err|
-          ValidationError.new(err)
+          ValidationError.new(
+            message: err['error'],
+            data_pointer: err['data_pointer'],
+            schema_pointer: err['schema_pointer'],
+            type: err['type'],
+            details: err['details']
+          )
         end
       end
     end

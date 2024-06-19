@@ -43,8 +43,8 @@ module OpenapiFirst
           key = pointer_key
           failure.errors.map do |error|
             {
-              message: error.error,
-              key => pointer(error.instance_location),
+              message: error.message,
+              key => pointer(error.data_pointer),
               code: error.type
             }
           end

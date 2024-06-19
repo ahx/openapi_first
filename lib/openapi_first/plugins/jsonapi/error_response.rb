@@ -22,8 +22,8 @@ module OpenapiFirst
           failure.errors.map do |error|
             {
               status: status.to_s,
-              source: { key => pointer(error.instance_location) },
-              title: error.error,
+              source: { key => pointer(error.data_pointer) },
+              title: error.message,
               code: error.type
             }
           end

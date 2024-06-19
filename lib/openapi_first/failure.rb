@@ -69,7 +69,7 @@ module OpenapiFirst
     private
 
     def generate_message
-      messages = errors&.take(3)&.map(&:error)
+      messages = errors&.take(3)&.map(&:message)
       messages << "... (#{errors.size} errors total)" if errors && errors.size > 3
       messages&.join('. ')
     end

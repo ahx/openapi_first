@@ -3,18 +3,24 @@
 module OpenapiFirst
   class Schema
     # One of multiple validation errors. Returned by Schema::ValidationResult#errors.
-    class ValidationError
-      def initialize(json_schemer_error)
-        @error = json_schemer_error
+    ValidationError = Data.define(:message, :data_pointer, :schema_pointer, :type, :details) do
+      # @deprecated Please use {#message} instead
+      def error
+        warn 'OpenapiFirst::Schema::ValidationError#error is deprecated. Use #message instead.'
+        message
       end
 
-      def error = @error['error']
-      alias message error
-      def schemer_error = @error
-      def instance_location = @error['data_pointer']
-      def schema_location = @error['schema_pointer']
-      def type = @error['type']
-      def details = @error['details']
+      # @deprecated Please use {#data_pointer} instead
+      def instance_location
+        warn 'OpenapiFirst::Schema::ValidationError#instance_location is deprecated. Use #data_pointer instead.'
+        data_pointer
+      end
+
+      # @deprecated Please use {#schema_pointer} instead
+      def schema_location
+        warn 'OpenapiFirst::Schema::ValidationError#schema_location is deprecated. Use #schema_pointer instead.'
+        schema_pointer
+      end
     end
   end
 end
