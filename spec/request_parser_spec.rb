@@ -117,7 +117,7 @@ RSpec.describe OpenapiFirst::RequestParser do
           parser.parse(rack_request, route_params: { 'id' => '1' })
         end
         expect(failure).to have_attributes(
-          error_type: :invalid_body,
+          type: :invalid_body,
           message: 'Failed to parse request body as JSON'
         )
       end

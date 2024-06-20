@@ -27,11 +27,11 @@ RSpec.describe OpenapiFirst::Router do
     end
 
     it 'returns an incomplete match for unknown path' do
-      expect(router.match('GET', '/c/d').error).to have_attributes(error_type: :not_found)
+      expect(router.match('GET', '/c/d').error).to have_attributes(type: :not_found)
     end
 
     it 'returns an incomplete match for unknown request method' do
-      expect(router.match('DELETE', '/b').error).to have_attributes(error_type: :method_not_allowed)
+      expect(router.match('DELETE', '/b').error).to have_attributes(type: :method_not_allowed)
     end
 
     context 'with matching content_type' do
@@ -82,7 +82,7 @@ RSpec.describe OpenapiFirst::Router do
         match = router.match('POST', '/stations', content_type: 'application/json')
 
         message = 'Content-Type application/json is not defined. Content-Type should be application/xml.'
-        expect(match.error).to have_attributes(error_type: :unsupported_media_type, message:)
+        expect(match.error).to have_attributes(type: :unsupported_media_type, message:)
       end
     end
 

@@ -32,9 +32,12 @@ A route has one path and one request method, but can have multiple requests (one
 
 - Several internal changes to make the code more maintainable, more performant , support hooks and prepare for OpenAPI 4. If you have monkey-patched OpenapiFirst, you might need to adjust your code. Please contact me if you need help.
 
+### Deprecations
+
 #### Custom error responses
 
 - `ValidationError#error`, `#instance_location` and `#schema_location` have been deprecated. Use `ValidationError#message`, `#data_pointer` and `#schema_pointer` instead.
+- `Failure#error_type` has been deprecated. Use `#type` instead
 
 ## 1.4.3
 

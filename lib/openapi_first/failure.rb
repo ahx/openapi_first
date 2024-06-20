@@ -19,26 +19,26 @@ module OpenapiFirst
     }.freeze
     private_constant :TYPES
 
-    # @param error_type [Symbol] See Failure::TYPES.keys
+    # @param type [Symbol] See Failure::TYPES.keys
     # @param errors [Array<OpenapiFirst::Schema::ValidationError>]
-    def self.fail!(error_type, message: nil, errors: nil)
+    def self.fail!(type, message: nil, errors: nil)
       throw FAILURE, new(
-        error_type,
+        type,
         message:,
         errors:
       )
     end
 
-    # @param error_type [Symbol] See TYPES.keys
+    # @param type [Symbol] See TYPES.keys
     # @param message [String] A generic error message
     # @param errors [Array<OpenapiFirst::Schema::ValidationError>]
-    def initialize(error_type, message: nil, errors: nil)
-      unless TYPES.key?(error_type)
+    def initialize(type, message: nil, errors: nil)
+      unless TYPES.key?(type)
         raise ArgumentError,
-              "error_type must be one of #{TYPES.keys} but was #{error_type.inspect}"
+              "type must be one of #{TYPES.keys} but was #{type.inspect}"
       end
 
-      @type = error_type
+      @type = type
       @message = message
       @errors = errors
     end
@@ -55,20 +55,20 @@ module OpenapiFirst
       @message ||= exception_message
     end
 
+    def exception
+      TYPES.fetch(type).first.new(exception_message)
+    end
+
+    def exception_message
+      _, message_prefix = TYPES.fetch(type)
+
+      [message_prefix, @message || generate_message].compact.join(' ')
+    end
+
     # @deprecated Please use {#type} instead
     def error_type
       warn 'OpenapiFirst::Failure#error_type is deprecated. Use #type instead.'
       type
-    end
-
-    def exception
-      TYPES.fetch(error_type).first.new(exception_message)
-    end
-
-    def exception_message
-      _, message_prefix = TYPES.fetch(error_type)
-
-      [message_prefix, @message || generate_message].compact.join(' ')
     end
 
     private
