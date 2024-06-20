@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'openapi_first/plugins/jsonapi'
 
-RSpec.describe OpenapiFirst::Plugins::Jsonapi::ErrorResponse do
+RSpec.describe OpenapiFirst::ErrorResponses::Jsonapi do
   let(:env) { {} }
   let(:validation_result) { OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data) }
 

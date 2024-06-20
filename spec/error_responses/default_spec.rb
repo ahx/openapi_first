@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'openapi_first/plugins/default'
 
-RSpec.describe OpenapiFirst::Plugins::Default::ErrorResponse do
+RSpec.describe OpenapiFirst::ErrorResponses::Default do
   let(:env) { {} }
   let(:validation_result) { OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data) }
 

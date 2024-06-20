@@ -5,18 +5,18 @@ require 'multi_json'
 require_relative 'openapi_first/json_refs'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'
-require_relative 'openapi_first/plugins'
 require_relative 'openapi_first/definition'
 require_relative 'openapi_first/version'
 require_relative 'openapi_first/schema'
+require_relative 'openapi_first/error_responses'
 require_relative 'openapi_first/error_response'
+require_relative 'openapi_first/error_responses/default'
+require_relative 'openapi_first/error_responses/jsonapi'
 require_relative 'openapi_first/middlewares/response_validation'
 require_relative 'openapi_first/middlewares/request_validation'
 
 # OpenapiFirst is a toolchain to build HTTP APIS based on OpenAPI API descriptions.
 module OpenapiFirst
-  extend Plugins
-
   class << self
     # @return [Configuration]
     def configuration
@@ -58,6 +58,3 @@ module OpenapiFirst
     end
   end
 end
-
-OpenapiFirst.plugin(:default)
-OpenapiFirst.plugin(:jsonapi)

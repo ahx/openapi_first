@@ -37,7 +37,7 @@ module OpenapiFirst
       private
 
       def error_response(mod)
-        return OpenapiFirst.find_plugin(mod)::ErrorResponse if mod.is_a?(Symbol)
+        return OpenapiFirst::ErrorResponses.find(mod) if mod.is_a?(Symbol)
 
         mod || OpenapiFirst.configuration.request_validation_error_response
       end
