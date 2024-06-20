@@ -38,15 +38,14 @@ module OpenapiFirst
               "error_type must be one of #{TYPES.keys} but was #{error_type.inspect}"
       end
 
-      @error_type = error_type
+      @type = error_type
       @message = message
       @errors = errors
     end
 
-    # @attr_reader [Symbol] error_type The type of the failure. See TYPES.keys.
+    # @attr_reader [Symbol] type The type of the failure. See TYPES.keys.
     # Example: :invalid_body
-    attr_reader :error_type
-    alias type error_type
+    attr_reader :type
 
     # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>] errors Schema validation errors
     attr_reader :errors
@@ -54,6 +53,12 @@ module OpenapiFirst
     # A generic error message
     def message
       @message ||= exception_message
+    end
+
+    # @deprecated Please use {#type} instead
+    def error_type
+      warn 'OpenapiFirst::Failure#error_type is deprecated. Use #type instead.'
+      type
     end
 
     def exception

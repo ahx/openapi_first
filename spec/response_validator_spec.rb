@@ -65,7 +65,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       end
 
       it 'fails' do
-        expect(subject.call(parsed_response).error_type).to eq(:invalid_response_body)
+        expect(subject.call(parsed_response).type).to eq(:invalid_response_body)
       end
     end
 
@@ -80,7 +80,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       end
 
       it 'fails' do
-        expect(subject.call(parsed_response).error_type).to eq(:invalid_response_body)
+        expect(subject.call(parsed_response).type).to eq(:invalid_response_body)
       end
     end
   end
