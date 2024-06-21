@@ -12,12 +12,12 @@ module OpenapiFirst
 
     # The response body
     def body
-      raise NotImplementedError
+      raise "#{self.class} must implement the method #{__method__}"
     end
 
     # The response content-type
     def content_type
-      raise NotImplementedError
+      raise "#{self.class} must implement the method #{__method__}"
     end
 
     STATUS = {
