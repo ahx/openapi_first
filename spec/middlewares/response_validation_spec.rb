@@ -287,8 +287,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     it 'raises an error' do
       expect do
         get '/pets'
-      end.to raise_error OpenapiFirst::ResponseInvalidError,
-                         'Response body is invalid: Failed to parse response body as JSON'
+      end.to throw_symbol(OpenapiFirst::FAILURE)
     end
   end
 

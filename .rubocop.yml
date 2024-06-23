@@ -20,6 +20,9 @@ Style/ExponentialNotation:
   Enabled: true
 Style/MapIntoArray:
   Enabled: false
+Style/MultilineBlockChain:
+  Exclude:
+    - "spec/**/*"
 Metrics/BlockLength:
   Exclude:
     - "spec/**/*.rb"

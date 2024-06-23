@@ -38,7 +38,7 @@ RSpec.describe OpenapiFirst::ResponseParser do
       it 'raises an error' do
         expect do
           parsed.body
-        end.to raise_error OpenapiFirst::ResponseInvalidError
+        end.to throw_symbol OpenapiFirst::FAILURE
       end
     end
 
