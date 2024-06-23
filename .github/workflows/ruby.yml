@@ -13,6 +13,7 @@ jobs:
         gemfiles:
           - Gemfile
           - Gemfile.rack2
+          - Gemfile.rack30
           - Gemfile.rails6
     runs-on: ${{ matrix.os }}
     steps:
