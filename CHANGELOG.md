@@ -2,21 +2,24 @@
 
 ## Unreleased
 
+## 2.0
+
 ### New Features
+- Test Assertions! 📋 You can now use `assert_api_conform`  for contract testing in your rack-test / Rails integration tests. See Readme for details.
 
-- Test Assertions! You can now use `assert_api_conform`  to do contract testing in your rack-test / Rails integration tests. See Readme for details.
+- New option for `Middlewares::ResponseValidation`: `:raise_error` (default: true). If set to `false`, the middleware will not aise an error if the response is invalid. 🤫
 
-- New option for `Middlewares::ResponseValidation`: `:raise_error` (default: true). If set to `false`, the middleware will not aise an error if the response is invalid.
-
-- Hooks (see Readme for details):
+- Hooks 🪝🪝 (see Readme for details). You can use these to collect metrics, write error logs etc.:
   - `after_request_validation`
   - `after_response_validation`
   - `after_request_body_property_validation`
   - `after_request_parameter_property_validation`
 
-- Validation failures returned by `ValidatedRequest#error` always returns a `#message`. So you can call `my_validated_request.error.message if validated_request.invalid?` and always get a human-readable error message.
+- Exceptions such as `OpenapiFirst::ResponseInvalidError` not respond to `#request` to get information about the validated request 💁🏻
 
-- Performance improvements.
+- Performance improvements 🚴🏻‍♀️
+
+- Validation failures returned by `ValidatedRequest#error` always returns a `#message`. So you can call `my_validated_request.error.message if validated_request.invalid?` and always get a human-readable error message. 😴
 
 ### Breaking Changes
 
@@ -24,6 +27,7 @@
 - `Definition#request.validate` was removed. Please use `Definition#validate_request` instead.
 - `Definition#validate_request` returns a `ValidatedRequest` which delgates all methods to the original (rack) request, except for `#valid?` `#parsed_body`. `#parsed_query`, `#operation` etc. See Readme for details.
 - The `Operation` class was removed. `ValidatedRequest#operation` now returns the OpenAPI 3 operation object as a plain Hash. So you can still call `ValidatedRequest#operation['x-foo']`. You can call `ValidatedRequest#operation_id` if you just need the _operationId_.
+-
 
 #### Inspecting OpenAPI files
 
