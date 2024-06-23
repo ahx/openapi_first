@@ -11,7 +11,7 @@ module OpenapiFirst
     ].freeze
 
     def initialize
-      @request_validation_error_response = OpenapiFirst::ErrorResponses.find(:default)
+      @request_validation_error_response = OpenapiFirst.find_error_response(:default)
       @request_validation_raise_error = false
       @response_validation_raise_error = true
       @hooks = (HOOKS.map { [_1, []] }).to_h

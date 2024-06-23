@@ -125,6 +125,7 @@ use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml, error_res
 #### Custom error responses
 
 You can build your own custom error response with `error_response: MyCustomClass` that implements `OpenapiFirst::ErrorResponse`.
+You can define custom error responses globally by including / implementing `OpenapiFirst::ErrorResponse` and register it via `OpenapiFirst.register_error_response(my_name, MyCustomErrorResponse)` and set `error_response: my_name`.
 
 #### readOnly / writeOnly properties
 

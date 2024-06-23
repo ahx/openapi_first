@@ -6,7 +6,7 @@ module OpenapiFirst
     # See also https://www.rfc-editor.org/rfc/rfc9457.html
     class Default
       include OpenapiFirst::ErrorResponse
-      OpenapiFirst::ErrorResponses.register(:default, self)
+      OpenapiFirst.register_error_response(:default, self)
 
       TITLES = {
         not_found: 'Not Found',
