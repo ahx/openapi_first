@@ -55,8 +55,8 @@ module OpenapiFirst
       @message ||= exception_message
     end
 
-    def exception
-      TYPES.fetch(type).first.new(exception_message)
+    def exception(context = nil)
+      TYPES.fetch(type).first.new(exception_message, context)
     end
 
     def exception_message

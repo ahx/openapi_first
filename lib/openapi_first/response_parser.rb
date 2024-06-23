@@ -24,7 +24,7 @@ module OpenapiFirst
     def parse_body(rack_response)
       MultiJson.load(read_body(rack_response)) if /json/i.match?(content_type)
     rescue MultiJson::ParseError
-      raise ResponseInvalidError, 'Response body is invalid: Failed to parse response body as JSON'
+      Failure.fail!(:invalid_response_body, message: 'Response body is invalid: Failed to parse response body as JSON')
     end
 
     def read_body(rack_response)

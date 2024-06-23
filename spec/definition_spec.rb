@@ -61,10 +61,21 @@ RSpec.describe OpenapiFirst::Definition do
         expect(validated.parsed_path_parameters).to eq({ 'id' => 'foo' })
       end
 
-      it 'raises an error with raise_error: true' do
-        expect do
-          definition.validate_request(request, raise_error: true)
-        end.to raise_error(OpenapiFirst::RequestInvalidError)
+      context 'with raise_error: true' do
+        it 'raises an error' do
+          expect do
+            definition.validate_request(request, raise_error: true)
+          end.to raise_error(OpenapiFirst::RequestInvalidError)
+        end
+
+        it 'raises an error with access to the validated request' do
+          expect do
+            definition.validate_request(request, raise_error: true)
+          end.to raise_error do |error|
+            expect(error.request).to be_a(OpenapiFirst::ValidatedRequest)
+            expect(error.request.path).to eq(request.path)
+          end
+        end
       end
     end
 
@@ -192,10 +203,21 @@ RSpec.describe OpenapiFirst::Definition do
         expect(validated.parsed_body).to eq({ 'id' => 'foo' })
       end
 
-      it 'raises an error with raise_error: true' do
+      context 'with raise_error: true' do
+        it 'raises an error' do
+          expect do
+            definition.validate_response(request, response, raise_error: true)
+          end.to raise_error(OpenapiFirst::ResponseInvalidError)
+        end
+      end
+
+      it 'raises an error with access to the validated request' do
         expect do
           definition.validate_response(request, response, raise_error: true)
-        end.to raise_error(OpenapiFirst::ResponseInvalidError)
+        end.to raise_error do |error|
+          expect(error.response).to be_a(OpenapiFirst::ValidatedResponse)
+          expect(error.response.content_type).to eq(response.content_type)
+        end
       end
     end
   end
