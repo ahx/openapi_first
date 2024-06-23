@@ -11,7 +11,7 @@ module OpenapiFirst
 
     def parse(request)
       body = read_body(request)
-      return if body.empty?
+      return if body.nil? || body.empty?
 
       return MultiJson.load(body) if @is_json
       return request.POST if request.form_data?
@@ -24,8 +24,8 @@ module OpenapiFirst
     private
 
     def read_body(request)
-      body = request.body.read
-      request.body.rewind
+      body = request.body&.read
+      request.body.rewind if request.body.respond_to?(:rewind)
       body
     end
   end
