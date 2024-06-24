@@ -2,9 +2,6 @@
 
 OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.openapis.org/) API description. It supports OpenAPI 3.0 and 3.1. It offers request and response validation and it ensures that your implementation follows exactly the API description.
 
-> [!IMPORTANT]
-> This Readme is about an upcoming 2.0 release. For the current version see the [v1 branch](../v1).
-
 ## Contents
 
 <!-- TOC -->
@@ -18,8 +15,7 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
   - [Validate response](#validate-response)
 - [Framework integration](#framework-integration)
 - [Configuration](#configuration)
-  - [Hooks](#hooks)
-  - [Defaults](#defaults)
+- [Hooks](#hooks)
 - [Alternatives](#alternatives)
 - [Development](#development)
   - [Benchmarks](#benchmarks)
@@ -150,7 +146,7 @@ use OpenapiFirst::Middlewares::ResponseValidation, spec: 'openapi.yaml' if ENV['
 
 ## Test assertions
 
-openapi_first ships with a simple but powerful Test module to run request and response validation in your tests without using the middlewares. This is design to be used in rack-test or Ruby on Rails integration tests.
+openapi_first ships with a simple but powerful Test module to run request and response validation in your tests without using the middlewares. This is designed to be used with rack-test or Ruby on Rails integration tests or request specs.
 
 Here is how to set it up for Rails integration tests:
 
@@ -241,7 +237,26 @@ OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
 ## Configuration
 
-### Hooks
+You can configure default options globally:
+
+```ruby
+OpenapiFirst.configure do |config|
+  # Specify which plugin is used to render error responses returned by the request validation middleware (defaults to :default)
+  config.request_validation_error_response = :jsonapi
+  # Configure if the request validation middleware should raise an exception (defaults to false)
+  config.request_validation_raise_error = true
+end
+```
+
+or configure per instance:
+
+```ruby
+OpenapiFirst.load('openapi.yaml') do |config|
+  config.request_validation_error_response = :jsonapi
+end
+```
+
+## Hooks
 
 You can integrate your code at certain points during request/response validation via hooks.
 
@@ -274,19 +289,6 @@ OpenapiFirst.configure do |config|
   config.after_request_parameter_property_validation do |data, property, property_schema|
     data[property] = Date.iso8601(data[property]) if propert_schema['format'] == 'date'
   end
-end
-```
-
-### Defaults
-
-You can configure default options globally:
-
-```ruby
-OpenapiFirst.configure do |config|
-  # Specify which plugin is used to render error responses returned by the request validation middleware (defaults to :default)
-  config.request_validation_error_response = :jsonapi
-  # Configure if the request validation middleware should raise an exception (defaults to false)
-  config.request_validation_raise_error = true
 end
 ```
 
