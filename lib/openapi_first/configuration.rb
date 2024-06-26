@@ -34,7 +34,7 @@ module OpenapiFirst
 
     def request_validation_error_response=(mod)
       @request_validation_error_response = if mod.is_a?(Symbol)
-                                             OpenapiFirst.find_error_response(:default)
+                                             OpenapiFirst.find_error_response(mod)
                                            else
                                              mod
                                            end

@@ -54,7 +54,7 @@ RSpec.describe OpenapiFirst::Configuration do
     it 'sets the error response' do
       config = OpenapiFirst::Configuration.new
       config.request_validation_error_response = :jsonapi
-      expect(config.request_validation_error_response).to be(OpenapiFirst::ErrorResponses::Default)
+      expect(config.request_validation_error_response).to be(OpenapiFirst::ErrorResponses::Jsonapi)
     end
   end
 
