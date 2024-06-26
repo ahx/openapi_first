@@ -50,6 +50,14 @@ RSpec.describe OpenapiFirst::Configuration do
     end
   end
 
+  describe '#request_validation_error_response=' do
+    it 'sets the error response' do
+      config = OpenapiFirst::Configuration.new
+      config.request_validation_error_response = :jsonapi
+      expect(config.request_validation_error_response).to be(OpenapiFirst::ErrorResponses::Default)
+    end
+  end
+
   describe '#clone' do
     it 'clones actions' do
       config = OpenapiFirst::Configuration.new

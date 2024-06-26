@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-## 2.0
+- Fix setting custom error response (thanks @gobijan)
+
+## 2.0.0
 
 ### New Features
 - Test Assertions! 📋 You can now use `assert_api_conform`  for contract testing in your rack-test / Rails integration tests. See Readme for details.
