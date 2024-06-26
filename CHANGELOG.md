@@ -2,9 +2,11 @@
 
 ## Unreleased
 
-## 2.0.1
+## 2.0.2
 
 - Fix setting custom error response (thanks @gobijan)
+
+## 2.0.1 (Janked)
 
 ## 2.0.0
 
