@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.1
+
 - Fix setting custom error response (thanks @gobijan)
 
 ## 2.0.0
