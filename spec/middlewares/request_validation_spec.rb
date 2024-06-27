@@ -75,7 +75,25 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
   end
 
-  context 'with custom error_response option' do
+  context 'with error_response: :default' do
+    let(:app) do
+      Rack::Builder.app do
+        use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
+                                                          error_response: :default
+        run lambda { |_env|
+          Rack::Response.new('hello', 200).finish
+        }
+      end
+    end
+
+    it 'returns 400' do
+      header 'Content-Type', 'application/json'
+      post '/pets'
+      expect(last_response.status).to eq 400
+    end
+  end
+
+  context 'with error_response: MyCustomClass' do
     let(:app) do
       custom_class = Class.new do
         include OpenapiFirst::ErrorResponse
@@ -101,21 +119,48 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
   end
 
-  context 'with :default error_response option' do
+  context 'with error_response: false' do
+    let(:called) { [] }
+
     let(:app) do
+      spec = OpenapiFirst.load('./spec/data/request-body-validation.yaml') do |config|
+        config.after_request_validation do |validated_request|
+          called << { valid: validated_request.valid? }
+        end
+      end
       Rack::Builder.app do
-        use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
-                                                          error_response: :default
+        use OpenapiFirst::Middlewares::RequestValidation, spec:,
+                                                          error_response: false
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
         }
       end
     end
 
-    it 'returns 400' do
+    it 'validates the response, but calls the application' do
+      header 'Content-Type', 'application/json'
+      post '/pets'
+      expect(last_response.status).to eq 200
+      expect(called).to eq [{ valid: false }]
+    end
+  end
+
+  context 'with error_response: nil' do
+    let(:app) do
+      Rack::Builder.app do
+        use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
+                                                          error_response: nil
+        run lambda { |_env|
+          Rack::Response.new('hello', 200).finish
+        }
+      end
+    end
+
+    it 'uses the default error reponse class' do
       header 'Content-Type', 'application/json'
       post '/pets'
       expect(last_response.status).to eq 400
+      expect(last_response.content_type).to eq 'application/problem+json'
     end
   end
 

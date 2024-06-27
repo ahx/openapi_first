@@ -97,7 +97,7 @@ use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml'
 | :---------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `spec:`           |                                                                          | The path to the spec file or spec loaded via `OpenapiFirst.load`                                                                    |
 | `raise_error:`    | `false` (default), `true`                                                | If set to true the middleware raises `OpenapiFirst::RequestInvalidError` or `OpenapiFirst::NotFoundError` instead of returning 4xx. |
-| `error_response:` | `:default` (default), `:jsonapi`, Your implementation of `ErrorResponse` |
+| `error_response:` | `:default` (default), `:jsonapi`, Your implementation of `ErrorResponse` or `false` to disable responding  |
 
 #### Error responses
 
