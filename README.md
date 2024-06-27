@@ -2,17 +2,20 @@
 
 OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.openapis.org/) API description. It supports OpenAPI 3.0 and 3.1. It offers request and response validation and it ensures that your implementation follows exactly the API description.
 
+[![Tests](https://github.com/ahx/openapi_first/actions/workflows/ruby.yml/badge.svg)](https://github.com/ahx/openapi_first/actions/workflows/ruby.yml)
+[![CodeQL](https://github.com/ahx/openapi_first/actions/workflows/codeql.yml/badge.svg)](https://github.com/ahx/openapi_first/blob/codeql/.github/workflows/codeql.yml)
+
 ## Contents
 
 <!-- TOC -->
 
+- [Manual use](#manual-use)
+  - [Validate request](#validate-request)
+  - [Validate response](#validate-response)
 - [Rack Middlewares](#rack-middlewares)
   - [Request validation](#request-validation)
   - [Response validation](#response-validation)
 - [Test assertions](#test-assertions)
-- [Manual use](#manual-use)
-  - [Validate request](#validate-request)
-  - [Validate response](#validate-response)
 - [Framework integration](#framework-integration)
 - [Configuration](#configuration)
 - [Hooks](#hooks)
@@ -22,6 +25,61 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
   - [Contributing](#contributing)
 
 <!-- /TOC -->
+
+## Manual use
+
+Load the API description:
+
+```ruby
+require 'openapi_first'
+
+definition = OpenapiFirst.load('openapi.yaml')
+```
+
+### Validate request
+
+```ruby
+validated_request = definition.validate_request(rack_request)
+
+# Inspect the request and access parsed parameters
+validated_request.valid?
+validated_request.invalid?
+validated_request.error # => Failure object or nil
+validated_request.parsed_body # => The parsed request body (Hash)
+validated_request.parsed_query # A Hash of query parameters that are defined in the API description, parsed exactly as described.
+validated_request.parsed_path_parameters
+validated_request.parsed_headers
+validated_request.parsed_cookies
+validated_request.parsed_params # Merged parsed path, query parameters and request body
+# Access the Openapi 3 Operation Object Hash
+validated_request.operation['x-foo']
+validated_request.operation['operationId'] => "getStuff"
+# or the whole request definition
+validated_request.request_definition.path # => "/pets/{petId}"
+validated_request.request_definition.operation_id # => "showPetById"
+
+# Or you can raise an exception if validation fails:
+definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if request is invalid
+```
+
+### Validate response
+
+```ruby
+validated_response = definition.validate_response(rack_request, rack_response)
+
+# Inspect the response and access parsed parameters and
+validated_response.valid?
+validated_response.invalid?
+validated_response.error # => Failure object or nil
+validated_response.status # => 200
+validated_response.parsed_body
+validated_response.parsed_headers
+
+# Or you can raise an exception if validation fails:
+definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
+```
+
+OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
 ## Rack Middlewares
 
@@ -173,67 +231,6 @@ class TripsApiTest < ActionDispatch::IntegrationTest
   end
 end
 ```
-
-## Manual use
-
-Load the API description:
-
-```ruby
-require 'openapi_first'
-
-definition = OpenapiFirst.load('openapi.yaml')
-```
-
-### Validate request
-
-```ruby
-# Find and validate request
-rack_request = Rack::Request.new(env)
-validated_request = definition.validate_request(rack_request)
-# Or raise an exception if validation fails:
-definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if request is invalid
-
-# Inspect the request and access parsed parameters
-validated_request.known? # Is the request defined in the API description?
-validated_request.valid? # => true / false
-validated_request.invalid? # => true / false
-validated_request.error # => Failure object if request is invalid
-validated_request.parsed_params # Merged parsed path, query parameters and request body
-validated_request.parsed_body
-validated_request.parsed_path_parameters # => { "pet_id" => 42 }
-validated_request.parsed_headers
-validated_request.parsed_cookies
-validated_request.parsed_query
-
-# Access the Openapi 3 Operation Object Hash
-validated_request.operation['x-foo']
-validated_request.operation['operationId']
-# or the whole request definition
-validated_request.request_definition.path # => "/pets/{petId}"
-validated_request.request_definition.operation_id # => "showPetById"
-```
-
-### Validate response
-
-```ruby
-# Find and validate the response
-rack_response = Rack::Response[*app.call(env)]
-validated_response = definition.validate_response(rack_request, rack_response)
-
-# Raise an exception if validation fails:
-definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
-
-# Inspect the response and access parsed parameters and
-response.known? # Is the response defined in the API description?
-response.valid? # => true / false
-response.invalid? # => true / false
-response.error # => Failure object if response is invalid
-response.status # => 200
-response.parsed_body
-response.parsed_headers
-```
-
-OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
 
 ## Configuration
 
