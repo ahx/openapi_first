@@ -5,8 +5,8 @@ module OpenapiFirst
     # @visibility private
     class PathTemplate
       # See also https://spec.openapis.org/oas/v3.1.0#path-templating
-      TEMPLATE_EXPRESSION = /(\{[^}]+\})/
-      TEMPLATE_EXPRESSION_NAME = /\{([^}]+)\}/
+      TEMPLATE_EXPRESSION = /(\{[^{}]+\})/
+      TEMPLATE_EXPRESSION_NAME = /\{([^{}]+)\}/
       ALLOWED_PARAMETER_CHARACTERS = %r{([^/?#]+)}
 
       def self.template?(string)
