@@ -7,7 +7,7 @@ module OpenapiFirst
   module Test
     class NotRegisteredError < StandardError; end
 
-    DEFINITIONS = {}.freeze
+    DEFINITIONS = {}
     def self.definitions = DEFINITIONS
 
     def self.register(path, as: :default)
