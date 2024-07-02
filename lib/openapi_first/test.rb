@@ -8,7 +8,7 @@ module OpenapiFirst
     class NotRegisteredError < StandardError; end
 
     DEFINITIONS = {} # rubocop:disable Style/MutableConstant
-  
+
     def self.definitions = DEFINITIONS
 
     def self.register(path, as: :default)
