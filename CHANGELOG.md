@@ -4,6 +4,8 @@
 
 ## 2.0.3
 
+- Fix `OpenapiFirst::Test.register` https://github.com/ahx/openapi_first/issues/276
+
 - Request validation middleware now accepts `error_response: false` do disable rendering a response. This is useful if you just want to collect metrics (via hooks) during a migration phase.
 
 ## 2.0.2
