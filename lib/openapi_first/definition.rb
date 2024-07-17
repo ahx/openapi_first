@@ -5,11 +5,13 @@ require_relative 'router'
 require_relative 'request'
 require_relative 'response'
 require_relative 'builder'
+require 'forwardable'
 
 module OpenapiFirst
   # Represents an OpenAPI API Description document
   # This is returned by OpenapiFirst.load.
   class Definition
+    extend Forwardable
     attr_reader :filepath, :config, :paths, :router
 
     # @param resolved [Hash] The resolved OpenAPI document.
@@ -20,8 +22,11 @@ module OpenapiFirst
       yield @config if block_given?
       @config.freeze
       @router = Builder.build_router(resolved, @config)
+      @resolved = resolved
       @paths = resolved['paths'].keys # TODO: Move into builder as well
     end
+
+    def_delegators :@resolved, :[]
 
     def routes
       @router.routes

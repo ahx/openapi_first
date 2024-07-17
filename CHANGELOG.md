@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `Definition#[]` to access a raw Hash representation of the OAS document
+
 ## 2.0.3
 
 - Fix `OpenapiFirst::Test.register` https://github.com/ahx/openapi_first/issues/276
