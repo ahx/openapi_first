@@ -25,19 +25,8 @@ module OpenapiFirst
 
       def call(env)
         status, headers, body = @app.call(env)
-        body = read_body(body)
         @definition.validate_response(Rack::Request.new(env), Rack::Response[status, headers, body], raise_error: @raise)
         [status, headers, body]
-      end
-
-      private
-
-      def read_body(body)
-        return body.to_ary if body.respond_to?(:to_ary)
-
-        result = []
-        body.each { |part| result << part }
-        result
       end
     end
   end

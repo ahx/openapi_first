@@ -11,8 +11,8 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     res = response
     definition = spec
     Rack::Builder.app do
-      use OpenapiFirst::Middlewares::ResponseValidation, spec: definition
       use Rack::Lint
+      use OpenapiFirst::Middlewares::ResponseValidation, spec: definition
       run ->(_env) { res.finish }
     end
   end

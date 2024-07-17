@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix issue with parsing reponse body when using Rails https://github.com/ahx/openapi_first/issues/281
+
 ## 2.0.3
 
 - Fix `OpenapiFirst::Test.register` https://github.com/ahx/openapi_first/issues/276
