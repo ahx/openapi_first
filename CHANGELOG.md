@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.4
+
 - Fix issue with parsing reponse body when using Rails https://github.com/ahx/openapi_first/issues/281
 
 ## 2.0.3
