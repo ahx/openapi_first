@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Added `Definition#[]` to access a raw Hash representation of the OAS document
+## 2.1.0
+
+- Added `OpenapiFirst::Definition#[]` to access the raw Hash representation of the OAS document. Example: `api['components'].fetch('schemas', 'Stations')`
 
 ## 2.0.4
 
