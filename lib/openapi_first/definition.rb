@@ -5,12 +5,22 @@ require_relative 'router'
 require_relative 'request'
 require_relative 'response'
 require_relative 'builder'
+require 'forwardable'
 
 module OpenapiFirst
   # Represents an OpenAPI API Description document
   # This is returned by OpenapiFirst.load.
   class Definition
-    attr_reader :filepath, :config, :paths, :router
+    extend Forwardable
+
+    # @return [String,nil]
+    attr_reader :filepath
+    # @return [Configuration]
+    attr_reader :config
+    # @return [Enumerable[String]]
+    attr_reader :paths
+    # @return [Router]
+    attr_reader :router
 
     # @param resolved [Hash] The resolved OpenAPI document.
     # @param filepath [String] The file path of the OpenAPI document.
@@ -20,15 +30,23 @@ module OpenapiFirst
       yield @config if block_given?
       @config.freeze
       @router = Builder.build_router(resolved, @config)
+      @resolved = resolved
       @paths = resolved['paths'].keys # TODO: Move into builder as well
     end
 
+    # Gives access to the raw resolved Hash. Like `mydefinition['components'].dig('schemas', 'Stations')`
+    # @!method [](key)
+    # @return [Hash]
+    def_delegators :@resolved, :[]
+
+    # Returns an Enumerable of available Routes for this API description.
+    # @return [Enumerable[Router::Route]]
     def routes
       @router.routes
     end
 
     # Validates the request against the API description.
-    # @param [Rack::Request] rack_request The Rack request object.
+    # @param [Rack::Request] request The Rack request object.
     # @param [Boolean] raise_error Whether to raise an error if validation fails.
     # @return [ValidatedRequest] The validated request object.
     def validate_request(request, raise_error: false)

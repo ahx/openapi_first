@@ -12,6 +12,15 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe '#[]' do
+    it 'gives access to the raw hash' do
+      definition = OpenapiFirst.load('./spec/data/train-travel-api/openapi.yaml')
+      expect(definition['webhooks']).to be_a(Hash)
+      expect(definition['webhooks'].dig('newBooking', 'post', 'operationId')).to eq('new-booking')
+      expect(definition['components'].dig('schemas', 'Station', 'type')).to eq('object')
+    end
+  end
+
   describe '#paths' do
     it 'returns all paths' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml')
