@@ -15,10 +15,23 @@ module OpenapiFirst
       @response_definition = response_definition
     end
 
-    attr_reader :parsed_values, :error, :response_definition
+    # A Failure object if the response is invalid
+    # @return [Failure, nil]
+    attr_reader :error
 
-    def_delegator :parsed_values, :headers, :parsed_headers
-    def_delegator :parsed_values, :body, :parsed_body
+    # The response definition if this response is defined in the API description
+    # @return [Response, nil]
+    attr_reader :response_definition
+
+    # The parsed headers
+    # @!method parsed_headers
+    # @return [Hash<String,anything>]
+    def_delegator :@parsed_values, :headers, :parsed_headers
+
+    # The parsed body
+    # @!method parsed_body
+    # @return [Hash<String,anything>]
+    def_delegator :@parsed_values, :body, :parsed_body
 
     # Checks if the response is valid.
     # @return [Boolean] true if the response is valid, false otherwise.
@@ -26,6 +39,8 @@ module OpenapiFirst
       error.nil?
     end
 
+    # Checks if the response is invalid.
+    # @return [Boolean]
     def invalid?
       !valid?
     end
