@@ -1,0 +1,46 @@
+---
+openapi: 3.1.0
+info:
+  title: API V1
+  version: v1
+paths:
+  "/pets":
+    get:
+      summary: Pets
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                items:
+                  oneOf:
+                    - "$ref": "#/components/schemas/Cat"
+                    - "$ref": "#/components/schemas/Dog"
+                  discriminator:
+                    propertyName: petType
+                type: array
+components:
+  schemas:
+    Cat:
+      type: object
+      properties:
+        id:
+          type: integer
+        petType:
+          type: string
+          enum:
+            - cat
+        meow:
+          type: string
+    Dog:
+      type: object
+      properties:
+        id:
+          type: integer
+        petType:
+          type: string
+          enum:
+            - dog
+        bark:
+          type: string
