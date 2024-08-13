@@ -53,7 +53,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     end
   end
 
-  describe 'invalid response' do
+  context 'with an invalid response' do
     context 'with missing property' do
       let(:parsed_response) do
         double(
