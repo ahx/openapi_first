@@ -40,10 +40,9 @@ module OpenapiFirst
     def_delegators :@resolved, :[]
 
     # Returns an Enumerable of available Routes for this API description.
+    # @!method routes
     # @return [Enumerable[Router::Route]]
-    def routes
-      @router.routes
-    end
+    def_delegators :@router, :routes
 
     # Validates the request against the API description.
     # @param [Rack::Request] request The Rack request object.
@@ -51,15 +50,14 @@ module OpenapiFirst
     # @return [ValidatedRequest] The validated request object.
     def validate_request(request, raise_error: false)
       route = @router.match(request.request_method, request.path, content_type: request.content_type)
-      validated = if route.error
-                    ValidatedRequest.new(request, error: route.error)
-                  else
-                    route.request_definition.validate(request, route_params: route.params)
-                  end
-      @config.hooks[:after_request_validation].each { |hook| hook.call(validated, self) }
-      raise validated.error.exception(validated) if validated.error && raise_error
-
-      validated
+      if route.error
+        ValidatedRequest.new(request, error: route.error)
+      else
+        route.request_definition.validate(request, route_params: route.params)
+      end.tap do |validated|
+        @config.hooks[:after_request_validation].each { |hook| hook.call(validated, self) }
+        raise validated.error.exception(validated) if validated.error && raise_error
+      end
     end
 
     # Validates the response against the API description.
@@ -73,15 +71,14 @@ module OpenapiFirst
 
       response_match = route.match_response(status: rack_response.status, content_type: rack_response.content_type)
       error = response_match.error
-      validated = if error
-                    ValidatedResponse.new(rack_response, error:)
-                  else
-                    response_match.response.validate(rack_response)
-                  end
-      @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated, rack_request, self) }
-      raise validated.error.exception(validated) if raise_error && validated.invalid?
-
-      validated
+      if error
+        ValidatedResponse.new(rack_response, error:)
+      else
+        response_match.response.validate(rack_response)
+      end.tap do |validated|
+        @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated, rack_request, self) }
+        raise validated.error.exception(validated) if raise_error && validated.invalid?
+      end
     end
   end
 end

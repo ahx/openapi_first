@@ -1,0 +1,32 @@
+openapi: "3.1.0"
+info:
+  title: Attachments API
+paths:
+  /attachments/{attachment_id}:
+    get:
+      parameters:
+        - name: attachment_id
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              description: Content-Disposition Header Detail
+            Content-Transfer-Encoding:
+              schema:
+                type: string
+              description: Content-Transfer-Encoding Header Detail
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: bad_request
+        "422":
+          description: unprocessable entity

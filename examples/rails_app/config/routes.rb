@@ -10,4 +10,6 @@ Rails.application.routes.draw do
   #
   get '/stations', to: 'stations#index'
   get '/trips', to: 'trips#index'
+
+  resources :attachments, only: :show
 end
