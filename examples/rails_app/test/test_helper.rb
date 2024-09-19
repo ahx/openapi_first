@@ -4,6 +4,7 @@ require 'rails/test_help'
 
 require 'openapi_first/test'
 OpenapiFirst::Test.register(Rails.root.join('../../spec/data/train-travel-api/openapi.yaml'))
+OpenapiFirst::Test.register(Rails.root.join('../../spec/data/attachments_openapi.yaml'), as: :attachments)
 
 module ActiveSupport
   class TestCase
