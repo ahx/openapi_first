@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix issue with non file downloads / JSON responses https://github.com/ahx/openapi_first/issues/281
+
 ## 2.1.0
 
 - Added `OpenapiFirst::Definition#[]` to access the raw Hash representation of the OAS document. Example: `api['components'].fetch('schemas', 'Stations')`
