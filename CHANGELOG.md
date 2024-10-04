@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Replace bundled json_refs fork with own code
+
 ## 2.1.1
 
 - Fix issue with non file downloads / JSON responses https://github.com/ahx/openapi_first/issues/281
