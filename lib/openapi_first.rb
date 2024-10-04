@@ -2,7 +2,7 @@
 
 require 'yaml'
 require 'multi_json'
-require_relative 'openapi_first/json_refs'
+require_relative 'openapi_first/refs'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'
 require_relative 'openapi_first/definition'
@@ -53,7 +53,7 @@ module OpenapiFirst
   def self.load(filepath, only: nil, &)
     raise FileNotFoundError, "File not found: #{filepath}" unless File.exist?(filepath)
 
-    resolved = Bundle.resolve(filepath)
+    resolved = Refs.resolve_file(filepath)
     parse(resolved, only:, filepath:, &)
   end
 
@@ -62,14 +62,6 @@ module OpenapiFirst
   def self.parse(resolved, only: nil, filepath: nil, &)
     resolved['paths'].filter!(&->(key, _) { only.call(key) }) if only
     Definition.new(resolved, filepath, &)
-  end
-
-  # @!visibility private
-  module Bundle
-    def self.resolve(spec_path)
-      @file_cache ||= {}
-      @file_cache[File.expand_path(spec_path).to_sym] ||= JsonRefs.load(spec_path)
-    end
   end
 end
 

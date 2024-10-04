@@ -15,7 +15,6 @@ Style/Documentation:
     - "spec/**/*"
     - "lib/openapi_first/validators/*.rb"
     - "benchmarks/**/*"
-    - "lib/openapi_first/json_refs.rb"
 Style/ExponentialNotation:
   Enabled: true
 Style/MapIntoArray:
