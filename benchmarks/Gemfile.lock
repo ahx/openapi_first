@@ -58,7 +58,7 @@ GEM
       tilt (~> 2.0)
     tilt (2.4.0)
     vernier (1.2.1)
-    webrick (1.8.1)
+    webrick (1.8.2)
 
 PLATFORMS
   arm64-darwin-23
