@@ -339,6 +339,30 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     end
   end
 
+  context 'with self-referencing schema' do
+    let(:spec) { './spec/data/self-referencing.yaml' }
+
+    context 'with an invalid response' do
+      let(:response_body) { json_dump({ bar: { foo: 1 } }) }
+
+      it 'fails' do
+        expect do
+          get '/'
+        end.to raise_error(OpenapiFirst::ResponseInvalidError)
+      end
+    end
+
+    context 'with a valid response' do
+      let(:response_body) { json_dump({ bar: { foo: 'bar' } }) }
+
+      it 'succeeds' do
+        get '/'
+
+        expect(last_response.status).to eq(200)
+      end
+    end
+  end
+
   describe 'response header validation' do
     let(:app) do
       Rack::Builder.app do
