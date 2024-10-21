@@ -5,7 +5,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     response_definition = instance_double(OpenapiFirst::Response,
                                           status: '200',
                                           content_type: 'application/json',
-                                          content_schema: {
+                                          content_schema: JSONSchemer.schema({
                                             'type' => 'array',
                                             'items' => {
                                               'type' => 'object',
@@ -16,7 +16,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
                                                 'tag' => { 'type' => 'string' }
                                               }
                                             }
-                                          },
+                                          }),
                                           headers: {},
                                           headers_schema: nil)
     described_class.new(response_definition, openapi_version: '3.1')

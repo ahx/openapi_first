@@ -29,6 +29,8 @@ module OpenapiFirst
 
     def resolve_data!(data, context:, dir:)
       if data.is_a?(Hash)
+        return data if data.key?('discriminator')
+
         if data.key?('$ref')
           referenced_value = resolve_ref(data.delete('$ref'), context:, dir:)
           data.merge!(referenced_value) if referenced_value.is_a?(Hash)

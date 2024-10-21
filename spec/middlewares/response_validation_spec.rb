@@ -305,16 +305,18 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
       let(:response_body) { json_dump([{ id: 1, petType: 'unknown', meow: 'Huh' }]) }
 
       it 'fails' do
-        get '/pets'
+        expect do
+          get '/pets'
+        end.to raise_error(OpenapiFirst::ResponseInvalidError)
       end
     end
 
     context 'with a valid response' do
       let(:response_body) do
         json_dump([
-          { id: 1, petType: 'cat', meow: 'Prrr' },
-          { id: 2, petType: 'dog', bark: 'Woof' }
-        ])
+                    { id: 1, petType: 'cat', meow: 'Prrr' },
+                    { id: 2, petType: 'dog', bark: 'Woof' }
+                  ])
       end
 
       it 'succeeds' do

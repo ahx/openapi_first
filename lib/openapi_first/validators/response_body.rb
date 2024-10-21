@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
+require_relative '../schema/validation_result'
+
 module OpenapiFirst
   module Validators
     class ResponseBody
-      def self.for(response_definition, openapi_version:)
+      def self.for(response_definition, **)
         schema = response_definition&.content_schema
         return unless schema
 
-        new(Schema.new(schema, write: false, openapi_version:))
+        new(schema)
       end
 
       def initialize(schema)
@@ -22,7 +24,9 @@ module OpenapiFirst
         rescue ParseError => e
           Failure.fail!(:invalid_response_body, message: e.message)
         end
-        validation = schema.validate(parsed_body)
+        validation = Schema::ValidationResult.new(
+          schema.validate(parsed_body, access_mode: 'read')
+        )
         Failure.fail!(:invalid_response_body, errors: validation.errors) if validation.error?
       end
     end
