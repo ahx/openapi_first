@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix support for discriminator in response body validation (https://github.com/ahx/openapi_first/issues/285)
 - Replace bundled json_refs fork with own code
 
 ## 2.1.1

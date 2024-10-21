@@ -4,7 +4,7 @@ module OpenapiFirst
   # Functions to handle JSON Pointers
   # @!visibility private
   module JsonPointer
-    ESCAPE_CHARS = { '~' => '~0', '/' => '~1', '+' => '%2B' }
+    ESCAPE_CHARS = { '~' => '~0', '/' => '~1', '+' => '%2B' }.freeze
     ESCAPE_REGEX = Regexp.union(ESCAPE_CHARS.keys)
 
     module_function

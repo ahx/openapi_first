@@ -28,7 +28,8 @@ module OpenapiFirst
     end
 
     def resolve_data!(data, context:, dir:)
-      if data.is_a?(Hash)
+      case data
+      when Hash
         return data if data.key?('discriminator')
 
         if data.key?('$ref')
@@ -38,7 +39,7 @@ module OpenapiFirst
         data.transform_values! do |value|
           resolve_data!(value, context:, dir:)
         end
-      elsif data.is_a?(Array)
+      when Array
         data.map! do |value|
           resolve_data!(value, context:, dir:)
         end

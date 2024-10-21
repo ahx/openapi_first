@@ -6,17 +6,17 @@ RSpec.describe OpenapiFirst::ResponseValidator do
                                           status: '200',
                                           content_type: 'application/json',
                                           content_schema: JSONSchemer.schema({
-                                            'type' => 'array',
-                                            'items' => {
-                                              'type' => 'object',
-                                              'required' => %w[id name],
-                                              'properties' => {
-                                                'id' => { 'type' => 'integer' },
-                                                'name' => { 'type' => 'string' },
-                                                'tag' => { 'type' => 'string' }
-                                              }
-                                            }
-                                          }),
+                                                                               'type' => 'array',
+                                                                               'items' => {
+                                                                                 'type' => 'object',
+                                                                                 'required' => %w[id name],
+                                                                                 'properties' => {
+                                                                                   'id' => { 'type' => 'integer' },
+                                                                                   'name' => { 'type' => 'string' },
+                                                                                   'tag' => { 'type' => 'string' }
+                                                                                 }
+                                                                               }
+                                                                             }),
                                           headers: {},
                                           headers_schema: nil)
     described_class.new(response_definition, openapi_version: '3.1')
