@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'json_pointer'
+
 module OpenapiFirst
   # Builds parts of a Definition
   # This knows how to read a resolved OpenAPI document and build {Request} and {Response} objects.
@@ -16,6 +18,7 @@ module OpenapiFirst
 
     def initialize(resolved, config, openapi_version)
       @resolved = resolved
+      @doc = JSONSchemer.openapi(resolved)
       @config = config
       @openapi_version = openapi_version
     end
@@ -35,7 +38,8 @@ module OpenapiFirst
               content_type: request.content_type
             )
           end
-          build_responses(operation_object).each do |response|
+          operation_pointer = JsonPointer.append('#', 'paths', URI::DEFAULT_PARSER.escape(path), request_method)
+          build_responses(operation_pointer:, operation_object:).each do |response|
             router.add_response(
               response,
               request_method:,
@@ -67,11 +71,14 @@ module OpenapiFirst
       )
     end
 
-    def build_responses(operation_object)
+    def build_responses(operation_pointer:, operation_object:)
       Array(operation_object['responses']).flat_map do |status, response_object|
         headers = response_object['headers']
         response_object['content']&.map do |content_type, content_object|
-          content_schema = content_object['schema']
+          content_schema = if content_object['schema']
+                             @doc.ref(JsonPointer.append(operation_pointer, 'responses', status, 'content', content_type,
+                                                         'schema'))
+                           end
           Response.new(status:, headers:, content_type:, content_schema:, openapi_version:)
         end || Response.new(status:, headers:, content_type: nil,
                             content_schema: nil, openapi_version:)

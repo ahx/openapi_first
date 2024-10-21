@@ -298,6 +298,35 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     end
   end
 
+  context 'with discriminator' do
+    let(:spec) { './spec/data/discriminator-refs.yaml' }
+
+    context 'with an invalid response' do
+      let(:response_body) { json_dump([{ id: 1, petType: 'unknown', meow: 'Huh' }]) }
+
+      it 'fails' do
+        expect do
+          get '/pets'
+        end.to raise_error(OpenapiFirst::ResponseInvalidError)
+      end
+    end
+
+    context 'with a valid response' do
+      let(:response_body) do
+        json_dump([
+                    { id: 1, petType: 'cat', meow: 'Prrr' },
+                    { id: 2, petType: 'dog', bark: 'Woof' }
+                  ])
+      end
+
+      it 'succeeds' do
+        get '/pets'
+
+        expect(last_response.status).to eq(200)
+      end
+    end
+  end
+
   describe 'response header validation' do
     let(:app) do
       Rack::Builder.app do

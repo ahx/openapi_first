@@ -5,18 +5,18 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     response_definition = instance_double(OpenapiFirst::Response,
                                           status: '200',
                                           content_type: 'application/json',
-                                          content_schema: {
-                                            'type' => 'array',
-                                            'items' => {
-                                              'type' => 'object',
-                                              'required' => %w[id name],
-                                              'properties' => {
-                                                'id' => { 'type' => 'integer' },
-                                                'name' => { 'type' => 'string' },
-                                                'tag' => { 'type' => 'string' }
-                                              }
-                                            }
-                                          },
+                                          content_schema: JSONSchemer.schema({
+                                                                               'type' => 'array',
+                                                                               'items' => {
+                                                                                 'type' => 'object',
+                                                                                 'required' => %w[id name],
+                                                                                 'properties' => {
+                                                                                   'id' => { 'type' => 'integer' },
+                                                                                   'name' => { 'type' => 'string' },
+                                                                                   'tag' => { 'type' => 'string' }
+                                                                                 }
+                                                                               }
+                                                                             }),
                                           headers: {},
                                           headers_schema: nil)
     described_class.new(response_definition, openapi_version: '3.1')
@@ -53,7 +53,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
     end
   end
 
-  describe 'invalid response' do
+  context 'with an invalid response' do
     context 'with missing property' do
       let(:parsed_response) do
         double(
