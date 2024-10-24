@@ -20,6 +20,25 @@ paths:
                   discriminator:
                     propertyName: petType
                 type: array
+  "/pets-file":
+    get:
+      summary: Pets
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                items:
+                  oneOf:
+                    - "$ref": "./components/schemas/cat.yaml"
+                    - "$ref": "./components/schemas/dog.yaml"
+                  discriminator:
+                    propertyName: petType
+                    mapping:
+                      cat: "./components/schemas/cat.yaml"
+                      dog: "./components/schemas/dog.yaml"
+                type: array
 components:
   schemas:
     cat:

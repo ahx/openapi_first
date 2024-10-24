@@ -29,7 +29,7 @@ module OpenapiFirst
       @config = OpenapiFirst.configuration.clone
       yield @config if block_given?
       @config.freeze
-      @router = Builder.build_router(resolved, @config)
+      @router = Builder.build_router(resolved, filepath:, config:)
       @resolved = resolved
       @paths = resolved['paths'].keys # TODO: Move into builder as well
     end
