@@ -11,19 +11,18 @@ module OpenapiFirst
     # Builds a router from a resolved OpenAPI document.
     # @param resolved [Hash] The resolved OpenAPI document.
     # @param config [OpenapiFirst::Configuration] The configuration object.
-    def self.build_router(resolved, config)
-      openapi_version = (resolved['openapi'] || resolved['swagger'])[0..2]
-      new(resolved, config, openapi_version).router
+    def self.build_router(resolved, filepath:, config:)
+      new(resolved, filepath:, config:).router
     end
 
-    def initialize(resolved, config, openapi_version)
+    def initialize(resolved, filepath:, config:)
       @resolved = resolved
-      ref_resolver = proc do |uri|
-        Refs.load_file(uri.path)
+      ref_resolver = JSONSchemer::CachedResolver.new do |uri|
+        Refs.load_file(File.join(File.dirname(filepath), uri.path))
       end
       @doc = JSONSchemer.openapi(resolved, ref_resolver:)
       @config = config
-      @openapi_version = openapi_version
+      @openapi_version = (resolved['openapi'] || resolved['swagger'])[0..2]
     end
 
     attr_reader :resolved, :openapi_version, :config
