@@ -18,7 +18,10 @@ module OpenapiFirst
 
     def initialize(resolved, config, openapi_version)
       @resolved = resolved
-      @doc = JSONSchemer.openapi(resolved)
+      ref_resolver = proc do |uri|
+        Refs.load_file(uri.path)
+      end
+      @doc = JSONSchemer.openapi(resolved, ref_resolver:)
       @config = config
       @openapi_version = openapi_version
     end

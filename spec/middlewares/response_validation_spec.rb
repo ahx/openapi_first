@@ -309,6 +309,12 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
           get '/pets'
         end.to raise_error(OpenapiFirst::ResponseInvalidError)
       end
+
+      it 'fails with referenced file' do
+        expect do
+          get '/pets-file'
+        end.to raise_error(OpenapiFirst::ResponseInvalidError)
+      end
     end
 
     context 'with a valid response' do
@@ -321,6 +327,12 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
       it 'succeeds' do
         get '/pets'
+
+        expect(last_response.status).to eq(200)
+      end
+
+      it 'succeeds with referenced file' do
+        get '/pets-file'
 
         expect(last_response.status).to eq(200)
       end
