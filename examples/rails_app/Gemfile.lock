@@ -1,11 +1,7 @@
 PATH
   remote: ../..
   specs:
-<<<<<<< Updated upstream
-    openapi_first (2.1.0)
-=======
     openapi_first (2.1.1)
->>>>>>> Stashed changes
       hana (~> 1.3)
       json_schemer (>= 2.1, < 3.0)
       multi_json (~> 1.15)
