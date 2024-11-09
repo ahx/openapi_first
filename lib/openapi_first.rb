@@ -53,15 +53,16 @@ module OpenapiFirst
   def self.load(filepath, only: nil, &)
     raise FileNotFoundError, "File not found: #{filepath}" unless File.exist?(filepath)
 
-    resolved = Refs.resolve_file(filepath)
-    parse(resolved, only:, filepath:, &)
+    contents = Refs.load_file(filepath)
+    parse(contents, only:, filepath:, &)
   end
 
   # Parse a dereferenced Hash
   # @return [Definition]
-  def self.parse(resolved, only: nil, filepath: nil, &)
-    resolved['paths'].filter!(&->(key, _) { only.call(key) }) if only
-    Definition.new(resolved, filepath, &)
+  def self.parse(contents, only: nil, filepath: nil, &)
+    # TODO: This needs to work with unresolved contents as well
+    contents['paths'].filter!(&->(key, _) { only.call(key) }) if only
+    Definition.new(contents, filepath, &)
   end
 end
 

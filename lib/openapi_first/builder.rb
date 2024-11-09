@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'json_pointer'
+require_relative 'resolved'
 
 module OpenapiFirst
   # Builds parts of a Definition
@@ -9,14 +10,13 @@ module OpenapiFirst
     REQUEST_METHODS = %w[get head post put patch delete trace options].freeze
 
     # Builds a router from a resolved OpenAPI document.
-    # @param resolved [Hash] The resolved OpenAPI document.
+    # @param contents [Hash] The OpenAPI document Hash.
     # @param config [OpenapiFirst::Configuration] The configuration object.
-    def self.build_router(resolved, filepath:, config:)
-      new(resolved, filepath:, config:).router
+    def self.build_router(contents, filepath:, config:)
+      new(contents, filepath:, config:).router
     end
 
-    def initialize(resolved, filepath:, config:)
-      @resolved = resolved
+    def initialize(contents, filepath:, config:)
       ref_resolver = JSONSchemer::CachedResolver.new do |uri|
         Refs.load_file(File.join(File.dirname(filepath), uri.path))
       end
@@ -25,16 +25,17 @@ module OpenapiFirst
         insert_property_defaults: true,
         after_property_validation: config.hooks[:after_request_body_property_validation]
       )
-      @doc = JSONSchemer.openapi(resolved, configuration:)
+      @doc = JSONSchemer.openapi(contents, configuration:)
       @config = config
-      @openapi_version = (resolved['openapi'] || resolved['swagger'])[0..2]
+      @openapi_version = (contents['openapi'] || contents['swagger'])[0..2]
+      @contents = contents
     end
 
-    attr_reader :resolved, :openapi_version, :config
+    attr_reader :openapi_version, :config
 
     def router # rubocop:disable Metrics/MethodLength
       router = OpenapiFirst::Router.new
-      resolved['paths'].each do |path, path_item_object|
+      Resolved.new(@contents)['paths'].each do |path, path_item_object|
         path_item_object.slice(*REQUEST_METHODS).keys.map do |request_method|
           operation_object = path_item_object[request_method]
           operation_pointer = JsonPointer.append('#', 'paths', URI::DEFAULT_PARSER.escape(path), request_method)

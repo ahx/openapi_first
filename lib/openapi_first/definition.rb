@@ -22,16 +22,16 @@ module OpenapiFirst
     # @return [Router]
     attr_reader :router
 
-    # @param resolved [Hash] The resolved OpenAPI document.
+    # @param contents [Hash] The OpenAPI document.
     # @param filepath [String] The file path of the OpenAPI document.
-    def initialize(resolved, filepath = nil)
+    def initialize(contents, filepath = nil)
       @filepath = filepath
       @config = OpenapiFirst.configuration.clone
       yield @config if block_given?
       @config.freeze
-      @router = Builder.build_router(resolved, filepath:, config:)
-      @resolved = resolved
-      @paths = resolved['paths'].keys # TODO: Move into builder as well
+      @router = Builder.build_router(contents, filepath:, config:)
+      @resolved = contents
+      @paths = @router.routes.map(&:path).to_a.uniq # TODO: Refactor
     end
 
     # Gives access to the raw resolved Hash. Like `mydefinition['components'].dig('schemas', 'Stations')`
