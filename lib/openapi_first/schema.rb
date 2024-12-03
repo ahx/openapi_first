@@ -20,25 +20,12 @@ module OpenapiFirst
         meta_schema: SCHEMAS.fetch(openapi_version),
         insert_property_defaults: true,
         output_format: 'classic',
-        before_property_validation: method(:before_property_validation),
         after_property_validation:
       )
     end
 
     def validate(data)
       ValidationResult.new(@schemer.validate(data))
-    end
-
-    private
-
-    def before_property_validation(data, property, property_schema, parent)
-      binary_format(data, property, property_schema, parent)
-    end
-
-    def binary_format(data, property, property_schema, _parent)
-      return unless property_schema.is_a?(Hash) && property_schema['format'] == 'binary'
-
-      data[property] = data.dig(property, :tempfile)&.read if data[property]
     end
   end
 end
