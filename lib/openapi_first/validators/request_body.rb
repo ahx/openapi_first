@@ -3,16 +3,9 @@
 module OpenapiFirst
   module Validators
     class RequestBody
-      def self.for(request_definition, openapi_version:, hooks: {})
-        schema = request_definition.content_schema
-        return unless schema
-
-        new(schema, required: request_definition.required_request_body?)
-      end
-
-      def initialize(schema, required:)
-        @schema = schema
-        @required = required
+      def initialize(request_definition)
+        @schema = request_definition.content_schema
+        @required = request_definition.required_request_body?
       end
 
       def call(request)

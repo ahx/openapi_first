@@ -38,7 +38,8 @@ module OpenapiFirst
         path_item_object.slice(*REQUEST_METHODS).keys.map do |request_method|
           operation_object = path_item_object[request_method]
           operation_pointer = JsonPointer.append('#', 'paths', URI::DEFAULT_PARSER.escape(path), request_method)
-          build_requests(path:, request_method:, operation_object:, operation_pointer:, path_item_object:).each do |request|
+          build_requests(path:, request_method:, operation_object:, operation_pointer:,
+                         path_item_object:).each do |request|
             router.add_request(
               request,
               request_method:,
@@ -65,8 +66,9 @@ module OpenapiFirst
       path_item_parameters = path_item_object['parameters']
       parameters = operation_object['parameters'].to_a.chain(path_item_parameters.to_a)
       required_body = operation_object.dig('requestBody', 'required') == true
-      result = operation_object.dig('requestBody', 'content')&.map do |content_type, content|
-        content_schema = @doc.ref(JsonPointer.append(operation_pointer, 'requestBody', 'content', content_type, 'schema'))
+      result = operation_object.dig('requestBody', 'content')&.map do |content_type, _content|
+        content_schema = @doc.ref(JsonPointer.append(operation_pointer, 'requestBody', 'content', content_type,
+                                                     'schema'))
         Request.new(path:, request_method:, operation_object:, parameters:, content_type:,
                     content_schema:, required_body:, hooks:, openapi_version:)
       end || []

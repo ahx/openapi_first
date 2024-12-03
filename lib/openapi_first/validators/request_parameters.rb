@@ -2,7 +2,7 @@
 
 module OpenapiFirst
   module Validators
-    class RequestParameters
+    module RequestParameters
       RequestHeaders = Data.define(:schema) do
         def call(parsed_values)
           validation = schema.validate(parsed_values[:headers])
@@ -38,23 +38,12 @@ module OpenapiFirst
         cookie_schema: RequestCookies
       }.freeze
 
-      def self.for(operation, openapi_version:, hooks: {})
+      def self.for(request_definition, openapi_version:, hooks: {})
         after_property_validation = hooks[:after_request_parameter_property_validation]
-        validators = VALIDATORS.filter_map do |key, klass|
-          schema = operation.send(key)
+        VALIDATORS.filter_map do |key, klass|
+          schema = request_definition.send(key)
           klass.new(Schema.new(schema, after_property_validation:, openapi_version:)) if schema
         end
-        return if validators.empty?
-
-        new(validators)
-      end
-
-      def initialize(validators)
-        @validators = validators
-      end
-
-      def call(parsed_values)
-        @validators.each { |validator| validator.call(parsed_values) }
       end
     end
   end
