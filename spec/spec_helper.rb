@@ -6,6 +6,7 @@ require 'bundler/setup'
 require 'openapi_first'
 require 'multi_json'
 require 'simplecov'
+require 'rack/test'
 
 SimpleCov.start do
   enable_coverage :branch
