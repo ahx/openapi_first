@@ -13,7 +13,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       Rack::Request.new(Rack::MockRequest.env_for('/')),
       parsed_request:,
       error: nil,
-      request_definition: double(:request_definition)
+      request_definition: double(:request_definition, key: 1)
     )
   end
 
