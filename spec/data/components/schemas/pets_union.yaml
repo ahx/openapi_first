@@ -1,10 +1,10 @@
 items:
   oneOf:
-    - "$ref": "./components/schemas/cat.yaml"
-    - "$ref": "./components/schemas/dog.yaml"
+    - "$ref": "./cat.yaml"
+    - "$ref": "./dog.yaml"
   discriminator:
     propertyName: petType
     mapping:
-      cat: "./components/schemas/cat.yaml"
-      dog: "./components/schemas/dog.yaml"
+      cat: "./cat.yaml"
+      dog: "./dog.yaml"
 type: array
