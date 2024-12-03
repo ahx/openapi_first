@@ -119,6 +119,45 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
   end
 
+  context 'with discriminator' do
+    let(:app) do
+      Rack::Builder.app do
+        use(OpenapiFirst::Middlewares::RequestValidation,
+            spec: File.expand_path('../data/discriminator-refs.yaml', __dir__))
+        run lambda { |_env|
+          Rack::Response.new('hello', 200).finish
+        }
+      end
+    end
+
+    context 'with an invalid request' do
+      let(:request_body) { json_dump([{ id: 1, petType: 'unknown', meow: 'Huh' }]) }
+
+      it 'fails' do
+        header 'Content-Type', 'application/json'
+        post '/pets-file', request_body
+
+        expect(last_response.status).to eq 400
+      end
+    end
+
+    context 'with a valid request' do
+      let(:request_body) do
+        json_dump([
+                    { id: 1, petType: 'cat', meow: 'Prrr' },
+                    { id: 2, petType: 'dog', bark: 'Woof' }
+                  ])
+      end
+
+      it 'succeeds' do
+        header 'Content-Type', 'application/json'
+        post '/pets-file', request_body
+
+        expect(last_response.status).to eq 200
+      end
+    end
+  end
+
   context 'with error_response: false' do
     let(:called) { [] }
 

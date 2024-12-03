@@ -3,19 +3,9 @@
 module OpenapiFirst
   module Validators
     class RequestBody
-      def self.for(request_definition, openapi_version:, hooks: {})
-        schema = request_definition.content_schema
-        return unless schema
-
-        after_property_validation = hooks[:after_request_body_property_validation]
-
-        new(Schema.new(schema, after_property_validation:, openapi_version:),
-            required: request_definition.required_request_body?)
-      end
-
-      def initialize(schema, required:)
-        @schema = schema
-        @required = required
+      def initialize(request_definition)
+        @schema = request_definition.content_schema
+        @required = request_definition.required_request_body?
       end
 
       def call(request)
@@ -25,7 +15,9 @@ module OpenapiFirst
           return
         end
 
-        validation = @schema.validate(request_body)
+        validation = Schema::ValidationResult.new(
+          @schema.validate(request_body, access_mode: 'write')
+        )
         Failure.fail!(:invalid_body, errors: validation.errors) if validation.error?
       end
 

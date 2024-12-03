@@ -92,7 +92,7 @@ RSpec.describe 'Hooks' do
                 }
               }
             ],
-            'get' => {
+            'post' => {
               'parameters' => [
                 {
                   'name' => 'page',
@@ -102,6 +102,20 @@ RSpec.describe 'Hooks' do
                   }
                 }
               ],
+              'requestBody' => {
+                'content' => {
+                  'application/json' => {
+                    'schema' => {
+                      'type' => 'object',
+                      'properties' => {
+                        'name' => {
+                          'type' => 'string'
+                        }
+                      }
+                    }
+                  }
+                }
+              },
               'responses' => {
                 '200' => {
                   'description' => 'ok'
@@ -120,7 +134,7 @@ RSpec.describe 'Hooks' do
         end
       end
 
-      definition.validate_request(build_request('/blue?page=2'))
+      definition.validate_request(build_request('/blue?page=2', method: 'POST', body: '{"name": "Quentin"}'))
 
       expect(called).to eq([
                              [{ 'color' => 'blue' }, 'color', {
@@ -138,7 +152,7 @@ RSpec.describe 'Hooks' do
           data[property] = 'two' if property == 'page'
         end
       end
-      validated = definition.validate_request(build_request('/blue?page=2'))
+      validated = definition.validate_request(build_request('/blue?page=2', method: 'POST', body: '{"name": "Quentin"}'))
       expect(validated.parsed_query['page']).to eq('two')
       expect(validated).to be_valid
     end
