@@ -1,4 +1,5 @@
 type: object
+required: [meow]
 properties:
   id:
     type: integer

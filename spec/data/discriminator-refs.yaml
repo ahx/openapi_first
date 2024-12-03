@@ -48,37 +48,10 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  oneOf:
-                    - "$ref": "./components/schemas/cat.yaml"
-                    - "$ref": "./components/schemas/dog.yaml"
-                  discriminator:
-                    propertyName: petType
-                    mapping:
-                      cat: "./components/schemas/cat.yaml"
-                      dog: "./components/schemas/dog.yaml"
-                type: array
+                "$ref": "./components/schemas/pets_union.yaml"
 components:
   schemas:
     cat:
-      type: object
-      properties:
-        id:
-          type: integer
-        petType:
-          type: string
-          enum:
-            - cat
-        meow:
-          type: string
+      "$ref": "./components/schemas/cat.yaml"
     dog:
-      type: object
-      properties:
-        id:
-          type: integer
-        petType:
-          type: string
-          enum:
-            - dog
-        bark:
-          type: string
+      "$ref": "./components/schemas/dog.yaml"

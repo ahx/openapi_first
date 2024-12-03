@@ -302,7 +302,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     let(:spec) { './spec/data/discriminator-refs.yaml' }
 
     context 'with an invalid response' do
-      let(:response_body) { json_dump([{ id: 1, petType: 'unknown', meow: 'Huh' }]) }
+      let(:response_body) { json_dump([{ id: 1, petType: 'dog', meow: 'Huh' }]) }
 
       it 'fails' do
         expect do
