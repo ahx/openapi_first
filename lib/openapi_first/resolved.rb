@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module OpenapiFirst
   # This is here to give easy access to resolved $refs
   # @visibility private
@@ -15,10 +17,8 @@ module OpenapiFirst
       self.class.new(value, context:)
     end
 
-    def each
-      resolved.each do |key, value|
-        yield key, value
-      end
+    def each(&)
+      resolved.each(&)
     end
 
     def resolved
@@ -27,9 +27,11 @@ module OpenapiFirst
       elsif value.is_a?(Array)
         return value.map do |item|
           break item.resolved if item.is_a?(Resolved)
+
           item
         end
       end
+
       value
     end
 
@@ -38,10 +40,10 @@ module OpenapiFirst
     private attr_accessor :value
     private attr_accessor :context
 
-
     def resolve_ref(pointer)
       value = Hana::Pointer.new(pointer[1..]).eval(context)
       raise "Unknown reference #{pointer} in #{context}" unless value
+
       value
     end
   end

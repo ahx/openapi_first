@@ -2,7 +2,7 @@
 
 require 'yaml'
 require 'multi_json'
-require_relative 'openapi_first/refs'
+require_relative 'openapi_first/file_loader'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'
 require_relative 'openapi_first/definition'
@@ -53,7 +53,7 @@ module OpenapiFirst
   def self.load(filepath, only: nil, &)
     raise FileNotFoundError, "File not found: #{filepath}" unless File.exist?(filepath)
 
-    contents = Refs.load_file(filepath)
+    contents = FileLoader.load(filepath)
     parse(contents, only:, filepath:, &)
   end
 

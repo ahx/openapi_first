@@ -18,7 +18,7 @@ module OpenapiFirst
 
     def initialize(contents, filepath:, config:)
       ref_resolver = JSONSchemer::CachedResolver.new do |uri|
-        Refs.load_file(File.join(File.dirname(filepath), uri.path))
+        FileLoader.load(File.join(File.dirname(filepath), uri.path))
       end
       configuration = JSONSchemer::Configuration.new(
         ref_resolver:,

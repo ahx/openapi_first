@@ -1,5 +1,6 @@
-require_relative '../lib/openapi_first/resolved'
+# frozen_string_literal: true
 
+require_relative '../lib/openapi_first/resolved'
 
 RSpec.describe OpenapiFirst::Resolved do
   let(:original_hash) do
