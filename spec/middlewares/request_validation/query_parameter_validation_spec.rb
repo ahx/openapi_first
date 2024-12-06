@@ -37,7 +37,7 @@ RSpec.describe 'Query Parameter validation' do
     end
 
     let(:response_body) do
-      json_load(last_response.body, symbolize_keys: true)
+      JSON.parse(last_response.body, symbolize_names: true)
     end
 
     it 'returns 400 if query parameter is missing' do

@@ -7,6 +7,7 @@
 - Replace bundled json_refs fork with own code
 - Better error messages when OpenAPI file has invalid references ("$ref")
 - Autoload OpenapiFirst::Test module. There is no need to `require 'openapi_first/test'` anymore.
+- Use default json gem instead of multi_json
 
 ## 2.1.1
 

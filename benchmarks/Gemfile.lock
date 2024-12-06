@@ -4,7 +4,6 @@ PATH
     openapi_first (2.1.1)
       hana (~> 1.3)
       json_schemer (>= 2.1, < 3.0)
-      multi_json (~> 1.15)
       openapi_parameters (>= 0.3.3, < 2.0)
       rack (>= 2.2, < 4.0)
 
@@ -29,7 +28,6 @@ GEM
       simpleidn (~> 0.2)
     logger (1.6.2)
     memory_profiler (1.1.0)
-    multi_json (1.15.0)
     mustermann (3.0.3)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.7.4)
@@ -72,7 +70,6 @@ DEPENDENCIES
   benchmark-ips
   benchmark-memory
   committee
-  multi_json
   openapi_first!
   openapi_parameters
   profile-viewer

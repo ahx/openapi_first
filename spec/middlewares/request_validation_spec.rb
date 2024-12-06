@@ -125,7 +125,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
 
     context 'with an invalid request' do
-      let(:request_body) { json_dump([{ id: 1, petType: 'unknown', meow: 'Huh' }]) }
+      let(:request_body) { JSON.generate([{ id: 1, petType: 'unknown', meow: 'Huh' }]) }
 
       it 'fails' do
         header 'Content-Type', 'application/json'
@@ -137,10 +137,10 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
 
     context 'with a valid request' do
       let(:request_body) do
-        json_dump([
-                    { id: 1, petType: 'cat', meow: 'Prrr' },
-                    { id: 2, petType: 'dog', bark: 'Woof' }
-                  ])
+        JSON.generate([
+                        { id: 1, petType: 'cat', meow: 'Prrr' },
+                        { id: 2, petType: 'dog', bark: 'Woof' }
+                      ])
       end
 
       it 'succeeds' do

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'yaml'
-require 'multi_json'
 require_relative 'openapi_first/file_loader'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'

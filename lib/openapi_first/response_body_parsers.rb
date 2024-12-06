@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json'
+
 module OpenapiFirst
   # @visibility private
   module ResponseBodyParsers
@@ -21,8 +23,8 @@ module OpenapiFirst
     end
 
     register(/json/i, lambda do |body|
-      MultiJson.load(body)
-    rescue MultiJson::ParseError
+      JSON.parse(body)
+    rescue JSON::ParserError
       Failure.fail!(:invalid_response_body, message: 'Response body is invalid: Failed to parse response body as JSON')
     end)
   end

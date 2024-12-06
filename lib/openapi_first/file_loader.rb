@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'json'
+require 'yaml'
+
 module OpenapiFirst
   # @!visibility private
   module FileLoader

@@ -194,7 +194,7 @@ RSpec.describe OpenapiFirst::Definition do
     let(:request) { build_request('/stuff') }
 
     context 'when response is valid' do
-      let(:response) { Rack::Response.new(JSON.dump({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
+      let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
 
       it 'returns a valid response' do
         validated = definition.validate_response(request, response)
@@ -204,7 +204,7 @@ RSpec.describe OpenapiFirst::Definition do
     end
 
     context 'when response is invalid' do
-      let(:response) { Rack::Response.new(JSON.dump({ 'id' => 'foo' }), 200, { 'Content-Type' => 'application/json' }) }
+      let(:response) { Rack::Response.new(JSON.generate({ 'id' => 'foo' }), 200, { 'Content-Type' => 'application/json' }) }
 
       it 'returns an invalid response' do
         validated = definition.validate_response(request, response)
