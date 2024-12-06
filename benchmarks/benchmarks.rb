@@ -10,7 +10,7 @@ examples = [
   [Rack::MockRequest.env_for('/hello'), 200],
   [Rack::MockRequest.env_for('/unknown'), 404],
   [
-    Rack::MockRequest.env_for('/hello', method: 'POST', input: JSON.dump({ say: 'hi!' }),
+    Rack::MockRequest.env_for('/hello', method: 'POST', input: JSON.generate({ say: 'hi!' }),
                                         'CONTENT_TYPE' => 'application/json'), 201
   ],
   [Rack::MockRequest.env_for('/hello/1'), 200],

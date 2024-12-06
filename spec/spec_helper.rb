@@ -4,7 +4,7 @@ ENV['RACK_ENV'] = 'test'
 
 require 'bundler/setup'
 require 'openapi_first'
-require 'multi_json'
+require 'json'
 require 'simplecov'
 require 'rack/test'
 
@@ -15,19 +15,7 @@ end
 
 SimpleCov.minimum_coverage line: 99, branch: 85
 
-module OpenapiFirstSpecHelpers
-  def json_dump(data)
-    MultiJson.dump(data)
-  end
-
-  def json_load(string, symbolize_keys: false)
-    MultiJson.load(string, { symbolize_keys: })
-  end
-end
-
 RSpec.configure do |config|
-  config.include(OpenapiFirstSpecHelpers)
-
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = '.rspec_status'
 

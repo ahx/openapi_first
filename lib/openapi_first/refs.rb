@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'yaml'
+require 'json'
+
 module OpenapiFirst
   # Functions to handle $refs
   # @!visibility private
