@@ -30,8 +30,8 @@ module OpenapiFirst
     end
 
     def parse_json(body)
-      MultiJson.load(body)
-    rescue MultiJson::ParseError
+      JSON.parse(body)
+    rescue JSON::ParserError
       Failure.fail!(:invalid_response_body, message: 'Response body is invalid: Failed to parse response body as JSON')
     end
 

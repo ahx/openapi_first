@@ -12,7 +12,7 @@ RSpec.describe OpenapiFirst::ResponseParser do
 
   describe '#body' do
     let(:rack_response) do
-      app_response = Rack::Response.new(JSON.dump({ foo: :bar }), 200, { 'Content-Type' => 'application/json' }).to_a
+      app_response = Rack::Response.new(JSON.generate({ foo: :bar }), 200, { 'Content-Type' => 'application/json' }).to_a
       Rack::Response[*app_response]
     end
 
@@ -22,7 +22,7 @@ RSpec.describe OpenapiFirst::ResponseParser do
 
     context 'without json content-type' do
       let(:rack_response) do
-        Rack::Response.new(JSON.dump({ foo: :bar }))
+        Rack::Response.new(JSON.generate({ foo: :bar }))
       end
 
       it 'also parses the body' do
@@ -45,7 +45,7 @@ RSpec.describe OpenapiFirst::ResponseParser do
     context 'when using Rails' do
       let(:rack_response) do
         app_response = ActionDispatch::Response.create(200, { 'Content-Type' => 'application/json' },
-                                                       JSON.dump({ foo: :bar })).to_a
+                                                       JSON.generate({ foo: :bar })).to_a
         Rack::Response[*app_response]
       end
 
@@ -56,7 +56,7 @@ RSpec.describe OpenapiFirst::ResponseParser do
 
     context 'when using Rails tests' do
       let(:rack_response) do
-        app_response = Rack::Response.new(JSON.dump({ foo: :bar }), 200, { 'Content-Type' => 'application/json' })
+        app_response = Rack::Response.new(JSON.generate({ foo: :bar }), 200, { 'Content-Type' => 'application/json' })
         ActionDispatch::TestResponse.from_response(app_response)
       end
 

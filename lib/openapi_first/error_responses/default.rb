@@ -26,7 +26,7 @@ module OpenapiFirst
           status:
         }
         result[:errors] = errors if failure.errors
-        MultiJson.dump(result)
+        JSON.generate(result)
       end
 
       def type = failure.type

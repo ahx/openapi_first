@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'multi_json'
+require 'json'
 
 module OpenapiFirst
   # @!visibility private
@@ -8,11 +8,11 @@ module OpenapiFirst
     def self.[](content_type)
       case content_type
       when /json/i
-        JSON
+        JsonBodyParser
       when %r{multipart/form-data}i
-        Multipart
+        MultipartBodyParser
       else
-        Default
+        DefaultBodyParser
       end
     end
 
@@ -22,23 +22,23 @@ module OpenapiFirst
       body
     end
 
-    JSON = lambda do |request|
+    JsonBodyParser = lambda do |request|
       body = read_body(request)
       return if body.nil? || body.empty?
 
-      MultiJson.load(body)
-    rescue MultiJson::ParseError
+      JSON.parse(body)
+    rescue JSON::ParserError
       Failure.fail!(:invalid_body, message: 'Failed to parse request body as JSON')
     end
 
-    Multipart = lambda do |request|
+    MultipartBodyParser = lambda do |request|
       request.POST.transform_values do |value|
         value.is_a?(Hash) && value[:tempfile] ? value[:tempfile].read : value
       end
     end
 
     # This returns the post data parsed by rack or the raw body
-    Default = lambda do |request|
+    DefaultBodyParser = lambda do |request|
       return request.POST if request.form_data?
 
       read_body(request)
