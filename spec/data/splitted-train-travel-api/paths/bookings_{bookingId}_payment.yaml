@@ -1,0 +1,115 @@
+parameters:
+  - name: bookingId
+    in: path
+    required: true
+    description: The ID of the booking to pay for.
+    schema:
+      type: string
+      format: uuid
+    example: 1725ff48-ab45-4bb5-9d02-88745177dedb
+post:
+  summary: Pay for a Booking
+  description: >-
+    A payment is an attempt to pay for the booking, which will confirm the
+    booking for the user and enable them to get their tickets.
+  operationId: create-booking-payment
+  tags:
+    - Payments
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/BookingPayment.yaml
+        examples:
+          Card:
+            summary: Card Payment
+            value:
+              amount: 49.99
+              currency: gbp
+              source:
+                object: card
+                name: J. Doe
+                number: '4242424242424242'
+                cvc: 123
+                exp_month: 12
+                exp_year: 2025
+                address_line1: 123 Fake Street
+                address_line2: 4th Floor
+                address_city: London
+                address_country: gb
+                address_post_code: N12 9XX
+          Bank:
+            summary: Bank Account Payment
+            value:
+              amount: 100.5
+              currency: gbp
+              source:
+                object: bank_account
+                name: J. Doe
+                number: '00012345'
+                sort_code: '000123'
+                account_type: individual
+                bank_name: Starling Bank
+                country: gb
+  responses:
+    '200':
+      description: Payment successful
+      headers:
+        RateLimit:
+          $ref: ../components/headers/RateLimit.yaml
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../components/schemas/BookingPayment.yaml
+              - properties:
+                  links:
+                    $ref: ../components/schemas/Links-Booking.yaml
+          examples:
+            Card:
+              summary: Card Payment
+              value:
+                id: 2e3b4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a
+                amount: 49.99
+                currency: gbp
+                source:
+                  object: card
+                  name: J. Doe
+                  number: '************4242'
+                  cvc: 123
+                  exp_month: 12
+                  exp_year: 2025
+                  address_country: gb
+                  address_post_code: N12 9XX
+                status: succeeded
+                links:
+                  booking: >-
+                    https://api.example.com/bookings/1725ff48-ab45-4bb5-9d02-88745177dedb/payment
+            Bank:
+              summary: Bank Account Payment
+              value:
+                id: 2e3b4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a
+                amount: 100.5
+                currency: gbp
+                source:
+                  object: bank_account
+                  name: J. Doe
+                  account_type: individual
+                  number: '*********2345'
+                  sort_code: '000123'
+                  bank_name: Starling Bank
+                  country: gb
+                status: succeeded
+                links:
+                  booking: >-
+                    https://api.example.com/bookings/1725ff48-ab45-4bb5-9d02-88745177dedb
+    '400':
+      $ref: ../components/responses/BadRequest.yaml
+    '401':
+      $ref: ../components/responses/Unauthorized.yaml
+    '403':
+      $ref: ../components/responses/Forbidden.yaml
+    '429':
+      $ref: ../components/responses/TooManyRequests.yaml
+    '500':
+      $ref: ../components/responses/InternalServerError.yaml

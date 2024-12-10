@@ -1,0 +1,81 @@
+parameters:
+  - name: bookingId
+    in: path
+    required: true
+    description: The ID of the booking to retrieve.
+    schema:
+      type: string
+      format: uuid
+    example: 1725ff48-ab45-4bb5-9d02-88745177dedb
+get:
+  summary: Get a booking
+  description: Returns the details of a specific booking.
+  operationId: get-booking
+  tags:
+    - Bookings
+  responses:
+    '200':
+      description: The booking details
+      headers:
+        RateLimit:
+          $ref: ../components/headers/RateLimit.yaml
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../components/schemas/Booking.yaml
+              - properties:
+                  links:
+                    $ref: ../components/schemas/Links-Self.yaml
+          example:
+            id: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+            trip_id: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+            passenger_name: John Doe
+            has_bicycle: true
+            has_dog: true
+            links:
+              self: >-
+                https://api.example.com/bookings/1725ff48-ab45-4bb5-9d02-88745177dedb
+        application/xml:
+          schema:
+            allOf:
+              - $ref: ../components/schemas/Booking.yaml
+              - properties:
+                  links:
+                    $ref: ../components/schemas/Links-Self.yaml
+    '400':
+      $ref: ../components/responses/BadRequest.yaml
+    '401':
+      $ref: ../components/responses/Unauthorized.yaml
+    '403':
+      $ref: ../components/responses/Forbidden.yaml
+    '404':
+      $ref: ../components/responses/NotFound.yaml
+    '429':
+      $ref: ../components/responses/TooManyRequests.yaml
+    '500':
+      $ref: ../components/responses/InternalServerError.yaml
+delete:
+  summary: Delete a booking
+  description: Deletes a booking, cancelling the hold on the trip.
+  operationId: delete-booking
+  security:
+    - OAuth2:
+        - write
+  tags:
+    - Bookings
+  responses:
+    '204':
+      description: Booking deleted
+    '400':
+      $ref: ../components/responses/BadRequest.yaml
+    '401':
+      $ref: ../components/responses/Unauthorized.yaml
+    '403':
+      $ref: ../components/responses/Forbidden.yaml
+    '404':
+      $ref: ../components/responses/NotFound.yaml
+    '429':
+      $ref: ../components/responses/TooManyRequests.yaml
+    '500':
+      $ref: ../components/responses/InternalServerError.yaml

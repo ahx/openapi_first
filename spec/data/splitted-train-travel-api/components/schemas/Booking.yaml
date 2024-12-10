@@ -1,0 +1,28 @@
+type: object
+xml:
+  name: booking
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier for the booking
+    readOnly: true
+    examples:
+      - 3f3e3e1-c824-4d63-b37a-d8d698862f1d
+  trip_id:
+    type: string
+    format: uuid
+    description: Identifier of the booked trip
+    examples:
+      - 4f4e4e1-c824-4d63-b37a-d8d698862f1d
+  passenger_name:
+    type: string
+    description: Name of the passenger
+    examples:
+      - John Doe
+  has_bicycle:
+    type: boolean
+    description: Indicates whether the passenger has a bicycle.
+  has_dog:
+    type: boolean
+    description: Indicates whether the passenger has a dog.

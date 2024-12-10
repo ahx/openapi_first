@@ -1,0 +1,123 @@
+get:
+  summary: Get available train trips
+  description: >-
+    Returns a list of available train trips between the specified origin and
+    destination stations on the given date, and allows for filtering by bicycle
+    and dog allowances.
+  operationId: get-trips
+  tags:
+    - Trips
+  parameters:
+    - name: origin
+      in: query
+      description: The ID of the origin station
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+    - name: destination
+      in: query
+      description: The ID of the destination station
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: b2e783e1-c824-4d63-b37a-d8d698862f1d
+    - name: date
+      in: query
+      description: >-
+        The date and time of the trip in ISO 8601 format in origin station's
+        timezone.
+      required: true
+      schema:
+        type: string
+        format: date-time
+      example: '2024-02-01T09:00:00Z'
+    - name: bicycles
+      in: query
+      description: Only return trips where bicycles are known to be allowed
+      required: false
+      schema:
+        type: boolean
+        default: false
+    - name: dogs
+      in: query
+      description: Only return trips where dogs are known to be allowed
+      required: false
+      schema:
+        type: boolean
+        default: false
+  responses:
+    '200':
+      description: A list of available train trips
+      headers:
+        RateLimit:
+          $ref: ../components/headers/RateLimit.yaml
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../components/schemas/Wrapper-Collection.yaml
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ../components/schemas/Trip.yaml
+              - properties:
+                  links:
+                    allOf:
+                      - $ref: ../components/schemas/Links-Self.yaml
+                      - $ref: ../components/schemas/Links-Pagination.yaml
+          example:
+            data:
+              - id: ea399ba1-6d95-433f-92d1-83f67b775594
+                origin: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+                destination: b2e783e1-c824-4d63-b37a-d8d698862f1d
+                departure_time: '2024-02-01T10:00:00Z'
+                arrival_time: '2024-02-01T16:00:00Z'
+                price: 50
+                operator: Deutsche Bahn
+                bicycles_allowed: true
+                dogs_allowed: true
+              - id: 4d67459c-af07-40bb-bb12-178dbb88e09f
+                origin: b2e783e1-c824-4d63-b37a-d8d698862f1d
+                destination: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+                departure_time: '2024-02-01T12:00:00Z'
+                arrival_time: '2024-02-01T18:00:00Z'
+                price: 50
+                operator: SNCF
+                bicycles_allowed: true
+                dogs_allowed: true
+            links:
+              self: >-
+                https://api.example.com/trips?origin=efdbb9d1-02c2-4bc3-afb7-6788d8782b1e&destination=b2e783e1-c824-4d63-b37a-d8d698862f1d&date=2024-02-01
+              next: >-
+                https://api.example.com/trips?origin=efdbb9d1-02c2-4bc3-afb7-6788d8782b1e&destination=b2e783e1-c824-4d63-b37a-d8d698862f1d&date=2024-02-01&page=2
+        application/xml:
+          schema:
+            allOf:
+              - $ref: ../components/schemas/Wrapper-Collection.yaml
+              - properties:
+                  data:
+                    type: array
+                    xml:
+                      name: trips
+                      wrapped: true
+                    items:
+                      $ref: ../components/schemas/Trip.yaml
+              - properties:
+                  links:
+                    allOf:
+                      - $ref: ../components/schemas/Links-Self.yaml
+                      - $ref: ../components/schemas/Links-Pagination.yaml
+    '400':
+      $ref: ../components/responses/BadRequest.yaml
+    '401':
+      $ref: ../components/responses/Unauthorized.yaml
+    '403':
+      $ref: ../components/responses/Forbidden.yaml
+    '429':
+      $ref: ../components/responses/TooManyRequests.yaml
+    '500':
+      $ref: ../components/responses/InternalServerError.yaml

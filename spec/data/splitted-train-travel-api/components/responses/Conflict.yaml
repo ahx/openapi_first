@@ -1,0 +1,21 @@
+description: Conflict
+headers:
+  RateLimit:
+    $ref: ../headers/RateLimit.yaml
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/conflict
+      title: Conflict
+      status: 409
+      detail: There is a conflict with an existing resource.
+  application/problem+xml:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/conflict
+      title: Conflict
+      status: 409
+      detail: There is a conflict with an existing resource.

@@ -1,0 +1,21 @@
+description: Unauthorized
+headers:
+  RateLimit:
+    $ref: ../headers/RateLimit.yaml
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/unauthorized
+      title: Unauthorized
+      status: 401
+      detail: You do not have the necessary permissions.
+  application/problem+xml:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/unauthorized
+      title: Unauthorized
+      status: 401
+      detail: You do not have the necessary permissions.

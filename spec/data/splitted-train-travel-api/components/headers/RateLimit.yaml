@@ -1,0 +1,8 @@
+description: |
+  The RateLimit header communicates quota policies. It contains a `limit` to
+  convey the expiring limit, `remaining` to convey the remaining quota units,
+  and `reset` to convey the time window reset time.
+schema:
+  type: string
+  examples:
+    - limit=10, remaining=0, reset=10

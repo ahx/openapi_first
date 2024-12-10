@@ -1,0 +1,96 @@
+openapi: 3.1.0
+info:
+  title: Train Travel API
+  description: >
+    API for finding and booking train trips across Europe.
+
+
+    ## Run in Postman
+
+
+    Experiment with this API in Postman, using our Postman Collection.
+
+
+    [<img src="https://run.pstmn.io/button.svg" alt="Run In Postman"
+    style="width: 128px; height:
+    32px;">](https://app.getpostman.com/run-collection/9265903-7a75a0d0-b108-4436-ba54-c6139698dc08?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D9265903-7a75a0d0-b108-4436-ba54-c6139698dc08%26entityType%3Dcollection%26workspaceId%3Df507f69d-9564-419c-89a2-cb8e4c8c7b8f)
+
+
+    ## Run in Insomnia
+
+
+    Experiment with this API in Insomnia, using our Insomnia Collection.
+
+
+    [![Run in
+    Insomnia}](https://insomnia.rest/images/run.svg)](https://insomnia.rest/run/?label=Train%20Travel%20API&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fbump-sh-examples%2Ftrain-travel-api%2Fmain%2Finsomnia%2FInsomnia_2024-05-27.json)
+  version: 1.0.0
+  contact:
+    name: Train Support
+    url: https://example.com/support
+    email: support@example.com
+  license:
+    name: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+    identifier: CC-BY-NC-SA-4.0
+servers:
+  - url: https://api.example.com
+    description: Production
+security:
+  - OAuth2:
+      - read
+x-topics:
+  - title: Getting started
+    content:
+      $ref: ./docs/getting-started.md
+tags:
+  - name: Stations
+    description: |
+      Find and filter train stations across Europe, including their location
+      and local timezone.
+  - name: Trips
+    description: |
+      Timetables and routes for train trips between stations, including pricing
+      and availability.
+  - name: Bookings
+    description: |
+      Create and manage bookings for train trips, including passenger details
+      and optional extras.
+  - name: Payments
+    description: >
+      Pay for bookings using a card or bank account, and view payment
+
+      status and history.
+
+
+      > warn
+
+      > Bookings usually expire within 1 hour so you'll need to make your
+      payment
+
+      > before the expiry date 
+paths:
+  /stations:
+    $ref: paths/stations.yaml
+  /trips:
+    $ref: paths/trips.yaml
+  /bookings:
+    $ref: paths/bookings.yaml
+  /bookings/{bookingId}:
+    $ref: paths/bookings_{bookingId}.yaml
+  /bookings/{bookingId}/payment:
+    $ref: paths/bookings_{bookingId}_payment.yaml
+webhooks:
+  newBooking:
+    $ref: webhooks/newBooking.yaml
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      description: OAuth 2.0 authorization code following RFC8725 best practices.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+          scopes:
+            read: Read access
+            write: Write access

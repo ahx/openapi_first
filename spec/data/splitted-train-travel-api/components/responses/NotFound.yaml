@@ -1,0 +1,21 @@
+description: Not Found
+headers:
+  RateLimit:
+    $ref: ../headers/RateLimit.yaml
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/not-found
+      title: Not Found
+      status: 404
+      detail: The requested resource was not found.
+  application/problem+xml:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/not-found
+      title: Not Found
+      status: 404
+      detail: The requested resource was not found.

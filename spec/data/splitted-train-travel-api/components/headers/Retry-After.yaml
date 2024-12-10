@@ -1,0 +1,19 @@
+description: >
+  The Retry-After header indicates how long the user agent should wait before
+  making a follow-up request. 
+
+  The value is in seconds and can be an integer or a date in the future. 
+
+  If the value is an integer, it indicates the number of seconds to wait. 
+
+  If the value is a date, it indicates the time at which the user agent should
+  make a follow-up request. 
+schema:
+  type: string
+examples:
+  integer:
+    value: '120'
+    summary: Retry after 120 seconds
+  date:
+    value: Fri, 31 Dec 2021 23:59:59 GMT
+    summary: Retry after the specified date

@@ -1,0 +1,7 @@
+type: object
+properties:
+  booking:
+    type: string
+    format: uri
+    examples:
+      - https://api.example.com/bookings/1725ff48-ab45-4bb5-9d02-88745177dedb
