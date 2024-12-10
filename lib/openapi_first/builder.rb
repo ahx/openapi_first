@@ -28,14 +28,14 @@ module OpenapiFirst
       @doc = JSONSchemer.openapi(contents, configuration:)
       @config = config
       @openapi_version = (contents['openapi'] || contents['swagger'])[0..2]
-      @contents = contents
+      @contents = RefResolver.new(contents, dir: filepath && File.dirname(filepath))
     end
 
     attr_reader :openapi_version, :config
 
     def router # rubocop:disable Metrics/MethodLength
       router = OpenapiFirst::Router.new
-      RefResolver.new(@contents).fetch('paths').each do |path, path_item_object|
+      @contents.fetch('paths').each do |path, path_item_object|
         path_item_object.resolved.keys.intersection(REQUEST_METHODS).map do |request_method|
           operation_object = path_item_object[request_method]
           operation_pointer = JsonPointer.append('#', 'paths', URI::DEFAULT_PARSER.escape(path), request_method)
