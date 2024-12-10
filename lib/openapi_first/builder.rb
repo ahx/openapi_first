@@ -35,7 +35,7 @@ module OpenapiFirst
 
     def router # rubocop:disable Metrics/MethodLength
       router = OpenapiFirst::Router.new
-      RefResolver.new(@contents)['paths'].each do |path, path_item_object|
+      RefResolver.new(@contents).fetch('paths').each do |path, path_item_object|
         path_item_object.resolved.keys.intersection(REQUEST_METHODS).map do |request_method|
           operation_object = path_item_object[request_method]
           operation_pointer = JsonPointer.append('#', 'paths', URI::DEFAULT_PARSER.escape(path), request_method)
@@ -48,7 +48,7 @@ module OpenapiFirst
               content_type: request.content_type
             )
           end
-          build_responses(operation_pointer:, operation_object: operation_object.resolved).each do |response|
+          build_responses(operation_pointer:, responses: operation_object['responses'].resolved.to_a).each do |response|
             router.add_response(
               response,
               request_method:,
@@ -81,8 +81,8 @@ module OpenapiFirst
       )
     end
 
-    def build_responses(operation_pointer:, operation_object:)
-      Array(operation_object['responses']).flat_map do |status, response_object|
+    def build_responses(operation_pointer:, responses:)
+      responses.flat_map do |status, response_object|
         headers = response_object['headers']
         response_object['content']&.map do |content_type, content_object|
           content_schema = if content_object['schema']
