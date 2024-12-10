@@ -20,14 +20,14 @@ RSpec.describe OpenapiFirst::RefResolver do
   end
 
   subject(:doc) do
-    described_class.new(contents)
+    described_class.for(contents)
   end
 
   describe '#[]' do
     it 'works across files' do
       file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
       contents = OpenapiFirst::FileLoader.load(file_path)
-      doc = described_class.new(contents, dir: File.dirname(file_path))
+      doc = described_class.for(contents, dir: File.dirname(file_path))
       target = doc['paths']['/stations']['get']['responses']['200']['headers']['RateLimit']['schema']
       schema = target.resolved
       expect(schema['type']).to eq('string')
@@ -36,7 +36,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     it 'follows pointers through files' do
       file_path = './spec/data/petstore.yaml'
       contents = OpenapiFirst::FileLoader.load(file_path)
-      doc = described_class.new(contents, dir: File.dirname(file_path))
+      doc = described_class.for(contents, dir: File.dirname(file_path))
       target = doc['components']['schemas']['Pet']
 
       expect(target.value).to eq({ '$ref' => './components/schemas/pet.yaml#/Pet' })
@@ -44,7 +44,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
 
     it 'returns nil if key is not found' do
-      doc = described_class.new(contents)
+      doc = described_class.for(contents)
       expect(doc['definitions']['unknown'].resolved).to eq(nil)
     end
   end
@@ -53,13 +53,13 @@ RSpec.describe OpenapiFirst::RefResolver do
     it 'works across files' do
       file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
       contents = OpenapiFirst::FileLoader.load(file_path)
-      doc = described_class.new(contents, dir: File.dirname(file_path))
+      doc = described_class.for(contents, dir: File.dirname(file_path))
       target = doc.fetch('paths').fetch('/stations')['get']['responses']['200']['headers']['RateLimit']['schema']
       expect(target.resolved['type']).to eq('string')
     end
 
     it 'raises KeyError if key is not found' do
-      doc = described_class.new(contents)
+      doc = described_class.for(contents)
       expect do
         doc.fetch('unknown')
       end.to raise_error KeyError
@@ -82,7 +82,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
 
     it 'works with arrays' do
-      doc = described_class.new(contents)
+      doc = described_class.for(contents)
       expect(doc['array'].resolved).to eq([{ 'name' => 'A' }, { 'name' => 'B' }])
     end
   end
@@ -91,7 +91,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     it 'works across files' do
       file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
       contents = OpenapiFirst::FileLoader.load(file_path)
-      doc = described_class.new(contents, dir: File.dirname(file_path))
+      doc = described_class.for(contents, dir: File.dirname(file_path))
 
       path, path_item = doc['paths'].first
 

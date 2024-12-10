@@ -28,7 +28,7 @@ module OpenapiFirst
       @doc = JSONSchemer.openapi(contents, configuration:)
       @config = config
       @openapi_version = (contents['openapi'] || contents['swagger'])[0..2]
-      @contents = RefResolver.new(contents, dir: filepath && File.dirname(filepath))
+      @contents = RefResolver.for(contents, dir: filepath && File.dirname(filepath))
     end
 
     attr_reader :openapi_version, :config

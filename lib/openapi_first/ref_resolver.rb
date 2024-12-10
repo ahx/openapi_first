@@ -4,7 +4,7 @@ module OpenapiFirst
   # This is here to give traverse an OAD while keeping $refs intact
   # @visibility private
   module RefResolver
-    def self.new(value, context: value, dir: Dir.pwd)
+    def self.for(value, context: value, dir: Dir.pwd)
       case value
       when ::Hash
         Hash.new(value, context:, dir:)
@@ -32,17 +32,17 @@ module OpenapiFirst
           value = Hana::Pointer.new(pointer[1..]).eval(context)
           raise "Unknown reference #{pointer} in #{context}" unless value
 
-          return RefResolver.new(value, dir:)
+          return RefResolver.for(value, dir:)
         end
 
         relative_path, file_pointer = pointer.split('#')
         full_path = File.expand_path(relative_path, dir)
         file_contents = FileLoader.load(full_path)
         new_dir = File.dirname(full_path)
-        return RefResolver.new(file_contents, dir: new_dir) unless file_pointer
+        return RefResolver.for(file_contents, dir: new_dir) unless file_pointer
 
         value = Hana::Pointer.new(file_pointer).eval(file_contents)
-        RefResolver.new(value, dir: new_dir)
+        RefResolver.for(value, dir: new_dir)
       end
     end
 
@@ -67,18 +67,18 @@ module OpenapiFirst
       def [](key)
         return resolve_ref(@value['$ref'])[key] if !@value.key?(key) && @value.key?('$ref')
 
-        RefResolver.new(@value[key], dir:, context:)
+        RefResolver.for(@value[key], dir:, context:)
       end
 
       def fetch(key)
         return resolve_ref(@value['$ref']).fetch(key) if !@value.key?(key) && @value.key?('$ref')
 
-        RefResolver.new(@value.fetch(key), dir:, context:)
+        RefResolver.for(@value.fetch(key), dir:, context:)
       end
 
       def each
         resolved.each do |key, value|
-          yield key, RefResolver.new(value, dir:)
+          yield key, RefResolver.for(value, dir:)
         end
       end
     end
