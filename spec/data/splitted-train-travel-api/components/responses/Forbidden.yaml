@@ -1,0 +1,21 @@
+description: Forbidden
+headers:
+  RateLimit:
+    $ref: ../headers/RateLimit.yaml
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/forbidden
+      title: Forbidden
+      status: 403
+      detail: Access is forbidden with the provided credentials.
+  application/problem+xml:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/forbidden
+      title: Forbidden
+      status: 403
+      detail: Access is forbidden with the provided credentials.

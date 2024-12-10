@@ -1,0 +1,147 @@
+type: object
+properties:
+  id:
+    description: >-
+      Unique identifier for the payment. This will be a unique identifier for
+      the payment, and is used to reference the payment in other objects.
+    type: string
+    format: uuid
+    readOnly: true
+  amount:
+    description: >-
+      Amount intended to be collected by this payment. A positive decimal figure
+      describing the amount to be collected.
+    type: number
+    exclusiveMinimum: 0
+    examples:
+      - 49.99
+  currency:
+    description: >-
+      Three-letter [ISO currency
+      code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase.
+    type: string
+    enum:
+      - bam
+      - bgn
+      - chf
+      - eur
+      - gbp
+      - nok
+      - sek
+      - try
+  source:
+    unevaluatedProperties: false
+    description: >-
+      The payment source to take the payment from. This can be a card or a bank
+      account. Some of these properties will be hidden on read to protect PII
+      leaking.
+    anyOf:
+      - title: Card
+        description: A card (debit or credit) to take payment from.
+        properties:
+          object:
+            type: string
+            const: card
+          name:
+            type: string
+            description: Cardholder's full name as it appears on the card.
+            examples:
+              - Francis Bourgeois
+          number:
+            type: string
+            description: >-
+              The card number, as a string without any separators. On read all
+              but the last four digits will be masked for security.
+            examples:
+              - '4242424242424242'
+          cvc:
+            type: integer
+            description: >-
+              Card security code, 3 or 4 digits usually found on the back of the
+              card.
+            minLength: 3
+            maxLength: 4
+            writeOnly: true
+            example: 123
+          exp_month:
+            type: integer
+            format: int64
+            description: Two-digit number representing the card's expiration month.
+            examples:
+              - 12
+          exp_year:
+            type: integer
+            format: int64
+            description: Four-digit number representing the card's expiration year.
+            examples:
+              - 2025
+          address_line1:
+            type: string
+            writeOnly: true
+          address_line2:
+            type: string
+            writeOnly: true
+          address_city:
+            type: string
+          address_country:
+            type: string
+          address_post_code:
+            type: string
+        required:
+          - name
+          - number
+          - cvc
+          - exp_month
+          - exp_year
+          - address_country
+      - title: Bank Account
+        description: >-
+          A bank account to take payment from. Must be able to make payments in
+          the currency specified in the payment.
+        type: object
+        properties:
+          object:
+            const: bank_account
+            type: string
+          name:
+            type: string
+          number:
+            type: string
+            description: >-
+              The account number for the bank account, in string form. Must be a
+              current account.
+          sort_code:
+            type: string
+            description: >-
+              The sort code for the bank account, in string form. Must be a
+              six-digit number.
+          account_type:
+            enum:
+              - individual
+              - company
+            type: string
+            description: >-
+              The type of entity that holds the account. This can be either
+              `individual` or `company`.
+          bank_name:
+            type: string
+            description: The name of the bank associated with the routing number.
+            examples:
+              - Starling Bank
+          country:
+            type: string
+            description: Two-letter country code (ISO 3166-1 alpha-2).
+        required:
+          - name
+          - number
+          - account_type
+          - bank_name
+          - country
+  status:
+    description: The status of the payment, one of `pending`, `succeeded`, or `failed`.
+    type: string
+    enum:
+      - pending
+      - succeeded
+      - failed
+    readOnly: true

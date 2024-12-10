@@ -1,0 +1,51 @@
+type: object
+xml:
+  name: trip
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier for the trip
+    examples:
+      - 4f4e4e1-c824-4d63-b37a-d8d698862f1d
+  origin:
+    type: string
+    description: The starting station of the trip
+    examples:
+      - Berlin Hauptbahnhof
+      - Paris Gare du Nord
+  destination:
+    type: string
+    description: The destination station of the trip
+    examples:
+      - Paris Gare du Nord
+      - Berlin Hauptbahnhof
+  departure_time:
+    type: string
+    format: date-time
+    description: The date and time when the trip departs
+    examples:
+      - '2024-02-01T10:00:00Z'
+  arrival_time:
+    type: string
+    format: date-time
+    description: The date and time when the trip arrives
+    examples:
+      - '2024-02-01T16:00:00Z'
+  operator:
+    type: string
+    description: The name of the operator of the trip
+    examples:
+      - Deutsche Bahn
+      - SNCF
+  price:
+    type: number
+    description: The cost of the trip
+    examples:
+      - 50
+  bicycles_allowed:
+    type: boolean
+    description: Indicates whether bicycles are allowed on the trip
+  dogs_allowed:
+    type: boolean
+    description: Indicates whether dogs are allowed on the trip

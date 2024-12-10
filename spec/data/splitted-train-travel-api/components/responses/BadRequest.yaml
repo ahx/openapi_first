@@ -1,0 +1,21 @@
+description: Bad Request
+headers:
+  RateLimit:
+    $ref: ../headers/RateLimit.yaml
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/bad-request
+      title: Bad Request
+      status: 400
+      detail: The request is invalid or missing required parameters.
+  application/problem+xml:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/bad-request
+      title: Bad Request
+      status: 400
+      detail: The request is invalid or missing required parameters.

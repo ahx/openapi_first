@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'json_pointer'
-require_relative 'resolved'
+require_relative 'ref_resolver'
 
 module OpenapiFirst
   # Builds parts of a Definition
@@ -35,8 +35,8 @@ module OpenapiFirst
 
     def router # rubocop:disable Metrics/MethodLength
       router = OpenapiFirst::Router.new
-      Resolved.new(@contents)['paths'].each do |path, path_item_object|
-        path_item_object.slice(*REQUEST_METHODS).keys.map do |request_method|
+      RefResolver.new(@contents)['paths'].each do |path, path_item_object|
+        path_item_object.resolved.keys.intersection(REQUEST_METHODS).map do |request_method|
           operation_object = path_item_object[request_method]
           operation_pointer = JsonPointer.append('#', 'paths', URI::DEFAULT_PARSER.escape(path), request_method)
           build_requests(path:, request_method:, operation_object:, operation_pointer:,
@@ -48,7 +48,7 @@ module OpenapiFirst
               content_type: request.content_type
             )
           end
-          build_responses(operation_pointer:, operation_object:).each do |response|
+          build_responses(operation_pointer:, operation_object: operation_object.resolved).each do |response|
             router.add_response(
               response,
               request_method:,
@@ -64,19 +64,18 @@ module OpenapiFirst
 
     def build_requests(path:, request_method:, operation_object:, operation_pointer:, path_item_object:)
       hooks = config.hooks
-      path_item_parameters = path_item_object['parameters']
-      parameters = operation_object['parameters'].to_a.chain(path_item_parameters.to_a)
-      required_body = operation_object.dig('requestBody', 'required') == true
-      result = operation_object.dig('requestBody', 'content')&.map do |content_type, _content|
+      parameters = operation_object['parameters'].resolved.to_a.chain(path_item_object['parameters'].resolved.to_a)
+      required_body = operation_object['requestBody'].resolved&.fetch('required', nil) == true
+      result = operation_object['requestBody'].resolved&.fetch('content', nil)&.map do |content_type, _content|
         content_schema = @doc.ref(JsonPointer.append(operation_pointer, 'requestBody', 'content', content_type,
                                                      'schema'))
-        Request.new(path:, request_method:, operation_object:, parameters:, content_type:,
+        Request.new(path:, request_method:, operation_object: operation_object.resolved, parameters:, content_type:,
                     content_schema:, required_body:, hooks:, openapi_version:)
       end || []
       return result if required_body
 
       result << Request.new(
-        path:, request_method:, operation_object:,
+        path:, request_method:, operation_object: operation_object.resolved,
         parameters:, content_type: nil, content_schema: nil,
         required_body:, hooks:, openapi_version:
       )

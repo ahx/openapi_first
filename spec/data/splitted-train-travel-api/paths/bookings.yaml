@@ -1,0 +1,128 @@
+get:
+  operationId: get-bookings
+  summary: List existing bookings
+  description: Returns a list of all trip bookings by the authenticated user.
+  tags:
+    - Bookings
+  responses:
+    '200':
+      description: A list of bookings
+      headers:
+        RateLimit:
+          $ref: ../components/headers/RateLimit.yaml
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../components/schemas/Wrapper-Collection.yaml
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ../components/schemas/Booking.yaml
+              - properties:
+                  links:
+                    allOf:
+                      - $ref: ../components/schemas/Links-Self.yaml
+                      - $ref: ../components/schemas/Links-Pagination.yaml
+          example:
+            data:
+              - id: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+                trip_id: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+                passenger_name: John Doe
+                has_bicycle: true
+                has_dog: true
+              - id: b2e783e1-c824-4d63-b37a-d8d698862f1d
+                trip_id: b2e783e1-c824-4d63-b37a-d8d698862f1d
+                passenger_name: Jane Smith
+                has_bicycle: false
+                has_dog: false
+            links:
+              self: https://api.example.com/bookings
+              next: https://api.example.com/bookings?page=2
+        application/xml:
+          schema:
+            allOf:
+              - $ref: ../components/schemas/Wrapper-Collection.yaml
+              - properties:
+                  data:
+                    type: array
+                    xml:
+                      name: bookings
+                      wrapped: true
+                    items:
+                      $ref: ../components/schemas/Booking.yaml
+              - properties:
+                  links:
+                    allOf:
+                      - $ref: ../components/schemas/Links-Self.yaml
+                      - $ref: ../components/schemas/Links-Pagination.yaml
+    '400':
+      $ref: ../components/responses/BadRequest.yaml
+    '401':
+      $ref: ../components/responses/Unauthorized.yaml
+    '403':
+      $ref: ../components/responses/Forbidden.yaml
+    '429':
+      $ref: ../components/responses/TooManyRequests.yaml
+    '500':
+      $ref: ../components/responses/InternalServerError.yaml
+post:
+  operationId: create-booking
+  summary: Create a booking
+  description: >-
+    A booking is a temporary hold on a trip. It is not confirmed until the
+    payment is processed.
+  tags:
+    - Bookings
+  security:
+    - OAuth2:
+        - write
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/Booking.yaml
+      application/xml:
+        schema:
+          $ref: ../components/schemas/Booking.yaml
+  responses:
+    '201':
+      description: Booking successful
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../components/schemas/Booking.yaml
+              - properties:
+                  links:
+                    $ref: ../components/schemas/Links-Self.yaml
+          example:
+            id: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+            trip_id: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+            passenger_name: John Doe
+            has_bicycle: true
+            has_dog: true
+            links:
+              self: >-
+                https://api.example.com/bookings/efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+        application/xml:
+          schema:
+            allOf:
+              - $ref: ../components/schemas/Booking.yaml
+              - properties:
+                  links:
+                    $ref: ../components/schemas/Links-Self.yaml
+    '400':
+      $ref: ../components/responses/BadRequest.yaml
+    '401':
+      $ref: ../components/responses/Unauthorized.yaml
+    '404':
+      $ref: ../components/responses/NotFound.yaml
+    '409':
+      $ref: ../components/responses/Conflict.yaml
+    '429':
+      $ref: ../components/responses/TooManyRequests.yaml
+    '500':
+      $ref: ../components/responses/InternalServerError.yaml

@@ -1,0 +1,16 @@
+description: >-
+  This is a generic request/response wrapper which contains both data and links
+  which serve as hypermedia controls (HATEOAS).
+type: object
+properties:
+  data:
+    description: The wrapper for a collection is an array of objects.
+    type: array
+    items:
+      type: object
+  links:
+    description: A set of hypermedia links which serve as controls for the client.
+    type: object
+    readOnly: true
+xml:
+  name: data

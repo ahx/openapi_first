@@ -1,0 +1,23 @@
+description: Too Many Requests
+headers:
+  RateLimit:
+    $ref: ../headers/RateLimit.yaml
+  Retry-After:
+    $ref: ../headers/Retry-After.yaml
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/too-many-requests
+      title: Too Many Requests
+      status: 429
+      detail: You have exceeded the rate limit.
+  application/problem+xml:
+    schema:
+      $ref: ../schemas/Problem.yaml
+    example:
+      type: https://example.com/errors/too-many-requests
+      title: Too Many Requests
+      status: 429
+      detail: You have exceeded the rate limit.
