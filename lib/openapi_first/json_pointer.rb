@@ -16,7 +16,7 @@ module OpenapiFirst
     end
 
     def escape_json_pointer_token(token)
-      token.gsub(ESCAPE_REGEX, ESCAPE_CHARS)
+      token.to_s.gsub(ESCAPE_REGEX, ESCAPE_CHARS)
     end
   end
 end
