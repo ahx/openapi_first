@@ -20,7 +20,15 @@ RSpec.describe OpenapiFirst::ResponseParser do
       expect(parsed.body).to eq('foo' => 'bar')
     end
 
-    context 'without json content-type' do
+    context 'with a non json content-type' do
+      let(:content_type) { 'text/plain' }
+
+      it 'returns the plain body' do
+        expect(parsed.body).to eq('{"foo":"bar"}')
+      end
+    end
+
+    context 'when request has no content-type' do
       let(:rack_response) do
         Rack::Response.new(JSON.dump({ foo: :bar }))
       end

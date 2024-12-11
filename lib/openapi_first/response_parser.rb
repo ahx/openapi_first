@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'response_body_parser'
+
 module OpenapiFirst
   ParsedResponse = Data.define(:body, :headers)
 
@@ -7,12 +9,13 @@ module OpenapiFirst
   class ResponseParser
     def initialize(headers:, content_type:)
       @headers = headers
-      @json = /json/i.match?(content_type)
+      @body_parser = ResponseBodyParser[content_type]
     end
 
     def parse(rack_response)
+      body = read_body(rack_response)
       ParsedResponse.new(
-        body: parse_body(read_body(rack_response)),
+        body: @body_parser.call(body),
         headers: parse_headers(rack_response)
       )
     end
@@ -20,20 +23,6 @@ module OpenapiFirst
     private
 
     attr_reader :headers
-
-    def json? = @json
-
-    def parse_body(body)
-      return parse_json(body) if json?
-
-      body
-    end
-
-    def parse_json(body)
-      MultiJson.load(body)
-    rescue MultiJson::ParseError
-      Failure.fail!(:invalid_response_body, message: 'Response body is invalid: Failed to parse response body as JSON')
-    end
 
     def read_body(rack_response)
       buffered_body = +''
