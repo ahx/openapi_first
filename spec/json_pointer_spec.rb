@@ -7,6 +7,11 @@ RSpec.describe OpenapiFirst::JsonPointer do
       expect(result).to eq('#/~1stations/~0italy')
     end
 
+    it 'works with integer statuses' do
+      result = described_class.append('#', 'responses', 201, 'content')
+      expect(result).to eq('#/responses/201/content')
+    end
+
     it 'URL escapes plus' do
       result = described_class.append('#', '/responses', 'content', 'application/problem+json')
       expect(result).to eq('#/~1responses/content/application~1problem%2Bjson')
