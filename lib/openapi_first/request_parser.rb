@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 require 'openapi_parameters'
-require_relative 'body_parser'
+require_relative 'request_body_parsers'
 
 module OpenapiFirst
+  ParsedRequest = Data.define(:path, :query, :headers, :body, :cookies)
+
   # Parse a request
   class RequestParser
     def initialize(
@@ -17,19 +19,19 @@ module OpenapiFirst
       @path_parser = OpenapiParameters::Path.new(path_parameters) if path_parameters
       @headers_parser = OpenapiParameters::Header.new(header_parameters) if header_parameters
       @cookies_parser = OpenapiParameters::Cookie.new(cookie_parameters) if cookie_parameters
-      @body_parser = BodyParser[content_type] if content_type
+      @body_parsers = RequestBodyParsers[content_type] if content_type
     end
 
     attr_reader :query, :path, :headers, :cookies
 
     def parse(request, route_params:)
-      result = {}
-      result[:path] = @path_parser.unpack(route_params) if @path_parser
-      result[:query] = @query_parser.unpack(request.env[Rack::QUERY_STRING]) if @query_parser
-      result[:headers] = @headers_parser.unpack_env(request.env) if @headers_parser
-      result[:cookies] = @cookies_parser.unpack(request.env[Rack::HTTP_COOKIE]) if @cookies_parser
-      result[:body] = @body_parser.call(request) if @body_parser
-      result
+      ParsedRequest.new(
+        path: @path_parser&.unpack(route_params),
+        query: @query_parser&.unpack(request.env[Rack::QUERY_STRING]),
+        headers: @headers_parser&.unpack_env(request.env),
+        cookies: @cookies_parser&.unpack(request.env[Rack::HTTP_COOKIE]),
+        body: @body_parsers&.call(request)
+      )
     end
   end
 end

@@ -41,7 +41,7 @@ RSpec.describe OpenapiFirst::RequestParser do
   describe '#parse' do
     it 'returns all parsed values' do
       parsed = parser.parse(rack_request, route_params: { 'id' => '1' })
-      expect(parsed).to eq(
+      expect(parsed).to have_attributes(
         path: { 'id' => 1 },
         query: { 'limit' => 3 },
         headers: { 'X-Api-Key' => 'secret' },
@@ -57,7 +57,7 @@ RSpec.describe OpenapiFirst::RequestParser do
 
       it 'returns empty values' do
         parsed = parser.parse(rack_request, route_params: { 'id' => '1' })
-        expect(parsed).to eq(
+        expect(parsed).to have_attributes(
           path: { 'id' => 1 },
           query: {},
           headers: {},
@@ -80,7 +80,7 @@ RSpec.describe OpenapiFirst::RequestParser do
 
       it 'does not include other fields' do
         parsed = parser.parse(rack_request, route_params: { 'id' => '1' })
-        expect(parsed).to eq(
+        expect(parsed).to have_attributes(
           query: { 'limit' => 3 },
           body: { 'name' => 'Hans' }
         )
@@ -100,7 +100,7 @@ RSpec.describe OpenapiFirst::RequestParser do
 
       it 'does not include the body' do
         parsed = parser.parse(rack_request, route_params: { 'id' => '1' })
-        expect(parsed).to eq(
+        expect(parsed).to have_attributes(
           query: { 'limit' => 3 }
         )
       end

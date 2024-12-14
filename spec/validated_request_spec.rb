@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 RSpec.describe OpenapiFirst::ValidatedRequest do
+  let(:parsed_request) { OpenapiFirst::ParsedRequest.new(nil, nil, nil, nil, nil) }
+
   let(:valid_request) do
     described_class.new(
       Rack::Request.new(Rack::MockRequest.env_for('/')),
-      parsed_values: {},
+      parsed_request:,
       error: nil,
       request_definition: double(:request_definition)
     )
@@ -28,13 +30,13 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
   let(:request_with_values) do
     described_class.new(
       Rack::Request.new(Rack::MockRequest.env_for('/')),
-      parsed_values: {
+      parsed_request: double(
         path: { 'name' => 42 },
         query: { 'name' => 42 },
         headers: { 'name' => 42 },
         cookies: { 'name' => 42 },
         body: { 'name' => 42 }
-      },
+      ),
       error: nil
     )
   end
@@ -71,16 +73,16 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
 
   describe '#parsed_params' do
     it 'returns merged path, query and body params' do
-      parsed_values = {
+      parsed_request = double(
         path: { 'winner' => 'path' },
         query: { 'winner' => 'query', 'my-query' => 'query' },
         headers: { 'winner' => 'headers', 'my-header' => 'header' },
         cookies: { 'winner' => 'cookies', 'my-cookie' => 'cookie' },
         body: { 'winner' => 'body', 'my-body' => 'body' }
-      }
+      )
       request = described_class.new(
         Rack::Request.new(Rack::MockRequest.env_for('/')),
-        parsed_values:,
+        parsed_request:,
         error: nil
       )
       expect(request.parsed_params).to eq({
@@ -103,27 +105,11 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     it 'returns the parameters' do
       expect(request_with_values.parsed_path_parameters['name']).to eq(42)
     end
-
-    it 'returns an empty hash if no path params are given' do
-      request = described_class.new(
-        Rack::Request.new(Rack::MockRequest.env_for('/')),
-        error: nil
-      )
-      expect(request.parsed_path_parameters).to eq({})
-    end
   end
 
   describe '#parsed_query' do
     it 'returns the parameters' do
       expect(request_with_values.parsed_query['name']).to eq(42)
-    end
-
-    it 'returns an empty hash if no query params are given' do
-      request = described_class.new(
-        Rack::Request.new(Rack::MockRequest.env_for('/')),
-        error: nil
-      )
-      expect(request.parsed_query).to eq({})
     end
   end
 
@@ -131,27 +117,11 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     it 'returns the parameters' do
       expect(request_with_values.parsed_headers['name']).to eq(42)
     end
-
-    it 'returns an empty hash if no path params are given' do
-      request = described_class.new(
-        Rack::Request.new(Rack::MockRequest.env_for('/')),
-        error: nil
-      )
-      expect(request.parsed_headers).to eq({})
-    end
   end
 
   describe '#parsed_cookies' do
     it 'returns the parameters' do
       expect(request_with_values.parsed_cookies['name']).to eq(42)
-    end
-
-    it 'returns an empty hash if no path params are given' do
-      request = described_class.new(
-        Rack::Request.new(Rack::MockRequest.env_for('/')),
-        error: nil
-      )
-      expect(request.parsed_cookies).to eq({})
     end
   end
 
@@ -160,18 +130,10 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       expect(request_with_values.parsed_body['name']).to eq(42)
     end
 
-    it 'returns an empty hash if no path params are given' do
+    it 'can return false' do
       request = described_class.new(
         Rack::Request.new(Rack::MockRequest.env_for('/')),
-        error: nil
-      )
-      expect(request.parsed_body).to eq({})
-    end
-
-    it 'can return falsy values' do
-      request = described_class.new(
-        Rack::Request.new(Rack::MockRequest.env_for('/')),
-        parsed_values: { body: false },
+        parsed_request: double(body: false),
         error: nil
       )
       expect(request.parsed_body).to eq(false)
@@ -182,7 +144,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     it 'returns the operationId value of the operation' do
       request = described_class.new(
         Rack::Request.new(Rack::MockRequest.env_for('/')),
-        parsed_values: {},
+        parsed_request:,
         error: nil,
         request_definition: instance_double(OpenapiFirst::Request, operation_id: 'createPets')
       )
@@ -195,7 +157,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       request_definition = double(:request_definition)
       request = described_class.new(
         Rack::Request.new(Rack::MockRequest.env_for('/')),
-        parsed_values: {},
+        parsed_request:,
         error: nil,
         request_definition:
       )
@@ -208,7 +170,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
       operation = { 'operationId' => 'createPets' }
       request = described_class.new(
         Rack::Request.new(Rack::MockRequest.env_for('/')),
-        parsed_values: {},
+        parsed_request:,
         error: nil,
         request_definition: instance_double(OpenapiFirst::Request, operation:)
       )

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'response_body_parser'
+require_relative 'response_body_parsers'
 
 module OpenapiFirst
   ParsedResponse = Data.define(:body, :headers)
@@ -8,21 +8,18 @@ module OpenapiFirst
   # Parse a response
   class ResponseParser
     def initialize(headers:, content_type:)
-      @headers = headers
-      @body_parser = ResponseBodyParser[content_type]
+      @headers_parser = build_headers_parser(headers)
+      @body_parser = ResponseBodyParsers[content_type]
     end
 
     def parse(rack_response)
-      body = read_body(rack_response)
       ParsedResponse.new(
-        body: @body_parser.call(body),
-        headers: parse_headers(rack_response)
+        body: @body_parser.call(read_body(rack_response)),
+        headers: @headers_parser.call(rack_response.headers)
       )
     end
 
     private
-
-    attr_reader :headers
 
     def read_body(rack_response)
       buffered_body = +''
@@ -33,14 +30,11 @@ module OpenapiFirst
       rack_response.body
     end
 
-    def parse_headers(rack_response)
-      return {} if headers.nil?
-
-      # TODO: memoize unpacker
-      headers_as_parameters = headers.map do |name, definition|
+    def build_headers_parser(header_definitions)
+      headers_as_parameters = header_definitions.to_a.map do |name, definition|
         definition.merge('name' => name, 'in' => 'header')
       end
-      OpenapiParameters::Header.new(headers_as_parameters).unpack(rack_response.headers)
+      OpenapiParameters::Header.new(headers_as_parameters).method(:unpack)
     end
   end
 end

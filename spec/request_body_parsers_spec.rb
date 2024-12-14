@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::BodyParser do
+RSpec.describe OpenapiFirst::RequestBodyParsers do
   include Rack::Test::Methods
 
   def app = ->(_env) { Rack::Response.new.finish }
