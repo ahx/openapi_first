@@ -38,10 +38,6 @@ RSpec.describe 'Request body validation' do
       }
     end
 
-    let(:response_body) do
-      json_load(last_response.body, symbolize_keys: true)
-    end
-
     it 'works with stringio' do
       header Rack::CONTENT_TYPE, 'application/json'
       io = StringIO.new(json_dump(request_body))
@@ -295,9 +291,7 @@ RSpec.describe 'Request body validation' do
       let(:app) do
         Rack::Builder.new do
           use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/readonly.yaml', raise_error: true
-          run lambda { |_env|
-            Rack::Response.new('hello', 200).finish
-          }
+          run ->(_) {}
         end
       end
 

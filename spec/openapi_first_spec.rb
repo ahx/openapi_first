@@ -16,13 +16,6 @@ RSpec.describe OpenapiFirst do
 
   let(:spec_path) { './spec/data/petstore-expanded.yaml' }
 
-  let(:request_body) do
-    {
-      'type' => 'pet',
-      'attributes' => { 'name' => 'Frido' }
-    }
-  end
-
   describe '.parse' do
     it 'loads a Hash' do
       definition = OpenapiFirst.parse(YAML.safe_load_file('./spec/data/petstore.yaml'))

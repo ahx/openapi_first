@@ -15,12 +15,8 @@ RSpec.describe OpenapiFirst::Configuration do
 
     it 'adds multiple actions' do
       config = OpenapiFirst::Configuration.new
-      config.after_request_validation do |request|
-        request
-      end
-      config.after_request_validation do |request|
-        request
-      end
+      config.after_request_validation { _1 }
+      config.after_request_validation { _1 }
 
       expect(config.hooks[:after_request_validation].size).to eq(2)
     end

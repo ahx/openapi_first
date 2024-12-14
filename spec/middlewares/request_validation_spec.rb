@@ -45,9 +45,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
       Rack::Builder.app do
         use(OpenapiFirst::Middlewares::RequestValidation,
             spec: File.expand_path('../data/petstore-expanded.yaml', __dir__))
-        run lambda { |_env|
-          Rack::Response.new('hello', 200).finish
-        }
+        run ->(_) {}
       end
     end
 
@@ -80,9 +78,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
       Rack::Builder.app do
         use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
                                                           error_response: :default
-        run lambda { |_env|
-          Rack::Response.new('hello', 200).finish
-        }
+        run ->(_) {}
       end
     end
 
@@ -105,9 +101,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
       Rack::Builder.app do
         use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
                                                           error_response: custom_class
-        run lambda { |_env|
-          Rack::Response.new('hello', 200).finish
-        }
+        run ->(_) {}
       end
     end
 
@@ -189,9 +183,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
       Rack::Builder.app do
         use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
                                                           error_response: nil
-        run lambda { |_env|
-          Rack::Response.new('hello', 200).finish
-        }
+        run ->(_) {}
       end
     end
 
