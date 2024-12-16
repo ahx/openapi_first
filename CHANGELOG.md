@@ -5,6 +5,7 @@
 - Fix support for discriminator in response bodies if no mapping is defined (https://github.com/ahx/openapi_first/issues/285)
 - Fix support for discriminator in request bodies if no mapping is defined
 - Replace bundled json_refs fork with own code
+- Better error messages when OpenAPI file has invalid references ("$ref")
 
 ## 2.1.1
 
