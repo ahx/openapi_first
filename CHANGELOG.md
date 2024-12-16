@@ -6,6 +6,7 @@
 - Fix support for discriminator in request bodies if no mapping is defined
 - Replace bundled json_refs fork with own code
 - Better error messages when OpenAPI file has invalid references ("$ref")
+- Autoload OpenapiFirst::Test module. There is no need to `require 'openapi_first/test'` anymore.
 
 ## 2.1.1
 

@@ -13,6 +13,8 @@ require_relative 'openapi_first/middlewares/request_validation'
 
 # OpenapiFirst is a toolchain to build HTTP APIS based on OpenAPI API descriptions.
 module OpenapiFirst
+  autoload :Test, 'openapi_first/test'
+
   # Key in rack to find instance of Request
   REQUEST = 'openapi.request'
   FAILURE = :openapi_first_validation_failure

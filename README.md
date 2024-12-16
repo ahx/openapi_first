@@ -210,7 +210,6 @@ Here is how to set it up for Rails integration tests:
 
 ```ruby
 # test_helper.rb
-require 'openapi_first/test'
 OpenapiFirst::Test.register('openapi/v1.openapi.yaml')
 ```
 
