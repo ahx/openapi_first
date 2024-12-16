@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 RSpec.describe OpenapiFirst::ValidatedRequest do
-  let(:parsed_request) { OpenapiFirst::ParsedRequest.new(nil, nil, nil, nil, nil) }
+  let(:path) { nil }
+  let(:query) { nil }
+  let(:headers) { nil }
+  let(:cookies) { nil }
+  let(:body) { nil }
+  let(:parsed_request) { OpenapiFirst::ParsedRequest.new(path:, query:, headers:, cookies:, body:) }
 
   let(:valid_request) do
     described_class.new(
@@ -97,7 +102,40 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
         Rack::Request.new(Rack::MockRequest.env_for('/')),
         error: nil
       )
-      expect(request.parsed_params).to be_empty
+      expect(request.parsed_params).to eq({})
+    end
+
+    it 'is never empty if one parsed values is not empty' do
+      [nil, { 'a' => 'b' }, nil].permutation do |path, query, body|
+        request = described_class.new(
+          Rack::Request.new(Rack::MockRequest.env_for('/')),
+          parsed_request: OpenapiFirst::ParsedRequest.new(path:, query:, body:, headers: nil, cookies: nil),
+          error: nil
+        )
+        expect(request.parsed_params).to eq({ 'a' => 'b' })
+      end
+    end
+
+    it 'prefers query over body' do
+      query = { 'a' => 'b' }
+      body = { 'a' => 'frombody' }
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        parsed_request: OpenapiFirst::ParsedRequest.new(path: nil, query:, body:, headers: nil, cookies: nil),
+        error: nil
+      )
+      expect(request.parsed_params).to eq({ 'a' => 'b' })
+    end
+
+    it 'prefers path over query' do
+      path = { 'a' => 'b' }
+      query = { 'a' => 'fromquery' }
+      request = described_class.new(
+        Rack::Request.new(Rack::MockRequest.env_for('/')),
+        parsed_request: OpenapiFirst::ParsedRequest.new(path:, query:, body: nil, headers: nil, cookies: nil),
+        error: nil
+      )
+      expect(request.parsed_params).to eq({ 'a' => 'b' })
     end
   end
 
