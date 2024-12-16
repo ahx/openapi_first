@@ -93,11 +93,40 @@ RSpec.describe OpenapiFirst::RefResolver do
       contents = OpenapiFirst::FileLoader.load(file_path)
       doc = described_class.for(contents, dir: File.dirname(file_path))
 
-      path, path_item = doc['paths'].first
+      items = []
+      doc.fetch('paths').each { |path, path_item| items << [path, path_item] }
+      path, path_item = items.first
 
       expect(path).to eq('/stations')
       ok = path_item['get']['responses']['200']
       expect(ok['headers']['RateLimit']['schema'].resolved).to include('type' => 'string')
+    end
+
+    it 'applies the correct context to resolve refs' do
+      contents = {
+        'paths' => {
+          '/' => {
+            'parameters' => [
+              { '$ref' => '#/components/parameters/page' }
+            ]
+          }
+        },
+        'components' => {
+          'parameters' => {
+            'page' => {
+              'in' => 'query',
+              'name' => 'page',
+              'schema' => {
+                'type' => 'integer'
+              }
+            }
+          }
+        }
+      }
+
+      doc = described_class.for(contents)
+      parameters = doc.fetch('paths').first[1]['parameters']
+      expect(parameters.resolved[0]['name']).to eq('page')
     end
   end
 end
