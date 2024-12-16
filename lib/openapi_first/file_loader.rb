@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  # Functions to handle $refs
   # @!visibility private
   module FileLoader
     module_function
