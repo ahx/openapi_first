@@ -9,7 +9,7 @@ RSpec.describe OpenapiFirst::RequestBodyParsers do
     subject(:parser) { described_class['application/json'] }
 
     it 'parses JSON' do
-      post '/', json_dump({ foo: 'bar' })
+      post '/', JSON.generate({ foo: 'bar' })
 
       body = parser.call(last_request)
       expect(body['foo']).to eq('bar')

@@ -78,7 +78,7 @@ module OpenapiFirst
 
       def each
         resolved.each do |key, value|
-          yield key, RefResolver.for(value, dir:)
+          yield key, RefResolver.for(value, dir:, context:)
         end
       end
     end

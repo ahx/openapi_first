@@ -48,7 +48,7 @@ RSpec.describe OpenapiFirst::ErrorResponses::Default do
     it 'renders an error about invalid body' do
       response = Rack::MockResponse[*error_response.render]
       expect(response.status).to eq(400)
-      expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
+      expect(JSON.parse(response.body, symbolize_names: true)).to eq(
         {
           title: 'Bad Request Body',
           status: 400,
@@ -100,7 +100,7 @@ RSpec.describe OpenapiFirst::ErrorResponses::Default do
     it 'renders an error about invalid parameter' do
       response = Rack::MockResponse[*error_response.render]
       expect(response.status).to eq(400)
-      expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
+      expect(JSON.parse(response.body, symbolize_names: true)).to eq(
         {
           title: 'Bad Query Parameter',
           status: 400,
@@ -142,7 +142,7 @@ RSpec.describe OpenapiFirst::ErrorResponses::Default do
     it 'renders an error about invalid parameter' do
       response = Rack::MockResponse[*error_response.render]
       expect(response.status).to eq(400)
-      expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
+      expect(JSON.parse(response.body, symbolize_names: true)).to eq(
         {
           title: 'Bad Request Header',
           status: 400,
@@ -184,7 +184,7 @@ RSpec.describe OpenapiFirst::ErrorResponses::Default do
     it 'renders an error about invalid parameter' do
       response = Rack::MockResponse[*error_response.render]
       expect(response.status).to eq(400)
-      expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
+      expect(JSON.parse(response.body, symbolize_names: true)).to eq(
         {
           title: 'Bad Request Path',
           status: 400,
@@ -226,7 +226,7 @@ RSpec.describe OpenapiFirst::ErrorResponses::Default do
     it 'renders an error about invalid parameter' do
       response = Rack::MockResponse[*error_response.render]
       expect(response.status).to eq(400)
-      expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
+      expect(JSON.parse(response.body, symbolize_names: true)).to eq(
         {
           title: 'Bad Request Cookie',
           status: 400,
@@ -254,7 +254,7 @@ RSpec.describe OpenapiFirst::ErrorResponses::Default do
     it 'renders an error about invalid parameter' do
       response = Rack::MockResponse[*error_response.render]
       expect(response.status).to eq(415)
-      expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
+      expect(JSON.parse(response.body, symbolize_names: true)).to eq(
         title: 'Unsupported Media Type',
         status: 415
       )
@@ -273,7 +273,7 @@ RSpec.describe OpenapiFirst::ErrorResponses::Default do
     it 'renders an error without pointer or code' do
       response = Rack::MockResponse[*error_response.render]
       expect(response.status).to eq(400)
-      expect(MultiJson.load(response.body, symbolize_keys: true)).to eq(
+      expect(JSON.parse(response.body, symbolize_names: true)).to eq(
         {
           title: 'Bad Request Body',
           status: 400

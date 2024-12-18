@@ -79,8 +79,6 @@ validated_response.parsed_headers
 definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
 ```
 
-OpenapiFirst uses [`multi_json`](https://rubygems.org/gems/multi_json).
-
 ## Rack Middlewares
 
 ### Request validation
@@ -210,7 +208,6 @@ Here is how to set it up for Rails integration tests:
 
 ```ruby
 # test_helper.rb
-require 'openapi_first/test'
 OpenapiFirst::Test.register('openapi/v1.openapi.yaml')
 ```
 

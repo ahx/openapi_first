@@ -5,6 +5,9 @@
 - Fix support for discriminator in response bodies if no mapping is defined (https://github.com/ahx/openapi_first/issues/285)
 - Fix support for discriminator in request bodies if no mapping is defined
 - Replace bundled json_refs fork with own code
+- Better error messages when OpenAPI file has invalid references ("$ref")
+- Autoload OpenapiFirst::Test module. There is no need to `require 'openapi_first/test'` anymore.
+- Use default json gem instead of multi_json
 
 ## 2.1.1
 

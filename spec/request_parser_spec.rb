@@ -34,7 +34,7 @@ RSpec.describe OpenapiFirst::RequestParser do
   end
 
   let(:rack_request) do
-    env = Rack::MockRequest.env_for('/pets/1?limit=3&unknown=4', 'HTTP_X_API_KEY' => 'secret', 'HTTP_COOKIE' => 'session=123', input: JSON.dump({ 'name' => 'Hans' }))
+    env = Rack::MockRequest.env_for('/pets/1?limit=3&unknown=4', 'HTTP_X_API_KEY' => 'secret', 'HTTP_COOKIE' => 'session=123', input: JSON.generate({ 'name' => 'Hans' }))
     Rack::Request.new(env)
   end
 

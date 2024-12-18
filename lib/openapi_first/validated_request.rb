@@ -67,7 +67,7 @@ module OpenapiFirst
     # Here path has the highest precedence, then query, then body.
     # @return [Hash<String, anything>]
     def parsed_params
-      @parsed_params ||= parsed_body&.merge(parsed_query, parsed_path_parameters) || {}
+      @parsed_params ||= parsed_body.to_h.merge(parsed_query, parsed_path_parameters) || {}
     end
   end
 end

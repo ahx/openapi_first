@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'yaml'
-require 'multi_json'
 require_relative 'openapi_first/file_loader'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'
@@ -13,6 +11,8 @@ require_relative 'openapi_first/middlewares/request_validation'
 
 # OpenapiFirst is a toolchain to build HTTP APIS based on OpenAPI API descriptions.
 module OpenapiFirst
+  autoload :Test, 'openapi_first/test'
+
   # Key in rack to find instance of Request
   REQUEST = 'openapi.request'
   FAILURE = :openapi_first_validation_failure

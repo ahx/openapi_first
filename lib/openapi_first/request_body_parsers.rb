@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'multi_json'
+require 'json'
 
 module OpenapiFirst
   # @!visibility private
@@ -33,8 +33,8 @@ module OpenapiFirst
 
     register(/json/i, lambda do |request|
       body = Utils.read_body(request)
-      MultiJson.load(body) unless body.nil? || body.empty?
-    rescue MultiJson::ParseError
+      JSON.parse(body) unless body.nil? || body.empty?
+    rescue JSON::ParserError
       Failure.fail!(:invalid_body, message: 'Failed to parse request body as JSON')
     end)
 

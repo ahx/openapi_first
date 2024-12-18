@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+require 'json'
+require 'yaml'
+
 module OpenapiFirst
-  # Functions to handle $refs
   # @!visibility private
   module FileLoader
     module_function

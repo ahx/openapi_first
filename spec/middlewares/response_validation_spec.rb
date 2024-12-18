@@ -18,7 +18,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
   end
 
   let(:spec) { './spec/data/petstore.yaml' }
-  let(:response_body) { json_dump([{ id: 42, name: 'hans' }]) }
+  let(:response_body) { JSON.generate([{ id: 42, name: 'hans' }]) }
   let(:status) { 200 }
   let(:headers) do
     { Rack::CONTENT_TYPE => 'application/json', 'X-HEAD' => '/api/next-page' }
@@ -117,13 +117,13 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
   context 'with a XX wildcard response status' do
     let(:spec) { './spec/data/response-code-wildcard.yaml' }
-    let(:response_body) { json_dump({}) }
+    let(:response_body) { JSON.generate({}) }
 
     context 'when 4XX (upcase) is expected and 404 is sent' do
       let(:status) { 404 }
 
       it 'does not raise an error' do
-        post '/test', json_dump({})
+        post '/test', JSON.generate({})
         expect(last_response.status).to eq 404
       end
     end
@@ -132,7 +132,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
       let(:status) { 205 }
 
       it 'does not raise an error' do
-        post '/test', json_dump({})
+        post '/test', JSON.generate({})
         expect(last_response.status).to eq 205
       end
     end
@@ -142,7 +142,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
       it 'finds the "default" response and raises an error' do
         expect do
-          post '/test', json_dump({})
+          post '/test', JSON.generate({})
         end.to raise_error OpenapiFirst::ResponseInvalidError
       end
     end
@@ -150,10 +150,10 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
   context 'with invalid response body' do
     let(:response_body) do
-      json_dump([
-                  { name: 'hans' },
-                  { id: '2', name: 'Voldemort' }
-                ])
+      JSON.generate([
+                      { name: 'hans' },
+                      { id: '2', name: 'Voldemort' }
+                    ])
     end
 
     it 'raises ResponseBodyInvalidError' do
@@ -169,12 +169,12 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
     context 'when field is sent in the response body' do
       let(:response_body) do
-        json_dump({ name: 'hans', password: 'admin' })
+        JSON.generate({ name: 'hans', password: 'admin' })
       end
 
       it 'raises an error' do
         expect do
-          post '/test', json_dump({ name: 'hans', password: 'admin' })
+          post '/test', JSON.generate({ name: 'hans', password: 'admin' })
         end.to raise_error OpenapiFirst::ResponseInvalidError
       end
     end
@@ -184,7 +184,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     let(:spec) { './spec/data/readonly.yaml' }
 
     let(:response_body) do
-      json_dump({ name: 'hans' })
+      JSON.generate({ name: 'hans' })
     end
 
     it 'raises an error if the readOnly field is missing' do
@@ -195,7 +195,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
     context 'when the readOnly field is valid' do
       let(:response_body) do
-        json_dump({ id: '42', name: 'hans' })
+        JSON.generate({ id: '42', name: 'hans' })
       end
 
       it 'does not raise an error' do
@@ -210,7 +210,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
     context 'when the field is missing' do
       let(:response_body) do
-        json_dump({})
+        JSON.generate({})
       end
 
       it 'raises an error' do
@@ -222,7 +222,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
     context 'when the field is nil' do
       let(:response_body) do
-        json_dump({ name: nil })
+        JSON.generate({ name: nil })
       end
 
       it 'does not raise an error' do
@@ -302,7 +302,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     let(:spec) { './spec/data/discriminator-refs.yaml' }
 
     context 'with an invalid response' do
-      let(:response_body) { json_dump([{ id: 1, petType: 'dog', meow: 'Huh' }]) }
+      let(:response_body) { JSON.generate([{ id: 1, petType: 'dog', meow: 'Huh' }]) }
 
       it 'fails' do
         expect do
@@ -319,10 +319,10 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
     context 'with a valid response' do
       let(:response_body) do
-        json_dump([
-                    { id: 1, petType: 'cat', meow: 'Prrr' },
-                    { id: 2, petType: 'dog', bark: 'Woof' }
-                  ])
+        JSON.generate([
+                        { id: 1, petType: 'cat', meow: 'Prrr' },
+                        { id: 2, petType: 'dog', bark: 'Woof' }
+                      ])
       end
 
       it 'succeeds' do
@@ -343,7 +343,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     let(:spec) { './spec/data/self-referencing.yaml' }
 
     context 'with an invalid response' do
-      let(:response_body) { json_dump({ bar: { foo: 1 } }) }
+      let(:response_body) { JSON.generate({ bar: { foo: 1 } }) }
 
       it 'fails' do
         expect do
@@ -353,7 +353,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     end
 
     context 'with a valid response' do
-      let(:response_body) { json_dump({ bar: { foo: 'bar' } }) }
+      let(:response_body) { JSON.generate({ bar: { foo: 'bar' } }) }
 
       it 'succeeds' do
         get '/'
@@ -370,7 +370,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
         run(lambda do |env|
           res = Rack::Response.new
           res.status = 201
-          res.headers.merge!(MultiJson.load(Rack::Request.new(env).body))
+          res.headers.merge!(JSON.parse(Rack::Request.new(env).body.read))
           res.finish
         end)
       end
@@ -381,7 +381,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     end
 
     it 'succeeds with a valid header' do
-      post '/echo', json_dump({ 'Location' => '/echos/42', 'X-Id' => '42', 'OptionalWithoutSchema' => '432' })
+      post '/echo', JSON.generate({ 'Location' => '/echos/42', 'X-Id' => '42', 'OptionalWithoutSchema' => '432' })
       expect(last_response.status).to eq 201
       expect(last_response.headers['Location']).to eq '/echos/42'
       expect(last_response.headers['X-Id']).to eq '42'
@@ -389,18 +389,18 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
     it 'fails with an invalid header' do
       expect do
-        post '/echo', json_dump({ 'Location' => '/echos/42', 'X-Id' => 'not-an-integer' })
+        post '/echo', JSON.generate({ 'Location' => '/echos/42', 'X-Id' => 'not-an-integer' })
       end.to raise_error OpenapiFirst::ResponseInvalidError
     end
 
     it 'ignores "Content-Type" header' do
-      post '/echo', json_dump({ 'Location' => '/echos/42', 'Content-Type' => 'unknown' })
+      post '/echo', JSON.generate({ 'Location' => '/echos/42', 'Content-Type' => 'unknown' })
       expect(last_response.status).to eq 201
     end
 
     it 'fails with a missing header' do
       expect do
-        post '/echo', json_dump({ 'X-Id' => '42' })
+        post '/echo', JSON.generate({ 'X-Id' => '42' })
       end.to raise_error OpenapiFirst::ResponseInvalidError
     end
   end

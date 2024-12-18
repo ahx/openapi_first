@@ -8,7 +8,7 @@ module OpenapiFirst
       OpenapiFirst.register_error_response(:jsonapi, self)
 
       def body
-        MultiJson.dump({ errors: serialized_errors })
+        JSON.generate({ errors: serialized_errors })
       end
 
       def content_type
