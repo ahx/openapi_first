@@ -42,6 +42,11 @@ RSpec.describe OpenapiFirst do
       expect(OpenapiFirst.load(spec_path)).to be_a OpenapiFirst::Definition
     end
 
+    it 'works with a lot of references' do
+      definition = OpenapiFirst.load('./spec/data/fullofrefs.yaml')
+      expect(definition.paths).to include('/foo')
+    end
+
     it 'works with YAML' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml')
       expect(definition.paths).to include('/pets')
