@@ -23,14 +23,37 @@ RSpec.describe OpenapiFirst::RefResolver do
     described_class.for(contents)
   end
 
+  describe '#dir' do
+    it 'returns the directory path' do
+      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
+      doc = described_class.load(file_path)
+      expect(doc.dir).to eq(File.expand_path('./spec/data/splitted-train-travel-api'))
+
+      node = doc['paths']['/stations']['get']
+      expect(node.dir).to eq(File.expand_path('./spec/data/splitted-train-travel-api/paths'))
+
+      node = node['responses']['200']['headers']['RateLimit']['schema']
+      expect(node.dir).to eq(File.expand_path('./spec/data/splitted-train-travel-api/components/headers'))
+    end
+  end
+
+  describe '#context' do
+    it 'returns the parent object' do
+      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
+      doc = described_class.load(file_path)
+      node = doc['paths']['/stations']['get']['responses']['200']
+      expect(node.context.dig('get', 'description')).to start_with('Returns a list of all train stations')
+    end
+  end
+
   describe '#[]' do
     it 'works across files' do
       file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
       contents = OpenapiFirst::FileLoader.load(file_path)
       doc = described_class.for(contents, dir: File.dirname(file_path))
-      target = doc['paths']['/stations']['get']['responses']['200']['headers']['RateLimit']['schema']
-      schema = target.resolved
-      expect(schema['type']).to eq('string')
+      node = doc['paths']['/stations']['get']['responses']['200']['headers']['RateLimit']['schema']
+      expect(node.context['description']).to start_with('The RateLimit header')
+      expect(node.resolved['type']).to eq('string')
     end
 
     it 'follows pointers through files' do

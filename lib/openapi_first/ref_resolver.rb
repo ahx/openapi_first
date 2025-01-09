@@ -4,6 +4,11 @@ module OpenapiFirst
   # This is here to give traverse an OAD while keeping $refs intact
   # @visibility private
   module RefResolver
+    def self.load(file_path)
+      contents = OpenapiFirst::FileLoader.load(file_path)
+      self.for(contents, dir: File.dirname(File.expand_path(file_path)))
+    end
+
     def self.for(value, context: value, dir: Dir.pwd)
       case value
       when ::Hash
@@ -23,9 +28,12 @@ module OpenapiFirst
         @dir = dir
       end
 
-      attr_accessor :value
-      private attr_accessor :dir
-      private attr_accessor :context
+      # The value of this node
+      attr_reader :value
+      # The path of the file sytem directory where this was loaded from
+      attr_reader :dir
+      # The object where this node was found in
+      attr_reader :context
 
       def resolve_ref(pointer)
         if pointer.start_with?('#')
@@ -37,10 +45,10 @@ module OpenapiFirst
 
         relative_path, file_pointer = pointer.split('#')
         full_path = File.expand_path(relative_path, dir)
+        return RefResolver.load(full_path) unless file_pointer
+
         file_contents = FileLoader.load(full_path)
         new_dir = File.dirname(full_path)
-        return RefResolver.for(file_contents, dir: new_dir) unless file_pointer
-
         value = Hana::Pointer.new(file_pointer).eval(file_contents)
         RefResolver.for(value, dir: new_dir)
       end
