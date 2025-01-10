@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json_schemer'
+
 module OpenapiFirst
   # This is here to give traverse an OAD while keeping $refs intact
   # @visibility private
@@ -15,8 +17,21 @@ module OpenapiFirst
         Hash.new(value, context:, dir:)
       when ::Array
         Array.new(value, context:, dir:)
+      when ::NilClass
+        nil
       else
         Simple.new(value)
+      end
+    end
+
+    # @visibility private
+    module Diggable
+      def dig(*keys)
+        keys.inject(self) do |result, key|
+          break unless result.respond_to?(:[])
+
+          result[key]
+        end
       end
     end
 
@@ -64,6 +79,7 @@ module OpenapiFirst
     # @visibility private
     class Hash
       include Resolvable
+      include Diggable
       include Enumerable
 
       def resolved
@@ -89,11 +105,27 @@ module OpenapiFirst
           yield key, RefResolver.for(value, dir:, context:)
         end
       end
+
+      def schema(options = {})
+        ref_resolver = JSONSchemer::CachedResolver.new do |uri|
+          FileLoader.load(File.join(dir, uri.path))
+        end
+        root = JSONSchemer::Schema.new(context, ref_resolver:, **options)
+        JSONSchemer::Schema.new(value, nil, root, **options)
+      end
     end
 
     # @visibility private
     class Array
       include Resolvable
+      include Diggable
+
+      def [](index)
+        item = @value[index]
+        return resolve_ref(item['$ref']) if item.is_a?(::Hash) && item.key?('$ref')
+
+        RefResolver.for(item, dir:, context:)
+      end
 
       def resolved
         value.map do |item|

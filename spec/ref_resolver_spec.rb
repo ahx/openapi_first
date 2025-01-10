@@ -46,6 +46,35 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
   end
 
+  describe '#schema' do
+    it 'returns a schema' do
+      node = described_class.load('./spec/data/components/schemas/dog.yaml')
+      schema = node.schema
+      expect(schema.valid?({ bark: 'woff' })).to eq(true)
+      expect(schema.valid?({ bark: 2 })).to eq(false)
+    end
+
+    it 'accepts options' do
+      node = described_class.for({ 'properties' => {
+                                   'color' => {
+                                     'type' => 'string',
+                                     'default' => 'black'
+                                   }
+                                 } })
+      data = {}
+      schema = node.schema(insert_property_defaults: true)
+      expect(schema.valid?(data)).to eq(true)
+      expect(data['color']).to eq('black')
+    end
+
+    it 'uses the right context' do
+      node = described_class.load('./spec/data/petstore.yaml')
+      schema = node.dig('paths', '/pets/{petId}', 'get', 'responses', '200', 'content', 'application/json', 'schema').schema
+      expect(schema.valid?([{ id: 2, name: 'Spet' }])).to eq(true)
+      expect(schema.valid?([{ id: 'two', name: 'Spet' }])).to eq(false)
+    end
+  end
+
   describe '#[]' do
     it 'works across files' do
       file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
@@ -68,7 +97,57 @@ RSpec.describe OpenapiFirst::RefResolver do
 
     it 'returns nil if key is not found' do
       doc = described_class.for(contents)
-      expect(doc['definitions']['unknown'].resolved).to eq(nil)
+      expect(doc['definitions']['unknown']).to eq(nil)
+    end
+
+    it 'works with arrays' do
+      doc = described_class.for(contents)['array']
+      expect(doc[0].resolved).to eq({ 'name' => 'A' })
+      expect(doc[1].resolved).to eq({ 'name' => 'B' })
+      # expect(doc.dig('array', 1, 'name').value).to eq('B')
+      # expect(doc.dig('array', 0, 'unknown')).to eq(nil)
+      # expect(doc.dig('array', 3)).to eq(nil)
+      # expect(doc.dig('array', 3, 'name')).to eq(nil)
+    end
+  end
+
+  describe '#dig' do
+    it 'works across files' do
+      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
+      contents = OpenapiFirst::FileLoader.load(file_path)
+      doc = described_class.for(contents, dir: File.dirname(file_path))
+      node = doc.dig('paths', '/stations', 'get', 'responses', '200', 'headers', 'RateLimit', 'schema')
+      expect(node.context['description']).to start_with('The RateLimit header')
+      expect(node.resolved['type']).to eq('string')
+    end
+
+    it 'follows pointers through files' do
+      file_path = './spec/data/petstore.yaml'
+      contents = OpenapiFirst::FileLoader.load(file_path)
+      doc = described_class.for(contents, dir: File.dirname(file_path))
+      target = doc.dig('components', 'schemas', 'Pet')
+
+      expect(target.value).to eq({ '$ref' => './components/schemas/pet.yaml#/Pet' })
+      expect(target.resolved).to eq(YAML.load_file('./spec/data/components/schemas/pet.yaml')['Pet'])
+    end
+
+    it 'works with arrays' do
+      doc = described_class.for(contents)
+      expect(doc.dig('array', 0, 'name').value).to eq('A')
+      expect(doc.dig('array', 1, 'name').value).to eq('B')
+      expect(doc.dig('array', 0, 'unknown')).to eq(nil)
+      expect(doc.dig('array', 3)).to eq(nil)
+      expect(doc.dig('array', 3, 'name')).to eq(nil)
+    end
+
+    it 'returns nil if key is not found' do
+      doc = described_class.for(contents)
+      expect(doc.dig('definitions', 'unknown')).to eq(nil)
+    end
+
+    it 'returns nil if multiple keys are not found is not found' do
+      doc = described_class.for(contents)
+      expect(doc.dig('definitions', 'unknown', 'funknown')).to eq(nil)
     end
   end
 
