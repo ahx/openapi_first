@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+gemspec
+
+gem 'multi_json'
+
+group :test, :development do
+  gem 'actionpack'
+  gem 'bundler'
+  gem 'rack-test'
+  gem 'rake'
+  gem 'rspec'
+  gem 'rubocop'
+  gem 'rubocop-performance'
+  gem 'simplecov'
+end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'openapi_first/json'
 require_relative 'openapi_first/file_loader'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'
