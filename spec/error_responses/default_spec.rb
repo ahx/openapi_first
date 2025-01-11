@@ -4,7 +4,10 @@ require 'spec_helper'
 
 RSpec.describe OpenapiFirst::ErrorResponses::Default do
   let(:env) { {} }
-  let(:validation_result) { OpenapiFirst::Schema.new(schema, openapi_version: '3.1').validate(data) }
+  let(:validation_result) do
+    validation = JSONSchemer.schema(schema).validate(data)
+    OpenapiFirst::Schema::ValidationResult.new(validation)
+  end
 
   it 'returns application/problem+json' do
     error_response = described_class.new(

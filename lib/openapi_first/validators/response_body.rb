@@ -5,7 +5,7 @@ require_relative '../schema/validation_result'
 module OpenapiFirst
   module Validators
     class ResponseBody
-      def self.for(response_definition, **)
+      def self.for(response_definition)
         schema = response_definition&.content_schema
         return unless schema
 

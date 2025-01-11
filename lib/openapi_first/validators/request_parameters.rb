@@ -6,6 +6,7 @@ module OpenapiFirst
       RequestHeaders = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.headers)
+          validation = Schema::ValidationResult.new(validation.to_a)
           Failure.fail!(:invalid_header, errors: validation.errors) if validation.error?
         end
       end
@@ -13,6 +14,7 @@ module OpenapiFirst
       Path = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.path)
+          validation = Schema::ValidationResult.new(validation.to_a)
           Failure.fail!(:invalid_path, errors: validation.errors) if validation.error?
         end
       end
@@ -20,6 +22,7 @@ module OpenapiFirst
       Query = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.query)
+          validation = Schema::ValidationResult.new(validation.to_a)
           Failure.fail!(:invalid_query, errors: validation.errors) if validation.error?
         end
       end
@@ -27,6 +30,7 @@ module OpenapiFirst
       RequestCookies = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.cookies)
+          validation = Schema::ValidationResult.new(validation.to_a)
           Failure.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
         end
       end
@@ -38,11 +42,10 @@ module OpenapiFirst
         cookie_schema: RequestCookies
       }.freeze
 
-      def self.for(request_definition, openapi_version:, hooks: {})
-        after_property_validation = hooks[:after_request_parameter_property_validation]
+      def self.for(args)
         VALIDATORS.filter_map do |key, klass|
-          schema = request_definition.send(key)
-          klass.new(Schema.new(schema, after_property_validation:, openapi_version:)) if schema
+          schema = args[key]
+          klass.new(schema) if schema.value
         end
       end
     end

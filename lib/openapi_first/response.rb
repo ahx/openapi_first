@@ -9,14 +9,14 @@ module OpenapiFirst
   # This is not a direct reflecton of the OpenAPI 3.X response definition, but a combination of
   # status, content type and content schema.
   class Response
-    def initialize(status:, headers:, content_type:, content_schema:, openapi_version:)
+    def initialize(status:, headers:, headers_schema:, content_type:, content_schema:)
       @status = status
       @content_type = content_type
       @content_schema = content_schema
       @headers = headers
-      @headers_schema = build_headers_schema(headers)
+      @headers_schema = headers_schema
       @parser = ResponseParser.new(headers:, content_type:)
-      @validator = ResponseValidator.new(self, openapi_version:)
+      @validator = ResponseValidator.new(self)
     end
 
     # @attr_reader [Integer] status The HTTP status code of the response definition.
@@ -34,24 +34,6 @@ module OpenapiFirst
 
     def parse(request)
       @parser.parse(request)
-    end
-
-    def build_headers_schema(headers_object)
-      return unless headers_object&.any?
-
-      properties = {}
-      required = []
-      headers_object.each do |name, header|
-        schema = header['schema']
-        next if name.casecmp('content-type').zero?
-
-        properties[name] = schema if schema
-        required << name if header['required']
-      end
-      {
-        'properties' => properties,
-        'required' => required
-      }
     end
   end
 end

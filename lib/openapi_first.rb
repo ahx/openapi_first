@@ -6,7 +6,6 @@ require_relative 'openapi_first/errors'
 require_relative 'openapi_first/configuration'
 require_relative 'openapi_first/definition'
 require_relative 'openapi_first/version'
-require_relative 'openapi_first/schema'
 require_relative 'openapi_first/middlewares/response_validation'
 require_relative 'openapi_first/middlewares/request_validation'
 

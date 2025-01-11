@@ -19,7 +19,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
                                                                              }),
                                           headers: {},
                                           headers_schema: nil)
-    described_class.new(response_definition, openapi_version: '3.1')
+    described_class.new(response_definition)
   end
 
   context 'with a valid response' do

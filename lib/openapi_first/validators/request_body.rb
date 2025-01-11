@@ -3,9 +3,9 @@
 module OpenapiFirst
   module Validators
     class RequestBody
-      def initialize(request_definition)
-        @schema = request_definition.content_schema
-        @required = request_definition.required_request_body?
+      def initialize(content_schema:, required_request_body:)
+        @schema = content_schema
+        @required = required_request_body
       end
 
       def call(parsed_request)

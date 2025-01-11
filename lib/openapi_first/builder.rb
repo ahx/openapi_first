@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
+require 'json_schemer'
 require_relative 'json_pointer'
 require_relative 'ref_resolver'
 
 module OpenapiFirst
   # Builds parts of a Definition
   # This knows how to read a resolved OpenAPI document and build {Request} and {Response} objects.
-  class Builder
+  class Builder # rubocop:disable Metrics/ClassLength
     REQUEST_METHODS = %w[get head post put patch delete trace options].freeze
 
     # Builds a router from a resolved OpenAPI document.
@@ -22,12 +23,11 @@ module OpenapiFirst
         insert_property_defaults: true
       )
       @config = config
-      @openapi_version = (contents['openapi'] || contents['swagger'])[0..2]
       @contents = RefResolver.for(contents, dir: filepath && File.dirname(filepath))
     end
 
-    attr_reader :openapi_version, :config
-    private attr_reader :schemer_configuration, :schemer_
+    attr_reader :config
+    private attr_reader :schemer_configuration
 
     def detect_meta_schema(document, filepath)
       # Copied from JSONSchemer 🙇🏻‍♂️
@@ -50,6 +50,8 @@ module OpenapiFirst
         path_item_object.resolved.keys.intersection(REQUEST_METHODS).map do |request_method|
           operation_object = path_item_object[request_method]
           parameters = operation_object['parameters']&.resolved.to_a.chain(path_item_object['parameters']&.resolved.to_a)
+          parameters = parse_parameters(parameters)
+
           build_requests(path:, request_method:, operation_object:,
                          parameters:).each do |request|
             router.add_request(
@@ -73,6 +75,28 @@ module OpenapiFirst
       router
     end
 
+    def parse_parameters(parameters)
+      grouped_parameters = group_parameters(parameters)
+      ParsedParameters.new(
+        query: grouped_parameters[:query],
+        path: grouped_parameters[:path],
+        cookie: grouped_parameters[:cookie],
+        header: grouped_parameters[:header],
+        query_schema: build_parameter_schema(grouped_parameters[:query]),
+        path_schema: build_parameter_schema(grouped_parameters[:path]),
+        cookie_schema: build_parameter_schema(grouped_parameters[:cookie]),
+        header_schema: build_parameter_schema(grouped_parameters[:header])
+      )
+    end
+
+    def build_parameter_schema(parameters)
+      schema = build_parameters_schema(parameters)
+
+      JSONSchemer.schema(schema,
+                         configuration: schemer_configuration,
+                         after_property_validation: config.hooks[:after_request_parameter_property_validation])
+    end
+
     def build_requests(path:, request_method:, operation_object:, parameters:)
       required_body = operation_object['requestBody']&.resolved&.fetch('required', false) == true
       result = operation_object.dig('requestBody', 'content')&.map do |content_type, content_object|
@@ -84,14 +108,14 @@ module OpenapiFirst
                     operation_object: operation_object.resolved,
                     parameters:, content_type:,
                     content_schema:,
-                    required_body:, hooks: config.hooks, openapi_version:)
+                    required_body:)
       end || []
       return result if required_body
 
       result << Request.new(
         path:, request_method:, operation_object: operation_object.resolved,
         parameters:, content_type: nil, content_schema: nil,
-        required_body:, hooks: config.hooks, openapi_version:
+        required_body:
       )
     end
 
@@ -100,16 +124,71 @@ module OpenapiFirst
 
       responses.flat_map do |status, response_object|
         headers = response_object['headers']&.resolved
+        headers_schema = JSONSchemer::Schema.new(
+          build_headers_schema(headers),
+          configuration: schemer_configuration
+        )
         response_object['content']&.map do |content_type, content_object|
           content_schema = content_object['schema'].schema(configuration: schemer_configuration)
           Response.new(status:,
                        headers:,
+                       headers_schema:,
                        content_type:,
-                       content_schema:,
-                       openapi_version:)
-        end || Response.new(status:, headers:, content_type: nil,
-                            content_schema: nil, openapi_version:)
+                       content_schema:)
+        end || Response.new(status:, headers:, headers_schema:, content_type: nil,
+                            content_schema: nil)
       end
     end
+
+    IGNORED_HEADER_PARAMETERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
+    private_constant :IGNORED_HEADER_PARAMETERS
+
+    def group_parameters(parameter_definitions)
+      result = {}
+      parameter_definitions&.each do |parameter|
+        (result[parameter['in'].to_sym] ||= []) << parameter
+      end
+      result[:header]&.reject! { IGNORED_HEADER_PARAMETERS.include?(_1['name']) }
+      result
+    end
+
+    def build_headers_schema(headers_object)
+      return unless headers_object&.any?
+
+      properties = {}
+      required = []
+      headers_object.each do |name, header|
+        schema = header['schema']
+        next if name.casecmp('content-type').zero?
+
+        properties[name] = schema if schema
+        required << name if header['required']
+      end
+      {
+        'properties' => properties,
+        'required' => required
+      }
+    end
+
+    def build_parameters_schema(parameters)
+      return unless parameters
+
+      properties = {}
+      required = []
+      parameters.each do |parameter|
+        schema = parameter['schema']
+        name = parameter['name']
+        properties[name] = schema if schema
+        required << name if parameter['required']
+      end
+
+      {
+        'properties' => properties,
+        'required' => required
+      }
+    end
+
+    ParsedParameters = Data.define(:path, :query, :header, :cookie, :path_schema, :query_schema, :header_schema,
+                                   :cookie_schema)
   end
 end
