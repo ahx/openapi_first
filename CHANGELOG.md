@@ -1,5 +1,7 @@
 # Changelog
 
+- Remove warning about missing assertions when using assert_api_conform
+
 ## Unreleased
 
 ## 2.2.0
