@@ -1,10 +1,11 @@
 # Changelog
 
-- Remove warning about missing assertions when using assert_api_conform
-
 ## Unreleased
 
-- Fix issue with $ref resolving paths poiting outside directories `$ref: '../a/b.yaml'`
+## 2.2.1
+
+- Fix issue with $ref resolving paths poiting outside directories `$ref: '../a/b.yaml'` (https://github.com/ahx/openapi_first/issues/313)
+- Remove warning about missing assertions when using assert_api_conform (https://github.com/ahx/openapi_first/issues/313)
 
 ## 2.2.0
 
