@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix issue with $ref resolving paths poiting outside directories `$ref: '../a/b.yaml'`
+
 ## 2.2.0
 
 - Fix support for discriminator in response bodies if no mapping is defined (https://github.com/ahx/openapi_first/issues/285)

@@ -40,7 +40,7 @@ module OpenapiFirst
       def initialize(value, context: value, dir: nil)
         @value = value
         @context = context
-        @dir = dir
+        @dir = (dir && File.absolute_path(dir)) || Dir.pwd
       end
 
       # The value of this node
@@ -108,10 +108,11 @@ module OpenapiFirst
 
       def schema(options = {})
         ref_resolver = JSONSchemer::CachedResolver.new do |uri|
-          FileLoader.load(File.join(dir, uri.path))
+          FileLoader.load(uri.path)
         end
-        root = JSONSchemer::Schema.new(context, ref_resolver:, **options)
-        JSONSchemer::Schema.new(value, nil, root, **options)
+        base_uri = URI::File.build({ path: "#{dir}/" })
+        root = JSONSchemer::Schema.new(context, base_uri:, ref_resolver:, **options)
+        JSONSchemer::Schema.new(value, nil, root, base_uri:, **options)
       end
     end
 
