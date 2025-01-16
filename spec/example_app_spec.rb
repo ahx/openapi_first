@@ -4,11 +4,19 @@ require 'rack/test'
 require_relative 'spec_helper'
 require_relative '../examples/rack_handler'
 
+OpenapiFirst::Test.register(File.join(__dir__, '../examples/openapi.yaml'), as: :example_app)
+
 RSpec.describe 'Example App' do
   include Rack::Test::Methods
+  include OpenapiFirst::Test::Methods
 
   def app
     App
+  end
+
+  it 'is API conform' do
+    get '/'
+    assert_api_conform(status: 200, api: :example_app)
   end
 
   it 'does not explode' do
@@ -17,9 +25,8 @@ RSpec.describe 'Example App' do
     expect(JSON.parse(last_response.body)).to eq('hello' => 'world')
   end
 
-  it 'raises OpenapiFirst::NotFoundError' do
-    expect do
-      get '/unknown'
-    end.to raise_error OpenapiFirst::NotFoundError
+  it 'returns 404' do
+    get '/unknown'
+    expect(last_response.status).to eq(404)
   end
 end
