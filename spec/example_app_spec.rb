@@ -4,11 +4,13 @@ require 'rack/test'
 require_relative 'spec_helper'
 require_relative '../examples/rack_handler'
 
-OpenapiFirst::Test.register(File.join(__dir__, '../examples/openapi.yaml'), as: :example_app)
-
 RSpec.describe 'Example App' do
   include Rack::Test::Methods
   include OpenapiFirst::Test::Methods
+
+  before do
+    OpenapiFirst::Test.register(File.join(__dir__, '../examples/openapi.yaml'), as: :example_app)
+  end
 
   def app
     App

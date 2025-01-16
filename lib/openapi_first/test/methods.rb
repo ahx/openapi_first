@@ -6,12 +6,6 @@ require_relative 'plain_helpers'
 module OpenapiFirst
   # Test integration
   module Test
-    def self.minitest?(base)
-      base.include?(::Minitest::Assertions)
-    rescue NameError
-      false
-    end
-
     # Methods to use in integration tests
     module Methods
       def self.included(base)

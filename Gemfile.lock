@@ -149,6 +149,7 @@ PLATFORMS
 DEPENDENCIES
   actionpack
   bundler
+  minitest
   openapi_first!
   rack (>= 3.0.0)
   rack-test

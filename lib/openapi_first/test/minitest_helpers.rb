@@ -4,6 +4,7 @@ module OpenapiFirst
   module Test
     # Assertion methods for Minitest
     module MinitestHelpers
+      # :nocov:
       def assert_api_conform(status: nil, api: :default)
         api = OpenapiFirst::Test[api]
         request = respond_to?(:last_request) ? last_request : @request
@@ -21,6 +22,7 @@ module OpenapiFirst
         assert validated_request.valid?, validated_request.error&.exception_message
         assert validated_response.valid?, validated_response.error&.exception_message
       end
+      # :nocov:
     end
   end
 end

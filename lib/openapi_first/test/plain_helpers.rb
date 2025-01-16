@@ -7,8 +7,10 @@ module OpenapiFirst
     module PlainHelpers
       def assert_api_conform(status: nil, api: :default)
         api = OpenapiFirst::Test[api]
+        # :nocov:
         request = respond_to?(:last_request) ? last_request : @request
         response = respond_to?(:last_response) ? last_response : @response
+        # :nocov:
 
         if status && status != response.status
           raise OpenapiFirst::Error,
