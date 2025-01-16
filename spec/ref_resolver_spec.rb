@@ -73,6 +73,13 @@ RSpec.describe OpenapiFirst::RefResolver do
       expect(schema.valid?([{ id: 2, name: 'Spet' }])).to eq(true)
       expect(schema.valid?([{ id: 'two', name: 'Spet' }])).to eq(false)
     end
+
+    it 'works with relative paths in the schema' do
+      node = described_class.load('./spec/data/splitted-train-travel-api/openapi.yaml')
+      schema = node.dig('paths', '/bookings', 'get', 'responses', '200', 'content', 'application/json', 'schema').schema
+      expect(schema.valid?({ data: [{ has_bicycle: true }] })).to eq(true)
+      expect(schema.valid?({ data: [{ has_bicycle: 'red' }] })).to eq(false)
+    end
   end
 
   describe '#[]' do
