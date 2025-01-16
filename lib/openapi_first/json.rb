@@ -22,5 +22,4 @@ begin
   end
 rescue LoadError
   require 'json'
-  puts 'openapi_first uses the default json gem'
 end
