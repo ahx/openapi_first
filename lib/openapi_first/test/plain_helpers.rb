@@ -1,0 +1,26 @@
+# frozen_string_literal: true
+
+module OpenapiFirst
+  module Test
+    # Assertion methods to use when no known test framework was found
+    # These methods just raise an exception if an error was found
+    module PlainHelpers
+      def assert_api_conform(status: nil, api: :default)
+        api = OpenapiFirst::Test[api]
+        # :nocov:
+        request = respond_to?(:last_request) ? last_request : @request
+        response = respond_to?(:last_response) ? last_response : @response
+        # :nocov:
+
+        if status && status != response.status
+          raise OpenapiFirst::Error,
+                "Expected status #{status}, but got #{response.status} " \
+                "from #{request.request_method.upcase} #{request.path}."
+        end
+
+        api.validate_request(request, raise_error: true)
+        api.validate_response(request, response, raise_error: true)
+      end
+    end
+  end
+end

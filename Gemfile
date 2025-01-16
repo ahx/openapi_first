@@ -10,6 +10,7 @@ gem 'rackup'
 group :test, :development do
   gem 'actionpack'
   gem 'bundler'
+  gem 'minitest'
   gem 'rack-test'
   gem 'rake'
   gem 'rspec'

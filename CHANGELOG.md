@@ -1,5 +1,7 @@
 # Changelog
 
+- Remove warning about missing assertions when using assert_api_conform
+
 ## Unreleased
 
 - Fix issue with $ref resolving paths poiting outside directories `$ref: '../a/b.yaml'`

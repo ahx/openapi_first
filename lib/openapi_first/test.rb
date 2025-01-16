@@ -5,6 +5,12 @@ require_relative 'test/methods'
 module OpenapiFirst
   # Test integration
   module Test
+    def self.minitest?(base)
+      base.include?(::Minitest::Assertions)
+    rescue NameError
+      false
+    end
+
     class NotRegisteredError < StandardError; end
 
     DEFINITIONS = {} # rubocop:disable Style/MutableConstant
