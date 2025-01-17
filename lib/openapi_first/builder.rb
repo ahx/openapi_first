@@ -60,15 +60,15 @@ module OpenapiFirst
               path:,
               content_type: request.content_type
             )
-          end
-          build_responses(responses: operation_object['responses']).each do |response|
-            router.add_response(
-              response,
-              request_method:,
-              path:,
-              status: response.status,
-              response_content_type: response.content_type
-            )
+            build_responses(request:, responses: operation_object['responses']).each do |response|
+              router.add_response(
+                response,
+                request_method:,
+                path:,
+                status: response.status,
+                response_content_type: response.content_type
+              )
+            end
           end
         end
       end
@@ -116,18 +116,20 @@ module OpenapiFirst
                     operation_object: operation_object.resolved,
                     parameters:, content_type:,
                     content_schema:,
-                    required_body:)
+                    required_body:,
+                    key: [path, request_method, content_type].join(':'))
       end || []
       return result if required_body
 
       result << Request.new(
         path:, request_method:, operation_object: operation_object.resolved,
         parameters:, content_type: nil, content_schema: nil,
-        required_body:
+        required_body:,
+        key: [path, request_method, nil].join(':')
       )
     end
 
-    def build_responses(responses:)
+    def build_responses(responses:, request:)
       return [] unless responses
 
       responses.flat_map do |status, response_object|
@@ -142,9 +144,10 @@ module OpenapiFirst
                        headers:,
                        headers_schema:,
                        content_type:,
-                       content_schema:)
+                       content_schema:,
+                       key: [request.key, status, content_type].join(':'))
         end || Response.new(status:, headers:, headers_schema:, content_type: nil,
-                            content_schema: nil)
+                            content_schema: nil, key: [request.key, status, nil].join(':'))
       end
     end
 

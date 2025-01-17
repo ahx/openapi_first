@@ -39,6 +39,9 @@ module OpenapiFirst
       error.nil?
     end
 
+    # Returns true if the response is defined.
+    def known? = response_definition != nil
+
     # Checks if the response is invalid.
     # @return [Boolean]
     def invalid?

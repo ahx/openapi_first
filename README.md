@@ -15,6 +15,7 @@ OpenapiFirst helps to implement HTTP APIs based on an [OpenAPI](https://www.open
 - [Rack Middlewares](#rack-middlewares)
   - [Request validation](#request-validation)
   - [Response validation](#response-validation)
+- [Test coverage](#test-coverage)
 - [Test assertions](#test-assertions)
 - [Framework integration](#framework-integration)
 - [Configuration](#configuration)
@@ -200,9 +201,42 @@ use OpenapiFirst::Middlewares::ResponseValidation, spec: 'openapi.yaml' if ENV['
 | `spec:` |                 | The path to the spec file or spec loaded via `OpenapiFirst.load` |
 | `raise_error:`    | `true` (default), `false`                                                | If set to true the middleware raises `OpenapiFirst::ResponseInvalidError` or `OpenapiFirst::ResonseNotFoundError` if the response does not match the API description. |
 
-## Test assertions
+## Testing
 
-openapi_first ships with a simple but powerful Test module to run request and response validation in your tests without using the middlewares. This is designed to be used with rack-test or Ruby on Rails integration tests or request specs.
+### Test Coverage
+
+You can track which requests and responses of your API description have been called during testing!
+
+This tracks whenever a request or respose is validated via OpenapiFirst. If all of your described requests/responses have been validated successfully at least once, your coverage is 100%.
+
+Here is how to set it up:
+
+1. Wrap your app with silent request / response validation. This validates all requets/responses you do during your test run. You can use this instead of the middlewares or test assertion method.
+  ```ruby
+  def app
+    OpenapiFirst::Test.app(MyRackApp, spec: 'openapi/openapi.yaml')
+  end
+  ```
+
+2. Register all OpenAPI documents to track coverage for and start tracking
+  ```ruby
+  OpenapiFirst::Test::Coverage.register(
+    'openapi/v1.openapi.yaml',
+    'openapi/openapi.yaml'
+  )
+
+  OpenapiFirst::Test::Coverage.start
+  ```
+3. Report after your test suite has finished
+  ```ruby
+  Minitest.after_run do
+    OpenapiFirst::Test::Coverage.report
+  end
+  ```
+
+### Test assertions
+
+openapi_first ships with a simple but powerful Test method to run request and response validation in your tests without using the middlewares. This is designed to be used with rack-test or Ruby on Rails integration tests or request specs.
 
 Here is how to set it up for Rails integration tests:
 

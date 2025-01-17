@@ -3,6 +3,10 @@
 require 'minitest'
 
 RSpec.describe OpenapiFirst::Test do
+  after(:each) do
+    described_class.definitions.clear
+  end
+
   describe '.minitest?' do
     it 'detects minitest' do
       test_case = Class.new(Minitest::Test)
@@ -24,7 +28,42 @@ RSpec.describe OpenapiFirst::Test do
     end
   end
 
+  describe '.app' do
+    let(:filename) { './spec/data/dice.yaml' }
+    let(:oad) { OpenapiFirst.load(filename) }
+
+    let(:app) do
+      described_class.app(
+        ->(_env) { [200, { 'content-type' => 'application/json' }, ['1']] },
+        spec: oad
+      )
+    end
+
+    include Rack::Test::Methods
+
+    it 'silently adds request and response validation' do
+      called = []
+      oad.config.after_request_validation do
+        called << :request
+      end
+
+      oad.config.after_response_validation do
+        called << :response
+      end
+
+      post '/roll'
+
+      expect(called).to eq(%i[request response])
+    end
+  end
+
   describe '.[]' do
+    it 'complaints about an unknown api' do
+      expect do
+        described_class[:default]
+      end.to raise_error(OpenapiFirst::Test::NotRegisteredError)
+    end
+
     it 'complaints about an unknown api' do
       expect do
         described_class[:mine]
