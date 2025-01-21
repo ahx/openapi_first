@@ -118,6 +118,7 @@ module OpenapiFirst
 
     # @visibility private
     class Array
+      include Enumerable
       include Resolvable
       include Diggable
 
@@ -126,6 +127,12 @@ module OpenapiFirst
         return resolve_ref(item['$ref']) if item.is_a?(::Hash) && item.key?('$ref')
 
         RefResolver.for(item, dir:, context:)
+      end
+
+      def each
+        resolved.each do |item|
+          yield RefResolver.for(item, dir:, context:)
+        end
       end
 
       def resolved

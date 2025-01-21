@@ -49,8 +49,9 @@ module OpenapiFirst
       @contents.fetch('paths').each do |path, path_item_object|
         path_item_object.resolved.keys.intersection(REQUEST_METHODS).map do |request_method|
           operation_object = path_item_object[request_method]
-          parameters = operation_object['parameters']&.resolved.to_a.chain(path_item_object['parameters']&.resolved.to_a)
-          parameters = parse_parameters(parameters)
+          parameters = parse_parameters(
+            operation_object['parameters'].to_a.chain(path_item_object['parameters'].to_a)
+          )
 
           build_requests(path:, request_method:, operation_object:,
                          parameters:).each do |request|
@@ -76,7 +77,8 @@ module OpenapiFirst
     end
 
     def parse_parameters(parameters)
-      grouped_parameters = group_parameters(parameters)
+      resolved_parameters = resolve_parameters(parameters)
+      grouped_parameters = group_parameters(resolved_parameters)
       ParsedParameters.new(
         query: grouped_parameters[:query],
         path: grouped_parameters[:path],
@@ -87,6 +89,14 @@ module OpenapiFirst
         cookie_schema: build_parameter_schema(grouped_parameters[:cookie]),
         header_schema: build_parameter_schema(grouped_parameters[:header])
       )
+    end
+
+    def resolve_parameters(parameters)
+      parameters.map do |parameter|
+        result = parameter.resolved
+        result['schema'] = parameter['schema'].resolved
+        result
+      end
     end
 
     def build_parameter_schema(parameters)

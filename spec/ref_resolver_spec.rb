@@ -237,5 +237,31 @@ RSpec.describe OpenapiFirst::RefResolver do
       parameters = doc.fetch('paths').first[1]['parameters']
       expect(parameters.resolved[0]['name']).to eq('page')
     end
+
+    context 'when value is an array' do
+      let(:contents) do
+        {
+          'definitions' => {
+            'Thing' => { 'type' => 'object' },
+            'A' => { 'name' => 'A' }
+          },
+          'array' => [
+            { 'object' => { '$ref' => '#/definitions/A' } },
+            { 'object' => { 'name' => 'B' } }
+          ]
+        }
+      end
+
+      it 'works' do
+        results = []
+        doc['array'].each do |node|
+          results << node['object'].resolved
+        end
+        expect(results).to eq([
+                                { 'name' => 'A' },
+                                { 'name' => 'B' }
+                              ])
+      end
+    end
   end
 end
