@@ -7,10 +7,10 @@ paths:
     parameters:
       - name: petId
         in: path
+        description: Parameter with referenced schema
         required: true
         schema:
-          type: integer
-          minimum: 1
+          $ref: '#/components/schemas/petId'
     get:
       summary: Find pet by ID
       operationId: findPetById
@@ -18,16 +18,20 @@ paths:
         '200':
           description: successful
   /users/{userName}:
-    parameters: 
+    parameters:
       - name: userName
         in: path
         required: true
         schema:
           type: string
-    get: 
+    get:
       summary: Find users by user name
       operationId: findUserByUserName
       responses:
         '200':
           description: successful
-      
+components:
+  schemas:
+    petId:
+      type: integer
+      minimum: 1

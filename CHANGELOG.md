@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix parsing parameters with referenced schemas (https://github.com/ahx/openapi_first/issues/316)
+
 ## 2.2.1
 
 - Fix issue with $ref resolving paths poiting outside directories `$ref: '../a/b.yaml'` (https://github.com/ahx/openapi_first/issues/313)
