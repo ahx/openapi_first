@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.2.2
+
 - Fix parsing parameters with referenced schemas (https://github.com/ahx/openapi_first/issues/316)
 
 ## 2.2.1
