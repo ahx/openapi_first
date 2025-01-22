@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'json_schemer'
-require_relative 'json_pointer'
 require_relative 'ref_resolver'
 
 module OpenapiFirst
