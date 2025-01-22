@@ -159,6 +159,48 @@ RSpec.describe OpenapiFirst::Definition do
         expect(validated.operation_id).to eq('showPetById')
       end
     end
+
+    context 'with customized global JSONSchemer configuration' do
+      before do
+        JSONSchemer.configure do |config|
+          config.formats = { 'pete' => ->(instance, _format) { instance == 'pete' } }
+        end
+      end
+
+      let(:definition) do
+        OpenapiFirst.parse({
+                             'openapi' => '3.1.0',
+                             'paths' => {
+                               '/' => {
+                                 'post' => {
+                                   'requestBody' => {
+                                     'content' => {
+                                       'application/json' => {
+                                         'schema' => {
+                                           'type' => 'string',
+                                           'format' => 'pete'
+                                         }
+                                       }
+                                     }
+                                   }
+                                 }
+                               }
+                             }
+                           })
+      end
+
+      it 'uses the global configuration' do
+        request = Rack::Request.new(Rack::MockRequest.env_for('/', method: 'POST', input: '"bob"', 'CONTENT_TYPE' => 'application/json'))
+        expect(
+          definition.validate_request(request)
+        ).not_to be_valid
+
+        request = Rack::Request.new(Rack::MockRequest.env_for('/', method: 'POST', input: '"pete"', 'CONTENT_TYPE' => 'application/json'))
+        expect(
+          definition.validate_request(request, raise_error: true)
+        ).to be_valid
+      end
+    end
   end
 
   describe '#validate_response' do
