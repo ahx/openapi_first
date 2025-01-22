@@ -18,10 +18,10 @@ module OpenapiFirst
     end
 
     def initialize(contents, filepath:, config:)
-      @schemer_configuration = JSONSchemer::Configuration.new(
-        meta_schema: detect_meta_schema(contents, filepath),
-        insert_property_defaults: true
-      )
+      @schemer_configuration = JSONSchemer.configuration.clone
+      @schemer_configuration.meta_schema = detect_meta_schema(contents, filepath)
+      @schemer_configuration.insert_property_defaults = true
+
       @config = config
       @contents = RefResolver.for(contents, dir: filepath && File.dirname(filepath))
     end
