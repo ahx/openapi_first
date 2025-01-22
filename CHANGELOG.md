@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.2.3
+
 - Respect global JSONSchemer configuration (https://github.com/ahx/openapi_first/pull/318)
 
 ## 2.2.2
