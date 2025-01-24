@@ -68,9 +68,13 @@ RSpec.describe OpenapiFirst::RefResolver do
   end
 
   describe '#schema' do
+    let(:ref_resolver) do
+      ->(uri) { OpenapiFirst::FileLoader.load(uri.path) }
+    end
+
     it 'returns a schema' do
       node = described_class.load('./spec/data/components/schemas/dog.yaml')
-      schema = node.schema
+      schema = node.schema(ref_resolver:)
       expect(schema.valid?({ bark: 'woff' })).to eq(true)
       expect(schema.valid?({ bark: 2 })).to eq(false)
     end
@@ -90,14 +94,14 @@ RSpec.describe OpenapiFirst::RefResolver do
 
     it 'uses the right context' do
       node = described_class.load('./spec/data/petstore.yaml')
-      schema = node.dig('paths', '/pets/{petId}', 'get', 'responses', '200', 'content', 'application/json', 'schema').schema
+      schema = node.dig('paths', '/pets/{petId}', 'get', 'responses', '200', 'content', 'application/json', 'schema').schema(ref_resolver:)
       expect(schema.valid?([{ id: 2, name: 'Spet' }])).to eq(true)
       expect(schema.valid?([{ id: 'two', name: 'Spet' }])).to eq(false)
     end
 
     it 'works with relative paths in the schema' do
       node = described_class.load('./spec/data/splitted-train-travel-api/openapi.yaml')
-      schema = node.dig('paths', '/bookings', 'get', 'responses', '200', 'content', 'application/json', 'schema').schema
+      schema = node.dig('paths', '/bookings', 'get', 'responses', '200', 'content', 'application/json', 'schema').schema(ref_resolver:)
       expect(schema.valid?({ data: [{ has_bicycle: true }] })).to eq(true)
       expect(schema.valid?({ data: [{ has_bicycle: 'red' }] })).to eq(false)
     end

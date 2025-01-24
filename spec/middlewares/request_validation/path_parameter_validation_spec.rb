@@ -35,11 +35,11 @@ RSpec.describe 'Path Parameter validation' do
 
   it 'works with nested refs' do
     get '/friends?search[name]=a,b'
-    expect(last_response.status).to eq(400), last_response.body
+    expect(last_response.status).to eq(400)
 
     get '/friends?search[name]=ahmed,bo'
     expect(last_response.status).to eq(200)
-    expect(last_request.env[OpenapiFirst::REQUEST].parsed_query_parameters['search[name]']).to eq(%w[ahmed bo])
+    expect(last_request.env[OpenapiFirst::REQUEST].parsed_query['search[name]']).to eq(%w[ahmed bo])
   end
 
   context 'with valid parameters' do
