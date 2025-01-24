@@ -113,12 +113,10 @@ module OpenapiFirst
         end
       end
 
-      def schema(options = {})
-        ref_resolver = JSONSchemer::CachedResolver.new do |uri|
-          FileLoader.load(uri.path)
-        end
+      # You have to pass configuration or ref_resolver
+      def schema(options)
         base_uri = URI::File.build({ path: "#{dir}/" })
-        root = JSONSchemer::Schema.new(context, base_uri:, ref_resolver:, **options)
+        root = JSONSchemer::Schema.new(context, base_uri:, **options)
         JSONSchemer::Schema.new(value, nil, root, base_uri:, **options)
       end
     end
