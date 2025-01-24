@@ -3,6 +3,17 @@ info:
   version: 1.0.0
   title: Path Parameter Validation
 paths:
+  /friends:
+    parameters:
+      - name: search[name]
+        in: query
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: './components/schemas/name.yaml'
+    get:
+      summary: Search a friend
   /pets/{petId}:
     parameters:
       - name: petId
