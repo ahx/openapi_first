@@ -18,6 +18,11 @@ module OpenapiFirst
 
     def initialize(contents, filepath:, config:)
       @schemer_configuration = JSONSchemer.configuration.clone
+      dir = (filepath && File.absolute_path(File.dirname(filepath))) || Dir.pwd
+      @schemer_configuration.base_uri = URI::File.build({ path: "#{dir}/" })
+      @schemer_configuration.ref_resolver = JSONSchemer::CachedResolver.new do |uri|
+        FileLoader.load(uri.path)
+      end
       @schemer_configuration.meta_schema = detect_meta_schema(contents, filepath)
       @schemer_configuration.insert_property_defaults = true
 

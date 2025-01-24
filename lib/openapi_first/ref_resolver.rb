@@ -8,7 +8,7 @@ module OpenapiFirst
   module RefResolver
     def self.load(file_path)
       contents = OpenapiFirst::FileLoader.load(file_path)
-      self.for(contents, dir: File.dirname(File.expand_path(file_path)))
+      self.for(contents, dir: File.absolute_path(File.dirname(file_path)))
     end
 
     def self.for(value, context: value, dir: Dir.pwd)
@@ -106,12 +106,10 @@ module OpenapiFirst
         end
       end
 
-      def schema(options = {})
-        ref_resolver = JSONSchemer::CachedResolver.new do |uri|
-          FileLoader.load(uri.path)
-        end
+      # You have to pass configuration or ref_resolver
+      def schema(options)
         base_uri = URI::File.build({ path: "#{dir}/" })
-        root = JSONSchemer::Schema.new(context, base_uri:, ref_resolver:, **options)
+        root = JSONSchemer::Schema.new(context, base_uri:, **options)
         JSONSchemer::Schema.new(value, nil, root, base_uri:, **options)
       end
     end
