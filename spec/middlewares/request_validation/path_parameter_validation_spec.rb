@@ -22,49 +22,56 @@ RSpec.describe 'Path Parameter validation' do
     end
   end
 
-  describe '#call' do
-    it 'returns 400 if path parameter is invalid' do
-      get '/pets/not-an-integer'
+  it 'returns 400 if path parameter is invalid' do
+    get '/pets/not-an-integer'
 
-      expect(last_response.status).to eq 400
-    end
+    expect(last_response.status).to eq 400
+  end
 
-    it 'adds the converted path parameter to env' do
+  it 'adds the converted path parameter to env' do
+    get '/pets/42'
+    expect(last_request.env[OpenapiFirst::REQUEST].parsed_path_parameters['petId']).to eq 42
+  end
+
+  it 'works with nested refs' do
+    get '/friends?search[name]=a,b'
+    expect(last_response.status).to eq(400), last_response.body
+
+    get '/friends?search[name]=ahmed,bo'
+    expect(last_response.status).to eq(200)
+    expect(last_request.env[OpenapiFirst::REQUEST].parsed_query_parameters['search[name]']).to eq(%w[ahmed bo])
+  end
+
+  context 'with valid parameters' do
+    it 'succeeds for valid integer' do
       get '/pets/42'
-      expect(last_request.env[OpenapiFirst::REQUEST].parsed_path_parameters['petId']).to eq 42
+      expect(last_response.status).to eq(200)
     end
 
-    context 'with valid parameters' do
-      it 'succeeds for valid integer' do
-        get '/pets/42'
-        expect(last_response.status).to eq(200)
-      end
-
-      it 'succeeds for valid string' do
-        get '/users/joe'
-        expect(last_response.status).to eq(200)
-      end
-
-      it 'succeds for string with special characters' do
-        get '/users/joe!doe'
-        expect(last_response.status).to eq(200)
-      end
+    it 'succeeds for valid string' do
+      get '/users/joe'
+      expect(last_response.status).to eq(200)
     end
 
-    it 'returns 404 if path parameter is empty' do
-      get '/pets//'
-      expect(last_response.status).to be 404
+    it 'succeds for string with special characters' do
+      get '/users/joe!doe'
+      expect(last_response.status).to eq(200)
     end
+  end
 
-    context 'when raise_error: true' do
-      let(:raise_error_option) { true }
+  it 'returns 404 if path parameter is empty' do
+    get '/pets//'
+    expect(last_response.status).to be 404
+  end
 
-      it 'raises an error if query parameter is missing' do
-        message = 'Path segment is invalid: value at `/petId` is not an integer'
-        expect do
-          get '/pets/not-an-integer'
-        end.to raise_error OpenapiFirst::RequestInvalidError, message
-      end
+  context 'when raise_error: true' do
+    let(:raise_error_option) { true }
+
+    it 'raises an error if query parameter is missing' do
+      message = 'Path segment is invalid: value at `/petId` is not an integer'
+      expect do
+        get '/pets/not-an-integer'
+      end.to raise_error OpenapiFirst::RequestInvalidError, message
     end
   end
 end
