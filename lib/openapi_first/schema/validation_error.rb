@@ -3,7 +3,7 @@
 module OpenapiFirst
   class Schema
     # One of multiple validation errors. Returned by Schema::ValidationResult#errors.
-    ValidationError = Data.define(:message, :data_pointer, :schema_pointer, :type, :details) do
+    ValidationError = Data.define(:message, :data_pointer, :schema_pointer, :type, :details, :schema) do
       # @deprecated Please use {#message} instead
       def error
         warn 'OpenapiFirst::Schema::ValidationError#error is deprecated. Use #message instead.'
