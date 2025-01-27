@@ -20,7 +20,8 @@ module OpenapiFirst
             data_pointer: err['data_pointer'],
             schema_pointer: err['schema_pointer'],
             type: err['type'],
-            details: err['details']
+            details: err['details'],
+            schema: err['schema']
           )
         end
       end
