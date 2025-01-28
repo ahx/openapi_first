@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add more error details to validation result (https://github.com/ahx/openapi_first/pull/322)
+
 ## 2.2.3
 
 - Respect global JSONSchemer configuration (https://github.com/ahx/openapi_first/pull/318)
