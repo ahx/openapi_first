@@ -74,12 +74,18 @@ RSpec.describe OpenapiFirst::Definition do
         validated = definition.validate_request(request)
         validated.error.errors.map(&:to_h).each do |error|
           expect(error).to have_key(:value)
+          expect(error[:value]).not_to be_nil
           expect(error).to have_key(:message)
-          expect(error).to have_key(:data_pointer)
-          expect(error).to have_key(:schema_pointer)
+          expect(error[:message]).not_to be_nil
           expect(error).to have_key(:type)
-          expect(error).to have_key(:details)
+          expect(error[:type]).not_to be_nil
+          expect(error).to have_key(:data_pointer)
+          expect(error[:data_pointer]).not_to be_nil
+          expect(error).to have_key(:schema_pointer)
+          expect(error[:schema_pointer]).not_to be_nil
           expect(error).to have_key(:schema)
+          expect(error[:schema]).not_to be_nil
+          expect(error).to have_key(:details)
         end
       end
 
