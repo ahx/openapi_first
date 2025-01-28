@@ -70,6 +70,18 @@ RSpec.describe OpenapiFirst::Definition do
         expect(validated.parsed_path_parameters).to eq({ 'id' => 'foo' })
       end
 
+      it 'includes keys from json_schemer' do
+        validated = definition.validate_request(request)
+        validated.error.errors.map(&:to_h).each do |error|
+          expect(error).to have_key(:message)
+          expect(error).to have_key(:data_pointer)
+          expect(error).to have_key(:schema_pointer)
+          expect(error).to have_key(:type)
+          expect(error).to have_key(:details)
+          expect(error).to have_key(:schema)
+        end
+      end
+
       context 'with raise_error: true' do
         it 'raises an error' do
           expect do
