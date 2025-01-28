@@ -72,21 +72,15 @@ RSpec.describe OpenapiFirst::Definition do
 
       it 'includes keys from json_schemer' do
         validated = definition.validate_request(request)
-        validated.error.errors.map(&:to_h).each do |error|
-          expect(error).to have_key(:value)
-          expect(error[:value]).not_to be_nil
-          expect(error).to have_key(:message)
-          expect(error[:message]).not_to be_nil
-          expect(error).to have_key(:type)
-          expect(error[:type]).not_to be_nil
-          expect(error).to have_key(:data_pointer)
-          expect(error[:data_pointer]).not_to be_nil
-          expect(error).to have_key(:schema_pointer)
-          expect(error[:schema_pointer]).not_to be_nil
-          expect(error).to have_key(:schema)
-          expect(error[:schema]).not_to be_nil
-          expect(error).to have_key(:details)
-        end
+        expect(validated.error.errors).to contain_exactly(have_attributes(
+                                                            value: 'foo',
+                                                            message: String,
+                                                            data_pointer: '/id',
+                                                            schema_pointer: '/properties/id',
+                                                            type: 'integer',
+                                                            details: nil,
+                                                            schema: { 'type' => 'integer' }
+                                                          ))
       end
 
       context 'with raise_error: true' do
@@ -271,6 +265,19 @@ RSpec.describe OpenapiFirst::Definition do
         validated = definition.validate_response(request, response)
         expect(validated).not_to be_valid
         expect(validated.parsed_body).to eq({ 'id' => 'foo' })
+      end
+
+      it 'includes keys from json_schemer' do
+        validated = definition.validate_response(request, response)
+        expect(validated.error.errors).to contain_exactly(have_attributes(
+                                                            value: 'foo',
+                                                            message: String,
+                                                            data_pointer: '/id',
+                                                            schema_pointer: '/properties/id',
+                                                            type: 'integer',
+                                                            details: nil,
+                                                            schema: { 'type' => 'integer' }
+                                                          ))
       end
 
       context 'with raise_error: true' do
