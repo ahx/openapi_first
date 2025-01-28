@@ -73,6 +73,7 @@ RSpec.describe OpenapiFirst::Definition do
       it 'includes keys from json_schemer' do
         validated = definition.validate_request(request)
         validated.error.errors.map(&:to_h).each do |error|
+          expect(error).to have_key(:value)
           expect(error).to have_key(:message)
           expect(error).to have_key(:data_pointer)
           expect(error).to have_key(:schema_pointer)
