@@ -98,7 +98,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     end
   end
 
-  context 'with an unkown route' do
+  context 'with an unknown route' do
     it 'skips response validation' do
       get '/unknown'
       expect(last_response.status).to eq 200
@@ -402,6 +402,19 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
       expect do
         post '/echo', JSON.generate({ 'X-Id' => '42' })
       end.to raise_error OpenapiFirst::ResponseInvalidError
+    end
+  end
+
+  describe 'with Response Object references' do
+    context 'when response is valid' do
+      let(:response_body) { JSON.generate([{ id: 42, name: 'Hank', bark: 'Woof' }]) }
+
+      it 'returns no errors' do
+        get '/dogs'
+
+        expect(last_response.status).to eq 200
+        expect(last_response.body).to eq response_body
+      end
     end
   end
 end
