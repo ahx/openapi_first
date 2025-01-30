@@ -25,15 +25,6 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
   end
   let(:response) { Rack::Response.new(response_body, status, headers) }
 
-  context 'with a valid response' do
-    it 'returns no errors' do
-      get '/pets'
-
-      expect(last_response.status).to eq 200
-      expect(last_response.body).to eq response_body
-    end
-  end
-
   context 'without content-type header' do
     let(:headers) do
       { 'X-HEAD' => '/api/next-page' }
@@ -237,6 +228,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
       get '/pets'
 
       expect(last_response.status).to eq 200
+      expect(last_response.body).to eq response_body
     end
   end
 
@@ -407,7 +399,8 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
   describe 'with Response Object references' do
     context 'when response is valid' do
-      let(:response_body) { JSON.generate([{ id: 42, name: 'Hank', bark: 'Woof' }]) }
+      let(:spec) { 'spec/data/petstore-openapi-object-references.yaml' }
+      let(:response_body) { JSON.generate([{ id: 42, name: 'Hank' }]) }
 
       it 'returns no errors' do
         get '/dogs'
