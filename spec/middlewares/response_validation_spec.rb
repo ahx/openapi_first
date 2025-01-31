@@ -25,15 +25,6 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
   end
   let(:response) { Rack::Response.new(response_body, status, headers) }
 
-  context 'with a valid response' do
-    it 'returns no errors' do
-      get '/pets'
-
-      expect(last_response.status).to eq 200
-      expect(last_response.body).to eq response_body
-    end
-  end
-
   context 'without content-type header' do
     let(:headers) do
       { 'X-HEAD' => '/api/next-page' }
@@ -98,7 +89,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     end
   end
 
-  context 'with an unkown route' do
+  context 'with an unknown route' do
     it 'skips response validation' do
       get '/unknown'
       expect(last_response.status).to eq 200
@@ -237,6 +228,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
       get '/pets'
 
       expect(last_response.status).to eq 200
+      expect(last_response.body).to eq response_body
     end
   end
 
@@ -402,6 +394,54 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
       expect do
         post '/echo', JSON.generate({ 'X-Id' => '42' })
       end.to raise_error OpenapiFirst::ResponseInvalidError
+    end
+  end
+
+  describe 'with Response Object references' do
+    let(:spec) { 'spec/data/petstore-openapi-object-references.yaml' }
+
+    context 'when response is a valid 200' do
+      let(:response_body) { JSON.generate([{ id: 42, name: 'Hank' }]) }
+
+      it 'returns no errors ' do
+        get '/pets'
+
+        expect(last_response.status).to eq 200
+        expect(last_response.body).to eq response_body
+      end
+    end
+
+    context 'when response is a valid default' do
+      let(:status) { 404 }
+      let(:response_body) { JSON.generate({ code: 123, message: 'Boom!' }) }
+
+      it 'returns no errors' do
+        get '/pets'
+
+        expect(last_response.status).to eq 404
+        expect(last_response.body).to eq response_body
+      end
+    end
+
+    context 'when response is an invalid 200' do
+      let(:response_body) { JSON.generate({ id: 42, name: 'Hank' }) }
+
+      it 'raises an error' do
+        expect do
+          get '/pets'
+        end.to raise_error OpenapiFirst::ResponseInvalidError, 'Response body is invalid: value at root is not an array'
+      end
+    end
+
+    context 'when response is an invalid default' do
+      let(:status) { 404 }
+      let(:response_body) { JSON.generate({ code: 123, message: 123 }) }
+
+      it 'raises an error' do
+        expect do
+          get '/pets'
+        end.to raise_error OpenapiFirst::ResponseInvalidError, 'Response body is invalid: value at `/message` is not a string'
+      end
     end
   end
 end

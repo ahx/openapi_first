@@ -1,0 +1,70 @@
+openapi: "3.1.0"
+info:
+  version: 1.0.0
+  title: Swagger Petstore
+  license:
+    name: MIT
+servers:
+  - url: http://petstore.swagger.io/v1
+paths:
+  /pets:
+    get:
+      summary: List all pets
+      operationId: listPets
+      tags:
+        - pets
+      parameters:
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          $ref: '#/components/responses/Pets'
+        default:
+          $ref: '#/components/responses/default'
+components:
+  responses:
+    default: 
+      description: unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Pets:
+      description: A paged array of pets
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Pets"
+  schemas:
+    Pets:
+      type: array
+      title: Pets
+      items:
+        $ref: "#/components/schemas/Pet"
+    Pet:
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+          tag:
+            type: string
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

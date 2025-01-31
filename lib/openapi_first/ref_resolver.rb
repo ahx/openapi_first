@@ -55,7 +55,7 @@ module OpenapiFirst
           value = Hana::Pointer.new(pointer[1..]).eval(context)
           raise "Unknown reference #{pointer} in #{context}" unless value
 
-          return RefResolver.for(value, dir:)
+          return RefResolver.for(value, dir:, context:)
         end
 
         relative_path, file_pointer = pointer.split('#')
@@ -65,7 +65,7 @@ module OpenapiFirst
         file_contents = FileLoader.load(full_path)
         new_dir = File.dirname(full_path)
         value = Hana::Pointer.new(file_pointer).eval(file_contents)
-        RefResolver.for(value, dir: new_dir)
+        RefResolver.for(value, dir: new_dir, context: file_contents)
       end
     end
 
