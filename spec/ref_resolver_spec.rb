@@ -38,11 +38,32 @@ RSpec.describe OpenapiFirst::RefResolver do
   end
 
   describe '#context' do
-    it 'returns the parent object' do
+    it 'returns contents of the main file' do
       file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
       doc = described_class.load(file_path)
-      node = doc['paths']['/stations']['get']['responses']['200']
+      node = doc['info']
+      expect(node.context['openapi']).to eq('3.1.0')
+    end
+
+    it 'returns contents of the main file when following internal refs' do
+      file_path = './spec/data/train-travel-api/openapi.yaml'
+      doc = described_class.load(file_path)
+      node = doc['paths']['/stations']['get']['responses']['200']['headers']['RateLimit']['schema']
+      expect(node.context['openapi']).to eq('3.1.0')
+    end
+
+    it 'returns contents of the referenced file' do
+      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
+      doc = described_class.load(file_path)
+      node = doc['paths']['/stations']['get']['responses']
       expect(node.context.dig('get', 'description')).to start_with('Returns a list of all train stations')
+    end
+
+    it 'returns contents of the referenced file when pointing inside referenced files' do
+      file_path = './spec/data/petstore.yaml'
+      doc = described_class.load(file_path)
+      node = doc['components']['schemas']['Pet']['required']
+      expect(node.context).to eq(YAML.load_file('./spec/data/components/schemas/pet.yaml'))
     end
   end
 
