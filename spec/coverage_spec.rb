@@ -3,89 +3,71 @@
 require_relative '../lib/openapi_first/coverage'
 
 RSpec.describe OpenapiFirst::Coverage do
+  let(:filepath) { './spec/data/dice.yaml' }
+  let(:definition) { OpenapiFirst.load(filepath) }
+
+  before(:each) do
+    described_class.register(filepath)
+    described_class.start
+  end
+
   after(:each) do
+    described_class.stop
     described_class.reset
   end
 
-  let(:spec) do
-    {
-      'openapi' => '3.1.0',
-      'paths' => {
-        '/stuff/{id}' => {
-          'parameters' => [
-            {
-              'name' => 'id',
-              'in' => 'path',
-              'required' => true,
-              'schema' => {
-                'type' => 'integer'
-              }
-            }
-          ],
-          'get' => {
-            'responses' => {
-              '200' => {
-                'content' => {
-                  'application/json' => {
-                    'schema' => {
-                      'type' => 'object'
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  end
+  let(:valid_request) { Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST')) }
 
-  let(:definition) { OpenapiFirst.parse(spec, filepath: 'myopenapi.yaml') }
+  let(:valid_response) do
+    Rack::Response[200, { 'content-type' => 'application/json' }, ['1']]
+  end
 
   describe '.register' do
     it 'accepts a filepath' do
-      expect(described_class.register('spec/data/petstore.yaml')).to be_truthy
+      filepath = 'spec/data/petstore.yaml'
+      expect(described_class.register(filepath)).to be_truthy
+      oad = OpenapiFirst.load(filepath)
+      expect(described_class.registry[oad.filepath].filepath).to eq(oad.filepath)
+    end
+  end
+
+  describe '.start' do
+    before { described_class.stop }
+
+    it 'accepts a block' do
+      myio = StringIO.new
+      described_class.start do |config|
+        config.output = myio
+      end
     end
   end
 
   describe '.report' do
-    before do
-      allow(OpenapiFirst).to receive(:load).with(definition.filepath) { definition }
-      described_class.register(definition.filepath)
+    def output
+      io = StringIO.new
+      described_class.report(output: io)
+      io.string
+    end
+
+    context 'without any requests' do
+      specify { expect(output).to include(': 0%') }
     end
 
     context 'with full coverage' do
       before do
-        rack_request = Rack::Request.new(Rack::MockRequest.env_for('/stuff/1'))
-        definition.validate_request(rack_request)
-        rack_response = Rack::Response.new(JSON.dump({}), 200, { 'Content-Type' => 'application/json' })
-        definition.validate_response(rack_request, rack_response)
+        definition.validate_request(valid_request)
+        definition.validate_response(valid_request, valid_response)
       end
 
-      it 'logs the coverage' do
-        expect(described_class).not_to receive(:warn)
-        expect(described_class).to receive(:puts).with(/fully covered/)
-        described_class.report
-      end
+      specify { expect(output).to include(': 100%') }
     end
 
     context 'with partly coverage' do
       before do
-        rack_request = Rack::Request.new(Rack::MockRequest.env_for('/stuff/1'))
-        definition.validate_request(rack_request)
+        definition.validate_request(valid_request)
       end
 
-      it 'warns' do
-        expect(described_class).to receive(:warn).with(/not fully covered/)
-        described_class.report
-      end
-    end
-
-    context 'without any requests' do
-      it 'warns' do
-        expect(described_class).to receive(:warn).with(/not detect any requests/)
-        described_class.report
-      end
+      specify { expect(output).to include(': 50%') }
     end
   end
 end
