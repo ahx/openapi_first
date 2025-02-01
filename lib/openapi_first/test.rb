@@ -11,6 +11,14 @@ module OpenapiFirst
       false
     end
 
+    def self.wrap_app(app, spec:)
+      Rack::Builder.app do
+        use OpenapiFirst::Middlewares::ResponseValidation, spec:, raise_error: false
+        use OpenapiFirst::Middlewares::RequestValidation, spec:, raise_error: false, error_response: false
+        run app
+      end
+    end
+
     class NotRegisteredError < StandardError; end
 
     DEFINITIONS = {} # rubocop:disable Style/MutableConstant
