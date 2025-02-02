@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 require 'json_schemer'
+
+require_relative 'failure'
+require_relative 'router'
+require_relative 'header'
+require_relative 'request'
+require_relative 'response'
 require_relative 'ref_resolver'
 
 module OpenapiFirst
@@ -151,26 +157,40 @@ module OpenapiFirst
       return [] unless responses
 
       responses.flat_map do |status, response_object|
-        headers = response_object['headers']&.resolved
-        headers_schema = JSONSchemer::Schema.new(
-          build_headers_schema(headers),
-          configuration: schemer_configuration
-        )
+        headers = build_response_headers(response_object['headers'])
         response_object['content']&.map do |content_type, content_object|
           content_schema = content_object['schema'].schema(configuration: schemer_configuration)
           Response.new(status:,
                        headers:,
-                       headers_schema:,
                        content_type:,
                        content_schema:,
                        key: [request.key, status, content_type].join(':'))
-        end || Response.new(status:, headers:, headers_schema:, content_type: nil,
+        end || Response.new(status:, headers:, content_type: nil,
                             content_schema: nil, key: [request.key, status, nil].join(':'))
       end
     end
 
     IGNORED_HEADER_PARAMETERS = Set['Content-Type', 'Accept', 'Authorization'].freeze
     private_constant :IGNORED_HEADER_PARAMETERS
+
+    def build_response_headers(headers_object)
+      return if headers_object.nil?
+
+      result = []
+      headers_object.each do |name, header|
+        next if header['schema'].nil?
+        next if IGNORED_HEADER_PARAMETERS.include?(name)
+
+        header = Header.new(
+          name:,
+          schema: header['schema'].schema(configuration: schemer_configuration),
+          required?: header['required']&.value == true,
+          node: header
+        )
+        result << header
+      end
+      result
+    end
 
     def group_parameters(parameter_definitions)
       result = {}
@@ -179,24 +199,6 @@ module OpenapiFirst
       end
       result[:header]&.reject! { IGNORED_HEADER_PARAMETERS.include?(_1['name']) }
       result
-    end
-
-    def build_headers_schema(headers_object)
-      return unless headers_object&.any?
-
-      properties = {}
-      required = []
-      headers_object.each do |name, header|
-        schema = header['schema']
-        next if name.casecmp('content-type').zero?
-
-        properties[name] = schema if schema
-        required << name if header['required']
-      end
-      {
-        'properties' => properties,
-        'required' => required
-      }
     end
 
     def build_parameters_schema(parameters)

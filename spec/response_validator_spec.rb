@@ -1,25 +1,27 @@
 # frozen_string_literal: true
 
 RSpec.describe OpenapiFirst::ResponseValidator do
+  let(:content_schema) do
+    JSONSchemer.schema({
+                         'type' => 'array',
+                         'items' => {
+                           'type' => 'object',
+                           'required' => %w[id name],
+                           'properties' => {
+                             'id' => { 'type' => 'integer' },
+                             'name' => { 'type' => 'string' },
+                             'tag' => { 'type' => 'string' }
+                           }
+                         }
+                       })
+  end
+
+  let(:headers) do
+    nil
+  end
+
   subject(:validator) do
-    response_definition = instance_double(OpenapiFirst::Response,
-                                          status: '200',
-                                          content_type: 'application/json',
-                                          content_schema: JSONSchemer.schema({
-                                                                               'type' => 'array',
-                                                                               'items' => {
-                                                                                 'type' => 'object',
-                                                                                 'required' => %w[id name],
-                                                                                 'properties' => {
-                                                                                   'id' => { 'type' => 'integer' },
-                                                                                   'name' => { 'type' => 'string' },
-                                                                                   'tag' => { 'type' => 'string' }
-                                                                                 }
-                                                                               }
-                                                                             }),
-                                          headers: {},
-                                          headers_schema: nil)
-    described_class.new(response_definition)
+    described_class.new(content_schema:, headers:)
   end
 
   context 'with a valid response' do
@@ -29,7 +31,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
           { 'id' => 42, 'name' => 'hans' },
           { 'id' => 2, 'name' => 'Voldemort' }
         ],
-        headers: {}
+        headers: []
       )
     end
 
@@ -54,13 +56,32 @@ RSpec.describe OpenapiFirst::ResponseValidator do
   end
 
   context 'with an invalid response' do
+    context 'with an invalid header' do
+      let(:content_schema) do
+        nil
+      end
+      let(:headers) do
+        [
+          instance_double(OpenapiFirst::Header,
+                          name: 'x-id',
+                          schema: JSONSchemer.schema({ type: 'integer' }),
+                          required?: false)
+        ]
+      end
+
+      it 'fails' do
+        parsed_response = double(headers: { 'x-id' => 'abc' })
+        expect(subject.call(parsed_response).type).to eq(:invalid_response_header)
+      end
+    end
+
     context 'with missing property' do
       let(:parsed_response) do
         double(
           body: [
             { 'id' => 42 }
           ],
-          headers: {}
+          headers: nil
         )
       end
 
@@ -75,7 +96,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
           body: [
             { 'id' => 'string', 'name' => 'hans' }
           ],
-          headers: {}
+          headers: nil
         )
       end
 

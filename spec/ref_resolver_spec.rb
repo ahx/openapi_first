@@ -209,6 +209,14 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
   end
 
+  describe '==' do
+    it 'raises an error' do
+      expect do
+        doc['hash']['type'] == 'Dog'
+      end.to raise_error "Don't call == on an unresolved value. Use .value == other instead."
+    end
+  end
+
   describe '#resolved' do
     it 'returns the resolved value' do
       expect(doc['hash'].resolved).to eq('type' => 'object')

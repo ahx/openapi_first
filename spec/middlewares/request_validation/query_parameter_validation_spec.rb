@@ -110,14 +110,14 @@ RSpec.describe 'Query Parameter validation' do
       context 'with form style no explode parameters (default)' do
         it 'parses the array' do
           params = {
-            strings: 'a,b,c',
+            strings: 'a1,b1,c1',
             integers: '2,3,4'
           }
           get '/default-style', params
 
           expect(last_response.status).to eq(200), last_response.body
           parsed_parameters = last_request.env[OpenapiFirst::REQUEST].parsed_query
-          expect(parsed_parameters['strings']).to eq %w[a b c]
+          expect(parsed_parameters['strings']).to eq %w[a1 b1 c1]
           expect(parsed_parameters['integers']).to eq [2, 3, 4]
         end
 

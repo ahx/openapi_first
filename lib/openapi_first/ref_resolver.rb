@@ -57,6 +57,10 @@ module OpenapiFirst
 
       attr_reader :filepath
 
+      def ==(_other)
+        raise "Don't call == on an unresolved value. Use .value == other instead."
+      end
+
       def resolve_ref(pointer)
         if pointer.start_with?('#')
           value = Hana::Pointer.new(pointer[1..]).eval(context)
@@ -91,6 +95,10 @@ module OpenapiFirst
       include Resolvable
       include Diggable
       include Enumerable
+
+      def ==(_other)
+        raise "Don't call == on an unresolved value. Use .value == other instead."
+      end
 
       def resolved
         return resolve_ref(value['$ref']).value if value.key?('$ref')

@@ -4,7 +4,7 @@ require 'action_dispatch'
 
 RSpec.describe OpenapiFirst::ResponseParser do
   let(:content_type) { 'application/json' }
-  let(:headers) { {} }
+  let(:headers) { nil }
 
   subject(:parsed) do
     described_class.new(content_type:, headers:).parse(rack_response)
@@ -78,26 +78,23 @@ RSpec.describe OpenapiFirst::ResponseParser do
     let(:content_type) { nil }
 
     let(:headers) do
-      {
-        'OptionalWithoutSchema' => { description: 'optonal' },
-        'Content-Type' => {
-          'required' => true,
-          'schema' => {
-            'type' => 'string',
-            'const' => 'this should be ignored'
-          }
-        },
-        'Location' => {
-          'required' => true,
-          'schema' => {
-            'type' => 'string',
-            format: 'uri-reference'
-          }
-        },
-        'X-Id' => {
-          'schema' => { 'type' => 'integer' }
-        }
+      location_schema = {
+        'type' => 'string',
+        format: 'uri-reference'
       }
+      x_id_schema = { 'type' => 'integer' }
+      [
+        instance_double(OpenapiFirst::Header,
+                        name: 'Location',
+                        required?: true,
+                        schema: JSONSchemer::Schema.new(location_schema),
+                        resolved_schema: location_schema),
+        instance_double(OpenapiFirst::Header,
+                        name: 'X-Id',
+                        required?: false,
+                        schema: JSONSchemer::Schema.new(x_id_schema),
+                        resolved_schema: x_id_schema)
+      ]
     end
 
     let(:rack_response) do
@@ -111,7 +108,6 @@ RSpec.describe OpenapiFirst::ResponseParser do
 
     it 'returns the unpacked headers as defined in the API description' do
       expect(parsed.headers).to eq(
-        'Content-Type' => 'application/json',
         'X-Id' => 42
       )
     end
