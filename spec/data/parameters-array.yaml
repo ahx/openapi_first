@@ -20,7 +20,7 @@ paths:
             type: array
             maxItems: 4
             items:
-              type: string
+              $ref: './components/schemas/name'
         - name: integers
           in: query
           required: false
