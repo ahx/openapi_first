@@ -30,3 +30,8 @@ paths:
             X-Id:
               schema:
                 type: integer
+            X-Authors:
+              schema:
+                type: array
+                items:
+                  $ref: './components/schemas/name.yaml'
