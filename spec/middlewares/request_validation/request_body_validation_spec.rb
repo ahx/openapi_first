@@ -204,6 +204,32 @@ RSpec.describe 'Request body validation' do
       expect(last_response.status).to be 400
     end
 
+    context 'when request body is optional' do
+      let(:path) { '/optional-request-body' }
+
+      it 'accepts a valid request body' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        post path, JSON.generate({ say: 'yes' })
+
+        expect(last_response.status).to be(200), last_response.body
+        expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq 'say' => 'yes'
+      end
+
+      it 'accepts an empty request body' do
+        post path
+
+        expect(last_response.status).to be(200), last_response.body
+        expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq nil
+      end
+
+      it 'returns 400 if request body is invalid' do
+        header Rack::CONTENT_TYPE, 'application/json'
+        post path, JSON.generate({ say: 'no ' })
+
+        expect(last_response.status).to be(400), last_response.body
+      end
+    end
+
     context 'with default values' do
       before { header Rack::CONTENT_TYPE, 'application/json' }
 
