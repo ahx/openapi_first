@@ -18,6 +18,7 @@ module OpenapiFirst
       @content_type = content_type
       @content_schema = content_schema
       @operation = operation_object
+      @allow_empty_content = content_type.nil? || required_body == false
       @key = key
       @request_parser = RequestParser.new(
         query_parameters: parameters.query,
@@ -38,6 +39,10 @@ module OpenapiFirst
     # rubocop:enable Metrics/MethodLength
 
     attr_reader :content_type, :content_schema, :operation, :request_method, :path, :key
+
+    def allow_empty_content?
+      @allow_empty_content
+    end
 
     def validate(request, route_params:)
       parsed_request = nil

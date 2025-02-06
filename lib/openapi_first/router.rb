@@ -32,15 +32,18 @@ module OpenapiFirst
         request_methods.filter_map do |request_method, content|
           next if request_method == :template
 
-          Route.new(path:, request_method:, requests: content[:requests].each_value,
+          Route.new(path:, request_method:, requests: content[:requests].each_value.lazy.uniq,
                     responses: content[:responses].each_value.lazy.flat_map(&:values))
         end
       end
     end
 
     # Add a request definition
-    def add_request(request, request_method:, path:, content_type: nil)
-      route_at(path, request_method)[:requests][content_type] = request
+    def add_request(request, request_method:, path:, content_type: nil, allow_empty_content: false)
+      route = route_at(path, request_method)
+      requests = route[:requests]
+      requests[content_type] = request
+      requests[nil] = request if allow_empty_content
     end
 
     # Add a response definition

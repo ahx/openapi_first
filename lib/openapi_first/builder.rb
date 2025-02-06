@@ -58,7 +58,8 @@ module OpenapiFirst
               request,
               request_method:,
               path:,
-              content_type: request.content_type
+              content_type: request.content_type,
+              allow_empty_content: request.allow_empty_content?
             )
             build_responses(request:, responses: operation_object['responses']).each do |response|
               router.add_response(
@@ -106,27 +107,31 @@ module OpenapiFirst
     end
 
     def build_requests(path:, request_method:, operation_object:, parameters:)
+      content_objects = operation_object.dig('requestBody', 'content')
+      # binding.irb if request_method == 'post'
+      if content_objects.nil?
+        return [
+          Request.new(path:, request_method:, parameters:,
+                      operation_object: operation_object.resolved,
+                      content_type: nil,
+                      content_schema: nil,
+                      required_body: false,
+                      key: [path, request_method, nil].join(':'))
+        ]
+      end
       required_body = operation_object['requestBody']&.resolved&.fetch('required', false) == true
-      result = operation_object.dig('requestBody', 'content')&.map do |content_type, content_object|
+      content_objects.map do |content_type, content_object|
         content_schema = content_object['schema'].schema(
           configuration: schemer_configuration,
           after_property_validation: config.hooks[:after_request_body_property_validation]
         )
-        Request.new(path:, request_method:,
+        Request.new(path:, request_method:, parameters:,
                     operation_object: operation_object.resolved,
-                    parameters:, content_type:,
+                    content_type:,
                     content_schema:,
                     required_body:,
                     key: [path, request_method, content_type].join(':'))
-      end || []
-      return result if required_body
-
-      result << Request.new(
-        path:, request_method:, operation_object: operation_object.resolved,
-        parameters:, content_type: nil, content_schema: nil,
-        required_body:,
-        key: [path, request_method, nil].join(':')
-      )
+      end
     end
 
     def build_responses(responses:, request:)
