@@ -18,8 +18,13 @@ module OpenapiFirst
                 "from #{request.request_method.upcase} #{request.path}."
         end
 
-        api.validate_request(request, raise_error: true)
-        api.validate_response(request, response, raise_error: true)
+        validated = api.validate_request(request, raise_error: false)
+        # :nocov:
+        raise validated.error.exception if validated.invalid?
+
+        validated = api.validate_response(request, response, raise_error: false)
+        raise validated.error.exception if validated.invalid?
+        # :nocov:
       end
     end
   end
