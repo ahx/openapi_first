@@ -19,10 +19,12 @@ module OpenapiFirst
         end
 
         validated = api.validate_request(request, raise_error: false)
+        # :nocov:
         raise validated.error.exception if validated.invalid?
 
         validated = api.validate_response(request, response, raise_error: false)
         raise validated.error.exception if validated.invalid?
+        # :nocov:
       end
     end
   end
