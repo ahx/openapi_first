@@ -25,8 +25,8 @@ RSpec.describe OpenapiFirst::RefResolver do
 
   describe '#dir' do
     it 'returns the directory path' do
-      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
-      doc = described_class.load(file_path)
+      filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
+      doc = described_class.load(filepath)
       expect(doc.dir).to eq(File.expand_path('./spec/data/splitted-train-travel-api'))
 
       node = doc['paths']['/stations']['get']
@@ -39,29 +39,29 @@ RSpec.describe OpenapiFirst::RefResolver do
 
   describe '#context' do
     it 'returns contents of the main file' do
-      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
-      doc = described_class.load(file_path)
+      filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
+      doc = described_class.load(filepath)
       node = doc['info']
       expect(node.context['openapi']).to eq('3.1.0')
     end
 
     it 'returns contents of the main file when following internal refs' do
-      file_path = './spec/data/train-travel-api/openapi.yaml'
-      doc = described_class.load(file_path)
+      filepath = './spec/data/train-travel-api/openapi.yaml'
+      doc = described_class.load(filepath)
       node = doc['paths']['/stations']['get']['responses']['200']['headers']['RateLimit']['schema']
       expect(node.context['openapi']).to eq('3.1.0')
     end
 
     it 'returns contents of the referenced file' do
-      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
-      doc = described_class.load(file_path)
+      filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
+      doc = described_class.load(filepath)
       node = doc['paths']['/stations']['get']['responses']
       expect(node.context.dig('get', 'description')).to start_with('Returns a list of all train stations')
     end
 
     it 'returns contents of the referenced file when pointing inside referenced files' do
-      file_path = './spec/data/petstore.yaml'
-      doc = described_class.load(file_path)
+      filepath = './spec/data/petstore.yaml'
+      doc = described_class.load(filepath)
       node = doc['components']['schemas']['Pet']['required']
       expect(node.context).to eq(YAML.load_file('./spec/data/components/schemas/pet.yaml'))
     end
@@ -105,18 +105,18 @@ RSpec.describe OpenapiFirst::RefResolver do
 
   describe '#[]' do
     it 'works across files' do
-      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
-      contents = OpenapiFirst::FileLoader.load(file_path)
-      doc = described_class.for(contents, dir: File.dirname(file_path))
+      filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
+      contents = OpenapiFirst::FileLoader.load(filepath)
+      doc = described_class.for(contents, filepath:)
       node = doc['paths']['/stations']['get']['responses']['200']['headers']['RateLimit']['schema']
       expect(node.context['description']).to start_with('The RateLimit header')
       expect(node.resolved['type']).to eq('string')
     end
 
     it 'follows pointers through files' do
-      file_path = './spec/data/petstore.yaml'
-      contents = OpenapiFirst::FileLoader.load(file_path)
-      doc = described_class.for(contents, dir: File.dirname(file_path))
+      filepath = './spec/data/petstore.yaml'
+      contents = OpenapiFirst::FileLoader.load(filepath)
+      doc = described_class.for(contents, filepath:)
       target = doc['components']['schemas']['Pet']
 
       expect(target.value).to eq({ '$ref' => './components/schemas/pet.yaml#/Pet' })
@@ -141,18 +141,18 @@ RSpec.describe OpenapiFirst::RefResolver do
 
   describe '#dig' do
     it 'works across files' do
-      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
-      contents = OpenapiFirst::FileLoader.load(file_path)
-      doc = described_class.for(contents, dir: File.dirname(file_path))
+      filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
+      contents = OpenapiFirst::FileLoader.load(filepath)
+      doc = described_class.for(contents, filepath:)
       node = doc.dig('paths', '/stations', 'get', 'responses', '200', 'headers', 'RateLimit', 'schema')
       expect(node.context['description']).to start_with('The RateLimit header')
       expect(node.resolved['type']).to eq('string')
     end
 
     it 'follows pointers through files' do
-      file_path = './spec/data/petstore.yaml'
-      contents = OpenapiFirst::FileLoader.load(file_path)
-      doc = described_class.for(contents, dir: File.dirname(file_path))
+      filepath = './spec/data/petstore.yaml'
+      contents = OpenapiFirst::FileLoader.load(filepath)
+      doc = described_class.for(contents, filepath:)
       target = doc.dig('components', 'schemas', 'Pet')
 
       expect(target.value).to eq({ '$ref' => './components/schemas/pet.yaml#/Pet' })
@@ -181,9 +181,9 @@ RSpec.describe OpenapiFirst::RefResolver do
 
   describe '#fetch' do
     it 'works across files' do
-      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
-      contents = OpenapiFirst::FileLoader.load(file_path)
-      doc = described_class.for(contents, dir: File.dirname(file_path))
+      filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
+      contents = OpenapiFirst::FileLoader.load(filepath)
+      doc = described_class.for(contents, filepath:)
       target = doc.fetch('paths').fetch('/stations')['get']['responses']['200']['headers']['RateLimit']['schema']
       expect(target.resolved['type']).to eq('string')
     end
@@ -219,9 +219,9 @@ RSpec.describe OpenapiFirst::RefResolver do
 
   describe '#each' do
     it 'works across files' do
-      file_path = './spec/data/splitted-train-travel-api/openapi.yaml'
-      contents = OpenapiFirst::FileLoader.load(file_path)
-      doc = described_class.for(contents, dir: File.dirname(file_path))
+      filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
+      contents = OpenapiFirst::FileLoader.load(filepath)
+      doc = described_class.for(contents, filepath:)
 
       items = []
       doc.fetch('paths').each { |path, path_item| items << [path, path_item] }

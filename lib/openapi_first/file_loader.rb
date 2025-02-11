@@ -8,7 +8,7 @@ module OpenapiFirst
     module_function
 
     def load(file_path)
-      raise FileNotFoundError, "File not found #{file_path}" unless File.exist?(file_path)
+      raise FileNotFoundError, "File not found #{file_path.inspect}" unless File.exist?(file_path)
 
       body = File.read(file_path)
       extname = File.extname(file_path)

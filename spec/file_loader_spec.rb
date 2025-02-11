@@ -18,7 +18,7 @@ RSpec.describe OpenapiFirst::FileLoader do
     end
 
     it 'raises FileNotFoundError if file was not found' do
-      expect { described_class.load('./spec/data/unknown.yaml') }.to raise_error(OpenapiFirst::FileNotFoundError, 'File not found ./spec/data/unknown.yaml')
+      expect { described_class.load('./spec/data/unknown.yaml') }.to raise_error(OpenapiFirst::FileNotFoundError, 'File not found "./spec/data/unknown.yaml"')
     end
   end
 end

@@ -6,17 +6,17 @@ module OpenapiFirst
   # This is here to give traverse an OAD while keeping $refs intact
   # @visibility private
   module RefResolver
-    def self.load(file_path)
-      contents = OpenapiFirst::FileLoader.load(file_path)
-      self.for(contents, dir: File.dirname(File.expand_path(file_path)))
+    def self.load(filepath)
+      contents = OpenapiFirst::FileLoader.load(filepath)
+      self.for(contents, filepath:)
     end
 
-    def self.for(value, context: value, dir: Dir.pwd)
+    def self.for(value, filepath: nil, context: value)
       case value
       when ::Hash
-        Hash.new(value, context:, dir:)
+        Hash.new(value, context:, filepath:)
       when ::Array
-        Array.new(value, context:, dir:)
+        Array.new(value, context:, filepath:)
       when ::NilClass
         nil
       else
@@ -37,9 +37,11 @@ module OpenapiFirst
 
     # @visibility private
     module Resolvable
-      def initialize(value, context: value, dir: nil)
+      def initialize(value, context: value, filepath: nil)
         @value = value
         @context = context
+        @filepath = filepath
+        dir = File.dirname(File.expand_path(filepath)) if filepath
         @dir = (dir && File.absolute_path(dir)) || Dir.pwd
       end
 
@@ -50,12 +52,14 @@ module OpenapiFirst
       # The object where this node was found in
       attr_reader :context
 
+      private attr_reader :filepath
+
       def resolve_ref(pointer)
         if pointer.start_with?('#')
           value = Hana::Pointer.new(pointer[1..]).eval(context)
           raise "Unknown reference #{pointer} in #{context}" unless value
 
-          return RefResolver.for(value, dir:, context:)
+          return RefResolver.for(value, filepath:, context:)
         end
 
         relative_path, file_pointer = pointer.split('#')
@@ -63,9 +67,12 @@ module OpenapiFirst
         return RefResolver.load(full_path) unless file_pointer
 
         file_contents = FileLoader.load(full_path)
-        new_dir = File.dirname(full_path)
         value = Hana::Pointer.new(file_pointer).eval(file_contents)
-        RefResolver.for(value, dir: new_dir, context: file_contents)
+        RefResolver.for(value, filepath: full_path, context: file_contents)
+      rescue OpenapiFirst::FileNotFoundError => e
+        message = "Problem with reference resolving #{pointer.inspect} in " \
+                  "file #{File.absolute_path(filepath).inspect}: #{e.message}"
+        raise OpenapiFirst::FileNotFoundError, message
       end
     end
 
@@ -91,18 +98,18 @@ module OpenapiFirst
       def [](key)
         return resolve_ref(@value['$ref'])[key] if !@value.key?(key) && @value.key?('$ref')
 
-        RefResolver.for(@value[key], dir:, context:)
+        RefResolver.for(@value[key], filepath:, context:)
       end
 
       def fetch(key)
         return resolve_ref(@value['$ref']).fetch(key) if !@value.key?(key) && @value.key?('$ref')
 
-        RefResolver.for(@value.fetch(key), dir:, context:)
+        RefResolver.for(@value.fetch(key), filepath:, context:)
       end
 
       def each
         resolved.each do |key, value|
-          yield key, RefResolver.for(value, dir:, context:)
+          yield key, RefResolver.for(value, filepath:, context:)
         end
       end
 
@@ -126,12 +133,12 @@ module OpenapiFirst
         item = @value[index]
         return resolve_ref(item['$ref']) if item.is_a?(::Hash) && item.key?('$ref')
 
-        RefResolver.for(item, dir:, context:)
+        RefResolver.for(item, filepath:, context:)
       end
 
       def each
         resolved.each do |item|
-          yield RefResolver.for(item, dir:, context:)
+          yield RefResolver.for(item, filepath:, context:)
         end
       end
 

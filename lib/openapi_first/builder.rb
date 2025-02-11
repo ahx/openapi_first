@@ -22,7 +22,7 @@ module OpenapiFirst
       @schemer_configuration.insert_property_defaults = true
 
       @config = config
-      @contents = RefResolver.for(contents, dir: filepath && File.dirname(filepath))
+      @contents = RefResolver.for(contents, filepath:)
     end
 
     attr_reader :config
@@ -108,7 +108,6 @@ module OpenapiFirst
 
     def build_requests(path:, request_method:, operation_object:, parameters:)
       content_objects = operation_object.dig('requestBody', 'content')
-      # binding.irb if request_method == 'post'
       if content_objects.nil?
         return [
           Request.new(path:, request_method:, parameters:,
