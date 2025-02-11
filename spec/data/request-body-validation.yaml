@@ -141,6 +141,46 @@ paths:
       responses:
         "200":
           description: ok
+  /nested-multipart-with-file:
+    post:
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    avatar:
+                      type: string
+                      format: binary
+      responses:
+        "200":
+          description: ok
+  /users-with-avatars:
+    post:
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      avatar:
+                        type: string
+                        format: binary
+      responses:
+        "200":
+          description: ok
   /with-form-urlencoded:
     post:
       requestBody:

@@ -36,11 +36,28 @@ module OpenapiFirst
       Failure.fail!(:invalid_body, message: 'Failed to parse request body as JSON')
     end)
 
-    register('multipart/form-data', lambda { |request|
-      request.POST.transform_values do |value|
-        value.is_a?(Hash) && value[:tempfile] ? value[:tempfile].read : value
+    # Parses multipart/form-data requests and currently puts the contents of a file upload at the parsed hash values.
+    # NOTE: This behavior will probably change in the next major version.
+    #       The uploaded file should not be read during request validation.
+    module MultipartBodyParser
+      def self.call(request)
+        request.POST.transform_values do |value|
+          unpack_value(value)
+        end
       end
-    })
+
+      def self.unpack_value(value)
+        return value.map { unpack_value(_1) } if value.is_a?(Array)
+        return value unless value.is_a?(Hash)
+        return value[:tempfile]&.read if value.key?(:tempfile)
+
+        value.transform_values do |v|
+          unpack_value(v)
+        end
+      end
+    end
+
+    register('multipart/form-data', MultipartBodyParser)
 
     register('application/x-www-form-urlencoded', lambda(&:POST))
   end
