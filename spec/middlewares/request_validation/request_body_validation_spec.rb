@@ -68,6 +68,26 @@ RSpec.describe 'Request body validation' do
       expect(uploaded_file).to eq File.read(fixture_path('foo.txt'))
     end
 
+    it 'succeeds with nested multipart form data file binary upload' do
+      uploaded_file = Rack::Test::UploadedFile.new(fixture_path('foo.txt'))
+
+      post '/nested-multipart-with-file', 'user' => { 'avatar' => uploaded_file }
+      expect(last_response.status).to eq(200), last_response.body
+
+      uploaded_file = last_request.env[OpenapiFirst::REQUEST].parsed_body.dig('user', 'avatar')
+      expect(uploaded_file).to eq File.read(fixture_path('foo.txt'))
+    end
+
+    it 'succeeds list of binary fields in multipart/form-data' do
+      uploaded_file = Rack::Test::UploadedFile.new(fixture_path('foo.txt'))
+
+      post '/users-with-avatars', 'data' => [{ 'avatar' => uploaded_file, 'name' => 'Quentin' }]
+      expect(last_response.status).to eq(200), last_response.body
+
+      names = last_request.env[OpenapiFirst::REQUEST].parsed_body.fetch('data').map { _1['name'] }
+      expect(names).to eq(['Quentin'])
+    end
+
     it 'succeeds without optional file upload' do
       header Rack::CONTENT_TYPE,  'multipart/form-data'
       post '/multipart-with-file', 'petId' => '12'
