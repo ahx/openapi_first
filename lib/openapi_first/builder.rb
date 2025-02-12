@@ -110,12 +110,7 @@ module OpenapiFirst
       content_objects = operation_object.dig('requestBody', 'content')
       if content_objects.nil?
         return [
-          Request.new(path:, request_method:, parameters:,
-                      operation_object: operation_object.resolved,
-                      content_type: nil,
-                      content_schema: nil,
-                      required_body: false,
-                      key: [path, request_method, nil].join(':'))
+          request_without_body(path:, request_method:, parameters:, operation_object:)
         ]
       end
       required_body = operation_object['requestBody']&.resolved&.fetch('required', false) == true
@@ -131,6 +126,15 @@ module OpenapiFirst
                     required_body:,
                     key: [path, request_method, content_type].join(':'))
       end
+    end
+
+    def request_without_body(path:, request_method:, parameters:, operation_object:)
+      Request.new(path:, request_method:, parameters:,
+                  operation_object: operation_object.resolved,
+                  content_type: nil,
+                  content_schema: nil,
+                  required_body: false,
+                  key: [path, request_method, nil].join(':'))
     end
 
     def build_responses(responses:, request:)
