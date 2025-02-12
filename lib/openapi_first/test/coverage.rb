@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'coverage/plan'
-require_relative 'coverage/terminal_formatter'
 
 module OpenapiFirst
   module Test
@@ -9,37 +8,12 @@ module OpenapiFirst
     # to assess if all parts of the API description have been tested.
     # Currently it does not care about unknown requests that are not part of any API description.
     module Coverage
-      # @visibility private
-      class NotRegisteredError < StandardError; end
+      autoload :TerminalFormatter, 'openapi_first/test/coverage/terminal_formatter'
 
-      # @visibility private
-      class Configuration
-        def initialize
-          @output = $stdout
-        end
-
-        attr_accessor :output
-      end
-
-      @registry = Hash.new do |_, filepath|
-        raise NotRegisteredError,
-              "API description '#{filepath}' was not registered." \
-              "Please call OpenapiFirst::Coverage.register('path/to/myopenapi.yaml') before calling" \
-              'OpenapiFirst::Coverage.start making requests.' \
-              "Registered descriptions are: #{plans.map(&:filepath)}."
-      end
-
-      @output = $stdout
+      Result = Data.define(:plans, :coverage)
 
       class << self
-        attr_reader :registry
-        private attr_writer :output
-
         def start
-          configuration = Configuration.new.clone
-          yield configuration if block_given?
-
-          self.output = configuration.output
           @after_request_validation = lambda do |validated_request, oad|
             track_request(validated_request, oad)
           end
@@ -60,15 +34,7 @@ module OpenapiFirst
           configuration.hooks[:after_response_validation].delete(@after_response_validation)
         end
 
-        # Add OAD where coverage should be tracked.
-        def register(*filepaths)
-          filepaths.each do |filepath|
-            oad = OpenapiFirst.load(filepath)
-            registry[oad.filepath] = oad
-          end
-        end
-
-        # Remove all OADs from registry.
+        # Clear current coverage run
         def reset
           @current_run = nil
         end
@@ -81,23 +47,26 @@ module OpenapiFirst
           current_run[oad.filepath].track_response(response)
         end
 
-        # Print the coverage report
-        # @param formatter A formatter to define the report.
-        # @output [IO] An output where to puts the report.
-        def report(formatter: TerminalFormatter, output: $stdout)
-          output.puts formatter.new.format(plans)
+        def result
+          Result.new(plans:, coverage:)
         end
+
+        private
 
         # Returns all plans (Plan) that were registered for this run
         def plans
           current_run.values
         end
 
-        private
+        def coverage
+          return 0 if plans.empty?
+
+          plans.sum(&:coverage) / plans.length
+        end
 
         def current_run
-          @current_run ||= registry.transform_values do |oad|
-            Plan.new(oad)
+          @current_run ||= Test.definitions.values.to_h do |oad|
+            [oad.filepath, Plan.new(oad)]
           end
         end
       end

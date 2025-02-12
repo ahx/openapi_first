@@ -5,6 +5,8 @@ require 'minitest'
 RSpec.describe OpenapiFirst::Test do
   after(:each) do
     described_class.definitions.clear
+    OpenapiFirst::Test::Coverage.stop
+    OpenapiFirst::Test::Coverage.reset
   end
 
   describe '.minitest?' do
@@ -25,6 +27,41 @@ RSpec.describe OpenapiFirst::Test do
     it 'can register an OAD with a custom name' do
       described_class.register('./examples/openapi.yaml', as: :mine)
       expect(described_class[:mine].filepath).to eq('./examples/openapi.yaml')
+    end
+
+    it 'raises an error if the same API description is registered twice' do
+      described_class.register('./examples/openapi.yaml')
+      expect do
+        described_class.register('./examples/openapi.yaml')
+      end.to raise_error(described_class::AlreadyRegisteredError)
+    end
+  end
+
+  describe '.setup' do
+    it 'registers an API description' do
+      described_class.setup { |test| test.register('./examples/openapi.yaml') }
+      expect(described_class.definitions[:default].filepath).to eq(OpenapiFirst.load('./examples/openapi.yaml').filepath)
+    end
+
+    it 'raises an error if no block is given' do
+      expect do
+        described_class.setup
+      end.to raise_error ArgumentError
+    end
+
+    it 'raises an error if no API description was registered' do
+      expect do
+        described_class.setup { |_test| } # rubocop:disable Lint/EmptyBlock
+      end.to raise_error described_class::NotRegisteredError
+    end
+  end
+
+  describe '.report_coverage' do
+    it 'reports 0% by default' do
+      output = StringIO.new
+      allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
+      described_class.report_coverage
+      expect(output.string).to include('0%')
     end
   end
 
@@ -55,6 +92,38 @@ RSpec.describe OpenapiFirst::Test do
 
       expect(called).to eq(%i[request response])
     end
+
+    context 'when using registered OAD' do
+      let(:app) do
+        described_class.app(
+          ->(_env) { [200, { 'content-type' => 'application/json' }, ['1']] },
+          api: :mars_attack
+        )
+      end
+
+      let(:oad) do
+        described_class.register(filename, as: :mars_attack)
+      end
+
+      after do
+        described_class.definitions.clear
+      end
+
+      it 'silently adds request and response validation' do
+        called = []
+        oad.config.after_request_validation do
+          called << :request
+        end
+
+        oad.config.after_response_validation do
+          called << :response
+        end
+
+        post '/roll'
+
+        expect(called).to eq(%i[request response])
+      end
+    end
   end
 
   describe '.[]' do
@@ -68,48 +137,6 @@ RSpec.describe OpenapiFirst::Test do
       expect do
         described_class[:mine]
       end.to raise_error(OpenapiFirst::Test::NotRegisteredError)
-    end
-  end
-
-  describe 'Methods' do
-    it 'can be included' do
-      minitest_class = Class.new(Minitest::Test) do
-        include OpenapiFirst::Test::Methods
-      end
-      expect(minitest_class.included_modules).to include(described_class::MinitestHelpers)
-
-      other_class = Class.new do
-        include OpenapiFirst::Test::Methods
-      end
-      expect(other_class.included_modules).to include(described_class::PlainHelpers)
-    end
-
-    it 'detects wrong response status for Minitest' do
-      described_class.register('./examples/openapi.yaml')
-      minitest_class = Class.new(Minitest::Test) do
-        include OpenapiFirst::Test::Methods
-
-        def last_request = Rack::Request.new(Rack::MockRequest.env_for('/'))
-        def last_response = Rack::Response.new
-      end
-
-      expect do
-        minitest_class.new('hey').assert_api_conform(status: 444)
-      end.to raise_error(Minitest::Assertion)
-    end
-
-    it 'detects wrong response status for non Minitest' do
-      described_class.register('./examples/openapi.yaml')
-      minitest_class = Class.new do
-        include OpenapiFirst::Test::Methods
-
-        def last_request = Rack::Request.new(Rack::MockRequest.env_for('/'))
-        def last_response = Rack::Response.new
-      end
-
-      expect do
-        minitest_class.new.assert_api_conform(status: 444)
-      end.to raise_error(OpenapiFirst::Error)
     end
   end
 end

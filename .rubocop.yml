@@ -30,4 +30,6 @@ Layout/LineLength:
   Exclude:
     - "spec/**/*.rb"
 Metrics/MethodLength:
+  Exclude:
+    - "lib/openapi_first/test/coverage/*_formatter.rb"
   Max: 20

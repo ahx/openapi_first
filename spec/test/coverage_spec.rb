@@ -5,7 +5,7 @@ RSpec.describe OpenapiFirst::Test::Coverage do
   let(:definition) { OpenapiFirst.load(filepath) }
 
   before(:each) do
-    described_class.register(filepath)
+    OpenapiFirst::Test.register(filepath)
     described_class.start
   end
 
@@ -20,38 +20,27 @@ RSpec.describe OpenapiFirst::Test::Coverage do
     Rack::Response[200, { 'content-type' => 'application/json' }, ['1']]
   end
 
-  describe '.register' do
-    it 'accepts filepaths' do
-      filepath1 = 'spec/data/petstore.yaml'
-      filepath2 = 'spec/data/train-travel-api/openapi.yaml'
-      expect(described_class.register(filepath1, filepath2)).to be_truthy
-      oad1 = OpenapiFirst.load(filepath1)
-      oad2 = OpenapiFirst.load(filepath2)
-      expect(described_class.registry[oad1.filepath].filepath).to eq(oad1.filepath)
-      expect(described_class.registry[oad2.filepath].filepath).to eq(oad2.filepath)
-    end
-  end
+  let(:result) { described_class.result }
 
   describe '.start' do
-    before { described_class.stop }
+    after { described_class.stop }
 
-    it 'accepts a block' do
-      myio = StringIO.new
-      described_class.start do |config|
-        config.output = myio
-      end
+    it 'installs global hooks' do
+      hooks = OpenapiFirst.configuration.hooks
+      described_class.stop
+      expect(hooks[:after_request_validation]).to be_empty
+      expect(hooks[:after_response_validation]).to be_empty
+      described_class.start
+      expect(hooks[:after_request_validation]).not_to be_empty
+      expect(hooks[:after_response_validation]).not_to be_empty
     end
   end
 
-  describe '.report' do
-    def output
-      io = StringIO.new
-      described_class.report(output: io)
-      io.string
-    end
+  describe '.result' do
+    let(:result) { described_class.result }
 
     context 'without any requests' do
-      specify { expect(output).to include(': 0%') }
+      specify { expect(result.coverage).to eq(0) }
     end
 
     context 'with full coverage' do
@@ -60,7 +49,7 @@ RSpec.describe OpenapiFirst::Test::Coverage do
         definition.validate_response(valid_request, valid_response)
       end
 
-      specify { expect(output).to include(': 100%') }
+      specify { expect(result.coverage).to eq(100) }
     end
 
     context 'with partly coverage' do
@@ -68,7 +57,7 @@ RSpec.describe OpenapiFirst::Test::Coverage do
         definition.validate_request(valid_request)
       end
 
-      specify { expect(output).to include(': 50%') }
+      specify { expect(result.coverage).to eq(50) }
     end
   end
 end

@@ -6,9 +6,9 @@ module OpenapiFirst
       # This is the default formatter
       class TerminalFormatter
         # This takes a list of Coverage::Plan instances and outputs a String
-        def format(plans)
+        def format(coverage_result)
           @out = StringIO.new
-          plans.each { |plan| format_plan(plan) }
+          coverage_result.plans.each { |plan| format_plan(plan) }
           @out.string
         end
 
@@ -24,30 +24,31 @@ module OpenapiFirst
           @out.print(string)
         end
 
-        def format_plan(plan)
+        def format_plan(plan) # rubocop:disable Metrics/PerceivedComplexity
           filepath = plan.filepath
           puts ['', "API validation coverage for #{filepath}: #{plan.coverage}%"]
           return if plan.done?
 
           plan.requests.each do |request|
-            if request.requested?
+            if request.finished?
               if request.responses.all?(&:finished?)
                 puts green "✓ #{request_label(request)}"
+                next
               else
                 puts orange "⚠ #{request_label(request)}"
               end
             else
-              puts red "❌ #{request_label(request)} – Not requested!"
+              puts red "❌ #{request_label(request)} – #{explain_unfinished_request(request)}"
               next
             end
 
             request.responses.each do |response|
-              if response.responded?
-                # puts green "  ✓ #{response_label(response)}"
+              if response.finished?
+                puts green "  ✓ #{response_label(response)}"
                 next
               end
 
-              puts red "  ❌ #{response_label(response)}"
+              puts red "  ❌ #{response_label(response)} – #{explain_unfinished_response(response)}"
             end
           end
         end
@@ -70,11 +71,23 @@ module OpenapiFirst
           name
         end
 
-        def response_label(response)
-          name = response.status.to_s
-          return(name + " (#{response.content_type})") if response.content_type
+        def explain_unfinished_request(request)
+          return 'No requests tracked!' unless request.requested?
 
+          'All requests invalid!' unless request.any_valid_request?
+        end
+
+        def response_label(response)
+          name = +''
+          name << response.status.to_s
+          name << " (#{response.content_type})" if response.content_type
           name
+        end
+
+        def explain_unfinished_response(response)
+          return 'No responses tracked!' unless response.responded?
+
+          'All responses invalid!' unless response.any_valid_response?
         end
       end
     end

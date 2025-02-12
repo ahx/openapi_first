@@ -19,8 +19,9 @@ module OpenapiFirst
 
         attr_reader :request, :responses
 
-        def track(_request)
+        def track(validated_request)
           @requested = true
+          @valid ||= true if validated_request.valid?
         end
 
         def request?
@@ -35,7 +36,13 @@ module OpenapiFirst
           @requested == true
         end
 
-        alias finished? requested?
+        def any_valid_request?
+          @valid == true
+        end
+
+        def finished?
+          requested? && any_valid_request?
+        end
 
         def unfinished?
           !finished?

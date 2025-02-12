@@ -11,6 +11,7 @@ require 'rack/test'
 SimpleCov.start do
   enable_coverage :branch
   primary_coverage :branch
+  add_filter 'lib/openapi_first/test/coverage/'
 end
 
 SimpleCov.minimum_coverage line: 99, branch: 85
@@ -27,6 +28,6 @@ RSpec.configure do |config|
   end
 
   config.after do
-    OpenapiFirst::Test::DEFINITIONS.clear
+    OpenapiFirst::Test.definitions.clear
   end
 end

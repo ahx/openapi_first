@@ -38,10 +38,6 @@ RSpec.describe 'Request body validation' do
       }
     end
 
-    let(:response_body) do
-      JSON.parse(last_response.body, symbolize_names: true)
-    end
-
     it 'works with stringio' do
       header Rack::CONTENT_TYPE, 'application/json'
       io = StringIO.new(JSON.generate(request_body))
