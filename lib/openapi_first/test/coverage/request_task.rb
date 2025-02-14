@@ -11,25 +11,16 @@ module OpenapiFirst
 
         def_delegators :@request, :path, :request_method, :content_type
 
-        def initialize(request_definition, responses:)
+        def initialize(request_definition)
           @request = request_definition
-          @responses = responses
           @requested = false
         end
 
-        attr_reader :request, :responses
+        attr_reader :request
 
         def track(validated_request)
           @requested = true
           @valid ||= true if validated_request.valid?
-        end
-
-        def request?
-          true
-        end
-
-        def response?
-          false
         end
 
         def requested?
@@ -42,10 +33,6 @@ module OpenapiFirst
 
         def finished?
           requested? && any_valid_request?
-        end
-
-        def unfinished?
-          !finished?
         end
       end
     end

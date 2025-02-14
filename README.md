@@ -157,7 +157,6 @@ Here is how to set it up:
   ```ruby
   Minitest.after_run do
     OpenapiFirst::Test.report_coverage # Prints a coverage report to the terminal
-    OpenapiFirst::Test.result.coverage # Returns the overal coverage in percent
   end
   ```
 

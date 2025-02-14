@@ -24,30 +24,36 @@ module OpenapiFirst
           @out.print(string)
         end
 
-        def format_plan(plan) # rubocop:disable Metrics/PerceivedComplexity
+        def format_plan(plan)
           filepath = plan.filepath
           puts ['', "API validation coverage for #{filepath}: #{plan.coverage}%"]
           return if plan.done?
 
-          plan.requests.each do |request|
+          plan.routes.each do |route|
+            next if route.finished?
+
+            format_requests(route.requests)
+            next if route.requests.none?(&:requested?)
+
+            format_responses(route.responses)
+          end
+        end
+
+        def format_requests(requests)
+          requests.each do |request|
             if request.finished?
-              if request.responses.all?(&:finished?)
-                puts green "✓ #{request_label(request)}"
-                next
-              else
-                puts orange "⚠ #{request_label(request)}"
-              end
+              puts green "✓ #{request_label(request)}"
             else
               puts red "❌ #{request_label(request)} – #{explain_unfinished_request(request)}"
-              next
             end
+          end
+        end
 
-            request.responses.each do |response|
-              if response.finished?
-                puts green "  ✓ #{response_label(response)}"
-                next
-              end
-
+        def format_responses(responses)
+          responses.each do |response|
+            if response.finished?
+              puts green "  ✓  #{response_label(response)}"
+            else
               puts red "  ❌ #{response_label(response)} – #{explain_unfinished_response(response)}"
             end
           end
@@ -79,8 +85,8 @@ module OpenapiFirst
 
         def response_label(response)
           name = +''
-          name << response.status.to_s
-          name << " (#{response.content_type})" if response.content_type
+          name += response.status.to_s
+          name += "(#{response.content_type})" if response.content_type
           name
         end
 

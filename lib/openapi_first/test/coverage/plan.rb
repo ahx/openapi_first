@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'route_task'
 require_relative 'response_task'
 require_relative 'request_task'
 
@@ -13,16 +14,18 @@ module OpenapiFirst
 
         def initialize(oad)
           @oad = oad
+          @routes = []
           @index = {}
           @filepath = oad.filepath
           oad.routes.each do |route|
-            route.requests.each do |request|
-              add request:, responses: route.responses.to_a
-            end
+            add_route request_method: route.request_method,
+                      path: route.path,
+                      requests: route.requests,
+                      responses: route.responses
           end
         end
 
-        attr_reader :filepath, :oad
+        attr_reader :filepath, :oad, :routes
         private attr_reader :index
 
         def track_request(validated_request)
@@ -37,14 +40,6 @@ module OpenapiFirst
           tasks.all?(&:finished?)
         end
 
-        def requests
-          tasks.filter(&:request?)
-        end
-
-        def tasks
-          index.values
-        end
-
         def coverage
           done = tasks.count(&:finished?)
           return 0 if done.zero?
@@ -53,16 +48,20 @@ module OpenapiFirst
           (done / (all.to_f / 100)).to_i
         end
 
+        def tasks
+          index.values
+        end
+
         private
 
-        def add(request:, responses:)
-          response_tasks = responses.map do |response|
-            ResponseTask.new(response)
+        def add_route(request_method:, path:, requests:, responses:)
+          request_tasks = requests.to_a.map do |request|
+            index[request.key] = RequestTask.new(request)
           end
-          index[request.key] = RequestTask.new(request, responses: response_tasks)
-          response_tasks.each do |task|
-            index[task.key] = task
+          response_tasks = responses.to_a.map do |response|
+            index[response.key] = ResponseTask.new(response)
           end
+          @routes << RouteTask.new(path:, request_method:, requests: request_tasks, responses: response_tasks)
         end
       end
     end

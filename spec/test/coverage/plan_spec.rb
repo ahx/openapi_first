@@ -69,28 +69,15 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
 
   subject(:plan) { described_class.new(oad) }
 
-  it 'has requests and responses' do
-    request = plan.requests.first
-    expect(request.requested?).to be(false)
-    expect(request.path).to eq('/stuff/{id}')
-    expect(request.request_method).to eq('get')
-    expect(request.content_type).to eq(nil)
-
-    response = request.responses.first
-    expect(response.responded?).to be(false)
-    expect(response.status).to eq('200')
-    expect(response.content_type).to eq('application/json')
-  end
-
   it 'tracks requests and responses' do
-    request = plan.requests.first
+    request = plan.routes.first.requests.first
     expect(request.requested?).to be(false)
 
     plan.track_request(valid_request)
 
     expect(request.requested?).to be(true)
 
-    response = request.responses.first
+    response = plan.routes.first.responses.first
     expect(response.responded?).to be(false)
 
     plan.track_response(valid_response)
@@ -135,26 +122,19 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
 
   it 'has tasks, finished and unfinished' do
     expect(plan.tasks.count).to eq(3)
-    expect(plan.tasks.count(&:request?)).to eq(1)
-    expect(plan.tasks.count(&:response?)).to eq(2)
 
     expect(plan.tasks.count(&:finished?)).to eq(0)
-    expect(plan.tasks.count(&:unfinished?)).to eq(3)
 
     plan.track_request(valid_request)
     plan.track_response(valid_response)
     plan.track_response(valid_400_response)
 
     expect(plan.tasks.count(&:finished?)).to eq(3)
-    expect(plan.tasks.count(&:unfinished?)).to eq(0)
   end
 
   it 'has ordered tasks' do
-    expect(plan.tasks[0]).to be_request
     expect(plan.tasks[0].path).to eq('/stuff/{id}')
-    expect(plan.tasks[1]).to be_response
     expect(plan.tasks[1].status).to eq('200')
-    expect(plan.tasks[2]).to be_response
     expect(plan.tasks[2].status).to eq('4XX')
   end
 end

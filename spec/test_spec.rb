@@ -63,6 +63,21 @@ RSpec.describe OpenapiFirst::Test do
       described_class.report_coverage
       expect(output.string).to include('0%')
     end
+
+    it 'reports 0% if ' do
+      described_class.setup do |test|
+        test.register('./spec/data/dice.yaml')
+      end
+
+      definition = OpenapiFirst.load('./spec/data/dice.yaml')
+      valid_request = Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST'))
+      definition.validate_request(valid_request)
+
+      output = StringIO.new
+      allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
+      described_class.report_coverage
+      expect(output.string).to include('0%')
+    end
   end
 
   describe '.app' do

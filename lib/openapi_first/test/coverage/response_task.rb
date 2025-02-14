@@ -23,14 +23,6 @@ module OpenapiFirst
           @valid ||= true if validated_response.valid?
         end
 
-        def request?
-          false
-        end
-
-        def response?
-          true
-        end
-
         def responded?
           @responded == true
         end
@@ -41,10 +33,6 @@ module OpenapiFirst
 
         def finished?
           responded? && any_valid_response?
-        end
-
-        def unfinished?
-          !finished?
         end
       end
     end
