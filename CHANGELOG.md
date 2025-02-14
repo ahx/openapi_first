@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.3.0
+
 ### New feature
 - Add OpenapiFirst::Test::Coverage to track request/response coverage for your API descriptions. (https://github.com/ahx/openapi_first/pull/327)
 
