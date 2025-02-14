@@ -209,5 +209,6 @@ module OpenapiFirst
 
     ParsedParameters = Data.define(:path, :query, :header, :cookie, :path_schema, :query_schema, :header_schema,
                                    :cookie_schema)
+    private_constant :ParsedParameters
   end
 end
