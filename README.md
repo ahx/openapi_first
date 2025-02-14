@@ -139,25 +139,27 @@ use OpenapiFirst::Middlewares::ResponseValidation, raise_error: true, spec: 'ope
 This feature tracks all requests/resposes that are validated via openapi_first and get return an overal coverage value. If all of your described requests/responses have been validated successfully at least once, your coverage is 100%.
 By checking your validation coverage you can avoid API drift where your API description describes requests/responses differently than your implemention works.
 
-Here is how to set it up:
+Here is how to set it up for RSpec in your `spec/spec_helper.rb`:
 
 1. Register all OpenAPI documents to track coverage for and start tracking. This should go at the top of you test helper file before loading application code.
   ```ruby
+  require 'openapi_first'
   OpenapiFirst::Test.setup do |test|
     test.register('openapi/openapi.yaml')
   end
   ```
 2. Wrap your app with silent request / response validation. This validates all requets/responses you do during your test run. (✷1)
   ```ruby
-  def app
-    OpenapiFirst::Test.app(MyRackApp)
+  config.before type: :request do
+    def app
+      OpenapiFirst::Test::(App)
+    end
   end
   ```
 3. Check coverage after your test suite has finished
   ```ruby
-  Minitest.after_run do
-    OpenapiFirst::Test.report_coverage # Prints a coverage report to the terminal
-  end
+  # Prints a coverage report to the terminal
+  config.after(:suite) { OpenapiFirst::Test.report_coverage }
   ```
 
 (✷1): Instead of using `OpenapiFirstTest.app` to wrap your application, you can use the middlewares or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
