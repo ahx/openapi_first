@@ -4,7 +4,6 @@ require_relative 'minitest_helpers'
 require_relative 'plain_helpers'
 
 module OpenapiFirst
-  # Test integration
   module Test
     # Methods to use in integration tests
     module Methods

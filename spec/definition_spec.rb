@@ -306,6 +306,18 @@ RSpec.describe OpenapiFirst::Definition do
       routes = definition.routes.map { |route| "#{route.request_method} #{route.path}" }
       expect(routes).to match_array ['GET /stations', 'GET /trips', 'GET /bookings', 'POST /bookings', 'GET /bookings/{bookingId}', 'DELETE /bookings/{bookingId}', 'POST /bookings/{bookingId}/payment']
     end
+
+    it 'has a different key for each request and response' do
+      requests_keys = definition.routes.flat_map { |route| route.requests.map(&:key) }
+      expect(requests_keys.all?(Integer))
+      expect(requests_keys.count).to eq(requests_keys.uniq.count)
+
+      response_keys = definition.routes.flat_map { |route| route.responses.map(&:key) }
+      expect(response_keys.all?(Integer))
+      expect(response_keys.count).to eq(response_keys.uniq.count)
+
+      expect((requests_keys + response_keys).uniq.count).to eq(requests_keys.count + response_keys.count)
+    end
   end
 
   describe '#router' do

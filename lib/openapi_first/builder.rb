@@ -22,7 +22,7 @@ module OpenapiFirst
       @schemer_configuration.insert_property_defaults = true
 
       @config = config
-      @contents = RefResolver.for(contents, dir: filepath && File.dirname(filepath))
+      @contents = RefResolver.for(contents, filepath:)
     end
 
     attr_reader :config
@@ -58,17 +58,18 @@ module OpenapiFirst
               request,
               request_method:,
               path:,
-              content_type: request.content_type
+              content_type: request.content_type,
+              allow_empty_content: request.allow_empty_content?
             )
-          end
-          build_responses(responses: operation_object['responses']).each do |response|
-            router.add_response(
-              response,
-              request_method:,
-              path:,
-              status: response.status,
-              response_content_type: response.content_type
-            )
+            build_responses(request:, responses: operation_object['responses']).each do |response|
+              router.add_response(
+                response,
+                request_method:,
+                path:,
+                status: response.status,
+                response_content_type: response.content_type
+              )
+            end
           end
         end
       end
@@ -106,28 +107,37 @@ module OpenapiFirst
     end
 
     def build_requests(path:, request_method:, operation_object:, parameters:)
+      content_objects = operation_object.dig('requestBody', 'content')
+      if content_objects.nil?
+        return [
+          request_without_body(path:, request_method:, parameters:, operation_object:)
+        ]
+      end
       required_body = operation_object['requestBody']&.resolved&.fetch('required', false) == true
-      result = operation_object.dig('requestBody', 'content')&.map do |content_type, content_object|
+      content_objects.map do |content_type, content_object|
         content_schema = content_object['schema'].schema(
           configuration: schemer_configuration,
           after_property_validation: config.hooks[:after_request_body_property_validation]
         )
-        Request.new(path:, request_method:,
+        Request.new(path:, request_method:, parameters:,
                     operation_object: operation_object.resolved,
-                    parameters:, content_type:,
+                    content_type:,
                     content_schema:,
-                    required_body:)
-      end || []
-      return result if required_body
-
-      result << Request.new(
-        path:, request_method:, operation_object: operation_object.resolved,
-        parameters:, content_type: nil, content_schema: nil,
-        required_body:
-      )
+                    required_body:,
+                    key: [path, request_method, content_type].join(':'))
+      end
     end
 
-    def build_responses(responses:)
+    def request_without_body(path:, request_method:, parameters:, operation_object:)
+      Request.new(path:, request_method:, parameters:,
+                  operation_object: operation_object.resolved,
+                  content_type: nil,
+                  content_schema: nil,
+                  required_body: false,
+                  key: [path, request_method, nil].join(':'))
+    end
+
+    def build_responses(responses:, request:)
       return [] unless responses
 
       responses.flat_map do |status, response_object|
@@ -142,9 +152,10 @@ module OpenapiFirst
                        headers:,
                        headers_schema:,
                        content_type:,
-                       content_schema:)
+                       content_schema:,
+                       key: [request.key, status, content_type].join(':'))
         end || Response.new(status:, headers:, headers_schema:, content_type: nil,
-                            content_schema: nil)
+                            content_schema: nil, key: [request.key, status, nil].join(':'))
       end
     end
 

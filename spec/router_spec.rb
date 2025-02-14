@@ -86,6 +86,29 @@ RSpec.describe OpenapiFirst::Router do
       end
     end
 
+    context 'with optional request body' do
+      subject(:router) do
+        described_class.new.tap do |router|
+          router.add_request(1, request_method: 'post', path: '/stations', content_type: 'application/json', allow_empty_content: true)
+        end
+      end
+
+      it 'accepts a matching content_type' do
+        match = router.match('POST', '/stations', content_type: 'application/json')
+        expect(match.request_definition).to eq(1)
+      end
+
+      it 'accepts an empty content_type' do
+        match = router.match('POST', '/stations', content_type: nil)
+        expect(match.request_definition).to eq(1)
+      end
+
+      it 'accepts a content-type mismatch' do
+        match = router.match('POST', '/stations', content_type: 'application/xml')
+        expect(match.request_definition).to eq(1)
+      end
+    end
+
     context 'with different variables in common nested routes' do
       let(:requests) do
         [

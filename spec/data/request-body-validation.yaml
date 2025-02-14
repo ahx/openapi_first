@@ -14,6 +14,21 @@ info:
 servers:
   - url: http://petstore.swagger.io/api
 paths:
+  /optional-request-body:
+    post:
+      requestBody:
+          # required: false # false is the default \o/
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - say
+                properties:
+                  say:
+                    type: string
+                    enum:
+                      - 'yes'
   /pets:
     post:
       description: Creates a new pet in the store.  Duplicates are allowed

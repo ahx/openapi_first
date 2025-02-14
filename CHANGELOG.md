@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### New feature
+- Add OpenapiFirst::Test::Coverage to track request/response coverage for your API descriptions. (https://github.com/ahx/openapi_first/pull/327)
+
 ## 2.2.4
 
 - Fix request validation file uploads in multipart/form-data requests with nested fields (https://github.com/ahx/openapi_first/issues/324)
