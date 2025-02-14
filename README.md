@@ -136,6 +136,9 @@ use OpenapiFirst::Middlewares::ResponseValidation, raise_error: true, spec: 'ope
 
 ### Coverage
 
+> [!NOTE]
+> This is a brand new feature. ✨ Your feedback is very welcome.
+
 This feature tracks all requests/resposes that are validated via openapi_first and get return an overal coverage value. If all of your described requests/responses have been validated successfully at least once, your coverage is 100%.
 By checking your validation coverage you can avoid API drift where your API description describes requests/responses differently than your implemention works.
 
