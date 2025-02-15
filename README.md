@@ -129,8 +129,10 @@ This can be useful in a test or staging environment, especially if you are adopt
 use OpenapiFirst::Middlewares::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] == 'test'
 
 # Pass `raise_error: false` to not raise an error:
-use OpenapiFirst::Middlewares::ResponseValidation, raise_error: true, spec: 'openapi.yaml'
+use OpenapiFirst::Middlewares::ResponseValidation, raise_error: false, spec: 'openapi.yaml'
 ```
+
+If you are adopting OpenAPI you can use these options together with [hooks](#hooks) to get notified about requests/responses that do match your API description.
 
 ## Contract Testing
 
