@@ -157,7 +157,7 @@ Here is how to set it up for RSpec in your `spec/spec_helper.rb`:
   ```ruby
   config.before type: :request do
     def app
-      OpenapiFirst::Test::(App)
+      OpenapiFirst::Test.app(App)
     end
   end
   ```
