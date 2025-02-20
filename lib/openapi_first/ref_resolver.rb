@@ -41,8 +41,11 @@ module OpenapiFirst
         @value = value
         @context = context
         @filepath = filepath
-        dir = File.dirname(File.expand_path(filepath)) if filepath
-        @dir = (dir && File.absolute_path(dir)) || Dir.pwd
+        @dir = if filepath
+          File.dirname(File.absolute_path(filepath))
+        else
+          Dir.pwd
+        end
       end
 
       # The value of this node
@@ -52,7 +55,7 @@ module OpenapiFirst
       # The object where this node was found in
       attr_reader :context
 
-      private attr_reader :filepath
+      attr_reader :filepath
 
       def resolve_ref(pointer)
         if pointer.start_with?('#')
@@ -108,8 +111,8 @@ module OpenapiFirst
       end
 
       def each
-        resolved.each do |key, value|
-          yield key, RefResolver.for(value, filepath:, context:)
+        resolved.each do |key, _value|
+          yield key, self[key]
         end
       end
 
@@ -117,6 +120,7 @@ module OpenapiFirst
       def schema(options)
         base_uri = URI::File.build({ path: "#{dir}/" })
         root = JSONSchemer::Schema.new(context, base_uri:, **options)
+        # binding.irb if value['maxItems'] == 4
         JSONSchemer::Schema.new(value, nil, root, base_uri:, **options)
       end
     end
@@ -135,8 +139,8 @@ module OpenapiFirst
       end
 
       def each
-        resolved.each do |item|
-          yield RefResolver.for(item, filepath:, context:)
+        resolved.each_with_index do |_item, index|
+          yield self[index]
         end
       end
 
