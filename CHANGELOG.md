@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 2.4.0
+
+- Support less verbose test setup without the need to call `OpenapiFirst::Test.report_coverage`, which will be called `at_exit`:
+  ```ruby
+  OpenapiFirst::Test.setup do |test|
+    test.register('openapi/openapi.yaml')
+    test.minimum_coverage = 100 # Setting this will lead to an `exit 2` if coverage is below minimum
+  end
+  ```
+- Add `OpenapiFirst::Test::Setup#minimum_coverage=` to control exit behaviour (exit 2 if coverage is below minimum)
+- Add `verbose` option to `OpenapiFirst::Test.report_coverage(verbose: true)`
+  to see all passing requests/responses
+
 ## 2.3.0
 
 ### New feature

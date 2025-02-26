@@ -279,7 +279,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     it 'raises an error' do
       expect do
         get '/pets'
-      end.to throw_symbol(OpenapiFirst::FAILURE)
+      end.to raise_error OpenapiFirst::ResponseInvalidError
     end
   end
 

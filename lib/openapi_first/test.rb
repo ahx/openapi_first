@@ -14,33 +14,58 @@ module OpenapiFirst
 
     # Helper class to setup tests
     class Setup
+      def initialize
+        @minimum_coverage = 0
+        yield self
+      end
+
       def register(*)
         Test.register(*)
       end
+
+      attr_accessor :minimum_coverage
+
+      # This called at_exit
+      def handle_exit
+        coverage = Coverage.result.coverage
+        # :nocov:
+        puts 'API Coverage did not detect any API requests for the registered API descriptions' if coverage.zero?
+        Test.report_coverage if coverage.positive?
+        return unless minimum_coverage > coverage
+
+        puts "API Coverage fails with exit 2, because API coverage of #{coverage}%" \
+             "is below minimum of #{minimum_coverage}%!"
+        exit 2
+        # :nocov:
+      end
     end
 
-    def self.setup
+    def self.setup(&)
       unless block_given?
         raise ArgumentError, "Please provide a block to #{self.class}.setup to register you API descriptions"
       end
 
       Coverage.start
-      setup = Setup.new
-      yield setup
-      return unless definitions.empty?
+      setup = Setup.new(&)
 
-      raise NotRegisteredError,
-            'No API descriptions have been registered. ' \
-            'Please register your API description via ' \
-            "OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }"
+      if definitions.empty?
+        raise NotRegisteredError,
+              'No API descriptions have been registered. ' \
+              'Please register your API description via ' \
+              "OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }"
+      end
+
+      @setup ||= at_exit do
+        setup.handle_exit
+      end
     end
 
     # Print the coverage report
     # @param formatter A formatter to define the report.
     # @output [IO] An output where to puts the report.
-    def self.report_coverage(formatter: Coverage::TerminalFormatter)
+    def self.report_coverage(formatter: Coverage::TerminalFormatter, **)
       coverage_result = Coverage.result
-      puts formatter.new.format(coverage_result)
+      puts formatter.new(**).format(coverage_result)
       puts "The overal API validation coverage of this run is: #{coverage_result.coverage}%"
     end
 
