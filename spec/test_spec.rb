@@ -43,6 +43,14 @@ RSpec.describe OpenapiFirst::Test do
       expect(described_class.definitions[:default].filepath).to eq(OpenapiFirst.load('./examples/openapi.yaml').filepath)
     end
 
+    it 'sets up minimum_coverage' do
+      described_class.setup do |test|
+        test.register('./examples/openapi.yaml')
+        test.minimum_coverage = 100
+      end
+      expect(described_class.definitions[:default].filepath).to eq(OpenapiFirst.load('./examples/openapi.yaml').filepath)
+    end
+
     it 'raises an error if no block is given' do
       expect do
         described_class.setup
@@ -57,10 +65,14 @@ RSpec.describe OpenapiFirst::Test do
   end
 
   describe '.report_coverage' do
+    let(:output) { StringIO.new }
+
     before do
       described_class.setup do |test|
         test.register('./spec/data/dice.yaml')
       end
+
+      allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
     end
 
     it 'reports 50% if halfe of requests/responses have been tracked' do
@@ -69,8 +81,6 @@ RSpec.describe OpenapiFirst::Test do
       definition.validate_request(valid_request, raise_error: true)
       # Response not tracked
 
-      output = StringIO.new
-      allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
       described_class.report_coverage
       expect(output.string).to include('The overal API validation coverage of this run is: 50%')
     end
@@ -84,8 +94,6 @@ RSpec.describe OpenapiFirst::Test do
       response.content_type = 'application/json'
       definition.validate_response(valid_request, response, raise_error: true)
 
-      output = StringIO.new
-      allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
       described_class.report_coverage
       expect(output.string).to include('The overal API validation coverage of this run is: 100%')
     end
@@ -100,8 +108,6 @@ RSpec.describe OpenapiFirst::Test do
         response.content_type = 'application/json'
         definition.validate_response(valid_request, response, raise_error: true)
 
-        output = StringIO.new
-        allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
         described_class.report_coverage(verbose: true)
 
         expected_output = [
