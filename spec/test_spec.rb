@@ -57,26 +57,73 @@ RSpec.describe OpenapiFirst::Test do
   end
 
   describe '.report_coverage' do
-    it 'reports 0% by default' do
-      output = StringIO.new
-      allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
-      described_class.report_coverage
-      expect(output.string).to include('0%')
-    end
-
-    it 'reports 0% if ' do
+    before do
       described_class.setup do |test|
         test.register('./spec/data/dice.yaml')
       end
+    end
 
+    it 'reports 50% if halfe of requests/responses have been tracked' do
       definition = OpenapiFirst.load('./spec/data/dice.yaml')
       valid_request = Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST'))
-      definition.validate_request(valid_request)
+      definition.validate_request(valid_request, raise_error: true)
+      # Response not tracked
 
       output = StringIO.new
       allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
       described_class.report_coverage
-      expect(output.string).to include('0%')
+      expect(output.string).to include('The overal API validation coverage of this run is: 50%')
+    end
+
+    it 'reports 100% if all requests/responses have been tracked' do
+      definition = OpenapiFirst.load('./spec/data/dice.yaml')
+      valid_request = Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST'))
+      definition.validate_request(valid_request, raise_error: true)
+
+      response = Rack::Response.new('4')
+      response.content_type = 'application/json'
+      definition.validate_response(valid_request, response, raise_error: true)
+
+      output = StringIO.new
+      allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
+      described_class.report_coverage
+      expect(output.string).to include('The overal API validation coverage of this run is: 100%')
+    end
+
+    context 'when passing verbose: true' do
+      it 'lists all requests/responses' do
+        definition = OpenapiFirst.load('./spec/data/dice.yaml')
+        valid_request = Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        definition.validate_request(valid_request, raise_error: true)
+
+        response = Rack::Response.new('4')
+        response.content_type = 'application/json'
+        definition.validate_response(valid_request, response, raise_error: true)
+
+        output = StringIO.new
+        allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
+        described_class.report_coverage(verbose: true)
+
+        expected_output = [
+          '✓ POST /roll',
+          '  ✓  200(application/json)',
+          'The overal API validation coverage of this run is: 100%'
+        ]
+        expect(output.string).to include(*expected_output)
+      end
+    end
+
+    context 'with no API description registered' do
+      before do
+        described_class.definitions.clear
+      end
+
+      it 'reports 0% by default' do
+        output = StringIO.new
+        allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
+        described_class.report_coverage
+        expect(output.string).to include('0%')
+      end
     end
   end
 

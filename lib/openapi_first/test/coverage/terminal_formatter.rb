@@ -5,6 +5,10 @@ module OpenapiFirst
     module Coverage
       # This is the default formatter
       class TerminalFormatter
+        def initialize(verbose: false)
+          @verbose = verbose
+        end
+
         # This takes a list of Coverage::Plan instances and outputs a String
         def format(coverage_result)
           @out = StringIO.new
@@ -12,7 +16,7 @@ module OpenapiFirst
           @out.string
         end
 
-        private attr_reader :out
+        private attr_reader :out, :verbose
 
         private
 
@@ -27,10 +31,10 @@ module OpenapiFirst
         def format_plan(plan)
           filepath = plan.filepath
           puts ['', "API validation coverage for #{filepath}: #{plan.coverage}%"]
-          return if plan.done?
+          return if plan.done? && !verbose
 
           plan.routes.each do |route|
-            next if route.finished?
+            next if route.finished? && !verbose
 
             format_requests(route.requests)
             next if route.requests.none?(&:requested?)
@@ -52,7 +56,7 @@ module OpenapiFirst
         def format_responses(responses)
           responses.each do |response|
             if response.finished?
-              puts green "  ✓  #{response_label(response)}"
+              puts green "  ✓  #{response_label(response)}" if verbose
             else
               puts red "  ❌ #{response_label(response)} – #{explain_unfinished_response(response)}"
             end

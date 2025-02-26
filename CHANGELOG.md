@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add `verbose` option to `OpenapiFirst::Test.report_coverage(verbose: true)`
+  to see all passing requests/responses
+
 ## 2.3.0
 
 ### New feature

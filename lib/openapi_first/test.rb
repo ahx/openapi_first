@@ -38,9 +38,9 @@ module OpenapiFirst
     # Print the coverage report
     # @param formatter A formatter to define the report.
     # @output [IO] An output where to puts the report.
-    def self.report_coverage(formatter: Coverage::TerminalFormatter)
+    def self.report_coverage(formatter: Coverage::TerminalFormatter, **)
       coverage_result = Coverage.result
-      puts formatter.new.format(coverage_result)
+      puts formatter.new(**).format(coverage_result)
       puts "The overal API validation coverage of this run is: #{coverage_result.coverage}%"
     end
 
