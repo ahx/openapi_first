@@ -151,6 +151,7 @@ Here is how to set it up for RSpec in your `spec/spec_helper.rb`:
   require 'openapi_first'
   OpenapiFirst::Test.setup do |test|
     test.register('openapi/openapi.yaml')
+    test.minimum_coverage = 100 # Setting this will lead to an `exit 2` if coverage is below minimum
   end
   ```
 2. Wrap your app with silent request / response validation. This validates all requets/responses you do during your test run. (✷1)
@@ -160,11 +161,6 @@ Here is how to set it up for RSpec in your `spec/spec_helper.rb`:
       OpenapiFirst::Test.app(App)
     end
   end
-  ```
-3. Check coverage after your test suite has finished
-  ```ruby
-  # Prints a coverage report to the terminal
-  config.after(:suite) { OpenapiFirst::Test.report_coverage }
   ```
 
 (✷1): Instead of using `OpenapiFirstTest.app` to wrap your application, you can use the middlewares or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.

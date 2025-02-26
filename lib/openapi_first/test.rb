@@ -24,15 +24,29 @@ module OpenapiFirst
       end
 
       attr_accessor :minimum_coverage
+
+      # This called at_exit
+      def handle_exit
+        coverage = Coverage.result.coverage
+        # :nocov:
+        puts 'API Coverage did not detect any API requests for the registered API descriptions' if coverage.zero?
+        Test.report_coverage if coverage.positive?
+        return unless minimum_coverage > coverage
+
+        puts "API Coverage fails with exit 2, because API coverage of #{coverage}%" \
+             "is below minimum of #{minimum_coverage}%!"
+        exit 2
+        # :nocov:
+      end
     end
 
-    def self.setup(&block)
+    def self.setup(&)
       unless block_given?
         raise ArgumentError, "Please provide a block to #{self.class}.setup to register you API descriptions"
       end
 
       Coverage.start
-      setup = Setup.new(&block)
+      setup = Setup.new(&)
 
       if definitions.empty?
         raise NotRegisteredError,
@@ -41,15 +55,8 @@ module OpenapiFirst
               "OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }"
       end
 
-      @exit_handler ||= at_exit do
-        coverage = Coverage.result.coverage
-        minimum_coverage = setup.minimum_coverage
-        puts "API Coverage did not detect any API requests for the registered API descriptions" if coverage.zero?
-        Test.report_coverage if coverage > 0
-        if minimum_coverage > coverage
-          puts "API Coverage fails with exit 2, because API coverage of #{coverage}% is below minimum of #{minimum_coverage}%!"
-          exit 2
-        end
+      @setup ||= at_exit do
+        setup.handle_exit
       end
     end
 
