@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['andreas.haller@posteo.de']
   spec.licenses      = ['MIT']
 
-  spec.summary       = 'Implement HTTP APIs based on OpenApi 3.x'
+  spec.summary       = 'OpenAPI based request validation, response validation, contract-testing and coverage'
   spec.homepage      = 'https://github.com/ahx/openapi_first'
 
   spec.metadata['homepage_uri'] = spec.homepage
