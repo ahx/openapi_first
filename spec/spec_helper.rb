@@ -27,7 +27,8 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.after do
+  config.after(:each) do
     OpenapiFirst::Test.definitions.clear
+    OpenapiFirst::Test::Coverage.uninstall
   end
 end

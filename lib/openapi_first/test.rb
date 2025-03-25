@@ -18,6 +18,7 @@ module OpenapiFirst
         @minimum_coverage = 0
         @coverage_formatter = Coverage::TerminalFormatter
         @coverage_formatter_options = {}
+        @skip_response_coverage = nil
         yield self
       end
 
@@ -25,9 +26,13 @@ module OpenapiFirst
         Test.register(*)
       end
 
-      def skip_response_coverage_for_status(*statuses); end
-
       attr_accessor :minimum_coverage, :coverage_formatter_options, :coverage_formatter
+
+      def skip_response_coverage(&block)
+        return @skip_response_coverage unless block_given?
+
+        @skip_response_coverage = block
+      end
 
       # This called at_exit
       def handle_exit
@@ -54,8 +59,9 @@ module OpenapiFirst
         raise ArgumentError, "Please provide a block to #{self.class}.setup to register you API descriptions"
       end
 
-      Coverage.start
+      Coverage.install
       setup = Setup.new(&)
+      Coverage.start(skip_response: setup.skip_response_coverage)
 
       if definitions.empty?
         raise NotRegisteredError,

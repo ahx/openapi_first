@@ -5,7 +5,7 @@ require 'minitest'
 RSpec.describe OpenapiFirst::Test do
   after(:each) do
     described_class.definitions.clear
-    OpenapiFirst::Test::Coverage.stop
+    OpenapiFirst::Test::Coverage.uninstall
     OpenapiFirst::Test::Coverage.reset
   end
 
@@ -49,6 +49,14 @@ RSpec.describe OpenapiFirst::Test do
         test.minimum_coverage = 100
       end
       expect(described_class.definitions[:default].filepath).to eq(OpenapiFirst.load('./examples/openapi.yaml').filepath)
+    end
+
+    it 'can skip responses for coverage' do
+      described_class.setup do |test|
+        test.register('./examples/openapi.yaml')
+        test.skip_response_coverage { |res| res.status == '401' }
+      end
+      expect(described_class::Coverage.plans.first.tasks.count).to eq(2)
     end
 
     it 'raises an error if no block is given' do
