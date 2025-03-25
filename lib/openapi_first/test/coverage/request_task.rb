@@ -14,13 +14,15 @@ module OpenapiFirst
         def initialize(request_definition)
           @request = request_definition
           @requested = false
+          @last_error_message = nil
         end
 
-        attr_reader :request
+        attr_reader :request, :last_error_message
 
         def track(validated_request)
           @requested = true
           @valid ||= true if validated_request.valid?
+          @last_error_message = validated_request.error.exception_message unless validated_request.valid?
         end
 
         def requested?

@@ -84,7 +84,7 @@ module OpenapiFirst
         def explain_unfinished_request(request)
           return 'No requests tracked!' unless request.requested?
 
-          'All requests invalid!' unless request.any_valid_request?
+          "All requests invalid! (#{request.last_error_message.inspect})" unless request.any_valid_request?
         end
 
         def response_label(response)
@@ -97,7 +97,7 @@ module OpenapiFirst
         def explain_unfinished_response(response)
           return 'No responses tracked!' unless response.responded?
 
-          'All responses invalid!' unless response.any_valid_response?
+          "All responses invalid! (#{response.last_error_message.inspect})" unless response.any_valid_response?
         end
       end
     end

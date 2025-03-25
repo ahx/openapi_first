@@ -14,13 +14,15 @@ module OpenapiFirst
         def initialize(response_definition)
           @response = response_definition
           @responded = false
+          @last_error_message = nil
         end
 
-        attr_reader :response
+        attr_reader :response, :last_error_message
 
         def track(validated_response)
           @responded = true
           @valid ||= true if validated_response.valid?
+          @last_error_message = validated_response.error.exception_message unless validated_response.valid?
         end
 
         def responded?
