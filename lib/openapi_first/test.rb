@@ -16,6 +16,8 @@ module OpenapiFirst
     class Setup
       def initialize
         @minimum_coverage = 0
+        @coverage_formatter = Coverage::TerminalFormatter
+        @coverage_formatter_options = {}
         yield self
       end
 
@@ -23,14 +25,21 @@ module OpenapiFirst
         Test.register(*)
       end
 
-      attr_accessor :minimum_coverage
+      def skip_response_coverage_for_status(*statuses); end
+
+      attr_accessor :minimum_coverage, :coverage_formatter_options, :coverage_formatter
 
       # This called at_exit
       def handle_exit
         coverage = Coverage.result.coverage
         # :nocov:
         puts 'API Coverage did not detect any API requests for the registered API descriptions' if coverage.zero?
-        Test.report_coverage if coverage.positive?
+        if coverage.positive?
+          Test.report_coverage(
+            formatter: coverage_formatter,
+            **coverage_formatter_options
+          )
+        end
         return unless minimum_coverage > coverage
 
         puts "API Coverage fails with exit 2, because API coverage of #{coverage}%" \

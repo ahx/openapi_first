@@ -104,7 +104,7 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
 
     plan.track_request(valid_request)
     plan.track_response(valid_response)
-    expect(plan.coverage).to eq(66)
+    expect(plan.coverage).to eq(66.66666666666667)
     plan.track_response(valid_400_response)
 
     expect(plan.coverage).to eq(100)
