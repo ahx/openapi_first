@@ -45,7 +45,7 @@ module OpenapiFirst
           return 0 if done.zero?
 
           all = tasks.count
-          (done / (all.to_f / 100)).to_i
+          (done / (all.to_f / 100))
         end
 
         def tasks
