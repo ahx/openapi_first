@@ -2,8 +2,20 @@
 
 ## Unreleased
 
-- OpenapiFirst::Test.report_coverage now includes fractional digits when returning a coverage value to avoid reporting "0% / no requests made" even though some requests have been made.
+## 2.5.0
+
+### New feature
 - Add option to skip certain responses in coverage calculation
+  ```ruby
+  require 'openapi_first'
+  OpenapiFirst::Test.setup do |s|
+    test.register('openapi/openapi.yaml')
+    test.skip_response_coverage { it.status == '401' }
+  end
+  ```
+
+### Minor changes
+- OpenapiFirst::Test.report_coverage now includes fractional digits when returning a coverage value to avoid reporting "0% / no requests made" even though some requests have been made.
 - Show details about invalid requests / responses in coverage report
 
 ## 2.4.0
