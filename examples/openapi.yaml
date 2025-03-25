@@ -26,3 +26,5 @@ paths:
                 properties:
                   hello:
                     type: string
+        "401":
+          description: Unauthorized

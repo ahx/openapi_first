@@ -67,7 +67,7 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     oad.validate_response(request, response)
   end
 
-  subject(:plan) { described_class.new(oad) }
+  subject(:plan) { described_class.for(oad) }
 
   it 'tracks requests and responses' do
     request = plan.routes.first.requests.first
@@ -136,5 +136,21 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     expect(plan.tasks[0].path).to eq('/stuff/{id}')
     expect(plan.tasks[1].status).to eq('200')
     expect(plan.tasks[2].status).to eq('4XX')
+  end
+
+  context 'with skip_response option' do
+    let(:plan) do
+      skip_response = ->(response) { response.status == '4XX' }
+      described_class.for(oad, skip_response:)
+    end
+
+    it 'can be done without the skipped response' do
+      expect(plan).not_to be_done
+
+      plan.track_request(valid_request)
+      plan.track_response(valid_response)
+
+      expect(plan.coverage).to eq(100)
+    end
   end
 end

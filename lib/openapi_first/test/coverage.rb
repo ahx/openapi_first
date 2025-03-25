@@ -13,7 +13,11 @@ module OpenapiFirst
       Result = Data.define(:plans, :coverage)
 
       class << self
-        def start
+        attr_reader :current_run
+
+        def install
+          return if @installed
+
           @after_request_validation = lambda do |validated_request, oad|
             track_request(validated_request, oad)
           end
@@ -26,12 +30,21 @@ module OpenapiFirst
             config.after_request_validation(&@after_request_validation)
             config.after_response_validation(&@after_response_validation)
           end
+          @installed = true
         end
 
-        def stop
+        def start(skip_response: nil)
+          @current_run = Test.definitions.values.to_h do |oad|
+            plan = Plan.for(oad, skip_response:)
+            [oad.filepath, plan]
+          end
+        end
+
+        def uninstall
           configuration = OpenapiFirst.configuration
           configuration.hooks[:after_request_validation].delete(@after_request_validation)
           configuration.hooks[:after_response_validation].delete(@after_response_validation)
+          @installed = nil
         end
 
         # Clear current coverage run
@@ -51,23 +64,17 @@ module OpenapiFirst
           Result.new(plans:, coverage:)
         end
 
-        private
-
         # Returns all plans (Plan) that were registered for this run
         def plans
-          current_run.values
+          current_run&.values
         end
+
+        private
 
         def coverage
-          return 0 if plans.empty?
+          return 0 unless plans
 
           plans.sum(&:coverage) / plans.length
-        end
-
-        def current_run
-          @current_run ||= Test.definitions.values.to_h do |oad|
-            [oad.filepath, Plan.new(oad)]
-          end
         end
       end
     end

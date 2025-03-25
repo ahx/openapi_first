@@ -149,9 +149,10 @@ Here is how to set it up for RSpec in your `spec/spec_helper.rb`:
 1. Register all OpenAPI documents to track coverage for and start tracking. This should go at the top of you test helper file before loading application code.
   ```ruby
   require 'openapi_first'
-  OpenapiFirst::Test.setup do |test|
+  OpenapiFirst::Test.setup do |s|
     test.register('openapi/openapi.yaml')
     test.minimum_coverage = 100 # Setting this will lead to an `exit 2` if coverage is below minimum
+    test.skip_response_coverage { it.status == '500' }
   end
   ```
 2. Wrap your app with silent request / response validation. This validates all requets/responses you do during your test run. (✷1)

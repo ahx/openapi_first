@@ -3,6 +3,7 @@
 ## Unreleased
 
 - OpenapiFirst::Test.report_coverage now includes fractional digits when returning a coverage value to avoid reporting "0% / no requests made" even though some requests have been made.
+- Add option to skip certain responses in coverage calculation
 
 ## 2.4.0
 
