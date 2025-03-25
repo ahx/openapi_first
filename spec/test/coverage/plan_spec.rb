@@ -50,11 +50,24 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     oad.validate_request(request)
   end
 
+  let(:invalid_request) do
+    request = Rack::Request.new(Rack::MockRequest.env_for('/stuff/2t4'))
+    oad.validate_request(request)
+  end
+
   let(:valid_response) do
     request = Rack::Request.new(Rack::MockRequest.env_for('/stuff/24'))
     response = Rack::Response.new
     response.content_type = 'application/json'
     response.write JSON.generate({})
+    oad.validate_response(request, response)
+  end
+
+  let(:invalid_response) do
+    request = Rack::Request.new(Rack::MockRequest.env_for('/stuff/24'))
+    response = Rack::Response.new
+    response.content_type = 'application/json'
+    response.write JSON.generate('foo')
     oad.validate_response(request, response)
   end
 
@@ -83,6 +96,24 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     plan.track_response(valid_response)
 
     expect(response.responded?).to be(true)
+  end
+
+  it 'stores details about invalid responses' do
+    plan.track_response(invalid_response)
+
+    response = plan.routes.first.responses.first
+    expect(response.responded?).to eq(true)
+    expect(response.any_valid_response?).to eq(false)
+    expect(response.last_error_message).to eq('Response body is invalid: value at root is not an object')
+  end
+
+  it 'stores details about invalid requests' do
+    plan.track_request(invalid_request)
+
+    request = plan.routes.first.requests.first
+    expect(request.requested?).to eq(true)
+    expect(request.any_valid_request?).to eq(false)
+    expect(request.last_error_message).to eq('Path segment is invalid: value at `/id` is not an integer')
   end
 
   it 'ignores unknown requests' do
