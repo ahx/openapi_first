@@ -155,13 +155,18 @@ Here is how to set it up for RSpec in your `spec/spec_helper.rb`:
     test.skip_response_coverage { it.status == '500' }
   end
   ```
-2. Wrap your app with silent request / response validation. This validates all requets/responses you do during your test run. (✷1)
+2. Add an `app` method to your tests that wraps your application with silent request / response validation. This validates all requests/responses you do during your test run. (✷1)
+
   ```ruby
-  config.before type: :request do
-    def app
-      OpenapiFirst::Test.app(App)
-    end
+  def app
+    OpenapiFirst::Test.app(App)
   end
+  ```
+
+  Or you can generate a Module and include it in your rspec spec_helper.rb:
+
+  ```ruby
+  config.include OpenapiFirst::Test::Methods[App], type: :request
   ```
 
 (✷1): Instead of using `OpenapiFirstTest.app` to wrap your application, you can use the middlewares or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
