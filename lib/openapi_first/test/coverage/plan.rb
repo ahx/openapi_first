@@ -38,7 +38,7 @@ module OpenapiFirst
         end
 
         def track_response(validated_response)
-          index[validated_response.response_definition.key].track(validated_response) if validated_response.known?
+          index[validated_response.response_definition.key]&.track(validated_response) if validated_response.known?
         end
 
         def done?

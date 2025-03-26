@@ -169,6 +169,25 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     expect(plan.tasks[2].status).to eq('4XX')
   end
 
+  it 'ignores unknown responses' do
+    request = Rack::Request.new(Rack::MockRequest.env_for('/stuff/24'))
+    response = Rack::Response.new
+    response.status = 208
+    unknown_response = oad.validate_response(request, response)
+
+    plan.track_response(unknown_response)
+
+    expect(plan.tasks.count(&:finished?)).to eq(0)
+  end
+
+  it 'ignores skipped responses' do
+    plan = described_class.for(oad, skip_response: ->(res) { res.status == '200' })
+
+    plan.track_response(valid_response)
+
+    expect(plan.tasks.count(&:finished?)).to eq(0)
+  end
+
   context 'with skip_response option' do
     let(:plan) do
       skip_response = ->(response) { response.status == '4XX' }

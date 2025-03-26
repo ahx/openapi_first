@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.5.1
+
+- Fix skipping skipped responses during coverage tracking
+
 ## 2.5.0
 
 ### New feature
