@@ -81,7 +81,6 @@ module OpenapiFirst
     def self.report_coverage(formatter: Coverage::TerminalFormatter, **)
       coverage_result = Coverage.result
       puts formatter.new(**).format(coverage_result)
-      puts "The overal API validation coverage of this run is: #{coverage_result.coverage}%"
     end
 
     # Returns the Rack app wrapped with silent request, response validation

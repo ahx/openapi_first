@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Make default coverage report less verbose
+  The default formatter (TerminalFormatter) no longer prints all un-requested requests by default. You can set `test.coverage_formatter_options = { focused: false }` to get back the old behavior
+
 ## 2.5.1
 
 - Fix skipping skipped responses during coverage tracking

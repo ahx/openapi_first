@@ -90,7 +90,7 @@ RSpec.describe OpenapiFirst::Test do
       # Response not tracked
 
       described_class.report_coverage
-      expect(output.string).to include('The overal API validation coverage of this run is: 50.0%')
+      expect(output.string).to include('API validation coverage for ./spec/data/dice.yaml: 50.0%')
     end
 
     it 'reports 100% if all requests/responses have been tracked' do
@@ -103,7 +103,7 @@ RSpec.describe OpenapiFirst::Test do
       definition.validate_response(valid_request, response, raise_error: true)
 
       described_class.report_coverage
-      expect(output.string).to include('The overal API validation coverage of this run is: 100.0%')
+      expect(output.string).to include('API validation coverage for ./spec/data/dice.yaml: 100.0%')
     end
 
     context 'when passing verbose: true' do
@@ -120,8 +120,7 @@ RSpec.describe OpenapiFirst::Test do
 
         expected_output = [
           '✓ POST /roll',
-          '  ✓  200(application/json)',
-          'The overal API validation coverage of this run is: 100.0%'
+          '  ✓  200(application/json)'
         ]
         expect(output.string).to include(*expected_output)
       end

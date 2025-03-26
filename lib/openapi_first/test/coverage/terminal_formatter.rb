@@ -5,8 +5,9 @@ module OpenapiFirst
     module Coverage
       # This is the default formatter
       class TerminalFormatter
-        def initialize(verbose: false)
+        def initialize(verbose: false, focused: true)
           @verbose = verbose
+          @focused = focused && !verbose
         end
 
         # This takes a list of Coverage::Plan instances and outputs a String
@@ -16,7 +17,7 @@ module OpenapiFirst
           @out.string
         end
 
-        private attr_reader :out, :verbose
+        private attr_reader :out, :verbose, :focused
 
         private
 
@@ -36,8 +37,9 @@ module OpenapiFirst
           plan.routes.each do |route|
             next if route.finished? && !verbose
 
+            next if route.requests.none?(&:requested?) && focused
+
             format_requests(route.requests)
-            next if route.requests.none?(&:requested?)
 
             format_responses(route.responses)
           end
