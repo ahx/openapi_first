@@ -168,12 +168,6 @@ This feature tracks all requests/resposes that are validated via openapi_first a
   end
   ```
 
-  Or you can generate a Module and include it in your rspec spec_helper.rb:
-
-  ```ruby
-  config.include OpenapiFirst::Test::Methods[MyApp], type: :request
-  ```
-
 (✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the middlewares or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
 
 ### Test assertions
