@@ -140,7 +140,7 @@ Here are two aspects of contract testing: Validation and Coverage
 
 ### Validation
 
-By validating requests and responses, you can avoid that your API implementation processes requests or returns responses that don't match your API description. You can use [test assertions](#test-assertions) or [rack middlewares](#rack-middlewares) to validate requests and responses with openapi_first.
+By validating requests and responses, you can avoid that your API implementation processes requests or returns responses that don't match your API description. You can use [test assertions](#test-assertions) or [rack middlewares](#rack-middlewares) or manual validation to validate requests and responses with openapi_first.
 
 ### Coverage
 
@@ -149,7 +149,8 @@ To make sure your _whole_ API description is implemented, openapi_first ships wi
 > [!NOTE]
 > This is a brand new feature. ✨ Your feedback is very welcome.
 
-This feature tracks all requests/resposes that are validated via openapi_first and returns overal coverage value. Here is how to set it up with rack-test or Rails' request specs:
+This feature tracks all requests/resposes that are validated via openapi_first and tells you about which request/responses are missing.
+Here is how to set it up with [rack-test](https://github.com/rack/rack-test):
 
 1. Register all OpenAPI documents to track coverage for. This should go at the top of your test helper file before loading your application code.
   ```ruby
