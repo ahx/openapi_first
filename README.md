@@ -149,9 +149,9 @@ To make sure your _whole_ API description is implemented, openapi_first ships wi
 > [!NOTE]
 > This is a brand new feature. ✨ Your feedback is very welcome.
 
-This feature tracks all requests/resposes that are validated via openapi_first and get return an overal coverage value.
+This feature tracks all requests/resposes that are validated via openapi_first and returns overal coverage value. Here is how to set it up with rack-test or Rails' request specs:
 
-1. Register all OpenAPI documents to track coverage for and start tracking. This should go at the top of your test helper file before loading your application code.
+1. Register all OpenAPI documents to track coverage for. This should go at the top of your test helper file before loading your application code.
   ```ruby
   require 'openapi_first'
   OpenapiFirst::Test.setup do |s|
@@ -167,6 +167,7 @@ This feature tracks all requests/resposes that are validated via openapi_first a
     OpenapiFirst::Test.app(MyApp)
   end
   ```
+3. Run your tests.  The Coverage feature will tell you about missing request/responses. 
 
 (✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the middlewares or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
 
