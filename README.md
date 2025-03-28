@@ -136,13 +136,19 @@ If you are adopting OpenAPI you can use these options together with [hooks](#hoo
 
 ## Contract Testing
 
+The main goal of contract testing is to avoid API drift. There are two aspects of contract testing:
+  1. Request/Response validation
+  2. Coverage
+
+With openapi_first, you can get 1. via the middlewares or the test assertion method, but there is
+
 ### Coverage
 
 > [!NOTE]
 > This is a brand new feature. ✨ Your feedback is very welcome.
 
-This feature tracks all requests/resposes that are validated via openapi_first and get return an overal coverage value. If all of your described requests/responses have been validated successfully at least once, your coverage is 100%.
-By checking your validation coverage you can avoid API drift where your API description describes requests/responses differently than your implemention works.
+This feature tracks all requests/resposes that are validated via openapi_first and get return an overal coverage value.
+By checking your validation coverage you can avoid API drift.
 
 Here is how to set it up for RSpec in your `spec/spec_helper.rb`:
 
