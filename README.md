@@ -136,32 +136,31 @@ If you are adopting OpenAPI you can use these options together with [hooks](#hoo
 
 ## Contract Testing
 
-The main goal of contract testing is to avoid API drift. There are two aspects of contract testing:
-  1. Request/Response validation
-  2. Coverage
+Here are two aspects of contract testing: Validation and Coverage
 
-With openapi_first, you can get 1. via the middlewares or the test assertion method, but there is
+### Validation
+
+By validating requests and responses, you can avoid that your API implementation processes requests or returns responses that don't match your API description. You can use [test assertions](#test-assertions) or [rack middlewares](#rack-middlewares) to validate requests and responses with openapi_first.
 
 ### Coverage
+
+To make sure your _whole_ API description is implemented, openapi_first ships with a coverage feature.
 
 > [!NOTE]
 > This is a brand new feature. ✨ Your feedback is very welcome.
 
 This feature tracks all requests/resposes that are validated via openapi_first and get return an overal coverage value.
-By checking your validation coverage you can avoid API drift.
 
-Here is how to set it up for RSpec in your `spec/spec_helper.rb`:
-
-1. Register all OpenAPI documents to track coverage for and start tracking. This should go at the top of you test helper file before loading application code.
+1. Register all OpenAPI documents to track coverage for and start tracking. This should go at the top of your test helper file before loading your application code.
   ```ruby
   require 'openapi_first'
   OpenapiFirst::Test.setup do |s|
     test.register('openapi/openapi.yaml')
-    test.minimum_coverage = 100 # Setting this will lead to an `exit 2` if coverage is below minimum
-    test.skip_response_coverage { it.status == '500' }
+    test.minimum_coverage = 100 # (Optional) Setting this will lead to an `exit 2` if coverage is below minimum
+    test.skip_response_coverage { it.status == '500' } # (Optional) Skip certain responses
   end
   ```
-2. Add an `app` method to your tests that wraps your application with silent request / response validation. This validates all requests/responses you do during your test run. (✷1)
+2. Add an `app` method to your tests that wraps your application with silent request / response validation. This validates all requests/responses in your test run. (✷1)
 
   ```ruby
   def app
@@ -175,7 +174,7 @@ Here is how to set it up for RSpec in your `spec/spec_helper.rb`:
   config.include OpenapiFirst::Test::Methods[App], type: :request
   ```
 
-(✷1): Instead of using `OpenapiFirstTest.app` to wrap your application, you can use the middlewares or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
+(✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the middlewares or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
 
 ### Test assertions
 
