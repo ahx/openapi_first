@@ -160,18 +160,18 @@ This feature tracks all requests/resposes that are validated via openapi_first a
     test.skip_response_coverage { it.status == '500' } # (Optional) Skip certain responses
   end
   ```
-2. Add an `app` method to your tests that wraps your application with silent request / response validation. This validates all requests/responses in your test run. (✷1)
+2. Add an `app` method to your tests, which wraps your application with silent request / response validation. This validates all requests/responses in your test run. (✷1)
 
   ```ruby
   def app
-    OpenapiFirst::Test.app(App)
+    OpenapiFirst::Test.app(MyApp)
   end
   ```
 
   Or you can generate a Module and include it in your rspec spec_helper.rb:
 
   ```ruby
-  config.include OpenapiFirst::Test::Methods[App], type: :request
+  config.include OpenapiFirst::Test::Methods[MyApp], type: :request
   ```
 
 (✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the middlewares or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
@@ -315,6 +315,10 @@ end
 
 Using rack middlewares is supported in probably all Ruby web frameworks.
 If you are using Ruby on Rails for example, you can add the request validation middleware globally in `config/application.rb` or inside specific controllers.
+
+The contract testing feature is designed to be used via rack-test, which should be compatible all Ruby web frameworks as well.
+
+That aside, closer integration with specific frameworks like Sinatra, Hanami, Roda or Rails would be great. If you have ideas, pain points or PRs, please don't hesitate to [share](https://github.com/ahx/openapi_first/discussions).
 
 ## Alternatives
 
