@@ -25,6 +25,26 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
   end
   let(:response) { Rack::Response.new(response_body, status, headers) }
 
+  context 'with path to OAD as first argument' do
+    let(:response_body) { '2' }
+
+    let(:app) do
+      res = response
+      definition = spec
+      Rack::Builder.app do
+        use Rack::Lint
+        use OpenapiFirst::Middlewares::ResponseValidation, definition
+        run ->(_env) { res.finish }
+      end
+    end
+
+    it 'fails if request is inavlid' do
+      expect do
+        get '/pets'
+      end.to raise_error OpenapiFirst::ResponseInvalidError
+    end
+  end
+
   context 'without content-type header' do
     let(:headers) do
       { 'X-HEAD' => '/api/next-page' }

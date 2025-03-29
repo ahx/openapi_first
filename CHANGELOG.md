@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Middlewares now accept the OAD as a first positional argument instead of `:spec` inside the options hash.
 - `OpenapiFirst::Test::Methods[MyApplication]` returns a Module which adds an `app` method to be used by rack-test alonside the `assert_api_conform` method.
 - Make default coverage report less verbose
   The default formatter (TerminalFormatter) no longer prints all un-requested requests by default. You can set `test.coverage_formatter_options = { focused: false }` to get back the old behavior
