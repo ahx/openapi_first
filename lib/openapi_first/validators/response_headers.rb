@@ -28,7 +28,6 @@ module OpenapiFirst
       def error_for(data_pointer:, value:, error:)
         Schema::ValidationError.new(
           value: value,
-          message: "value at #{data_pointer} is invalid",
           data_pointer:,
           schema_pointer: error['schema_pointer'],
           type: error['type'],

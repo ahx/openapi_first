@@ -33,7 +33,7 @@ RSpec.describe 'Response Header validation' do
   it 'fails with an invalid header' do
     expect do
       post '/echo', JSON.generate({ 'Location' => '/echos/42', 'X-Id' => 'not-an-integer' })
-    end.to raise_error OpenapiFirst::ResponseInvalidError, 'Response header is invalid: value at /X-Id is invalid'
+    end.to raise_error OpenapiFirst::ResponseInvalidError, 'Response header is invalid: value at `/X-Id` is not an integer'
   end
 
   it 'ignores "Content-Type" header' do
