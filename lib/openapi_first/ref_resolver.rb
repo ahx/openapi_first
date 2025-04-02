@@ -41,8 +41,11 @@ module OpenapiFirst
         @value = value
         @context = context
         @filepath = filepath
-        dir = File.dirname(File.expand_path(filepath)) if filepath
-        @dir = (dir && File.absolute_path(dir)) || Dir.pwd
+        @dir = if filepath
+                 File.dirname(File.absolute_path(filepath))
+               else
+                 Dir.pwd
+               end
       end
 
       # The value of this node
@@ -52,7 +55,11 @@ module OpenapiFirst
       # The object where this node was found in
       attr_reader :context
 
-      private attr_reader :filepath
+      attr_reader :filepath
+
+      def ==(_other)
+        raise "Don't call == on an unresolved value. Use .value == other instead."
+      end
 
       def resolve_ref(pointer)
         if pointer.start_with?('#')
@@ -89,6 +96,10 @@ module OpenapiFirst
       include Diggable
       include Enumerable
 
+      def ==(_other)
+        raise "Don't call == on an unresolved value. Use .value == other instead."
+      end
+
       def resolved
         return resolve_ref(value['$ref']).value if value.key?('$ref')
 
@@ -108,17 +119,16 @@ module OpenapiFirst
       end
 
       def each
-        resolved.each do |key, value|
-          yield key, RefResolver.for(value, filepath:, context:)
+        resolved.each_key do |key|
+          yield key, self[key]
         end
       end
 
-      def schema(options = {})
-        ref_resolver = JSONSchemer::CachedResolver.new do |uri|
-          FileLoader.load(uri.path)
-        end
+      # You have to pass configuration or ref_resolver
+      def schema(options)
         base_uri = URI::File.build({ path: "#{dir}/" })
-        root = JSONSchemer::Schema.new(context, base_uri:, ref_resolver:, **options)
+        root = JSONSchemer::Schema.new(context, base_uri:, **options)
+        # binding.irb if value['maxItems'] == 4
         JSONSchemer::Schema.new(value, nil, root, base_uri:, **options)
       end
     end
@@ -137,8 +147,8 @@ module OpenapiFirst
       end
 
       def each
-        resolved.each do |item|
-          yield RefResolver.for(item, filepath:, context:)
+        resolved.each_with_index do |_item, index|
+          yield self[index]
         end
       end
 

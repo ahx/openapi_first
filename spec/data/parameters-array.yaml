@@ -12,15 +12,7 @@ paths:
       summary: Get some info
       operationId: info
       parameters:
-        - name: strings
-          in: query
-          required: false
-          explode: false
-          schema:
-            type: array
-            maxItems: 4
-            items:
-              type: string
+        - $ref: './components/parameters/strings.yaml'
         - name: integers
           in: query
           required: false

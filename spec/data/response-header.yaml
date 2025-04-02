@@ -16,7 +16,7 @@ paths:
           description: Ok
           headers:
             OptionalWithoutSchema:
-              description: "optonal"
+              description: "optional"
             "Content-Type":
               required: true
               schema:
@@ -30,3 +30,5 @@ paths:
             X-Id:
               schema:
                 type: integer
+            X-Authors:
+              $ref: './components/headers/x-authors.yaml'

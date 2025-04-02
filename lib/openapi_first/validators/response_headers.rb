@@ -3,24 +3,37 @@
 module OpenapiFirst
   module Validators
     class ResponseHeaders
-      def self.for(response_definition)
-        schema = response_definition&.headers_schema
-        return unless schema&.value
-
-        new(schema)
+      def initialize(headers)
+        @headers = headers
       end
 
-      def initialize(schema)
-        @schema = schema
+      attr_reader :headers
+
+      def call(parsed_response)
+        headers.each do |header|
+          header_value = parsed_response.headers[header.name]
+          next if header_value.nil? && !header.required?
+
+          validation_errors = header.schema.validate(header_value)
+          next unless validation_errors.any?
+
+          Failure.fail!(:invalid_response_header,
+                        errors: [error_for(data_pointer: "/#{header.name}", value: header_value,
+                                           error: validation_errors.first)])
+        end
       end
 
-      attr_reader :schema
+      private
 
-      def call(parsed_request)
-        validation = Schema::ValidationResult.new(
-          schema.validate(parsed_request.headers)
+      def error_for(data_pointer:, value:, error:)
+        Schema::ValidationError.new(
+          value: value,
+          data_pointer:,
+          schema_pointer: error['schema_pointer'],
+          type: error['type'],
+          details: error['details'],
+          schema: error['schema']
         )
-        Failure.fail!(:invalid_response_header, errors: validation.errors) if validation.error?
       end
     end
   end

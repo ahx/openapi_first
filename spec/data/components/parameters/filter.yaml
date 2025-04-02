@@ -1,0 +1,15 @@
+name: filter
+in: query
+description: Filter results
+example: "filter[name]"
+style: deepObject
+schema:
+  type: object
+  required: [name]
+  properties:
+    name:
+      $ref: '../schemas/name.yaml'
+    other:
+      type: object
+    id:
+      type: integer
