@@ -104,6 +104,25 @@ RSpec.describe 'Query Parameter validation' do
       expect(last_request.env[OpenapiFirst::REQUEST].parsed_query).to eq expected_params
     end
 
+    context 'multiple parameter validation failures' do
+      let(:spec) { OpenapiFirst.load('./spec/data/parameters.yaml') }
+
+      it 'returns multiple errors' do
+        params = {
+          birthdate: '1',
+          limit: 'a'
+        }
+        get '/search', params
+        expect(last_response.status).to eq(400)
+        errors = JSON.parse(last_response.body)['errors']
+        expect(errors).to include(
+          hash_including('parameter' => 'limit', 'code' => 'integer'),
+          hash_including('parameter' => 'birthdate', 'code' => 'format'),
+          hash_including('parameter' => '', 'code' => 'required')
+        )
+      end
+    end
+
     context 'with array query parameters' do
       let(:spec) { OpenapiFirst.load('./spec/data/parameters-array.yaml') }
 
@@ -186,7 +205,8 @@ RSpec.describe 'Query Parameter validation' do
         {
           'term' => 'Oscar',
           'filter[id]' => '1',
-          'filter[other]' => 'things'
+          'filter[other]' => 'things',
+          'filter[name]' => 'ahmed'
         }
       end
 
@@ -197,8 +217,8 @@ RSpec.describe 'Query Parameter validation' do
         expect(last_response.status).to eq 400
       end
 
-      it 'returns 400 if non-required array parameter is nil' do
-        params['filter[tag]'] = nil
+      it 'returns 400 if non-required parameter is nil' do
+        params['filter[id]'] = nil
         get '/search', params
         expect(last_response.status).to eq 400
       end
@@ -305,7 +325,7 @@ RSpec.describe 'Query Parameter validation' do
       end
 
       it 'converts nested params' do
-        get '/search', params.merge(filter: { id: '100', tag: 'foo' })
+        get '/search', params.merge(filter: { id: '100', name: 'foo' })
 
         expect(last_response.status).to eq(200), last_response.body
         expect(last_params.dig('filter', 'id')).to eq 100
