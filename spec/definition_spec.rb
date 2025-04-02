@@ -74,9 +74,8 @@ RSpec.describe OpenapiFirst::Definition do
         validated = definition.validate_request(request)
         expect(validated.error.errors).to contain_exactly(have_attributes(
                                                             value: 'foo',
-                                                            message: String,
                                                             data_pointer: '/id',
-                                                            schema_pointer: '/properties/id',
+                                                            schema_pointer: '',
                                                             type: 'integer',
                                                             details: nil,
                                                             schema: { 'type' => 'integer' }

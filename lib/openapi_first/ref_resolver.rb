@@ -42,10 +42,10 @@ module OpenapiFirst
         @context = context
         @filepath = filepath
         @dir = if filepath
-          File.dirname(File.absolute_path(filepath))
-        else
-          Dir.pwd
-        end
+                 File.dirname(File.absolute_path(filepath))
+               else
+                 Dir.pwd
+               end
       end
 
       # The value of this node
@@ -119,7 +119,7 @@ module OpenapiFirst
       end
 
       def each
-        resolved.each do |key, _value|
+        resolved.each_key do |key|
           yield key, self[key]
         end
       end

@@ -7,6 +7,7 @@ require_relative 'router'
 require_relative 'header'
 require_relative 'request'
 require_relative 'response'
+require_relative 'schema/hash'
 require_relative 'ref_resolver'
 
 module OpenapiFirst
@@ -62,10 +63,10 @@ module OpenapiFirst
     def router # rubocop:disable Metrics/MethodLength
       router = OpenapiFirst::Router.new
       @contents.fetch('paths').each do |path, path_item_object|
-        path_parameters = resolve_parameters(path_item_object['parameters'])
+        path_parameters = path_item_object['parameters'] || []
         path_item_object.resolved.keys.intersection(REQUEST_METHODS).map do |request_method|
           operation_object = path_item_object[request_method]
-          operation_parameters = resolve_parameters(operation_object['parameters'])
+          operation_parameters = operation_object['parameters'] || []
           parameters = parse_parameters(operation_parameters.chain(path_parameters))
 
           build_requests(path:, request_method:, operation_object:,
@@ -95,10 +96,10 @@ module OpenapiFirst
     def parse_parameters(parameters)
       grouped_parameters = group_parameters(parameters)
       ParsedParameters.new(
-        query: grouped_parameters[:query],
-        path: grouped_parameters[:path],
-        cookie: grouped_parameters[:cookie],
-        header: grouped_parameters[:header],
+        query: resolve_parameters(grouped_parameters[:query]),
+        path: resolve_parameters(grouped_parameters[:path]),
+        cookie: resolve_parameters(grouped_parameters[:cookie]),
+        header: resolve_parameters(grouped_parameters[:header]),
         query_schema: build_parameter_schema(grouped_parameters[:query]),
         path_schema: build_parameter_schema(grouped_parameters[:path]),
         cookie_schema: build_parameter_schema(grouped_parameters[:cookie]),
@@ -115,11 +116,18 @@ module OpenapiFirst
     end
 
     def build_parameter_schema(parameters)
-      schema = build_parameters_schema(parameters)
+      return unless parameters
 
-      JSONSchemer.schema(schema,
-                         configuration: schemer_configuration,
-                         after_property_validation: config.hooks[:after_request_parameter_property_validation])
+      required = []
+      schemas = parameters.each_with_object({}) do |parameter, result|
+        schema = parameter['schema'].schema(configuration: schemer_configuration)
+        name = parameter['name']&.value
+        required << name if parameter['required']&.value
+        result[name] = schema if schema
+      end
+
+      Schema::Hash.new(schemas, required:, configuration: schemer_configuration,
+                                after_property_validation: config.hooks[:after_request_parameter_property_validation])
     end
 
     def build_requests(path:, request_method:, operation_object:, parameters:)
@@ -195,28 +203,10 @@ module OpenapiFirst
     def group_parameters(parameter_definitions)
       result = {}
       parameter_definitions&.each do |parameter|
-        (result[parameter['in'].to_sym] ||= []) << parameter
+        (result[parameter['in']&.value&.to_sym] ||= []) << parameter
       end
-      result[:header]&.reject! { IGNORED_HEADER_PARAMETERS.include?(_1['name']) }
+      result[:header]&.reject! { IGNORED_HEADER_PARAMETERS.include?(_1['name']&.value) }
       result
-    end
-
-    def build_parameters_schema(parameters)
-      return unless parameters
-
-      properties = {}
-      required = []
-      parameters.each do |parameter|
-        schema = parameter['schema']
-        name = parameter['name']
-        properties[name] = schema if schema
-        required << name if parameter['required']
-      end
-
-      {
-        'properties' => properties,
-        'required' => required
-      }
     end
 
     ParsedParameters = Data.define(:path, :query, :header, :cookie, :path_schema, :query_schema, :header_schema,

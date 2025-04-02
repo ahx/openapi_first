@@ -6,7 +6,6 @@ module OpenapiFirst
       RequestHeaders = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.headers)
-          validation = Schema::ValidationResult.new(validation.to_a)
           Failure.fail!(:invalid_header, errors: validation.errors) if validation.error?
         end
       end
@@ -14,7 +13,6 @@ module OpenapiFirst
       Path = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.path)
-          validation = Schema::ValidationResult.new(validation.to_a)
           Failure.fail!(:invalid_path, errors: validation.errors) if validation.error?
         end
       end
@@ -22,7 +20,6 @@ module OpenapiFirst
       Query = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.query)
-          validation = Schema::ValidationResult.new(validation.to_a)
           Failure.fail!(:invalid_query, errors: validation.errors) if validation.error?
         end
       end
@@ -30,7 +27,6 @@ module OpenapiFirst
       RequestCookies = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.cookies)
-          validation = Schema::ValidationResult.new(validation.to_a)
           Failure.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
         end
       end
@@ -45,7 +41,7 @@ module OpenapiFirst
       def self.for(args)
         VALIDATORS.filter_map do |key, klass|
           schema = args[key]
-          klass.new(schema) if schema.value
+          klass.new(schema) if schema
         end
       end
     end
