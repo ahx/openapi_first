@@ -29,11 +29,7 @@ module OpenapiFirst
             hook.call(root_value, key, schema.value, nil)
           end
           enum.chain(key_validation.map do |err|
-            data_pointer = "/#{key}"
-            err.merge(
-              'error' => JSONSchemer::Errors.pretty(err),
-              'data_pointer' => data_pointer
-            )
+            err.merge('data_pointer' => "/#{key}")
           end)
         end
         ValidationResult.new(validations)
