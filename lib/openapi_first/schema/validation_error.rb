@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  class Schema
+  module Schema
     # One of multiple validation errors. Returned by Schema::ValidationResult#errors.
     ValidationError = Data.define(:value, :data_pointer, :schema_pointer, :type, :details, :schema) do
       # This returns an error message for this specific error.

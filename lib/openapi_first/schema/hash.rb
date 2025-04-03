@@ -3,7 +3,7 @@
 require_relative 'validation_error'
 
 module OpenapiFirst
-  class Schema
+  module Schema
     # A hash of Schemas
     class Hash
       # @param schema Hash of schemas
