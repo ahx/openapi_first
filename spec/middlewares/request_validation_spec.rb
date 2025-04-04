@@ -32,6 +32,22 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
   end
 
+  context 'when OAD is passed as first argument' do
+    let(:app) do
+      Rack::Builder.app do
+        use(OpenapiFirst::Middlewares::RequestValidation, File.expand_path('../data/petstore-expanded.yaml', __dir__))
+        run ->(_) {}
+      end
+    end
+
+    it 'returns 400 is request is invalid' do
+      header 'Content-Type', 'application/json'
+      post '/pets', 'not json'
+
+      expect(last_response.status).to eq 400
+    end
+  end
+
   context 'when parameter is invalid' do
     it 'returns 400' do
       get '/pets?limit=three'

@@ -6,19 +6,26 @@ module OpenapiFirst
     # A Rack middleware to validate requests against an OpenAPI API description
     class RequestValidation
       # @param app The parent Rack application
-      # @param options An optional Hash of configuration options to override defaults
+      # @param spec [String, OpenapiFirst::Definition] Path to the OpenAPI file or an instance of Definition.
+      # @param options Hash
+      #   :spec [String, OpenapiFirst::Definition] Path to the OpenAPI file or an instance of Definition.
+      #         This will be deprecated. Please use spec argument instead.
       #   :raise_error    A Boolean indicating whether to raise an error if validation fails.
       #                   default: false
       #   :error_response The Class to use for error responses.
       #                   This can be a Symbol-name of an registered error response (:default, :jsonapi)
       #                   or it can be set to false to disable returning a response.
       #                   default: OpenapiFirst::Plugins::Default::ErrorResponse (Config.default_options.error_response)
-      def initialize(app, options = {})
+      def initialize(app, spec = nil, options = {})
         @app = app
+        if spec.is_a?(Hash)
+          options = spec
+          spec = options.fetch(:spec)
+        end
         @raise = options.fetch(:raise_error, OpenapiFirst.configuration.request_validation_raise_error)
         @error_response_class = error_response_option(options[:error_response])
 
-        spec = options.fetch(:spec)
+        spec ||= options.fetch(:spec)
         raise "You have to pass spec: when initializing #{self.class}" unless spec
 
         @definition = spec.is_a?(Definition) ? spec : OpenapiFirst.load(spec)
