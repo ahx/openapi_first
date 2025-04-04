@@ -25,7 +25,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
   end
   let(:response) { Rack::Response.new(response_body, status, headers) }
 
-  context 'with path to OAD as first argument' do
+  context 'with path to OAD as spec: argument' do
     let(:response_body) { '2' }
 
     let(:app) do
@@ -33,7 +33,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
       definition = spec
       Rack::Builder.app do
         use Rack::Lint
-        use OpenapiFirst::Middlewares::ResponseValidation, definition
+        use OpenapiFirst::Middlewares::ResponseValidation, spec: definition
         run ->(_env) { res.finish }
       end
     end
@@ -93,7 +93,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
         res = response
         definition = spec
         Rack::Builder.app do
-          use OpenapiFirst::Middlewares::ResponseValidation, spec: definition
+          use OpenapiFirst::Middlewares::ResponseValidation, definition
           run ->(_env) { res.finish }
         end
       end
@@ -255,7 +255,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
   context 'when response is invalid' do
     let(:app) do
       Rack::Builder.new.tap do |builder|
-        builder.use(described_class, spec: './spec/data/petstore.yaml')
+        builder.use(described_class, './spec/data/petstore.yaml')
         builder.run lambda { |_env|
           Rack::Response.new('{"foo": "bar"}', 200, { 'Content-Type' => 'application/json' }).finish
         }
@@ -271,7 +271,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     context 'with raise_error: false' do
       let(:app) do
         Rack::Builder.new.tap do |builder|
-          builder.use(described_class, spec: './spec/data/petstore.yaml', raise_error: false)
+          builder.use(described_class, './spec/data/petstore.yaml', raise_error: false)
           builder.run lambda { |_env|
             Rack::Response.new('{"foo": "bar"}', 200, { 'Content-Type' => 'application/json' }).finish
           }
@@ -289,7 +289,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
   context 'when response is not valid JSON' do
     let(:app) do
       Rack::Builder.new.tap do |builder|
-        builder.use(described_class, spec: './spec/data/petstore.yaml')
+        builder.use(described_class, './spec/data/petstore.yaml')
         builder.run lambda { |_env|
           Rack::Response.new('{boofar}', 200, { 'Content-Type' => 'application/json' }).finish
         }
