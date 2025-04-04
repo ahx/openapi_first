@@ -15,7 +15,7 @@ module OpenapiFirst
     def parse(rack_response)
       ParsedResponse.new(
         body: @body_parser.call(read_body(rack_response)),
-        headers: @headers_parser.call(rack_response.headers)
+        headers: @headers_parser&.call(rack_response.headers) || {}
       )
     end
 
@@ -30,9 +30,16 @@ module OpenapiFirst
       rack_response.body
     end
 
-    def build_headers_parser(header_definitions)
-      headers_as_parameters = header_definitions.to_a.map do |name, definition|
-        definition.merge('name' => name, 'in' => 'header')
+    def build_headers_parser(headers)
+      return unless headers&.any?
+
+      headers_as_parameters = headers.map do |header|
+        {
+          'name' => header.name,
+          'explode' => false,
+          'in' => 'header',
+          'schema' => header.resolved_schema
+        }
       end
       OpenapiParameters::Header.new(headers_as_parameters).method(:unpack)
     end

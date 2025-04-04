@@ -11,10 +11,10 @@ module OpenapiFirst
       Validators::ResponseBody
     ].freeze
 
-    def initialize(response_definition)
-      @validators = VALIDATORS.filter_map do |klass|
-        klass.for(response_definition)
-      end
+    def initialize(content_schema:, headers:)
+      @validators = []
+      @validators << Validators::ResponseBody.new(content_schema) if content_schema
+      @validators << Validators::ResponseHeaders.new(headers) if headers&.any?
     end
 
     def call(parsed_response)

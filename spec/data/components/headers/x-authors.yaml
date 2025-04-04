@@ -1,0 +1,4 @@
+schema:
+  type: array
+  items:
+    $ref: '../schemas/name.yaml'
