@@ -170,6 +170,12 @@ Here is how to set it up with [rack-test](https://github.com/rack/rack-test):
   ```
 3. Run your tests.  The Coverage feature will tell you about missing request/responses. 
 
+  Or you can generate a Module and include it in your rspec spec_helper.rb:
+
+  ```ruby
+  config.include OpenapiFirst::Test::Methods[MyApp], type: :request
+  ```
+
 (✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the middlewares or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
 
 ### Test assertions
