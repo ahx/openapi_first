@@ -32,10 +32,10 @@ You can use openapi_first on production for [request validation](#request-valida
 The request validation middleware returns a 4xx if the request is invalid or not defined in the API description. It adds a request object to the current Rack environment at `env[OpenapiFirst::REQUEST]` with the request parameters parsed exaclty as described in your API description plus access to meta information from your API description. See _[Manual use](#manual-use)_ for more details about that object.
 
 ```ruby
-use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml'
+use OpenapiFirst::Middlewares::RequestValidation, 'openapi.yaml'
 
 # Pass `raise_error: true` to raise an error if request is invalid:
-use OpenapiFirst::Middlewares::RequestValidation, raise_error: true, spec: 'openapi.yaml'
+use OpenapiFirst::Middlewares::RequestValidation, 'openapi.yaml', raise_error: true
 ```
 
 #### Error responses
@@ -73,7 +73,7 @@ content-type: "application/problem+json"
 openapi_first offers a [JSON:API](https://jsonapi.org/) error response by passing `error_response: :jsonapi`:
 
 ```ruby
-use OpenapiFirst::Middlewares::RequestValidation, spec: 'openapi.yaml, error_response: :jsonapi'
+use OpenapiFirst::Middlewares::RequestValidation, 'openapi.yaml, error_response: :jsonapi'
 ```
 
 <details>
@@ -126,10 +126,10 @@ This middleware raises an error by default if the response is not valid.
 This can be useful in a test or staging environment, especially if you are adopting OpenAPI for an existing implementation.
 
 ```ruby
-use OpenapiFirst::Middlewares::ResponseValidation, spec: 'openapi.yaml' if ENV['RACK_ENV'] == 'test'
+use OpenapiFirst::Middlewares::ResponseValidation, 'openapi.yaml' if ENV['RACK_ENV'] == 'test'
 
 # Pass `raise_error: false` to not raise an error:
-use OpenapiFirst::Middlewares::ResponseValidation, raise_error: false, spec: 'openapi.yaml'
+use OpenapiFirst::Middlewares::ResponseValidation, 'openapi.yaml', raise_error: false
 ```
 
 If you are adopting OpenAPI you can use these options together with [hooks](#hooks) to get notified about requests/responses that do match your API description.
@@ -168,7 +168,7 @@ Here is how to set it up with [rack-test](https://github.com/rack/rack-test):
     OpenapiFirst::Test.app(MyApp)
   end
   ```
-3. Run your tests.  The Coverage feature will tell you about missing request/responses. 
+3. Run your tests.  The Coverage feature will tell you about missing request/responses.
 
   Or you can generate a Module and include it in your rspec spec_helper.rb:
 
