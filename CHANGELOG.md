@@ -2,8 +2,10 @@
 
 ## Unreleased
 
+## 2.6.0
+
 - Middlewares now accept the OAD as a first positional argument instead of `:spec` inside the options hash.
-- No longer merge parameter schemas per of the same location (for example "query") in order to fix https://github.com/ahx/openapi_first/issues/320
+- No longer merge parameter schemas of the same location (for example "query") in order to fix [#320](https://github.com/ahx/openapi_first/issues/320). Use `OpenapiFirst::Schema::Hash` to validate multiple parameters schemas and return a single error object.
 - `OpenapiFirst::Test::Methods[MyApplication]` returns a Module which adds an `app` method to be used by rack-test alonside the `assert_api_conform` method.
 - Make default coverage report less verbose
   The default formatter (TerminalFormatter) no longer prints all un-requested requests by default. You can set `test.coverage_formatter_options = { focused: false }` to get back the old behavior

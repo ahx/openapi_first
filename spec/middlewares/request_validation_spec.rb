@@ -11,7 +11,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
   let(:app) do
     Rack::Builder.app do
       use Rack::Lint
-      use(OpenapiFirst::Middlewares::RequestValidation, spec: File.expand_path('../data/petstore.yaml', __dir__))
+      use(OpenapiFirst::Middlewares::RequestValidation, File.expand_path('../data/petstore.yaml', __dir__))
       use Rack::Lint
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
@@ -32,10 +32,10 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
   end
 
-  context 'when OAD is passed as first argument' do
+  context 'when OAD is passed as spec: argument' do
     let(:app) do
       Rack::Builder.app do
-        use(OpenapiFirst::Middlewares::RequestValidation, File.expand_path('../data/petstore-expanded.yaml', __dir__))
+        use(OpenapiFirst::Middlewares::RequestValidation, spec: File.expand_path('../data/petstore-expanded.yaml', __dir__))
         run ->(_) {}
       end
     end
@@ -60,7 +60,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     let(:app) do
       Rack::Builder.app do
         use(OpenapiFirst::Middlewares::RequestValidation,
-            spec: File.expand_path('../data/petstore-expanded.yaml', __dir__))
+            File.expand_path('../data/petstore-expanded.yaml', __dir__))
         run ->(_) {}
       end
     end
@@ -92,8 +92,8 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
   context 'with error_response: :default' do
     let(:app) do
       Rack::Builder.app do
-        use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
-                                                          error_response: :default
+        use OpenapiFirst::Middlewares::RequestValidation, './spec/data/request-body-validation.yaml',
+            error_response: :default
         run ->(_) {}
       end
     end
@@ -115,8 +115,8 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
         def status = 409
       end
       Rack::Builder.app do
-        use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
-                                                          error_response: custom_class
+        use OpenapiFirst::Middlewares::RequestValidation, './spec/data/request-body-validation.yaml',
+            error_response: custom_class
         run ->(_) {}
       end
     end
@@ -133,7 +133,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     let(:app) do
       Rack::Builder.app do
         use(OpenapiFirst::Middlewares::RequestValidation,
-            spec: File.expand_path('../data/discriminator-refs.yaml', __dir__))
+            File.expand_path('../data/discriminator-refs.yaml', __dir__))
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
         }
@@ -178,8 +178,8 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
         end
       end
       Rack::Builder.app do
-        use OpenapiFirst::Middlewares::RequestValidation, spec:,
-                                                          error_response: false
+        use OpenapiFirst::Middlewares::RequestValidation, spec,
+            error_response: false
         run lambda { |_env|
           Rack::Response.new('hello', 200).finish
         }
@@ -197,8 +197,8 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
   context 'with error_response: nil' do
     let(:app) do
       Rack::Builder.app do
-        use OpenapiFirst::Middlewares::RequestValidation, spec: './spec/data/request-body-validation.yaml',
-                                                          error_response: nil
+        use OpenapiFirst::Middlewares::RequestValidation, './spec/data/request-body-validation.yaml',
+            error_response: nil
         run ->(_) {}
       end
     end
@@ -214,7 +214,7 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
   describe '#app' do
     it 'returns the next app in the stack' do
       app = double
-      expect(described_class.new(app, spec: File.expand_path('../data/petstore.yaml', __dir__)).app).to eq app
+      expect(described_class.new(app, File.expand_path('../data/petstore.yaml', __dir__)).app).to eq app
     end
   end
 end
