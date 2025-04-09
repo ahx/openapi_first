@@ -155,7 +155,7 @@ Here is how to set it up with [rack-test](https://github.com/rack/rack-test):
 1. Register all OpenAPI documents to track coverage for. This should go at the top of your test helper file before loading your application code.
   ```ruby
   require 'openapi_first'
-  OpenapiFirst::Test.setup do |s|
+  OpenapiFirst::Test.setup do |test|
     test.register('openapi/openapi.yaml')
     test.minimum_coverage = 100 # (Optional) Setting this will lead to an `exit 2` if coverage is below minimum
     test.skip_response_coverage { it.status == '500' } # (Optional) Skip certain responses
