@@ -15,6 +15,10 @@ module OpenapiFirst
 
   # Key in rack to find instance of Request
   REQUEST = 'openapi.request'
+
+  # Key in rack env that stores the alternative path used for schema matching
+  RACK_KEY_PATH_TO_MATCH = 'openapi.path_to_match'
+
   FAILURE = :openapi_first_validation_failure
 
   # @return [Configuration]
@@ -30,6 +34,13 @@ module OpenapiFirst
 
   ERROR_RESPONSES = {} # rubocop:disable Style/MutableConstant
   private_constant :ERROR_RESPONSES
+
+  # Retrieve the path used for schema matching.
+  #
+  # @param [Rack::Request] rack_request
+  def self.get_path_to_match(rack_request)
+    rack_request.env[RACK_KEY_PATH_TO_MATCH] || rack_request.path
+  end
 
   # Register an error response class
   # @param name [Symbol]
