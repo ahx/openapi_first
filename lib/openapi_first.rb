@@ -16,8 +16,8 @@ module OpenapiFirst
   # Key in rack to find instance of Request
   REQUEST = 'openapi.request'
 
-  # Key in rack env that stores the alternative path used for schema matching
-  RACK_KEY_PATH_TO_MATCH = 'openapi.path_to_match'
+  # Key in rack to store the alternate path used for schema matching
+  PATH = 'openapi.path'
 
   FAILURE = :openapi_first_validation_failure
 
@@ -39,7 +39,7 @@ module OpenapiFirst
   #
   # @param [Rack::Request] rack_request
   def self.get_path_to_match(rack_request)
-    rack_request.env[RACK_KEY_PATH_TO_MATCH] || rack_request.path
+    rack_request.env[PATH] || rack_request.path
   end
 
   # Register an error response class

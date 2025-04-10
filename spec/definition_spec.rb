@@ -217,7 +217,7 @@ RSpec.describe OpenapiFirst::Definition do
     context 'with an alternate path used for schema matching' do
       let(:request) {
         build_request('/prefix/stuff/42').tap { |req|
-          req.env[OpenapiFirst::RACK_KEY_PATH_TO_MATCH] = '/stuff/42'
+          req.env[OpenapiFirst::PATH] = '/stuff/42'
         }
       }
 
@@ -314,7 +314,7 @@ RSpec.describe OpenapiFirst::Definition do
     context 'with an alternate path used for schema matching' do
       let(:request) {
         build_request('/prefix/stuff/42').tap { |req|
-          req.env[OpenapiFirst::RACK_KEY_PATH_TO_MATCH] = '/stuff'
+          req.env[OpenapiFirst::PATH] = '/stuff'
         }
       }
       let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
