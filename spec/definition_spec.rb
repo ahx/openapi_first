@@ -215,11 +215,11 @@ RSpec.describe OpenapiFirst::Definition do
     end
 
     context 'with an alternate path used for schema matching' do
-      let(:request) {
-        build_request('/prefix/stuff/42').tap { |req|
+      let(:request) do
+        build_request('/prefix/stuff/42').tap do |req|
           req.env[OpenapiFirst::PATH] = '/stuff/42'
-        }
-      }
+        end
+      end
 
       it 'returns a valid request' do
         validated = definition.validate_request(request)
@@ -312,11 +312,11 @@ RSpec.describe OpenapiFirst::Definition do
     end
 
     context 'with an alternate path used for schema matching' do
-      let(:request) {
-        build_request('/prefix/stuff/42').tap { |req|
+      let(:request) do
+        build_request('/prefix/stuff/42').tap do |req|
           req.env[OpenapiFirst::PATH] = '/stuff'
-        }
-      }
+        end
+      end
       let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
 
       it 'returns a valid response' do
