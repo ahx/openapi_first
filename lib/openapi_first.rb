@@ -35,13 +35,6 @@ module OpenapiFirst
   ERROR_RESPONSES = {} # rubocop:disable Style/MutableConstant
   private_constant :ERROR_RESPONSES
 
-  # Retrieve the path used for schema matching.
-  #
-  # @param [Rack::Request] rack_request
-  def self.get_path_to_match(rack_request)
-    rack_request.env[PATH] || rack_request.path
-  end
-
   # Register an error response class
   # @param name [Symbol]
   # @param klass [Class] A class that includes / implements OpenapiFirst::ErrorResponse
