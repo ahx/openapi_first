@@ -29,7 +29,7 @@ You can use openapi_first on production for [request validation](#request-valida
 
 ### Request validation
 
-The request validation middleware returns a 4xx if the request is invalid or not defined in the API description. It adds a request object to the current Rack environment at `env[OpenapiFirst::REQUEST]` with the request parameters parsed exaclty as described in your API description plus access to meta information from your API description. See _[Manual use](#manual-use)_ for more details about that object.
+The request validation middleware returns a 4xx if the request is invalid or not defined in the API description. It adds a request object to the current Rack environment at `env[OpenapiFirst::REQUEST]` with the request parameters parsed exactly as described in your API description plus access to meta information from your API description. See _[Manual use](#manual-use)_ for more details about that object.
 
 ```ruby
 use OpenapiFirst::Middlewares::RequestValidation, 'openapi.yaml'
@@ -149,7 +149,7 @@ To make sure your _whole_ API description is implemented, openapi_first ships wi
 > [!NOTE]
 > This is a brand new feature. ✨ Your feedback is very welcome.
 
-This feature tracks all requests/resposes that are validated via openapi_first and tells you about which request/responses are missing.
+This feature tracks all requests/responses that are validated via openapi_first and tells you about which request/responses are missing.
 Here is how to set it up with [rack-test](https://github.com/rack/rack-test):
 
 1. Register all OpenAPI documents to track coverage for. This should go at the top of your test helper file before loading your application code.
@@ -308,7 +308,7 @@ Setup globally:
 ```ruby
 OpenapiFirst.configure do |config|
   config.after_request_parameter_property_validation do |data, property, property_schema|
-    data[property] = Date.iso8601(data[property]) if propert_schema['format'] == 'date'
+    data[property] = Date.iso8601(data[property]) if property_schema['format'] == 'date'
   end
 end
 ```
@@ -324,7 +324,7 @@ That aside, closer integration with specific frameworks like Sinatra, Hanami, Ro
 
 ## Alternatives
 
-This gem was inspired by [committe](https://github.com/interagent/committee) (Ruby) and [Connexion](https://github.com/spec-first/connexion) (Python).
+This gem was inspired by [committee](https://github.com/interagent/committee) (Ruby) and [Connexion](https://github.com/spec-first/connexion) (Python).
 Here is a [feature comparison between openapi_first and committee](https://gist.github.com/ahx/1538c31f0652f459861713b5259e366a).
 
 ## Development
