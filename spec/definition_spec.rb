@@ -213,6 +213,20 @@ RSpec.describe OpenapiFirst::Definition do
         ).to be_valid
       end
     end
+
+    context 'with an alternate path used for schema matching' do
+      let(:request) do
+        build_request('/prefix/stuff/42').tap do |req|
+          req.env[OpenapiFirst::PATH] = '/stuff/42'
+        end
+      end
+
+      it 'returns a valid request' do
+        validated = definition.validate_request(request)
+        expect(validated).to be_valid
+        expect(validated.parsed_path_parameters).to eq({ 'id' => 42 })
+      end
+    end
   end
 
   describe '#validate_response' do
@@ -294,6 +308,21 @@ RSpec.describe OpenapiFirst::Definition do
           expect(error.response).to be_a(OpenapiFirst::ValidatedResponse)
           expect(error.response.content_type).to eq(response.content_type)
         end
+      end
+    end
+
+    context 'with an alternate path used for schema matching' do
+      let(:request) do
+        build_request('/prefix/stuff/42').tap do |req|
+          req.env[OpenapiFirst::PATH] = '/stuff'
+        end
+      end
+      let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
+
+      it 'returns a valid response' do
+        validated = definition.validate_response(request, response)
+        expect(validated).to be_valid
+        expect(validated.parsed_body).to eq({ 'id' => 42 })
       end
     end
   end

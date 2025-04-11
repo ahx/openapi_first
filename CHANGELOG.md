@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Allow to override path for schema matching with `env[OpenapiFirst::PATH]` (https://github.com/ahx/openapi_first/pull/345)
+
 ## 2.6.0
 
 - Middlewares now accept the OAD as a first positional argument instead of `:spec` inside the options hash.
