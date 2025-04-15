@@ -130,7 +130,6 @@ module OpenapiFirst
       def schema(options)
         base_uri = URI::File.build({ path: "#{dir}/" })
         root = JSONSchemer::Schema.new(context, base_uri:, **options)
-        # binding.irb if value['maxItems'] == 4
         JSONSchemer::Schema.new(value, nil, root, base_uri:, **options)
       end
     end
