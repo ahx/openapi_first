@@ -64,7 +64,7 @@ module OpenapiFirst
       def resolve_ref(pointer)
         if pointer.start_with?('#')
           value = Hana::Pointer.new(pointer[1..]).eval(context)
-          raise "Unknown reference #{pointer} in #{context}" unless value
+          raise "Unknown reference #{pointer.inspect} in #{filepath || context}" unless value
 
           return RefResolver.for(value, filepath:, context:)
         end
@@ -75,6 +75,8 @@ module OpenapiFirst
 
         file_contents = FileLoader.load(full_path)
         value = Hana::Pointer.new(file_pointer).eval(file_contents)
+        raise "Unknown reference #{pointer.inspect} in #{filepath || context}" unless value
+
         RefResolver.for(value, filepath: full_path, context: file_contents)
       rescue OpenapiFirst::FileNotFoundError => e
         message = "Problem with reference resolving #{pointer.inspect} in " \
