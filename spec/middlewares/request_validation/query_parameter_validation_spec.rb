@@ -121,6 +121,15 @@ RSpec.describe 'Query Parameter validation' do
           hash_including('parameter' => '', 'code' => 'required')
         )
       end
+
+      it 'validates the path param' do
+        get '/stuff/abc'
+        expect(last_response.status).to eq(400)
+        errors = JSON.parse(last_response.body)['errors']
+        expect(errors).to contain_exactly(
+          hash_including('parameter' => 'id', 'code' => 'integer')
+        )
+      end
     end
 
     context 'with array query parameters' do
