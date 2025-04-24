@@ -11,6 +11,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     base64 (0.2.0)
+    benchmark (0.4.0)
     benchmark-ips (2.14.0)
     benchmark-memory (0.2.0)
       memory_profiler (~> 1)
@@ -68,6 +69,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  benchmark
   benchmark-ips
   benchmark-memory
   committee

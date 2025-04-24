@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'benchmark'
 require 'benchmark/ips'
 require 'benchmark/memory'
 require 'rack'
@@ -45,4 +46,10 @@ Benchmark.memory do |x|
     x.report(config) { bench.call(app) }
   end
   x.compare!
+end
+
+Benchmark.bmbm do |x|
+  apps.each do |config, app|
+    x.report(config) { bench.call(app) }
+  end
 end
