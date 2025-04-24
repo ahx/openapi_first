@@ -50,10 +50,8 @@ module OpenapiFirst
       version = document['openapi']
       case version
       when /\A3\.1\.\d+\z/
-        @document_schema = JSONSchemer.openapi31_document
         document.fetch('jsonSchemaDialect') { JSONSchemer::OpenAPI31::BASE_URI.to_s }
       when /\A3\.0\.\d+\z/
-        @document_schema = JSONSchemer.openapi30_document
         JSONSchemer::OpenAPI30::BASE_URI.to_s
       else
         raise Error, "Unsupported OpenAPI version #{version.inspect} #{filepath}"
