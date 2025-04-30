@@ -69,7 +69,7 @@ RSpec.describe OpenapiFirst::Test::Methods do
 
   it 'detects wrong response status for non Minitest' do
     OpenapiFirst::Test.register('./examples/openapi.yaml')
-    minitest_class = Class.new do
+    other_test_class = Class.new do
       include OpenapiFirst::Test::Methods
 
       def last_request = Rack::Request.new(Rack::MockRequest.env_for('/'))
@@ -77,7 +77,7 @@ RSpec.describe OpenapiFirst::Test::Methods do
     end
 
     expect do
-      minitest_class.new.assert_api_conform(status: 444)
+      other_test_class.new.assert_api_conform(status: 444)
     end.to raise_error(OpenapiFirst::Error)
   end
 end
