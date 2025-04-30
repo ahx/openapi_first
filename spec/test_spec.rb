@@ -24,8 +24,10 @@ RSpec.describe OpenapiFirst::Test do
       expect(described_class[:default].filepath).to eq('./examples/openapi.yaml')
     end
 
-    it 'can register an OAD with a custom name' do
+    it 'can register multiple OADs' do
+      described_class.register('./spec/data/dice.yaml')
       described_class.register('./examples/openapi.yaml', as: :mine)
+      expect(described_class[:default].filepath).to eq('./spec/data/dice.yaml')
       expect(described_class[:mine].filepath).to eq('./examples/openapi.yaml')
     end
 

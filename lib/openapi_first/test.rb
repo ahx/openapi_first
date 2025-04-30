@@ -22,8 +22,8 @@ module OpenapiFirst
         yield self
       end
 
-      def register(*)
-        Test.register(*)
+      def register(oad, as: :default)
+        Test.register(oad, as:)
       end
 
       attr_accessor :minimum_coverage, :coverage_formatter_options, :coverage_formatter
@@ -47,7 +47,7 @@ module OpenapiFirst
         end
         return unless minimum_coverage > coverage
 
-        puts "API Coverage fails with exit 2, because API coverage of #{coverage}%" \
+        puts "API Coverage fails with exit 2, because API coverage of #{coverage}% " \
              "is below minimum of #{minimum_coverage}%!"
         exit 2
         # :nocov:
