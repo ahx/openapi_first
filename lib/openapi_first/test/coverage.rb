@@ -53,11 +53,11 @@ module OpenapiFirst
         end
 
         def track_request(request, oad)
-          current_run[oad.key].track_request(request)
+          current_run[oad.key]&.track_request(request)
         end
 
         def track_response(response, _request, oad)
-          current_run[oad.key].track_response(response)
+          current_run[oad.key]&.track_response(response)
         end
 
         def result
