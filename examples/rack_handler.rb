@@ -10,7 +10,7 @@ App = Rack::Builder.new do
 
   not_found = ->(_request) { [404, {}, []] }
   handlers = {
-    'things#index' => lambda do |_request|
+    'example#root' => lambda do |_request|
       [200, { Rack::CONTENT_TYPE => 'application/json' }, ['{"hello": "world"}']]
     end
   }
