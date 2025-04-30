@@ -52,9 +52,13 @@ module OpenapiFirst
     end
   end
 
-  # Load and dereference an OpenAPI spec file
+  # Load and dereference an OpenAPI spec file or return the Definition if it's already loaded
+  # @param filepath_or_definition [String, Definition] The path to the file or a Definition object
   # @return [Definition]
-  def self.load(filepath, only: nil, &)
+  def self.load(filepath_or_definition, only: nil, &)
+    return filepath_or_definition if filepath_or_definition.is_a?(Definition)
+
+    filepath = filepath_or_definition
     raise FileNotFoundError, "File not found: #{filepath}" unless File.exist?(filepath)
 
     contents = FileLoader.load(filepath)

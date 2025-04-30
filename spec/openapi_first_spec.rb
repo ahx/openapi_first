@@ -57,6 +57,13 @@ RSpec.describe OpenapiFirst do
       expect(definition.paths).to include('/pets')
     end
 
+    it 'returns the same definition when a Definition object is passed in' do
+      original_definition = OpenapiFirst.load('./spec/data/petstore.yaml')
+      returned_definition = OpenapiFirst.load(original_definition)
+
+      expect(returned_definition).to be(original_definition)
+    end
+
     describe 'only option' do
       specify 'with empty filter' do
         definition = OpenapiFirst.load(spec_path, only: nil)

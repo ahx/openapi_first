@@ -21,6 +21,47 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe '#key' do
+    context 'when filepath is available' do
+      it 'returns the filepath' do
+        definition = OpenapiFirst.parse({
+          'openapi' => '3.1.0',
+          'paths' => {}
+        }, filepath: '/path/to/openapi.yaml')
+
+        expect(definition.key).to eq('/path/to/openapi.yaml')
+      end
+    end
+
+    context 'when filepath is not available' do
+      it 'generates a key from info.title and info.version' do
+        definition = OpenapiFirst.parse({
+          'openapi' => '3.1.0',
+          'info' => {
+            'title' => 'Test API',
+            'version' => '1.0.0'
+          },
+          'paths' => {}
+        })
+        expect(definition.key).to eq('Test API @ 1.0.0')
+      end
+    end
+
+    context 'when the OpenAPI document is missing info.title or info.version' do
+      it 'raises an error' do
+        definition = OpenapiFirst.parse({
+          'openapi' => '3.1.0',
+          'info' => {
+            'title' => 'Test API'
+            # Missing version
+          },
+          'paths' => {}
+        })
+        expect { definition.key }.to raise_error(ArgumentError, /Cannot generate key/)
+      end
+    end
+  end
+
   describe '#paths' do
     it 'returns all paths' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml')

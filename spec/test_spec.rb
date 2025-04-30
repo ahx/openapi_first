@@ -29,6 +29,56 @@ RSpec.describe OpenapiFirst::Test do
       expect(described_class[:mine].filepath).to eq('./examples/openapi.yaml')
     end
 
+    it 'can register a Definition object' do
+      definition = OpenapiFirst.load('./examples/openapi.yaml')
+      described_class.register(definition, as: :from_definition)
+      expect(described_class[:from_definition]).to eq(definition)
+    end
+
+    it 'uses filepath as key for Definition objects with filepath' do
+      # Start coverage tracking
+      OpenapiFirst::Test::Coverage.install
+
+      # Register a definition with filepath and start tracking
+      definition = OpenapiFirst.load('./spec/data/dice.yaml')
+      described_class.register(definition, as: :with_filepath)
+      OpenapiFirst::Test::Coverage.start
+
+      # Verify the plan was registered with the filepath key
+      filepath = './spec/data/dice.yaml'
+      plan = OpenapiFirst::Test::Coverage.current_run[filepath]
+
+      expect(plan).not_to be_nil
+      expect(plan.filepath).to eq(filepath)
+      expect(plan.definition_key).to eq(filepath)
+      expect(plan.api_identifier).to eq(filepath)
+    end
+
+    it 'uses the definition key for Definition objects without filepath' do
+      # Start coverage tracking
+      OpenapiFirst::Test::Coverage.install
+
+      # Create a definition without filepath
+      dice_hash = YAML.load_file('./spec/data/dice.yaml')
+      dice_hash['info'] = {
+        'title' => 'Dice API',
+        'version' => '1.0.0'
+      }
+      definition = OpenapiFirst.parse(dice_hash)
+
+      # Register and start tracking
+      described_class.register(definition, as: :without_filepath)
+      OpenapiFirst::Test::Coverage.start
+
+      expected_key = definition.key
+      plan = OpenapiFirst::Test::Coverage.current_run[expected_key]
+
+      # Verify the plan was registered with the definition key
+      expect(plan).to be_a(OpenapiFirst::Test::Coverage::Plan)
+      expect(plan.definition_key).to eq(expected_key)
+      expect(plan.api_identifier).to eq(expected_key)
+    end
+
     it 'raises an error if the same API description is registered twice' do
       described_class.register('./examples/openapi.yaml')
       expect do

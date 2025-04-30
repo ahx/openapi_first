@@ -13,7 +13,7 @@ module OpenapiFirst
         class UnknownRequestError < StandardError; end
 
         def self.for(oad, skip_response: nil)
-          plan = new(filepath: oad.filepath)
+          plan = new(definition_key: oad.key, filepath: oad.filepath)
           oad.routes.each do |route|
             responses = skip_response ? route.responses.reject(&skip_response) : route.responses
             plan.add_route request_method: route.request_method,
@@ -24,14 +24,21 @@ module OpenapiFirst
           plan
         end
 
-        def initialize(filepath:)
+        def initialize(definition_key:, filepath: nil)
           @routes = []
           @index = {}
+          @definition_key = definition_key
           @filepath = filepath
         end
 
-        attr_reader :filepath, :routes
+        attr_reader :definition_key, :filepath, :routes
         private attr_reader :index
+
+        # Returns the best available identifier for this API description
+        # @return [String] The identifier to display in reports and logs
+        def api_identifier
+          filepath || definition_key
+        end
 
         def track_request(validated_request)
           index[validated_request.request_definition.key].track(validated_request) if validated_request.known?
