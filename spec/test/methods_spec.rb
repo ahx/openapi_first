@@ -29,6 +29,30 @@ RSpec.describe OpenapiFirst::Test::Methods do
     expect(env[OpenapiFirst::REQUEST]).to be_valid
   end
 
+  it 'adds an app method that wraps the app for a specific API' do
+    OpenapiFirst::Test.register('./examples/openapi.yaml', as: :v1)
+    myapp = ->(_env) { Rack::Response.new('hello').finish }
+    minitest_class = Class.new(Minitest::Test) do
+      include OpenapiFirst::Test::Methods[myapp, api: :v1]
+    end
+    expect(minitest_class.included_modules).to include(OpenapiFirst::Test::MinitestHelpers)
+
+    test_app = minitest_class.new(1).app
+    env = Rack::MockRequest.env_for('/')
+    expect(test_app.call(env)).to eq(Rack::Response.new('hello').finish)
+    expect(env[OpenapiFirst::REQUEST]).to be_valid
+  end
+
+  it 'does not add an app method if app is nil' do
+    OpenapiFirst::Test.register('./examples/openapi.yaml', as: :v1)
+    minitest_class = Class.new(Minitest::Test) do
+      include OpenapiFirst::Test::Methods[api: :v1]
+    end
+    expect(minitest_class.included_modules).to include(OpenapiFirst::Test::MinitestHelpers)
+
+    expect(minitest_class.new(1).respond_to?(:app)).to eq(false)
+  end
+
   it 'detects wrong response status for Minitest' do
     OpenapiFirst::Test.register('./examples/openapi.yaml')
     minitest_class = Class.new(Minitest::Test) do
