@@ -13,7 +13,6 @@ RSpec.describe OpenapiFirst::Test::Coverage do
   after(:each) do
     described_class.uninstall
     described_class.reset
-    OpenapiFirst::Test.definitions.clear
   end
 
   let(:valid_request) { Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST')) }

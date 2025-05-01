@@ -36,9 +36,6 @@ RSpec.describe OpenapiFirst::Test do
     end
 
     it 'uses filepath as key for Definition objects with filepath' do
-      # Start coverage tracking
-      OpenapiFirst::Test::Coverage.install
-
       # Register a definition with filepath and start tracking
       definition = OpenapiFirst.load('./spec/data/dice.yaml')
       described_class.register(definition, as: :with_filepath)
@@ -50,14 +47,10 @@ RSpec.describe OpenapiFirst::Test do
 
       expect(plan).not_to be_nil
       expect(plan.filepath).to eq(filepath)
-      expect(plan.definition_key).to eq(filepath)
       expect(plan.api_identifier).to eq(filepath)
     end
 
     it 'uses the definition key for Definition objects without filepath' do
-      # Start coverage tracking
-      OpenapiFirst::Test::Coverage.install
-
       # Create a definition without filepath
       dice_hash = YAML.load_file('./spec/data/dice.yaml')
       dice_hash['info'] = {
@@ -75,7 +68,6 @@ RSpec.describe OpenapiFirst::Test do
 
       # Verify the plan was registered with the definition key
       expect(plan).to be_a(OpenapiFirst::Test::Coverage::Plan)
-      expect(plan.definition_key).to eq(expected_key)
       expect(plan.api_identifier).to eq(expected_key)
     end
 

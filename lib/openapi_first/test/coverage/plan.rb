@@ -27,18 +27,12 @@ module OpenapiFirst
         def initialize(definition_key:, filepath: nil)
           @routes = []
           @index = {}
-          @definition_key = definition_key
+          @api_identifier = filepath || definition_key
           @filepath = filepath
         end
 
-        attr_reader :definition_key, :filepath, :routes
+        attr_reader :api_identifier, :filepath, :routes
         private attr_reader :index
-
-        # Returns the best available identifier for this API description
-        # @return [String] The identifier to display in reports and logs
-        def api_identifier
-          filepath || definition_key
-        end
 
         def track_request(validated_request)
           index[validated_request.request_definition.key].track(validated_request) if validated_request.known?
