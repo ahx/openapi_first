@@ -36,7 +36,7 @@ module OpenapiFirst
         def start(skip_response: nil)
           @current_run = Test.definitions.values.to_h do |oad|
             plan = Plan.for(oad, skip_response:)
-            [oad.filepath, plan]
+            [oad.key, plan]
           end
         end
 
@@ -53,11 +53,11 @@ module OpenapiFirst
         end
 
         def track_request(request, oad)
-          current_run[oad.filepath].track_request(request)
+          current_run[oad.key].track_request(request)
         end
 
         def track_response(response, _request, oad)
-          current_run[oad.filepath].track_response(response)
+          current_run[oad.key].track_response(response)
         end
 
         def result

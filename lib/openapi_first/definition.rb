@@ -40,6 +40,24 @@ module OpenapiFirst
     # @return [Enumerable[Router::Route]]
     def_delegators :@router, :routes
 
+    # Returns a unique identifier for this API definition
+    # @return [String] A unique key for this API definition
+    def key
+      return filepath if filepath
+
+      info = self['info'] || {}
+      title = info['title']
+      version = info['version']
+
+      if title.nil? || version.nil?
+        raise ArgumentError,
+              "Cannot generate key for the OpenAPI document because 'info.title' or 'info.version' is missing. " \
+              'Please add these fields to your OpenAPI document.'
+      end
+
+      "#{title} @ #{version}"
+    end
+
     # Validates the request against the API description.
     # @param [Rack::Request] request The Rack request object.
     # @param [Boolean] raise_error Whether to raise an error if validation fails.

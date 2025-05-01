@@ -30,8 +30,7 @@ module OpenapiFirst
         end
 
         def format_plan(plan)
-          filepath = plan.filepath
-          puts ['', "API validation coverage for #{filepath}: #{plan.coverage}%"]
+          puts ['', "API validation coverage for #{plan.api_identifier}: #{plan.coverage}%"]
           return if plan.done? && !verbose
 
           plan.routes.each do |route|
