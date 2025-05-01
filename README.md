@@ -213,13 +213,6 @@ require 'openapi_first'
 definition = OpenapiFirst.load('openapi.yaml')
 ```
 
-You may also pass an existing Definition object:
-
-```ruby
-existing_definition = OpenapiFirst.parse(...) # Returns an Openapi::Definition object
-definition = OpenapiFirst.load(existing_definition) # Returns the same Definition object
-```
-
 ### Validate request
 
 ```ruby
