@@ -25,9 +25,9 @@ RSpec.describe OpenapiFirst::Definition do
     context 'when filepath is available' do
       it 'returns the filepath' do
         definition = OpenapiFirst.parse({
-          'openapi' => '3.1.0',
-          'paths' => {}
-        }, filepath: '/path/to/openapi.yaml')
+                                          'openapi' => '3.1.0',
+                                          'paths' => {}
+                                        }, filepath: '/path/to/openapi.yaml')
 
         expect(definition.key).to eq('/path/to/openapi.yaml')
       end
@@ -36,13 +36,13 @@ RSpec.describe OpenapiFirst::Definition do
     context 'when filepath is not available' do
       it 'generates a key from info.title and info.version' do
         definition = OpenapiFirst.parse({
-          'openapi' => '3.1.0',
-          'info' => {
-            'title' => 'Test API',
-            'version' => '1.0.0'
-          },
-          'paths' => {}
-        })
+                                          'openapi' => '3.1.0',
+                                          'info' => {
+                                            'title' => 'Test API',
+                                            'version' => '1.0.0'
+                                          },
+                                          'paths' => {}
+                                        })
         expect(definition.key).to eq('Test API @ 1.0.0')
       end
     end
@@ -50,13 +50,13 @@ RSpec.describe OpenapiFirst::Definition do
     context 'when the OpenAPI document is missing info.title or info.version' do
       it 'raises an error' do
         definition = OpenapiFirst.parse({
-          'openapi' => '3.1.0',
-          'info' => {
-            'title' => 'Test API'
-            # Missing version
-          },
-          'paths' => {}
-        })
+                                          'openapi' => '3.1.0',
+                                          'info' => {
+                                            'title' => 'Test API'
+                                            # Missing version
+                                          },
+                                          'paths' => {}
+                                        })
         expect { definition.key }.to raise_error(ArgumentError, /Cannot generate key/)
       end
     end

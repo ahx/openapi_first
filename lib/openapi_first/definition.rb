@@ -52,7 +52,7 @@ module OpenapiFirst
       if title.nil? || version.nil?
         raise ArgumentError,
               "Cannot generate key for the OpenAPI document because 'info.title' or 'info.version' is missing. " \
-              "Please add these fields to your OpenAPI document."
+              'Please add these fields to your OpenAPI document.'
       end
 
       "#{title} @ #{version}"
