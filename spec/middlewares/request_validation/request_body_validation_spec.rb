@@ -212,10 +212,33 @@ RSpec.describe 'Request body validation' do
       end
 
       it 'accepts an empty request body' do
+        header Rack::CONTENT_TYPE, 'application/json'
         post path
 
         expect(last_response.status).to be(200), last_response.body
         expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq nil
+      end
+
+      it 'accepts an empty request body without content-type' do
+        post path
+
+        expect(last_response.status).to be(200), last_response.body
+        expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq nil
+      end
+
+      it 'accepts an unknown content-type and an empty request body' do
+        header Rack::CONTENT_TYPE, 'foo/bar'
+        post path
+
+        expect(last_response.status).to be(200), last_response.body
+        expect(last_request.env[OpenapiFirst::REQUEST].parsed_body).to eq nil
+      end
+
+      it 'returns 400 if content-type is unknown and request body is invalid' do
+        header Rack::CONTENT_TYPE, 'foo/bar'
+        post path, JSON.generate({ say: 'no ' })
+
+        expect(last_response.status).to be(400), last_response.body
       end
 
       it 'returns 400 if request body is invalid' do

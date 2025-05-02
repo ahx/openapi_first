@@ -65,4 +65,18 @@ RSpec.describe OpenapiFirst::Test::Coverage do
       specify { expect(result.coverage).to eq(50) }
     end
   end
+
+  describe '.track_request' do
+    it 'ignores unregistered OADs' do
+      oad = double(key: 'unknown')
+      described_class.track_request(double, oad)
+    end
+  end
+
+  describe '.track_response' do
+    it 'ignores unregistered OADs' do
+      oad = double(key: 'unknown')
+      described_class.track_response(double(:response), double(:request), oad)
+    end
+  end
 end
