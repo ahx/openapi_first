@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-- Allow to override path for schema matching with `env[OpenapiFirst::PATH]` (https://github.com/ahx/openapi_first/pull/345)
+## 2.7.0
+
+- Allow to override path for schema matching with `config.path = ->(request) { '/prefix' + request.path  } ` (https://github.com/ahx/openapi_first/issues/349)
+- Support passing in a Definition instance when registering an OAD for tests (https://github.com/ahx/openapi_first/issues/353)
+- Fix registering multiple APIs for testing (https://github.com/ahx/openapi_first/issues/352)
 
 ## 2.6.0
 
