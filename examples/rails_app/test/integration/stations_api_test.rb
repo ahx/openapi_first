@@ -3,8 +3,6 @@
 require 'test_helper'
 
 class StationsApiTest < ActionDispatch::IntegrationTest
-  include OpenapiFirst::Test::Methods
-
   test 'GET /stations' do
     get '/stations'
 
