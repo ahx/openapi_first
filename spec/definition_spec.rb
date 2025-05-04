@@ -70,26 +70,30 @@ RSpec.describe OpenapiFirst::Definition do
   end
 
   describe '#validate_request' do
+    let(:definition_contents) do
+      {
+        'openapi' => '3.1.0',
+        'paths' => {
+          '/stuff/{id}' => {
+            'get' => {
+              'parameters' => [
+                {
+                  'name' => 'id',
+                  'in' => 'path',
+                  'required' => true,
+                  'schema' => {
+                    'type' => 'integer'
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    end
+
     let(:definition) do
-      OpenapiFirst.parse({
-                           'openapi' => '3.1.0',
-                           'paths' => {
-                             '/stuff/{id}' => {
-                               'get' => {
-                                 'parameters' => [
-                                   {
-                                     'name' => 'id',
-                                     'in' => 'path',
-                                     'required' => true,
-                                     'schema' => {
-                                       'type' => 'integer'
-                                     }
-                                   }
-                                 ]
-                               }
-                             }
-                           }
-                         })
+      OpenapiFirst.parse(definition_contents)
     end
 
     context 'when request is valid' do
@@ -256,13 +260,14 @@ RSpec.describe OpenapiFirst::Definition do
     end
 
     context 'with an alternate path used for schema matching' do
-      let(:request) do
-        build_request('/prefix/stuff/42').tap do |req|
-          req.env[OpenapiFirst::PATH] = '/stuff/42'
+      let(:definition) do
+        OpenapiFirst.parse(definition_contents) do |config|
+          config.path = ->(req) { req.path.delete_prefix('/prefix') }
         end
       end
 
       it 'returns a valid request' do
+        request = build_request('/prefix/stuff/42')
         validated = definition.validate_request(request)
         expect(validated).to be_valid
         expect(validated.parsed_path_parameters).to eq({ 'id' => 42 })
@@ -271,33 +276,37 @@ RSpec.describe OpenapiFirst::Definition do
   end
 
   describe '#validate_response' do
+    let(:definition_contents) do
+      {
+        'openapi' => '3.1.0',
+        'paths' => {
+          '/stuff' => {
+            'get' => {
+              'responses' => {
+                '200' => {
+                  'description' => 'OK',
+                  'content' => {
+                    'application/json' => {
+                      'schema' => {
+                        'type' => 'object',
+                        'properties' => {
+                          'id' => {
+                            'type' => 'integer'
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    end
+
     let(:definition) do
-      OpenapiFirst.parse({
-                           'openapi' => '3.1.0',
-                           'paths' => {
-                             '/stuff' => {
-                               'get' => {
-                                 'responses' => {
-                                   '200' => {
-                                     'description' => 'OK',
-                                     'content' => {
-                                       'application/json' => {
-                                         'schema' => {
-                                           'type' => 'object',
-                                           'properties' => {
-                                             'id' => {
-                                               'type' => 'integer'
-                                             }
-                                           }
-                                         }
-                                       }
-                                     }
-                                   }
-                                 }
-                               }
-                             }
-                           }
-                         })
+      OpenapiFirst.parse(definition_contents)
     end
 
     let(:request) { build_request('/stuff') }
@@ -353,11 +362,12 @@ RSpec.describe OpenapiFirst::Definition do
     end
 
     context 'with an alternate path used for schema matching' do
-      let(:request) do
-        build_request('/prefix/stuff/42').tap do |req|
-          req.env[OpenapiFirst::PATH] = '/stuff'
+      let(:definition) do
+        OpenapiFirst.parse(definition_contents) do |config|
+          config.path = ->(req) { req.path.delete_prefix('/prefix') }
         end
       end
+
       let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
 
       it 'returns a valid response' do

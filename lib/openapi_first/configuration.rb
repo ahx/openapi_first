@@ -15,10 +15,11 @@ module OpenapiFirst
       @request_validation_raise_error = false
       @response_validation_raise_error = true
       @hooks = (HOOKS.map { [_1, Set.new] }).to_h
+      @path = nil
     end
 
     attr_reader :request_validation_error_response, :hooks
-    attr_accessor :request_validation_raise_error, :response_validation_raise_error
+    attr_accessor :request_validation_raise_error, :response_validation_raise_error, :path
 
     def clone
       copy = super
