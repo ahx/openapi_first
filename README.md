@@ -19,6 +19,7 @@ You can use openapi_first on production for [request validation](#request-valida
 - [Configuration](#configuration)
 - [Hooks](#hooks)
 - [Alternatives](#alternatives)
+- [Frequently Asked Questions](#frequently-asked-questions)
 - [Development](#development)
   - [Benchmarks](#benchmarks)
   - [Contributing](#contributing)
@@ -326,6 +327,74 @@ That aside, closer integration with specific frameworks like Sinatra, Hanami, Ro
 
 This gem was inspired by [committee](https://github.com/interagent/committee) (Ruby) and [Connexion](https://github.com/spec-first/connexion) (Python).
 Here is a [feature comparison between openapi_first and committee](https://gist.github.com/ahx/1538c31f0652f459861713b5259e366a).
+
+## Frequently Asked Questions
+
+### How can I adapt request paths that don't match my schema?
+
+If your API is deployed at a different path than what's defined in your OpenAPI schema, you can use `env[OpenapiFirst::PATH]` to override the path used for schema matching.
+
+Let's say you have `openapi.yaml` like this:
+
+```yaml
+servers:
+  - url: https://yourhost/api
+paths:
+  # The actual endpoint URL is https://yourhost/api/resource
+  /resource:
+```
+
+Here your OpenAPI schema defines endpoints starting with `/resource` but your actual application is mounted at `/api/resource`. You can bridge the gap by transforming the path via the `path:` configuration:
+
+```ruby
+oad = OpenapiFirst.load('openapi.yaml') do |config|
+  config.path = ->(req) { request.path.delete_prefix('/api') }
+end
+# Add your custom middleware
+use OpenapiFirst::Middlewares::RequestValidation, oad
+
+# You can add ResponseValidation without any customization.
+use OpenapiFirst::Middlewares::ResponseValidation, 'openapi.yaml'
+```
+
+In this case, you might want to serve APIs on `/api` while serving rendered pages on other paths which are not managed by OpenAPI schema in a single application.
+
+You can add some lines to selectively validate only paths under `/api` while bypassing others:
+
+```diff
+    env[OpenapiFirst::PATH] = request.path.to_s.sub(%r"^/api", "")
+
++    # Only validate paths under /api/
++    if request.path.start_with?('/api/')
+       super
++    else
++      @app.call(env)
++    end
+   end
+```
+
+And the final code is:
+
+```ruby
+class CustomOpenAPIValidation < OpenapiFirst::Middlewares::RequestValidation
+  def call(env)
+    request = Rack::Request.new(env)
+
+    # Strip the "/api" prefix for schema matching
+    env[OpenapiFirst::PATH] = request.path.to_s.sub(%r"^/api", "")
+
+    # Only validate paths under /api/
+    if request.path.start_with?('/api/')
+      super
+    else
+      @app.call(env)
+    end
+  end
+end
+
+use CustomOpenAPIValidation, 'openapi.yaml'
+use OpenapiFirst::Middlewares::ResponseValidation, 'openapi.yaml'
+```
 
 ## Development
 

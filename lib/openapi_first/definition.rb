@@ -99,7 +99,9 @@ module OpenapiFirst
     private
 
     def resolve_path(rack_request)
-      rack_request.env[PATH] || rack_request.path
+      return rack_request.path unless @config.path
+
+      @config.path.call(rack_request)
     end
   end
 end
