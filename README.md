@@ -332,8 +332,6 @@ Here is a [feature comparison between openapi_first and committee](https://gist.
 
 ### How can I adapt request paths that don't match my schema?
 
-If your API is deployed at a different path than what's defined in your OpenAPI schema, you can use `env[OpenapiFirst::PATH]` to override the path used for schema matching.
-
 Let's say you have `openapi.yaml` like this:
 
 ```yaml

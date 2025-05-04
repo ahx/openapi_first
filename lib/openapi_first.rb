@@ -16,9 +16,6 @@ module OpenapiFirst
   # Key in rack to find instance of Request
   REQUEST = 'openapi.request'
 
-  # Key in rack to store the alternate path used for schema matching
-  PATH = 'openapi.path'
-
   FAILURE = :openapi_first_validation_failure
 
   # @return [Configuration]
