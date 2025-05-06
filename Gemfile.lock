@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    openapi_first (2.7.0)
+    openapi_first (2.7.1)
       hana (~> 1.3)
       json_schemer (>= 2.1, < 3.0)
       openapi_parameters (>= 0.3.3, < 2.0)
@@ -80,7 +80,7 @@ GEM
     prism (1.4.0)
     racc (1.8.1)
     rack (3.1.13)
-    rack-session (2.1.0)
+    rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
     rack-test (2.2.0)
@@ -106,11 +106,11 @@ GEM
     rspec-expectations (3.13.4)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-mocks (3.13.3)
+    rspec-mocks (3.13.4)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.3)
-    rubocop (1.75.4)
+    rubocop (1.75.5)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
