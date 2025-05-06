@@ -64,6 +64,16 @@ RSpec.describe OpenapiFirst do
       expect(returned_definition).to be(original_definition)
     end
 
+    require 'benchmark'
+    it 'works with a large document' do
+      time = Benchmark.realtime do
+        Timeout.timeout(2) do
+          OpenapiFirst.load('./spec/data/large.yaml')
+        end
+      end
+      expect(time).to be < 1
+    end
+
     describe 'only option' do
       specify 'with empty filter' do
         definition = OpenapiFirst.load(spec_path, only: nil)

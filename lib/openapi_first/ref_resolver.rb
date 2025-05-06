@@ -127,9 +127,31 @@ module OpenapiFirst
       # You have to pass configuration or ref_resolver
       def schema(options)
         base_uri = URI::File.build({ path: "#{dir}/" })
-        root = JSONSchemer::Schema.new(context, base_uri:, **options)
-        # binding.irb if value['maxItems'] == 4
-        JSONSchemer::Schema.new(value, nil, root, base_uri:, **options)
+        Schema.new(value:, context:, base_uri:, options:)
+      end
+    end
+
+    # @visibility private
+    # Defers initialization JSONSchemer::Schema, because that takes time.
+    class Schema
+      extend Forwardable
+
+      def initialize(value:, context:, base_uri:, options:)
+        @value = value
+        @context = context
+        @base_uri = base_uri
+        @options = options
+      end
+
+      attr_reader :value, :context, :base_uri, :options
+
+      def_delegators :schema, :validate, :valid?
+
+      def schema
+        @schema ||= begin
+          root_schema = JSONSchemer::Schema.new(context, base_uri:, **options)
+          JSONSchemer::Schema.new(value, nil, root_schema, base_uri:, **options)
+        end
       end
     end
 
