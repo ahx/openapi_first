@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Speedup loading very large OADs by deferring creation of JSONSchemer Schema instances.
+## 2.7.1
+
+- Speedup loading very large OADs by deferring creation of JSONSchemer::Schema instances.
 
 ## 2.7.0
 
