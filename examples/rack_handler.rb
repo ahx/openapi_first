@@ -21,34 +21,3 @@ App = Rack::Builder.new do
     (handlers[validated_request.operation_id] || not_found).call(validated_request)
   end)
 end
-
-
-__END__
-openapi: 3.0.0
-info:
-  title: "API"
-  version: "1.0.0"
-  contact:
-    name: Contact Name
-    email: contact@example.com
-    url: https://example.com/
-tags:
-  - name: Metadata
-    description: Metadata related requests
-paths:
-  /:
-    get:
-      operationId: things#index
-      summary: Get metadata from the root of the API
-      tags: ["Metadata"]
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [hello]
-                properties:
-                  hello:
-                    type: string
