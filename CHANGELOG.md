@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Fix $ref resolving for referenced arrays.
+## 2.7.2
+
+- Fix $ref-resolving for referenced arrays.
   This fixes loading something like this:
   ```yaml
   parameters:
