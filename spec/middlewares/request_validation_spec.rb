@@ -89,6 +89,39 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
   end
 
+  %w[GET HEAD POST PUT PATCH DELETE TRACE OPTIONS QUERY].each do |verb|
+    context "a #{verb} request" do
+      let(:app) do
+        oad = OpenapiFirst.parse({
+                                   'openapi' => '3.1.0',
+                                   'info' => {
+                                     'title' => 'Test API',
+                                     'version' => '1.0'
+                                   },
+                                   'paths' => {
+                                     '/' => {
+                                       verb.downcase => {
+                                         'responses' => {
+                                           '200' => { 'description' => 'Ok' }
+                                         }
+                                       }
+                                     }
+                                   }
+                                 })
+        Rack::Builder.app do
+          use OpenapiFirst::Middlewares::RequestValidation, oad
+          run ->(_) { Rack::Response.new.finish }
+        end
+      end
+
+      it "supports #{verb}" do
+        custom_request(verb, '/')
+
+        expect(last_response.status).to eq 200
+      end
+    end
+  end
+
   context 'with error_response: :default' do
     let(:app) do
       Rack::Builder.app do
