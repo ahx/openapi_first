@@ -14,7 +14,7 @@ module OpenapiFirst
   # Builds parts of a Definition
   # This knows how to read a resolved OpenAPI document and build {Request} and {Response} objects.
   class Builder # rubocop:disable Metrics/ClassLength
-    REQUEST_METHODS = %w[get head post put patch delete trace options].freeze
+    REQUEST_METHODS = %w[get head post put patch delete trace options query].freeze
 
     # Builds a router from a resolved OpenAPI document.
     # @param contents [Hash] The OpenAPI document Hash.
