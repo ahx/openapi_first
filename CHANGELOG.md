@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Fix $ref resolving for referenced arrays.
+  This fixes loading something like this:
+  ```yaml
+  parameters:
+    $ref: 'my-paramters.yaml'
+  ```
+
 ## 2.7.1
 
 - Speedup loading very large OADs by deferring creation of JSONSchemer::Schema instances.

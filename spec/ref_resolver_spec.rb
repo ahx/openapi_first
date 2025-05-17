@@ -295,6 +295,30 @@ RSpec.describe OpenapiFirst::RefResolver do
                                 { 'name' => 'B' }
                               ])
       end
+
+      it 'works with a referenced array' do
+        contents = {
+          'definitions' => {
+            'Thing' => { 'type' => 'object' },
+            'A' => { 'name' => 'A' },
+            'array' => [
+              { 'object' => { '$ref' => '#/definitions/A' } },
+              { 'object' => { 'name' => 'B' } }
+            ]
+          },
+          'array' => { '$ref' => '#/definitions/array' }
+        }
+        doc = described_class.for(contents)
+
+        results = []
+        doc['array'].each do |node|
+          results << node['object'].resolved
+        end
+        expect(results).to eq([
+                                { 'name' => 'A' },
+                                { 'name' => 'B' }
+                              ])
+      end
     end
   end
 end

@@ -14,7 +14,12 @@ module OpenapiFirst
     def self.for(value, filepath: nil, context: value)
       case value
       when ::Hash
-        Hash.new(value, context:, filepath:)
+        resolver = Hash.new(value, context:, filepath:)
+        if value.key?('$ref')
+          probe = resolver.resolve_ref(value['$ref'])
+          return probe if probe.is_a?(Array)
+        end
+        resolver
       when ::Array
         Array.new(value, context:, filepath:)
       when ::NilClass
