@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Support QUERY request method
+  OpenAPI 3.0, 3.1 does not support that, but this does
+
 ## 2.7.2
 
 - Fix $ref-resolving for referenced arrays.
