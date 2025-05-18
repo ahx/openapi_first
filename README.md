@@ -2,18 +2,17 @@
 
 openapi_first is a Ruby gem for request / response validation and contract-testing against an [OpenAPI](https://www.openapis.org/) 3.0 or 3.1 API description. It makes an APIFirst workflow easy and reliable.
 
-You can use openapi_first on production for [request validation](#request-validation) and in your tests to avoid API drift with it's request/response validation and coverage features.
+You can use openapi_first on production for [request validation](#request-validation) and in your [tests](#contract-testing) to avoid API drift with it's request/response validation and coverage features.
 
 ## Contents
 
 <!-- TOC -->
 
+- [Contract testing](#contract-testing)
 - [Rack Middlewares](#rack-middlewares)
   - [Request validation](#request-validation)
   - [Response validation](#response-validation)
-- [Contract testing](#contract-testing)
-  - [Coverage](#coverage)
-  - [Test assertions](#test-assertions)
+- [Test assertions](#test-assertions)
 - [Manual use](#manual-use)
 - [Framework integration](#framework-integration)
 - [Configuration](#configuration)
@@ -25,6 +24,41 @@ You can use openapi_first on production for [request validation](#request-valida
   - [Contributing](#contributing)
 
 <!-- /TOC -->
+
+## Contract Testing
+
+You can see your OpenAPI API description as a contract that your clients can rely on as how your API behaves. There are two aspects of contract testing: Validation and Coverage. By validating requests and responses, you can avoid that your API implementation processes requests or returns responses that don't match your API description. To make sure your _whole_ API description is implemented, openapi_first can check that all of your API description is covered when you test your API with [rack-test](https://github.com/rack/rack-test).
+
+Here is how to set it up:
+
+1. Register all OpenAPI documents to track coverage for.
+  This should go at the top of your test helper file before loading your application code.
+    ```ruby
+    require 'openapi_first'
+    OpenapiFirst::Test.setup do |test|
+      test.register('openapi/openapi.yaml')
+      # Optional: Make tests fail if coverage is below minimum
+      test.minimum_coverage = 100
+      # Optional: Skip certain responses, which are described in your API description, but need no test coverage
+      test.skip_response_coverage { it.status == '500' } #
+    end
+    ```
+2. Add an `app` method to your tests by including a Module. This `app` method wraps your application with silent request / response validation. This validates all requests/responses in your test run. (✷1)
+    ```ruby
+    RSpec.configure do |config|
+      config.include OpenapiFirst::Test::Methods[MyApp], type: :request
+    end
+    ```
+    Or add the `app` method yourself:
+
+    ```ruby
+    def app
+      OpenapiFirst::Test.app(MyApp)
+    end
+    ```
+3. Run your tests. The Coverage feature will tell you about missing or invalid requests/responses.
+
+(✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the [middlewares](#rack-middlewares) or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
 
 ## Rack Middlewares
 
@@ -135,51 +169,7 @@ use OpenapiFirst::Middlewares::ResponseValidation, 'openapi.yaml', raise_error: 
 
 If you are adopting OpenAPI you can use these options together with [hooks](#hooks) to get notified about requests/responses that do match your API description.
 
-## Contract Testing
-
-Here are two aspects of contract testing: Validation and Coverage
-
-### Validation
-
-By validating requests and responses, you can avoid that your API implementation processes requests or returns responses that don't match your API description. You can use [test assertions](#test-assertions) or [rack middlewares](#rack-middlewares) or manual validation to validate requests and responses with openapi_first.
-
-### Coverage
-
-To make sure your _whole_ API description is implemented, openapi_first ships with a coverage feature.
-
-> [!NOTE]
-> This is a brand new feature. ✨ Your feedback is very welcome.
-
-This feature tracks all requests/responses that are validated via openapi_first and tells you about which request/responses are missing.
-Here is how to set it up with [rack-test](https://github.com/rack/rack-test):
-
-1. Register all OpenAPI documents to track coverage for. This should go at the top of your test helper file before loading your application code.
-  ```ruby
-  require 'openapi_first'
-  OpenapiFirst::Test.setup do |test|
-    test.register('openapi/openapi.yaml')
-    test.minimum_coverage = 100 # (Optional) Setting this will lead to an `exit 2` if coverage is below minimum
-    test.skip_response_coverage { it.status == '500' } # (Optional) Skip certain responses
-  end
-  ```
-2. Add an `app` method to your tests, which wraps your application with silent request / response validation. This validates all requests/responses in your test run. (✷1)
-
-  ```ruby
-  def app
-    OpenapiFirst::Test.app(MyApp)
-  end
-  ```
-3. Run your tests.  The Coverage feature will tell you about missing request/responses.
-
-  Or you can generate a Module and include it in your rspec spec_helper.rb:
-
-  ```ruby
-  config.include OpenapiFirst::Test::Methods[MyApp], type: :request
-  ```
-
-(✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the middlewares or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
-
-### Test assertions
+## Test assertions
 
 openapi_first ships with a simple but powerful Test method to run request and response validation in your tests without using the middlewares. This is designed to be used with rack-test or Ruby on Rails integration tests or request specs.
 
