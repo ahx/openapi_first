@@ -54,6 +54,8 @@ module OpenapiFirst
       end
     end
 
+    # Sets up OpenAPI test coverage and OAD registration.
+    # @yieldparam [OpenapiFirst::Test::Setup] setup A setup for configuration
     def self.setup(&)
       unless block_given?
         raise ArgumentError, "Please provide a block to #{self.class}.setup to register you API descriptions"
