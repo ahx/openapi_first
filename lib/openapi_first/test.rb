@@ -13,7 +13,7 @@ module OpenapiFirst
     end
 
     # Helper class to setup tests
-    class Setup
+    class Configuration
       def initialize
         @minimum_coverage = 0
         @coverage_formatter = Coverage::TerminalFormatter
@@ -59,26 +59,29 @@ module OpenapiFirst
 
     # Sets up OpenAPI test coverage and OAD registration.
     # @yieldparam [OpenapiFirst::Test::Setup] setup A setup for configuration
-    def self.setup(&)
+    def self.configure(&)
       unless block_given?
         raise ArgumentError, "Please provide a block to #{self.class}.setup to register you API descriptions"
       end
 
       Coverage.install
-      setup = Setup.new(&)
-      Coverage.start(skip_response: setup.skip_response_coverage)
+      configuration = Configuration.new(&)
+      Coverage.start(skip_response: configuration.skip_response_coverage)
 
       if definitions.empty?
         raise NotRegisteredError,
               'No API descriptions have been registered. ' \
               'Please register your API description via ' \
-              "OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }"
+              "OpenapiFirst::Test.configure { |config| config.register('myopenapi.yaml') }"
       end
 
-      @setup ||= at_exit do
-        setup.handle_exit
+      @configure ||= at_exit do
+        configuration.handle_exit
       end
     end
+
+    # TODO: Deprecate setup
+    alias setup configure
 
     # Print the coverage report
     # @param formatter A formatter to define the report.
