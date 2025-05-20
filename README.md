@@ -40,7 +40,7 @@ Here is how to set it up:
       # Optional: Make tests fail if coverage is below minimum
       test.minimum_coverage = 100
       # Optional: Skip certain responses, which are described in your API description, but need no test coverage
-      test.skip_response_coverage { it.status == '500' } #
+      test.skip_response_coverage_if { |response_definition| response_definition.status.to_s == '500' }
     end
     ```
 2. Add an `app` method to your tests by including a Module. This `app` method wraps your application with silent request / response validation. This validates all requests/responses in your test run. (✷1)
