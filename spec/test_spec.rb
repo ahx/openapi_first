@@ -95,10 +95,18 @@ RSpec.describe OpenapiFirst::Test do
       expect(described_class.definitions[:default].filepath).to eq(OpenapiFirst.load('./examples/openapi.yaml').filepath)
     end
 
-    it 'can skip responses for coverage' do
+    it 'can skip_response_coverage' do
       described_class.setup do |test|
         test.register('./examples/openapi.yaml')
         test.skip_response_coverage { |res| res.status == '401' }
+      end
+      expect(described_class::Coverage.plans.first.tasks.count).to eq(2)
+    end
+
+    it 'can skip_response_coverage_if' do
+      described_class.setup do |test|
+        test.register('./examples/openapi.yaml')
+        test.skip_response_coverage_if { |res| res.status == '401' }
       end
       expect(described_class::Coverage.plans.first.tasks.count).to eq(2)
     end

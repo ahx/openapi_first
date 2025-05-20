@@ -28,11 +28,14 @@ module OpenapiFirst
 
       attr_accessor :minimum_coverage, :coverage_formatter_options, :coverage_formatter
 
-      def skip_response_coverage(&block)
+      def skip_response_coverage_if(&block)
         return @skip_response_coverage unless block_given?
 
         @skip_response_coverage = block
       end
+
+      # TODO: Deprecate skip_response_coverage
+      alias skip_response_coverage skip_response_coverage_if
 
       # This called at_exit
       def handle_exit
