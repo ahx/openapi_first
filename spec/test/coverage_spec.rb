@@ -1,18 +1,28 @@
 # frozen_string_literal: true
 
 RSpec.describe OpenapiFirst::Test::Coverage do
-  let(:filepath) { './spec/data/dice.yaml' }
-  let(:definition) { OpenapiFirst.load(filepath) }
-
-  before(:each) do
-    described_class.install
-    OpenapiFirst::Test.register(filepath)
-    described_class.start
+  let(:definition) do
+    OpenapiFirst.parse(YAML.load(%(
+      openapi: 3.1.0
+      info:
+        title: Dice
+        version: 1
+      paths:
+        "/roll":
+          post:
+            responses:
+              '200':
+                content:
+                  application/json:
+                    schema:
+                      type: integer
+                      min: 1
+                      max:
+    )))
   end
 
-  after(:each) do
-    described_class.uninstall
-    described_class.reset
+  before(:each) do
+    OpenapiFirst::Test.setup { |test| test.register(definition) }
   end
 
   let(:valid_request) { Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST')) }
@@ -22,24 +32,6 @@ RSpec.describe OpenapiFirst::Test::Coverage do
   end
 
   let(:result) { described_class.result }
-
-  describe '.install' do
-    it 'installs global hooks' do
-      described_class.install
-
-      hooks = OpenapiFirst.configuration.hooks
-      expect(hooks[:after_request_validation]).not_to be_empty
-      expect(hooks[:after_response_validation]).not_to be_empty
-    end
-
-    it 'does not install hooks multiple times' do
-      2.times { described_class.install }
-
-      hooks = OpenapiFirst.configuration.hooks
-      expect(hooks[:after_request_validation].count).to eq(1)
-      expect(hooks[:after_response_validation].count).to eq(1)
-    end
-  end
 
   describe '.result' do
     let(:result) { described_class.result }

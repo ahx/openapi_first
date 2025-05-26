@@ -12,26 +12,12 @@ module OpenapiFirst
 
       Result = Data.define(:plans, :coverage)
 
+      @current_run = {}
+
       class << self
         attr_reader :current_run
 
-        def install
-          return if @installed
-
-          @after_request_validation = lambda do |validated_request, oad|
-            track_request(validated_request, oad)
-          end
-
-          @after_response_validation = lambda do |validated_response, request, oad|
-            track_response(validated_response, request, oad)
-          end
-
-          OpenapiFirst.configure do |config|
-            config.after_request_validation(&@after_request_validation)
-            config.after_response_validation(&@after_response_validation)
-          end
-          @installed = true
-        end
+        def install = Test.install
 
         def start(skip_response: nil)
           @current_run = Test.definitions.values.to_h do |oad|
@@ -40,16 +26,11 @@ module OpenapiFirst
           end
         end
 
-        def uninstall
-          configuration = OpenapiFirst.configuration
-          configuration.hooks[:after_request_validation].delete(@after_request_validation)
-          configuration.hooks[:after_response_validation].delete(@after_response_validation)
-          @installed = nil
-        end
+        def uninstall = Test.uninstall
 
         # Clear current coverage run
         def reset
-          @current_run = nil
+          @current_run = {}
         end
 
         def track_request(request, oad)
@@ -72,7 +53,7 @@ module OpenapiFirst
         private
 
         def coverage
-          return 0 unless plans
+          return 0 if plans.empty?
 
           plans.sum(&:coverage) / plans.length
         end

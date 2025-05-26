@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- OpenapiFirst::Test now raises an "invalid response" error if it sees an invalid response.
+  You can change this back to the old behavior by setting `response_raise_error = false`:
+  ```ruby
+  OpenapiFirst::Test.setup do |test|
+    # test.register(...)
+    test.response_raise_error = false
+  end
+  ```
 ## 2.7.3
 
 - Accept loading OAD documents with numeric status codes. Fixes "Unknown reference" error. https://github.com/ahx/openapi_first/issues/367

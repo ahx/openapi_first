@@ -35,7 +35,7 @@ Here is how to set it up:
   This should go at the top of your test helper file before loading your application code.
     ```ruby
     require 'openapi_first'
-    OpenapiFirst::Test.configure do |config|
+    OpenapiFirst::Test.setup do |config|
       config.register('openapi/openapi.yaml')
       # Optional: Make tests fail if coverage is below minimum
       config.minimum_coverage = 100
