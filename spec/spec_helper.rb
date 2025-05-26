@@ -29,6 +29,6 @@ RSpec.configure do |config|
 
   config.after(:each) do
     OpenapiFirst::Test.definitions.clear
-    OpenapiFirst::Test::Coverage.uninstall
+    OpenapiFirst::Test.uninstall
   end
 end

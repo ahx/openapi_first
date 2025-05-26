@@ -3,12 +3,6 @@
 require 'minitest'
 
 RSpec.describe OpenapiFirst::Test do
-  after(:each) do
-    described_class.definitions.clear
-    OpenapiFirst::Test::Coverage.uninstall
-    OpenapiFirst::Test::Coverage.reset
-  end
-
   describe '.minitest?' do
     it 'detects minitest' do
       test_case = Class.new(Minitest::Test)
@@ -253,6 +247,24 @@ RSpec.describe OpenapiFirst::Test do
     end
   end
 
+  describe '.install' do
+    it 'installs global hooks' do
+      described_class.install
+
+      hooks = OpenapiFirst.configuration.hooks
+      expect(hooks[:after_request_validation]).not_to be_empty
+      expect(hooks[:after_response_validation]).not_to be_empty
+    end
+
+    it 'does not install hooks multiple times' do
+      2.times { described_class.install }
+
+      hooks = OpenapiFirst.configuration.hooks
+      expect(hooks[:after_request_validation].count).to eq(1)
+      expect(hooks[:after_response_validation].count).to eq(1)
+    end
+  end
+
   describe '.[]' do
     it 'complaints about an unknown api' do
       expect do
@@ -264,6 +276,63 @@ RSpec.describe OpenapiFirst::Test do
       expect do
         described_class[:mine]
       end.to raise_error(OpenapiFirst::Test::NotRegisteredError)
+    end
+  end
+
+  describe 'handling invalid responses' do
+    let(:definition) do
+      OpenapiFirst.parse(YAML.load(%(
+        openapi: 3.1.0
+        info:
+          title: Dice
+          version: 1
+        paths:
+          "/roll":
+            post:
+              responses:
+                '200':
+                  content:
+                    application/json:
+                      schema:
+                        type: integer
+                        min: 1
+                        max:
+      )))
+    end
+
+    let(:app) do
+      described_class.app(
+        ->(_env) { [200, { 'content-type' => 'application/json' }, ['foo']] },
+        spec: definition
+      )
+    end
+
+    before(:each) do
+      described_class.setup do |test|
+        test.register(definition)
+      end
+    end
+
+    it 'raises an error' do
+      expect do
+        app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+      end.to raise_error(OpenapiFirst::ResponseInvalidError)
+    end
+
+    context 'with response_raise_error = false' do
+      before(:each) do
+        described_class.uninstall
+        described_class.setup do |test|
+          test.register(definition)
+          test.response_raise_error = false
+        end
+      end
+
+      it 'does not raise an error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        end.not_to raise_error
+      end
     end
   end
 end

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- OpenapiFirst::Test now raises an "invalid response" error if it sees an invalid response.
+  You can change this back to the old behavior by setting `response_raise_error = false`:
+  ```ruby
+  OpenapiFirst::Test.setup do |test|
+    # test.register(...)
+    test.response_raise_error = false
+  end
+  ```
+
 ## 2.7.4
 
 - Return 400 if Rack cannot parse query string instead of raising an exception. Fixes https://github.com/ahx/openapi_first/issues/372
