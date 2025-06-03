@@ -47,6 +47,11 @@ RSpec.describe OpenapiFirst do
       expect(definition.paths).to include('/foo')
     end
 
+    it 'works with numeric statuses' do
+      definition = OpenapiFirst.load('./spec/data/numeric-status.yaml')
+      expect(definition.paths).to include('/roles')
+    end
+
     it 'works with YAML' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml')
       expect(definition.paths).to include('/pets')

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Accept loading OAD documents with numeric status codes. Fixes "Unknown reference" error. https://github.com/ahx/openapi_first/issues/367
+
 - Support QUERY request method
   OpenAPI 3.0, 3.1 does not support that, but this does
 

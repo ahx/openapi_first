@@ -1,0 +1,27 @@
+openapi: 3.0.2
+info:
+  title: Acme Control API
+  version: 0.0.1
+paths:
+  /roles:
+    get:
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+  /roles/query:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                type: object
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1roles/get/responses/200/content/application~1json/schema'
