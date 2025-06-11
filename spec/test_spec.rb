@@ -3,6 +3,10 @@
 require 'minitest'
 
 RSpec.describe OpenapiFirst::Test do
+  before do
+    described_class.configuration.report_coverage = false
+  end
+
   describe '.minitest?' do
     it 'detects minitest' do
       test_case = Class.new(Minitest::Test)
@@ -177,11 +181,11 @@ RSpec.describe OpenapiFirst::Test do
         described_class.definitions.clear
       end
 
-      it 'reports 0% by default' do
+      it 'reports no detected requests by default' do
         output = StringIO.new
         allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
         described_class.report_coverage
-        expect(output.string).to include('0%')
+        expect(output.string).to include('Coverage did not detect any API requests')
       end
     end
   end
@@ -325,6 +329,7 @@ RSpec.describe OpenapiFirst::Test do
         described_class.setup do |test|
           test.register(definition)
           test.response_raise_error = false
+          test.report_coverage = false
         end
       end
 

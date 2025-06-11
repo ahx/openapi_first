@@ -5,13 +5,13 @@ module OpenapiFirst
     # Helper class to setup tests
     class Configuration
       def initialize
-        @minimum_coverage = 0
+        @minimum_coverage = 100
         @coverage_formatter = Coverage::TerminalFormatter
         @coverage_formatter_options = {}
         @skip_response_coverage = nil
         @response_raise_error = true
+        @report_coverage = true
         @registry = {}
-        yield self if block_given?
       end
 
       # Register OADs, but don't load them just yet
@@ -19,8 +19,24 @@ module OpenapiFirst
         @registry[as] = oad
       end
 
-      attr_accessor :minimum_coverage, :coverage_formatter_options, :coverage_formatter, :response_raise_error
-      attr_reader :registry
+      attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error
+      attr_reader :registry, :minimum_coverage, :report_coverage
+
+      def minimum_coverage=(value)
+        warn 'Setting OpenapiFirst::Test::Configuration#minimum_coverage= is deprecated ' \
+             'and will be removed in a future version.' \
+             "Use 'report_coverage = true / false / :info' instead."
+        @minimum_coverage = value
+      end
+
+      def report_coverage=(value)
+        allowed_values = [true, false, :warn]
+        unless allowed_values.include?(value)
+          raise ArgumentError, "'report_coverage' must be one of #{allowed_values}, but was #{value.inspect}"
+        end
+
+        @report_coverage = value
+      end
 
       def skip_response_coverage_if(&block)
         return @skip_response_coverage unless block_given?
@@ -33,21 +49,19 @@ module OpenapiFirst
 
       # This called at_exit
       def handle_exit
-        coverage = Coverage.result.coverage
-        # :nocov:
-        puts 'API Coverage did not detect any API requests for the registered API descriptions' if coverage.zero?
-        if coverage.positive?
-          Test.report_coverage(
-            formatter: coverage_formatter,
-            **coverage_formatter_options
-          )
-        end
-        return unless minimum_coverage > coverage
+        return unless report_coverage
 
-        puts "API Coverage fails with exit 2, because API coverage of #{coverage}% " \
-             "is below minimum of #{minimum_coverage}%!"
+        Test.report_coverage(
+          formatter: coverage_formatter,
+          **coverage_formatter_options
+        )
+        coverage = Coverage.result.coverage
+        return if coverage >= minimum_coverage
+
+        return unless report_coverage == true
+
+        warn 'OpenapiFirst::Test failed with exit 2, because not all described requests/responses have been tested.'
         exit 2
-        # :nocov:
       end
     end
   end

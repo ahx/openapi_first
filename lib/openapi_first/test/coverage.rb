@@ -47,7 +47,7 @@ module OpenapiFirst
 
         # Returns all plans (Plan) that were registered for this run
         def plans
-          current_run&.values
+          current_run.values
         end
 
         private
