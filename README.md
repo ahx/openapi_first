@@ -37,8 +37,6 @@ Here is how to set it up:
     require 'openapi_first'
     OpenapiFirst::Test.setup do |config|
       config.register('openapi/openapi.yaml')
-      # Optional: Make tests fail if coverage is below minimum
-      config.minimum_coverage = 100
       # Optional: Skip certain responses, which are described in your API description, but need no test coverage
       config.skip_response_coverage_if { |response_definition| response_definition.status.to_s == '500' }
     end

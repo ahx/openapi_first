@@ -21,8 +21,11 @@ RSpec.describe OpenapiFirst::Test::Coverage do
     )))
   end
 
-  before(:each) do
-    OpenapiFirst::Test.setup { |test| test.register(definition) }
+  before do
+    OpenapiFirst::Test.setup do |test|
+      test.register(definition)
+      test.report_coverage = false
+    end
   end
 
   let(:valid_request) { Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST')) }

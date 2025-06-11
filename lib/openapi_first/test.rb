@@ -14,19 +14,23 @@ module OpenapiFirst
       false
     end
 
+    def self.configuration
+      @configuration ||= Configuration.new
+    end
+
     # Sets up OpenAPI test coverage and OAD registration.
     # @yieldparam [OpenapiFirst::Test::Configuration] configuration A configuration to setup test integration
-    def self.setup(&)
+    def self.setup
       unless block_given?
         raise ArgumentError, "Please provide a block to #{self.class}.confgure to register you API descriptions"
       end
 
       install
-      @configuration = Configuration.new(&)
-      @configuration.registry.each do |name, oad|
+      yield configuration
+      configuration.registry.each do |name, oad|
         register(oad, as: name)
       end
-      Coverage.start(skip_response: @configuration.skip_response_coverage)
+      Coverage.start(skip_response: configuration.skip_response_coverage)
 
       if definitions.empty?
         raise NotRegisteredError,
@@ -34,6 +38,8 @@ module OpenapiFirst
               'Please register your API description via ' \
               "OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }"
       end
+
+      return unless configuration.report_coverage
 
       @setup ||= at_exit do
         configuration.handle_exit
@@ -79,6 +85,7 @@ module OpenapiFirst
       configuration.hooks[:after_request_validation].delete(@after_request_validation)
       configuration.hooks[:after_response_validation].delete(@after_response_validation)
       definitions.clear
+      @configuration = nil
       @installed = nil
     end
 
@@ -86,10 +93,9 @@ module OpenapiFirst
     class AlreadyRegisteredError < StandardError; end
 
     @definitions = {}
-    @configuration = Configuration.new
 
     class << self
-      attr_reader :definitions, :configuration
+      attr_reader :definitions
 
       # Register an OpenAPI definition for testing
       # @param path_or_definition [String, Definition] Path to the OpenAPI file or a Definition object
