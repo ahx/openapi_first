@@ -8,6 +8,8 @@ module OpenapiFirst
     autoload :Coverage, 'openapi_first/test/coverage'
     autoload :Methods, 'openapi_first/test/methods'
 
+    class CoverageError < Error; end
+
     def self.minitest?(base)
       base.include?(::Minitest::Assertions)
     rescue NameError
@@ -39,11 +41,28 @@ module OpenapiFirst
               "OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }"
       end
 
-      return unless configuration.report_coverage
+      @exit_handler = method(:handle_exit)
 
       @setup ||= at_exit do
-        configuration.handle_exit
+        # :nocov:
+        @exit_handler&.call
+        # :nocov:
       end
+    end
+
+    def self.handle_exit
+      return unless configuration.report_coverage
+
+      report_coverage(
+        formatter: configuration.coverage_formatter,
+        **configuration.coverage_formatter_options
+      )
+      return unless configuration.report_coverage == true
+
+      coverage = Coverage.result.coverage
+      return if coverage >= configuration.minimum_coverage
+
+      raise OpenapiFirst::Test::CoverageError, 'Not all described requests and responses have been tested.'
     end
 
     # Print the coverage report
@@ -87,6 +106,7 @@ module OpenapiFirst
       definitions.clear
       @configuration = nil
       @installed = nil
+      @exit_handler = nil
     end
 
     class NotRegisteredError < StandardError; end
