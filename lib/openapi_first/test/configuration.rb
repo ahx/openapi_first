@@ -46,23 +46,6 @@ module OpenapiFirst
 
       # TODO: Deprecate skip_response_coverage
       alias skip_response_coverage skip_response_coverage_if
-
-      # This called at_exit
-      def handle_exit
-        return unless report_coverage
-
-        Test.report_coverage(
-          formatter: coverage_formatter,
-          **coverage_formatter_options
-        )
-        coverage = Coverage.result.coverage
-        return if coverage >= minimum_coverage
-
-        return unless report_coverage == true
-
-        warn 'OpenapiFirst::Test failed with exit 2, because not all described requests/responses have been tested.'
-        exit 2
-      end
     end
   end
 end

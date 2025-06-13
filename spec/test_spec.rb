@@ -3,10 +3,6 @@
 require 'minitest'
 
 RSpec.describe OpenapiFirst::Test do
-  before do
-    described_class.configuration.report_coverage = false
-  end
-
   describe '.minitest?' do
     it 'detects minitest' do
       test_case = Class.new(Minitest::Test)
@@ -119,6 +115,94 @@ RSpec.describe OpenapiFirst::Test do
       expect do
         described_class.setup { |_test| } # rubocop:disable Lint/EmptyBlock
       end.to raise_error described_class::NotRegisteredError
+    end
+  end
+
+  describe '#handle_exit' do
+    let(:configuration) { described_class.configuration }
+
+    before do
+      configuration.report_coverage = true
+    end
+
+    it 'reports coverage and fails' do
+      expect(OpenapiFirst::Test).to receive(:report_coverage)
+      expect do
+        described_class.handle_exit
+      end.to raise_error(OpenapiFirst::Test::CoverageError)
+    end
+
+    context 'with full coverage' do
+      let(:definition) do
+        OpenapiFirst.parse(YAML.load(%(
+          openapi: 3.1.0
+          info:
+            title: Dice
+            version: 1
+          paths:
+            "/roll":
+              post:
+                responses:
+                  '200':
+                    content:
+                      application/json:
+                        schema:
+                          type: integer
+                          min: 1
+                          max:
+        )))
+      end
+
+      before do
+        valid_request = Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        valid_response = Rack::Response[200, { 'content-type' => 'application/json' }, ['1']]
+        OpenapiFirst::Test.setup { |test| test.register(definition) }
+        definition.validate_request(valid_request)
+        definition.validate_response(valid_request, valid_response)
+      end
+
+      it 'does not fail' do
+        expect do
+          described_class.handle_exit
+        end.not_to raise_error
+      end
+    end
+
+    context 'with report_coverage = true' do
+      before do
+        configuration.report_coverage = true
+      end
+
+      it 'reports coverage' do
+        expect(OpenapiFirst::Test).to receive(:report_coverage)
+        expect do
+          described_class.handle_exit
+        end.to raise_error(OpenapiFirst::Test::CoverageError)
+      end
+    end
+
+    context 'with report_coverage = false' do
+      before do
+        configuration.report_coverage = false
+      end
+
+      it 'does not report coverage' do
+        expect(OpenapiFirst::Test).not_to receive(:report_coverage)
+
+        described_class.handle_exit
+      end
+    end
+
+    context 'with report_coverage = :warn' do
+      before do
+        configuration.report_coverage = :warn
+      end
+
+      it 'reports coverage, but does not fail' do
+        expect(OpenapiFirst::Test).to receive(:report_coverage)
+
+        described_class.handle_exit
+      end
     end
   end
 
