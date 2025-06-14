@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Add `OpenapiFirst::Test::Configuration#ignored_unknown_status` to configure response status(es) that do not have to be descriped in the API description.
 - Change `OpenapiFirst::Test` to make tests fail if API description is not covered by tests. You can adapt this behavior via `OpenapiFirst::Test.setup` / `skip_response_coverage_if` or deactivate coverage with `report_coverage = false` or `report_coverage = :warn`
 - Added `OpenapiFirst::Test::Configuration#report_coverage=` to configure the behavior if not all requests/responses of the API under test have been tested.
 - Deprecate  `OpenapiFirst::Test::Configuration#minimum_coverage=` use "#report_coverage" instead to modify the behavior

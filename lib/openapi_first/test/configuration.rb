@@ -10,6 +10,7 @@ module OpenapiFirst
         @coverage_formatter_options = {}
         @skip_response_coverage = nil
         @response_raise_error = true
+        @ignored_unknown_status = []
         @report_coverage = true
         @registry = {}
       end
@@ -20,7 +21,7 @@ module OpenapiFirst
       end
 
       attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error
-      attr_reader :registry, :minimum_coverage, :report_coverage
+      attr_reader :registry, :minimum_coverage, :report_coverage, :ignored_unknown_status
 
       def minimum_coverage=(value)
         warn 'Setting OpenapiFirst::Test::Configuration#minimum_coverage= is deprecated ' \
