@@ -92,13 +92,24 @@ module OpenapiFirst
         @after_request_validation = config.after_request_validation do |validated_request, oad|
           Coverage.track_request(validated_request, oad)
         end
-        @after_response_validation = config.after_response_validation do |validated_response, rack_request, oad|
-          raise validated_response.error.exception if configuration.response_raise_error && validated_response.invalid?
 
-          Coverage.track_response(validated_response, rack_request, oad)
+        @after_response_validation = config.after_response_validation do |validated_response, rack_request, oad|
+          after_response_validation(validated_response, rack_request, oad)
         end
       end
       @installed = true
+    end
+
+    def self.after_response_validation(validated_response, rack_request, oad)
+      if validated_response.invalid? && raise_response_error?(validated_response)
+        raise validated_response.error.exception
+      end
+
+      Coverage.track_response(validated_response, rack_request, oad)
+    end
+
+    def self.raise_response_error?(validated_response)
+      configuration.response_raise_error && !configuration.ignored_unknown_status.include?(validated_response.status)
     end
 
     def self.uninstall

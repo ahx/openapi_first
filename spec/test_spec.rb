@@ -424,4 +424,41 @@ RSpec.describe OpenapiFirst::Test do
       end
     end
   end
+
+  describe 'handling unknown response status' do
+    let(:definition) do
+      OpenapiFirst.load('./spec/data/dice.yaml')
+    end
+
+    let(:app) do
+      described_class.app(
+        ->(_env) { [302, { 'content-type' => 'application/json' }, ['5']] },
+        spec: definition
+      )
+    end
+
+    before(:each) do
+      described_class.setup do |test|
+        test.register(definition)
+      end
+    end
+
+    it 'raises an error' do
+      expect do
+        app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+      end.to raise_error(OpenapiFirst::ResponseNotFoundError)
+    end
+
+    context 'with ignored_unknown_status' do
+      before(:each) do
+        described_class.configuration.ignored_unknown_status << 302
+      end
+
+      it 'does not raise an error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        end.not_to raise_error
+      end
+    end
+  end
 end
