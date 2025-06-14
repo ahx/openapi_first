@@ -10,10 +10,11 @@ module OpenapiFirst
           @focused = focused && !verbose
         end
 
-        # This takes a list of Coverage::Plan instances and outputs a String
         def format(coverage_result)
+          coverage = coverage_result.coverage
           @out = StringIO.new
-          coverage_result.plans.each { |plan| format_plan(plan) }
+          @out.puts 'API Coverage did not detect any API requests for the registered API descriptions' if coverage.zero?
+          coverage_result.plans.each { |plan| format_plan(plan) } if coverage.positive?
           @out.string
         end
 
