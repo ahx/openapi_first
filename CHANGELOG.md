@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.7.4
+
 - Return 400 if Rack cannot parse query string instead of raising an exception. Fixes https://github.com/ahx/openapi_first/issues/372
 
 ## 2.7.3
