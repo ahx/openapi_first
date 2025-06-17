@@ -27,11 +27,19 @@ module OpenapiFirst
     def parse(request, route_params:)
       ParsedRequest.new(
         path: @path_parser&.unpack(route_params),
-        query: @query_parser&.unpack(request.env[Rack::QUERY_STRING]),
+        query: parse_query(request.env[Rack::QUERY_STRING]),
         headers: @headers_parser&.unpack_env(request.env),
         cookies: @cookies_parser&.unpack(request.env[Rack::HTTP_COOKIE]),
         body: @body_parsers&.call(request)
       )
+    end
+
+    private
+
+    def parse_query(query_string)
+      @query_parser&.unpack(query_string)
+    rescue OpenapiParameters::InvalidParameterError
+      Failure.fail!(:invalid_query, message: 'Invalid query parameter.')
     end
   end
 end

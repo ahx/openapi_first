@@ -52,7 +52,20 @@ RSpec.describe 'Query Parameter validation' do
       get '/search', params
 
       expect(last_response.status).to be 400
-      response_body[:errors][0]
+    end
+
+    it 'returns 400 if query parameter has invalid encoding' do
+      get '/search?birthdate=%E0%A4%A'
+
+      expect(last_response.status).to be 400
+      expect(response_body[:title]).to eq 'Bad Query Parameter'
+    end
+
+    it 'returns 400 if nested[parameter] has invalid encoding' do
+      get '/search?filter=%E0%A4%A'
+
+      expect(last_response.status).to eq 400
+      expect(response_body[:title]).to eq 'Bad Query Parameter'
     end
 
     it 'returns 400 if query parameter has not valid date-time format' do
