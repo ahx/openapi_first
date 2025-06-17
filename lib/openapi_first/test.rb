@@ -63,7 +63,9 @@ module OpenapiFirst
 
       return if Coverage.result.coverage >= configuration.minimum_coverage
 
-      raise OpenapiFirst::Test::CoverageError, 'Not all described requests and responses have been tested.'
+      puts 'API Coverage fails with exit 2, because not all described requests and responses have been tested.'
+
+      exit 2
     end
 
     # Print the coverage report

@@ -129,7 +129,7 @@ RSpec.describe OpenapiFirst::Test do
       expect(OpenapiFirst::Test).to receive(:report_coverage)
       expect do
         described_class.handle_exit
-      end.to raise_error(OpenapiFirst::Test::CoverageError)
+      end.to raise_error(SystemExit)
     end
 
     context 'with full coverage' do
@@ -177,7 +177,7 @@ RSpec.describe OpenapiFirst::Test do
         expect(OpenapiFirst::Test).to receive(:report_coverage)
         expect do
           described_class.handle_exit
-        end.to raise_error(OpenapiFirst::Test::CoverageError)
+        end.to raise_error(SystemExit)
       end
     end
 
