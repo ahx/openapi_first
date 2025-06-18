@@ -3,7 +3,9 @@
 ## Unreleased
 
 OpenapiFirst::Test is stricter and more configurable:
-- Added `OpenapiFirst::Test::Configuration#ignored_unknown_status` to configure response status(es) that do not have to be descriped in the API description.
+- Added `Test.setup { it.observe }` and low level `Test::Callable[]` to inject request/response validation in rack app as an alternative to overwrite the `app` method in a test
+- Added `Test.observe(App, api: :my_api)`
+- Added Test::Configuration#ignored_unknown_status` to configure response status(es) that do not have to be descriped in the API description.
 - Changed `OpenapiFirst::Test` to make tests fail if API description is not covered by tests. You can adapt this behavior via `OpenapiFirst::Test.setup` / `skip_response_coverage` or deactivate coverage with `report_coverage = false` or `report_coverage = :warn`
 - Added `OpenapiFirst::Test::Configuration#report_coverage=` to configure the behavior if not all requests/responses of the API under test have been tested.
 - Deprecated `OpenapiFirst::Test::Configuration#minimum_coverage=` use "#report_coverage=true/false/:info" instead to modify the behavior

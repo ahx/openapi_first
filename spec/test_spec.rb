@@ -3,6 +3,51 @@
 require 'minitest'
 
 RSpec.describe OpenapiFirst::Test do
+  let(:definition) { OpenapiFirst.load('./examples/openapi.yaml') }
+
+  let(:app) do
+    Class.new do
+      def call(_env)
+        Rack::Response.new.finish
+      end
+    end
+  end
+
+  describe 'Callable[]' do
+    it 'returns a Module that can call the api' do
+      described_class.register(definition, as: :some)
+      mod = described_class::Callable[api: :some]
+      app.prepend(mod)
+
+      expect(definition).to receive(:validate_request)
+      expect(definition).to receive(:validate_response)
+
+      app.new.call({})
+    end
+  end
+
+  describe '.observe' do
+    it 'injects request/response validation in the app' do
+      described_class.register(definition, as: :some)
+      described_class.observe(app, api: :some)
+
+      expect(definition).to receive(:validate_request)
+      expect(definition).to receive(:validate_response)
+
+      app.new.call({})
+    end
+
+    it 'injects request/response validation just once' do
+      described_class.register(definition, as: :some)
+      2.times { described_class.observe(app, api: :some) }
+
+      expect(definition).to receive(:validate_request).once
+      expect(definition).to receive(:validate_response).once
+
+      app.new.call({})
+    end
+  end
+
   describe '.minitest?' do
     it 'detects minitest' do
       test_case = Class.new(Minitest::Test)
@@ -79,6 +124,16 @@ RSpec.describe OpenapiFirst::Test do
     it 'registers an API description' do
       described_class.setup { |test| test.register('./examples/openapi.yaml') }
       expect(described_class.definitions[:default].filepath).to eq(OpenapiFirst.load('./examples/openapi.yaml').filepath)
+    end
+
+    it 'observes an app' do
+      described_class.setup do |test|
+        test.register(definition, as: :some)
+        test.observe(app, api: :some)
+      end
+
+      expect(definition).to receive(:validate_request)
+      app.new.call({})
     end
 
     it 'sets up minimum_coverage' do
