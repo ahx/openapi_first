@@ -38,7 +38,7 @@ Here is how to set it up:
     OpenapiFirst::Test.setup do |config|
       config.register('openapi/openapi.yaml')
       # Optional: Skip certain responses, which are described in your API description, but need no test coverage
-      config.skip_response_coverage_if { |response_definition| response_definition.status.to_s == '500' }
+      config.skip_response_coverage { |response_definition| response_definition.status.to_s == '500' }
     end
     ```
 2. Add an `app` method to your tests by including a Module. This `app` method wraps your application with silent request / response validation. This validates all requests/responses in your test run. (✷1)
