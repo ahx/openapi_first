@@ -39,14 +39,11 @@ module OpenapiFirst
         @report_coverage = value
       end
 
-      def skip_response_coverage_if(&block)
+      def skip_response_coverage(&block)
         return @skip_response_coverage unless block_given?
 
         @skip_response_coverage = block
       end
-
-      # TODO: Deprecate skip_response_coverage
-      alias skip_response_coverage skip_response_coverage_if
     end
   end
 end
