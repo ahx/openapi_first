@@ -10,7 +10,7 @@ module OpenapiFirst
         @coverage_formatter_options = {}
         @skip_response_coverage = nil
         @response_raise_error = true
-        @ignored_unknown_status = []
+        @ignored_unknown_status = [404]
         @report_coverage = true
         @registry = {}
       end
