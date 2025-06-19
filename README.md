@@ -1,8 +1,24 @@
 # openapi_first
 
-openapi_first is a Ruby gem for request / response validation and contract-testing against an [OpenAPI](https://www.openapis.org/) 3.0 or 3.1 API description. It makes an APIFirst workflow easy and reliable.
+openapi_first is a Ruby gem for request / response validation and contract-testing against an [OpenAPI](https://www.openapis.org/) 3.0 or 3.1 Openapi API description (OAD). It makes an APIFirst workflow easy and reliable.
 
-You can use openapi_first on production for [request validation](#request-validation) and in your [tests](#contract-testing) to avoid API drift with it's request/response validation and coverage features.
+## Usage
+
+Use an OAD to validate incoming requests in production:
+```ruby
+use OpenapiFirst::Middlewares::RequestValidation, 'openapi/openapi.yaml'
+```
+
+Turn your request tests into contract tests against an OAD:
+```ruby
+# spec_helper.rb
+require 'openapi_first'
+OpenapiFirst::Test.setup do |config|
+  config.register('openapi/openapi.yaml')
+end
+require 'application' # Load Application code
+OpenapiFirst::Test.observe(Application)
+```
 
 ## Contents
 
@@ -37,23 +53,26 @@ Here is how to set it up:
     require 'openapi_first'
     OpenapiFirst::Test.setup do |config|
       config.register('openapi/openapi.yaml')
-      # Optional: Skip certain responses, which are described in your API description, but need no test coverage
-      config.skip_response_coverage { |response_definition| response_definition.status.to_s == '500' }
     end
     ```
-2. Add an `app` method to your tests by including a Module. This `app` method wraps your application with silent request / response validation. This validates all requests/responses in your test run. (✷1)
-    ```ruby
-    RSpec.configure do |config|
-      config.include OpenapiFirst::Test::Methods[MyApp], type: :request
-    end
-    ```
-    Or add the `app` method yourself:
+2. Observe your application. You can do this in one of two ways:
+    - Inject a Module to wrap (prepend) the `call` method of your Rack app Class.
+      ```ruby
+      OpenapiFirst::Test.observe(MyApplication)
+      ```
+    - Or add an `app` method to your tests, which wraps your application with silent request / response validation. (✷1)
+      ```ruby
+      RSpec.configure do |config|
+        config.include OpenapiFirst::Test::Methods[MyApp], type: :request
+      end
+      ```
+      Or add the `app` method yourself:
 
-    ```ruby
-    def app
-      OpenapiFirst::Test.app(MyApp)
-    end
-    ```
+      ```ruby
+      def app
+        OpenapiFirst::Test.app(MyApp)
+      end
+      ```
 3. Run your tests. The Coverage feature will tell you about missing or invalid requests/responses.
 
 (✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the [middlewares](#rack-middlewares) or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
