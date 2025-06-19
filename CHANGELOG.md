@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.8.0
+
 ### OpenapiFirst::Test is now stricter and more configurable
 
 Changes:
