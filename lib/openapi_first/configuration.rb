@@ -30,6 +30,7 @@ module OpenapiFirst
     HOOKS.each do |hook|
       define_method(hook) do |&block|
         hooks[hook] << block
+        block
       end
     end
 

@@ -25,14 +25,6 @@ RSpec.describe OpenapiFirst::Test::Methods do
   end
 
   context 'with RSpec' do
-    let(:app) do
-      lambda do |_|
-        res = Rack::Response.new(JSON.generate(hello: 'there'))
-        res.content_type = 'application/json'
-        res.finish
-      end
-    end
-
     context 'with metadata', api: :v1 do
       include OpenapiFirst::Test::Methods
       include Rack::Test::Methods

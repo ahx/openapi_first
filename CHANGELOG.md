@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 2.8.0
+
+### OpenapiFirst::Test is now stricter and more configurable
+
+Changes:
+- Changed OpenapiFirst::Test to raises an "invalid response" error if it sees an invalid response (https://github.com/ahx/openapi_first/issues/366).
+  You can change this back to the old behavior by setting `OpenapiFirst::Test::Configuration#response_raise_error = false` (but you shouldn't).
+- Added `Test.setup { it.observe(MyApp) }`, `Test.observe(App, api: :my_api)` and internal `Test::Callable[]` to inject request/response validation in rack app as an alternative to overwrite the `app` method in a test
+- Added `Test::Configuration#ignored_unknown_status` to configure response status(es) that do not have to be descriped in the API description. 404 statuses are ignored by default.
+- Changed `OpenapiFirst::Test` to make tests fail if API description is not covered by tests. You can adapt this behavior via `OpenapiFirst::Test.setup` / `skip_response_coverage` or deactivate coverage with `OpenapiFirst::Test::Configuration#report_coverage = false` or `report_coverage = :warn`
+
 ## 2.7.4
 
 - Return 400 if Rack cannot parse query string instead of raising an exception. Fixes https://github.com/ahx/openapi_first/issues/372

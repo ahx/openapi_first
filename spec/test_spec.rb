@@ -3,10 +3,38 @@
 require 'minitest'
 
 RSpec.describe OpenapiFirst::Test do
-  after(:each) do
-    described_class.definitions.clear
-    OpenapiFirst::Test::Coverage.uninstall
-    OpenapiFirst::Test::Coverage.reset
+  let(:definition) { OpenapiFirst.load('./examples/openapi.yaml') }
+
+  let(:app) do
+    Class.new do
+      def call(_env)
+        Rack::Response.new.finish
+      end
+    end
+  end
+
+  describe 'Callable[]' do
+    it 'returns a Module that can call the api' do
+      mod = described_class::Callable[definition]
+      app.prepend(mod)
+
+      expect(definition).to receive(:validate_request)
+      expect(definition).to receive(:validate_response)
+
+      app.new.call({})
+    end
+  end
+
+  describe '.observe' do
+    it 'injects request/response validation in the app' do
+      described_class.register(definition, as: :some)
+      described_class.observe(app, api: :some)
+
+      expect(definition).to receive(:validate_request)
+      expect(definition).to receive(:validate_response)
+
+      app.new.call({})
+    end
   end
 
   describe '.minitest?' do
@@ -87,6 +115,16 @@ RSpec.describe OpenapiFirst::Test do
       expect(described_class.definitions[:default].filepath).to eq(OpenapiFirst.load('./examples/openapi.yaml').filepath)
     end
 
+    it 'observes an app' do
+      described_class.setup do |test|
+        test.register(definition, as: :some)
+        test.observe(app, api: :some)
+      end
+
+      expect(definition).to receive(:validate_request)
+      app.new.call({})
+    end
+
     it 'sets up minimum_coverage' do
       described_class.setup do |test|
         test.register('./examples/openapi.yaml')
@@ -95,7 +133,15 @@ RSpec.describe OpenapiFirst::Test do
       expect(described_class.definitions[:default].filepath).to eq(OpenapiFirst.load('./examples/openapi.yaml').filepath)
     end
 
-    it 'can skip responses for coverage' do
+    it 'can skip_response_coverage' do
+      described_class.setup do |test|
+        test.register('./examples/openapi.yaml')
+        test.skip_response_coverage { |res| res.status == '401' }
+      end
+      expect(described_class::Coverage.plans.first.tasks.count).to eq(2)
+    end
+
+    it 'can skip_response_coverage' do
       described_class.setup do |test|
         test.register('./examples/openapi.yaml')
         test.skip_response_coverage { |res| res.status == '401' }
@@ -113,6 +159,94 @@ RSpec.describe OpenapiFirst::Test do
       expect do
         described_class.setup { |_test| } # rubocop:disable Lint/EmptyBlock
       end.to raise_error described_class::NotRegisteredError
+    end
+  end
+
+  describe '#handle_exit' do
+    let(:configuration) { described_class.configuration }
+
+    before do
+      configuration.report_coverage = true
+    end
+
+    it 'reports coverage and fails' do
+      expect(OpenapiFirst::Test).to receive(:report_coverage)
+      expect do
+        described_class.handle_exit
+      end.to raise_error(SystemExit)
+    end
+
+    context 'with full coverage' do
+      let(:definition) do
+        OpenapiFirst.parse(YAML.load(%(
+          openapi: 3.1.0
+          info:
+            title: Dice
+            version: 1
+          paths:
+            "/roll":
+              post:
+                responses:
+                  '200':
+                    content:
+                      application/json:
+                        schema:
+                          type: integer
+                          min: 1
+                          max:
+        )))
+      end
+
+      before do
+        valid_request = Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        valid_response = Rack::Response[200, { 'content-type' => 'application/json' }, ['1']]
+        OpenapiFirst::Test.setup { |test| test.register(definition) }
+        definition.validate_request(valid_request)
+        definition.validate_response(valid_request, valid_response)
+      end
+
+      it 'does not fail' do
+        expect do
+          described_class.handle_exit
+        end.not_to raise_error
+      end
+    end
+
+    context 'with report_coverage = true' do
+      before do
+        configuration.report_coverage = true
+      end
+
+      it 'reports coverage' do
+        expect(OpenapiFirst::Test).to receive(:report_coverage)
+        expect do
+          described_class.handle_exit
+        end.to raise_error(SystemExit)
+      end
+    end
+
+    context 'with report_coverage = false' do
+      before do
+        configuration.report_coverage = false
+      end
+
+      it 'does not report coverage' do
+        expect(OpenapiFirst::Test).not_to receive(:report_coverage)
+
+        described_class.handle_exit
+      end
+    end
+
+    context 'with report_coverage = :warn' do
+      before do
+        configuration.report_coverage = :warn
+      end
+
+      it 'reports coverage, but does not fail' do
+        expect(OpenapiFirst::Test).to receive(:report_coverage)
+
+        described_class.handle_exit
+      end
     end
   end
 
@@ -175,11 +309,11 @@ RSpec.describe OpenapiFirst::Test do
         described_class.definitions.clear
       end
 
-      it 'reports 0% by default' do
+      it 'reports no detected requests by default' do
         output = StringIO.new
         allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
         described_class.report_coverage
-        expect(output.string).to include('0%')
+        expect(output.string).to include('Coverage did not detect any API requests')
       end
     end
   end
@@ -245,6 +379,24 @@ RSpec.describe OpenapiFirst::Test do
     end
   end
 
+  describe '.install' do
+    it 'installs global hooks' do
+      described_class.install
+
+      hooks = OpenapiFirst.configuration.hooks
+      expect(hooks[:after_request_validation]).not_to be_empty
+      expect(hooks[:after_response_validation]).not_to be_empty
+    end
+
+    it 'does not install hooks multiple times' do
+      2.times { described_class.install }
+
+      hooks = OpenapiFirst.configuration.hooks
+      expect(hooks[:after_request_validation].count).to eq(1)
+      expect(hooks[:after_response_validation].count).to eq(1)
+    end
+  end
+
   describe '.[]' do
     it 'complaints about an unknown api' do
       expect do
@@ -256,6 +408,101 @@ RSpec.describe OpenapiFirst::Test do
       expect do
         described_class[:mine]
       end.to raise_error(OpenapiFirst::Test::NotRegisteredError)
+    end
+  end
+
+  describe 'handling invalid responses' do
+    let(:definition) do
+      OpenapiFirst.parse(YAML.load(%(
+        openapi: 3.1.0
+        info:
+          title: Dice
+          version: 1
+        paths:
+          "/roll":
+            post:
+              responses:
+                '200':
+                  content:
+                    application/json:
+                      schema:
+                        type: integer
+                        min: 1
+                        max:
+      )))
+    end
+
+    let(:app) do
+      described_class.app(
+        ->(_env) { [200, { 'content-type' => 'application/json' }, ['foo']] },
+        spec: definition
+      )
+    end
+
+    before(:each) do
+      described_class.setup do |test|
+        test.register(definition)
+      end
+    end
+
+    it 'raises an error' do
+      expect do
+        app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+      end.to raise_error(OpenapiFirst::ResponseInvalidError)
+    end
+
+    context 'with response_raise_error = false' do
+      before(:each) do
+        described_class.uninstall
+        described_class.setup do |test|
+          test.register(definition)
+          test.response_raise_error = false
+          test.report_coverage = false
+        end
+      end
+
+      it 'does not raise an error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        end.not_to raise_error
+      end
+    end
+  end
+
+  describe 'handling unknown response status' do
+    let(:definition) do
+      OpenapiFirst.load('./spec/data/dice.yaml')
+    end
+
+    let(:app) do
+      described_class.app(
+        ->(_env) { [302, { 'content-type' => 'application/json' }, ['5']] },
+        spec: definition
+      )
+    end
+
+    before(:each) do
+      described_class.setup do |test|
+        test.register(definition)
+      end
+    end
+
+    it 'raises an error' do
+      expect do
+        app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+      end.to raise_error(OpenapiFirst::ResponseNotFoundError)
+    end
+
+    context 'with ignored_unknown_status' do
+      before(:each) do
+        described_class.configuration.ignored_unknown_status << 302
+      end
+
+      it 'does not raise an error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        end.not_to raise_error
+      end
     end
   end
 end

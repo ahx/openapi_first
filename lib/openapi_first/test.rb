@@ -1,10 +1,23 @@
 # frozen_string_literal: true
 
+require_relative 'test/configuration'
+require_relative 'test/registry'
+
 module OpenapiFirst
   # Test integration
   module Test
     autoload :Coverage, 'openapi_first/test/coverage'
     autoload :Methods, 'openapi_first/test/methods'
+    autoload :Callable, 'openapi_first/test/callable'
+    autoload :Observe, 'openapi_first/test/observe'
+    extend Registry
+
+    class CoverageError < Error; end
+
+    # Inject request/response validation in a rack app class
+    def self.observe(app, api: :default)
+      Observe.observe(app, api:)
+    end
 
     def self.minitest?(base)
       base.include?(::Minitest::Assertions)
@@ -12,58 +25,23 @@ module OpenapiFirst
       false
     end
 
-    # Helper class to setup tests
-    class Setup
-      def initialize
-        @minimum_coverage = 0
-        @coverage_formatter = Coverage::TerminalFormatter
-        @coverage_formatter_options = {}
-        @skip_response_coverage = nil
-        yield self
-      end
-
-      def register(oad, as: :default)
-        Test.register(oad, as:)
-      end
-
-      attr_accessor :minimum_coverage, :coverage_formatter_options, :coverage_formatter
-
-      def skip_response_coverage(&block)
-        return @skip_response_coverage unless block_given?
-
-        @skip_response_coverage = block
-      end
-
-      # This called at_exit
-      def handle_exit
-        coverage = Coverage.result.coverage
-        # :nocov:
-        puts 'API Coverage did not detect any API requests for the registered API descriptions' if coverage.zero?
-        if coverage.positive?
-          Test.report_coverage(
-            formatter: coverage_formatter,
-            **coverage_formatter_options
-          )
-        end
-        return unless minimum_coverage > coverage
-
-        puts "API Coverage fails with exit 2, because API coverage of #{coverage}% " \
-             "is below minimum of #{minimum_coverage}%!"
-        exit 2
-        # :nocov:
-      end
+    def self.configuration
+      @configuration ||= Configuration.new
     end
 
     # Sets up OpenAPI test coverage and OAD registration.
-    # @yieldparam [OpenapiFirst::Test::Setup] setup A setup for configuration
-    def self.setup(&)
+    # @yieldparam [OpenapiFirst::Test::Configuration] configuration A configuration to setup test integration
+    def self.setup
       unless block_given?
-        raise ArgumentError, "Please provide a block to #{self.class}.setup to register you API descriptions"
+        raise ArgumentError, "Please provide a block to #{self.class}.confgure to register you API descriptions"
       end
 
-      Coverage.install
-      setup = Setup.new(&)
-      Coverage.start(skip_response: setup.skip_response_coverage)
+      install
+      yield configuration
+
+      configuration.registry.each { |name, oad| register(oad, as: name) }
+      configuration.apps.each { |name, app| observe(app, api: name) }
+      Coverage.start(skip_response: configuration.skip_response_coverage)
 
       if definitions.empty?
         raise NotRegisteredError,
@@ -72,17 +50,37 @@ module OpenapiFirst
               "OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }"
       end
 
+      @exit_handler = method(:handle_exit)
+
       @setup ||= at_exit do
-        setup.handle_exit
+        # :nocov:
+        @exit_handler&.call
+        # :nocov:
       end
+    end
+
+    def self.handle_exit
+      return unless configuration.report_coverage
+
+      report_coverage(
+        formatter: configuration.coverage_formatter,
+        **configuration.coverage_formatter_options
+      )
+      return unless configuration.report_coverage == true
+
+      coverage = Coverage.result.coverage
+      return if coverage >= configuration.minimum_coverage
+
+      puts "API Coverage fails with exit 2, because not all described requests and responses have been tested (#{coverage.round(4)}% covered)." # rubocop:disable Layout/LineLength
+
+      exit 2
     end
 
     # Print the coverage report
     # @param formatter A formatter to define the report.
     # @output [IO] An output where to puts the report.
     def self.report_coverage(formatter: Coverage::TerminalFormatter, **)
-      coverage_result = Coverage.result
-      puts formatter.new(**).format(coverage_result)
+      puts formatter.new(**).format(Coverage.result)
     end
 
     # Returns the Rack app wrapped with silent request, response validation
@@ -97,42 +95,37 @@ module OpenapiFirst
       end
     end
 
-    class NotRegisteredError < StandardError; end
-    class AlreadyRegisteredError < StandardError; end
+    def self.install
+      return if @installed
 
-    @definitions = {}
-
-    class << self
-      attr_reader :definitions
-
-      # Register an OpenAPI definition for testing
-      # @param path_or_definition [String, Definition] Path to the OpenAPI file or a Definition object
-      # @param as [Symbol] Name to register the API definition as
-      def register(path_or_definition, as: :default)
-        if definitions.key?(as) && as == :default
-          raise(
-            AlreadyRegisteredError,
-            "#{definitions[as].filepath.inspect} is already registered " \
-            "as ':default' so you cannot register #{path_or_definition.inspect} without " \
-            'giving it a custom name. Please call register with a custom key like: ' \
-            "OpenapiFirst::Test.register(#{path_or_definition.inspect}, as: :my_other_api)"
-          )
+      OpenapiFirst.configure do |config|
+        @after_request_validation = config.after_request_validation do |validated_request, oad|
+          Coverage.track_request(validated_request, oad)
         end
 
-        definition = OpenapiFirst.load(path_or_definition)
-        definitions[as] = definition
-        definition
-      end
+        @after_response_validation = config.after_response_validation do |validated_response, rack_request, oad|
+          if validated_response.invalid? && raise_response_error?(validated_response)
+            raise validated_response.error.exception
+          end
 
-      def [](api)
-        definitions.fetch(api) do
-          option = api == :default ? '' : ", as: #{api.inspect}"
-          raise(NotRegisteredError,
-                "API description '#{api.inspect}' not found." \
-                "Please call OpenapiFirst::Test.register('myopenapi.yaml'#{option}) " \
-                'once before running tests.')
+          Coverage.track_response(validated_response, rack_request, oad)
         end
       end
+      @installed = true
+    end
+
+    def self.raise_response_error?(validated_response)
+      configuration.response_raise_error && !configuration.ignored_unknown_status.include?(validated_response.status)
+    end
+
+    def self.uninstall
+      configuration = OpenapiFirst.configuration
+      configuration.hooks[:after_request_validation].delete(@after_request_validation)
+      configuration.hooks[:after_response_validation].delete(@after_response_validation)
+      definitions.clear
+      @configuration = nil
+      @installed = nil
+      @exit_handler = nil
     end
   end
 end

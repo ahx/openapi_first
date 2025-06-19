@@ -23,7 +23,9 @@ module OpenapiFirst
     register(/json/i, lambda do |body|
       JSON.parse(body)
     rescue JSON::ParserError
-      Failure.fail!(:invalid_response_body, message: 'Response body is invalid: Failed to parse response body as JSON')
+      return Failure.fail!(:invalid_response_body, message: 'JSON response body must not be empty') if body.empty?
+
+      Failure.fail!(:invalid_response_body, message: 'Failed to parse response body as JSON')
     end)
   end
 end

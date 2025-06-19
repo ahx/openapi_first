@@ -10,10 +10,14 @@ module OpenapiFirst
           @focused = focused && !verbose
         end
 
-        # This takes a list of Coverage::Plan instances and outputs a String
         def format(coverage_result)
+          coverage = coverage_result.coverage
           @out = StringIO.new
-          coverage_result.plans.each { |plan| format_plan(plan) }
+          if coverage.zero?
+            @out.puts 'API Coverage did not detect any API requests for the registered API descriptions. ' \
+                      'Make sure to observe your application using OpenapiFirst::Test.'
+          end
+          coverage_result.plans.each { |plan| format_plan(plan) } if coverage.positive?
           @out.string
         end
 
@@ -85,7 +89,9 @@ module OpenapiFirst
         def explain_unfinished_request(request)
           return 'No requests tracked!' unless request.requested?
 
-          "All requests invalid! (#{request.last_error_message.inspect})" unless request.any_valid_request?
+          return if request.any_valid_request?
+
+          "All requests invalid! (#{request.last_error_message.inspect})"
         end
 
         def response_label(response)

@@ -11,7 +11,7 @@ module OpenapiFirst
       def call(parsed_request)
         body = parsed_request.body
         if body.nil?
-          Failure.fail!(:invalid_body, message: 'Request body is not defined') if @required
+          Failure.fail!(:invalid_body, message: 'Request body must not be empty') if @required
           return
         end
 

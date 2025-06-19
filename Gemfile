@@ -12,9 +12,11 @@ group :test, :development do
   gem 'bundler'
   gem 'minitest'
   gem 'rack-test'
+  gem 'rails'
   gem 'rake'
   gem 'rspec'
   gem 'rubocop'
   gem 'rubocop-performance'
   gem 'simplecov'
+  gem 'sinatra'
 end
