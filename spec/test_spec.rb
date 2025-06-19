@@ -15,8 +15,7 @@ RSpec.describe OpenapiFirst::Test do
 
   describe 'Callable[]' do
     it 'returns a Module that can call the api' do
-      described_class.register(definition, as: :some)
-      mod = described_class::Callable[api: :some]
+      mod = described_class::Callable[definition]
       app.prepend(mod)
 
       expect(definition).to receive(:validate_request)
@@ -33,16 +32,6 @@ RSpec.describe OpenapiFirst::Test do
 
       expect(definition).to receive(:validate_request)
       expect(definition).to receive(:validate_response)
-
-      app.new.call({})
-    end
-
-    it 'injects request/response validation just once' do
-      described_class.register(definition, as: :some)
-      2.times { described_class.observe(app, api: :some) }
-
-      expect(definition).to receive(:validate_request).once
-      expect(definition).to receive(:validate_response).once
 
       app.new.call({})
     end

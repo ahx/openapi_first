@@ -9,18 +9,14 @@ module OpenapiFirst
     autoload :Coverage, 'openapi_first/test/coverage'
     autoload :Methods, 'openapi_first/test/methods'
     autoload :Callable, 'openapi_first/test/callable'
+    autoload :Observe, 'openapi_first/test/observe'
     extend Registry
 
     class CoverageError < Error; end
 
-    # @visible private
-    module Observed; end
-
     # Inject request/response validation in a rack app class
     def self.observe(app, api: :default)
-      mod = Callable[api:]
-      app.prepend(mod) unless app.include?(Observed)
-      app.include(Observed)
+      Observe.observe(app, api:)
     end
 
     def self.minitest?(base)
