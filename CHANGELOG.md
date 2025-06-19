@@ -8,7 +8,6 @@ OpenapiFirst::Test is stricter and more configurable:
 - Added Test::Configuration#ignored_unknown_status` to configure response status(es) that do not have to be descriped in the API description.
 - Changed `OpenapiFirst::Test` to make tests fail if API description is not covered by tests. You can adapt this behavior via `OpenapiFirst::Test.setup` / `skip_response_coverage` or deactivate coverage with `report_coverage = false` or `report_coverage = :warn`
 - Added `OpenapiFirst::Test::Configuration#report_coverage=` to configure the behavior if not all requests/responses of the API under test have been tested.
-- Deprecated `OpenapiFirst::Test::Configuration#minimum_coverage=` use "#report_coverage=true/false/:info" instead to modify the behavior
 - Changed OpenapiFirst::Test to raises an "invalid response" error if it sees an invalid response (https://github.com/ahx/openapi_first/issues/366).
   You can change this back to the old behavior by setting `response_raise_error = false` (but you shouldn't).
 
