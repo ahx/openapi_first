@@ -104,18 +104,14 @@ module OpenapiFirst
         end
 
         @after_response_validation = config.after_response_validation do |validated_response, rack_request, oad|
-          after_response_validation(validated_response, rack_request, oad)
+          if validated_response.invalid? && raise_response_error?(validated_response)
+            raise validated_response.error.exception
+          end
+
+          Coverage.track_response(validated_response, rack_request, oad)
         end
       end
       @installed = true
-    end
-
-    def self.after_response_validation(validated_response, rack_request, oad)
-      if validated_response.invalid? && raise_response_error?(validated_response)
-        raise validated_response.error.exception
-      end
-
-      Coverage.track_response(validated_response, rack_request, oad)
     end
 
     def self.raise_response_error?(validated_response)

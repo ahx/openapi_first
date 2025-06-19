@@ -86,14 +86,15 @@ module OpenapiFirst
 
       response_match = route.match_response(status: rack_response.status, content_type: rack_response.content_type)
       error = response_match.error
-      if error
-        ValidatedResponse.new(rack_response, error:)
-      else
-        response_match.response.validate(rack_response)
-      end.tap do |validated|
-        @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated, rack_request, self) }
-        raise validated.error.exception(validated) if raise_error && validated.invalid?
-      end
+      validated = if error
+                    ValidatedResponse.new(rack_response, error:)
+                  else
+                    response_match.response.validate(rack_response)
+                  end
+      @config.hooks[:after_response_validation]&.each { |hook| hook.call(validated, rack_request, self) }
+      raise validated.error.exception(validated) if raise_error && validated.invalid?
+
+      validated
     end
 
     private
