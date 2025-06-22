@@ -54,7 +54,10 @@ module OpenapiFirst
     # Return all request objects that match the given path and request method
     def match(request_method, path, content_type: nil)
       path_item, params = find_path_item(path)
-      return NOT_FOUND unless path_item
+      unless path_item
+        message = "Request path #{path} is not defined in API description."
+        return NOT_FOUND.with(error: Failure.new(:not_found, message:))
+      end
 
       contents = path_item.dig(request_method, :requests)
       return NOT_FOUND.with(error: Failure.new(:method_not_allowed)) unless contents
