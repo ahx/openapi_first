@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- OpenapiFirst::Test now raises an error for unknown requests. You can deactivate this by setting `OpenapiFirst::Test::Configuration#ignore_unknown_request = true`.
+
 ## 2.8.0
 
 ### OpenapiFirst::Test is now stricter and more configurable

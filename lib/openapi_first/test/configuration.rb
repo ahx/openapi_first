@@ -12,6 +12,7 @@ module OpenapiFirst
         @response_raise_error = true
         @ignored_unknown_status = [404]
         @report_coverage = true
+        @ignore_unknown_requests = false
         @registry = {}
         @apps = {}
       end
@@ -28,7 +29,8 @@ module OpenapiFirst
         @apps[api] = app
       end
 
-      attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error, :minimum_coverage
+      attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error, :minimum_coverage,
+                    :ignore_unknown_requests
       attr_reader :registry, :apps, :report_coverage, :ignored_unknown_status
 
       # Configure report coverage
