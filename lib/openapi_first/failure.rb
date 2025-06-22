@@ -5,7 +5,7 @@ module OpenapiFirst
   # This returned in ValidatedRequest#error and ValidatedResponse#error.
   class Failure
     TYPES = {
-      not_found: [NotFoundError, 'Request path is not defined.'],
+      not_found: [NotFoundError, 'Not found.'],
       method_not_allowed: [RequestInvalidError, 'Request method is not defined.'],
       unsupported_media_type: [RequestInvalidError, 'Request content type is not defined.'],
       invalid_body: [RequestInvalidError, 'Request body invalid:'],

@@ -411,6 +411,45 @@ RSpec.describe OpenapiFirst::Test do
     end
   end
 
+  describe 'handling unknown requests paths' do
+    let(:app) do
+      described_class.app(
+        ->(_env) { [200, { 'content-type' => 'application/json' }, ['foo']] },
+        spec: definition
+      )
+    end
+
+    before(:each) do
+      described_class.setup do |test|
+        test.register(definition)
+        test.report_coverage = false
+      end
+    end
+
+    it 'raises an error' do
+      expect do
+        app.call(Rack::MockRequest.env_for('/unknown'))
+      end.to raise_error(OpenapiFirst::NotFoundError)
+    end
+
+    context 'with ignore_unknown_requests = true' do
+      before(:each) do
+        described_class.uninstall
+        described_class.setup do |test|
+          test.register(definition)
+          test.ignore_unknown_requests = true
+          test.report_coverage = false
+        end
+      end
+
+      it 'does not raise an error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/unknown'))
+        end.not_to raise_error
+      end
+    end
+  end
+
   describe 'handling invalid responses' do
     let(:definition) do
       OpenapiFirst.parse(YAML.load(%(

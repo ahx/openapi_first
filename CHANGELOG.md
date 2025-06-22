@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 2.9.0
+
+- OpenapiFirst::Test now raises an error for unknown requests. You can deactivate with:
+
+```ruby
+OpenapiFirst::Test.setup do |test|
+  # ...
+  test.ignore_unknown_request = true
+end
+```
+
+- NotFoundError#message now includes the requested path
+
 ## 2.8.0
 
 ### OpenapiFirst::Test is now stricter and more configurable
