@@ -102,8 +102,6 @@ module OpenapiFirst
         @after_request_validation = config.after_request_validation do |validated_request, oad|
           raise validated_request.error.exception if raise_request_error?(validated_request)
 
-          configuration.ignore_unknown_requests && validated_request.known?
-
           Coverage.track_request(validated_request, oad)
         end
 
