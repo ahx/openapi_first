@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- OpenapiFirst::Test reports all non-covered requests now
+- Response validation: Improve content type mismatch exception message
+
 ## 2.9.1
 
 - Fix OpenapiFirst::Test's request validation to not always raise an error, but only for unknown requests

@@ -33,14 +33,17 @@ module OpenapiFirst
           @out.print(string)
         end
 
-        def format_plan(plan)
+        def format_plan(plan) # rubocop:disable Metrics/PerceivedComplexity
           puts ['', "API validation coverage for #{plan.api_identifier}: #{plan.coverage}%"]
           return if plan.done? && !verbose
+
+          requested_routes_count = plan.routes.count { |route| route.requests.any?(&:requested?) }
+          focused_route = requested_routes_count <= 1 && focused
 
           plan.routes.each do |route|
             next if route.finished? && !verbose
 
-            next if route.requests.none?(&:requested?) && focused
+            next if route.requests.none?(&:requested?) && focused_route
 
             format_requests(route.requests)
 
