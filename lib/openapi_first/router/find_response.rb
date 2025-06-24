@@ -16,20 +16,24 @@ module OpenapiFirst
           return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
         end
         response = FindContent.call(contents, content_type)
-        if response.nil?
-          message = "#{content_error(content_type, request_method:,
-                                                   path:)} Content-Type should be #{contents.keys.join(' or ')}."
-          return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
-        end
+        return response_not_found(content_type:, contents:, request_method:, path:) unless response
 
         Match.new(response:, error: nil)
       end
 
-      def self.content_error(content_type, request_method:, path:)
-        return 'Response Content-Type must not be empty.' if content_type.nil? || content_type.empty?
+      def self.response_not_found(content_type:, contents:, request_method:, path:)
+        empty_content = content_type.nil? || content_type.empty?
+        message =
+          "Content-Type should be #{contents.keys.join(' or ')}, " \
+          "but was #{empty_content ? 'empty' : content_type} for " \
+          "#{request_method.upcase} #{path}"
 
-        "Response Content-Type #{content_type} is not defined for #{request_method} #{path}."
+        Match.new(
+          error: Failure.new(:response_not_found, message:),
+          response: nil
+        )
       end
+      private_class_method :response_not_found
 
       def self.find_status(responses, status)
         # According to OAS status has to be a string,

@@ -82,7 +82,7 @@ RSpec.describe OpenapiFirst::Router::FindResponse do
           double(status: '200', content_type: 'application/text'),
           double(status: '200', content_type: 'application/xml')
         ]
-        message = 'Response Content-Type application/json is not defined for GET /stations. Content-Type should be application/text or application/xml.'
+        message = 'Content-Type should be application/text or application/xml, but was application/json for GET /stations'
         expect(find(responses, 200, 'application/json')).to have_attributes(
           response: nil,
           error: have_attributes(type: :response_not_found, message:)
