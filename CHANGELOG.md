@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.9.1
+
+- Fix OpenapiFirst::Test's request validation to not always raise an error, but only for unknown requests
+
 ## 2.9.0
 
 - OpenapiFirst::Test now raises an error for unknown requests. You can deactivate with:

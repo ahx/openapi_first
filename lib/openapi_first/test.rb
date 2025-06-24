@@ -118,7 +118,7 @@ module OpenapiFirst
 
     def self.raise_request_error?(validated_request)
       return false if validated_request.valid?
-      return true if validated_request.known?
+      return false if validated_request.known?
 
       !configuration.ignore_unknown_requests
     end

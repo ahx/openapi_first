@@ -411,6 +411,58 @@ RSpec.describe OpenapiFirst::Test do
     end
   end
 
+  describe 'handling invalid requests' do
+    let(:definition) do
+      OpenapiFirst.parse(
+        {
+          'openapi' => '3.1.0',
+          'paths' => {
+            '/stuff/{id}' => {
+              'get' => {
+                'parameters' => [
+                  {
+                    'name' => 'id',
+                    'in' => 'path',
+                    'required' => true,
+                    'schema' => {
+                      'type' => 'integer'
+                    }
+                  }
+                ],
+                'responses' => {
+                  '200' => {
+                    'descrition' => 'Ok'
+                  }
+                }
+              }
+            }
+          }
+        },
+        filepath: 'somefile'
+      )
+    end
+
+    let(:app) do
+      described_class.app(
+        ->(_env) { [200, { 'content-type' => 'application/json' }, ['foo']] },
+        spec: definition
+      )
+    end
+
+    before(:each) do
+      described_class.setup do |test|
+        test.register(definition)
+        test.report_coverage = false
+      end
+    end
+
+    it 'raises no error, but tracks the request' do
+      app.call(Rack::MockRequest.env_for('/stuff/nostring'))
+
+      expect(described_class::Coverage.result.coverage).to eq 50
+    end
+  end
+
   describe 'handling unknown requests paths' do
     let(:app) do
       described_class.app(
