@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.9.2
+
 - OpenapiFirst::Test reports all non-covered requests now
 - Response validation: Improve content type mismatch exception message
 
