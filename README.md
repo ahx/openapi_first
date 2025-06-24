@@ -368,6 +368,8 @@ use OpenapiFirst::Middlewares::RequestValidation, oad
 
 ## Development
 
+Run `git submodule update --init` to initialize the git submodules.
+
 Run `bin/setup` to install dependencies.
 
 See `bundle exec rake` to run the linter and the tests.
