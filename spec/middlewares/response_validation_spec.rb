@@ -51,7 +51,7 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     end
 
     it 'returns an error' do
-      msg = 'Response Content-Type must not be empty. Content-Type should be application/json.'
+      msg = 'Content-Type should be application/json, but was empty for GET /pets'
       expect do
         get '/pets'
       end.to raise_error OpenapiFirst::ResponseNotFoundError, msg
