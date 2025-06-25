@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix OpenapiFirst.load when MultiJson is configured to return symbol keys
+
 ## 2.9.2
 
 - OpenapiFirst::Test reports all non-covered requests now
