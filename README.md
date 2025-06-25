@@ -56,7 +56,7 @@ Here is how to set it up:
     end
     ```
 2. Observe your application. You can do this in one of two ways:
-    -  Add an `app` method to your tests, which wraps your application with silent request / response validation. (✷1)
+    - Add an `app` method to your tests, which wraps your application with silent request / response validation. (✷1)
       ```ruby
       RSpec.configure do |config|
         config.include OpenapiFirst::Test::Methods[MyApp], type: :request
@@ -69,9 +69,9 @@ Here is how to set it up:
         OpenapiFirst::Test.app(MyApp)
       end
       ```
-    - Inject a Module to wrap (prepend) the `call` method of your Rack app Class.
-      > [!IMPORTANT]  
-      > This is still work in progress. It works with basic Sinatra apps, but does not work with Hanami or Rails out of the box, yet. PRs welcome 🤗
+    - Or inject a Module to wrap (prepend) the `call` method of your Rack app Class.
+    
+      NOTE: This is still work in progress. It works with basic Sinatra apps, but does not work with Hanami or Rails out of the box, yet. PRs welcome 🤗
       
       ```ruby
       OpenapiFirst::Test.observe(MyApplication)
