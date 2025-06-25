@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.9.3
+
 - Fix OpenapiFirst.load when MultiJson is configured to return symbol keys
 
 ## 2.9.2
