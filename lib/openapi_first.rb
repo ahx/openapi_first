@@ -66,7 +66,7 @@ module OpenapiFirst
   # @return [Definition]
   # TODO: This needs to work with unresolved contents as well
   def self.parse(contents, only: nil, filepath: nil, &)
-    contents = JSON.parse(JSON.generate(contents)) # Deeply stringify keys, because of YAML. See https://github.com/ahx/openapi_first/issues/367
+    contents = ::JSON.parse(::JSON.generate(contents)) # Deeply stringify keys, because of YAML. See https://github.com/ahx/openapi_first/issues/367
     contents['paths'].filter!(&->(key, _) { only.call(key) }) if only
     Definition.new(contents, filepath, &)
   end

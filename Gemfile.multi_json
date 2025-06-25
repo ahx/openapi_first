@@ -9,10 +9,13 @@ gem 'multi_json'
 group :test, :development do
   gem 'actionpack'
   gem 'bundler'
+  gem 'minitest'
   gem 'rack-test'
+  gem 'rails'
   gem 'rake'
   gem 'rspec'
   gem 'rubocop'
   gem 'rubocop-performance'
   gem 'simplecov'
+  gem 'sinatra'
 end

@@ -2,9 +2,16 @@
 
 RSpec.describe OpenapiFirst::FileLoader do
   describe '.load' do
-    it 'loads .json' do
-      contents = described_class.load('./spec/data/petstore.json')
-      expect(contents['openapi']).to eq('3.0.0')
+    begin
+      require 'multi_json'
+      before do
+        MultiJson.load_options = { symbolize_keys: true }
+      end
+
+      after do
+        MultiJson.load_options = { symbolize_keys: false }
+      end
+    rescue LoadError # rubocop:disable Lint/SuppressedException
     end
 
     it 'loads .yaml' do
@@ -14,6 +21,11 @@ RSpec.describe OpenapiFirst::FileLoader do
 
     it 'loads .yml' do
       contents = described_class.load('./spec/data/petstore.yml')
+      expect(contents['openapi']).to eq('3.0.0')
+    end
+
+    it 'loads .json' do
+      contents = described_class.load('./spec/data/petstore.json')
       expect(contents['openapi']).to eq('3.0.0')
     end
 

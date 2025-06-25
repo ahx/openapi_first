@@ -7,11 +7,14 @@ gemspec
 gem 'rackup'
 
 group :test, :development do
-  gem 'actionpack', '~> 6.1'
   gem 'bundler'
+  gem 'minitest'
   gem 'rack-test'
+  gem 'rails', '~> 6.1'
   gem 'rake'
   gem 'rspec'
   gem 'rubocop'
+  gem 'rubocop-performance'
   gem 'simplecov'
+  gem 'sinatra'
 end

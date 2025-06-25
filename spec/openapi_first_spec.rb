@@ -38,6 +38,18 @@ RSpec.describe OpenapiFirst do
   end
 
   describe '.load' do
+    begin
+      require 'multi_json'
+      before do
+        MultiJson.load_options = { symbolize_keys: true }
+      end
+
+      after do
+        MultiJson.load_options = { symbolize_keys: false }
+      end
+    rescue LoadError # rubocop:disable Lint/SuppressedException
+    end
+
     it 'returns a Definition' do
       expect(OpenapiFirst.load(spec_path)).to be_a OpenapiFirst::Definition
     end
