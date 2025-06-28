@@ -236,9 +236,15 @@ RSpec.describe 'Query Parameter validation' do
         expect(last_response.status).to eq 400
       end
 
-      it 'returns 400 if non-required array parameter is empty' do
+      it 'passes if non-required array parameter is empty' do
         get '/search?term=Oscar&filter[id]=1&filter[tag]=&filter[other]=things'
-        expect(last_response.status).to eq 400
+        expect(last_response.status).to eq 200
+        expect(last_request.env[OpenapiFirst::REQUEST].parsed_query).to eq(
+          { 'term' => 'Oscar',
+            'filter[tag]' => [],
+            'filter[id]' => 1,
+            'filter[other]' => 'things' }
+        )
       end
 
       it 'passes if query parameters are valid' do

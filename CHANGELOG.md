@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update openapi_parameters to make parsing array query parameters more consistent.
+  Now parsing an empty array query parameter like `ids=&` or `ids&` both result in an empty array value (`[]`) instead of `nil` or `""`.
 - Fix Test::Coverage.result returning < 100 even if plan is fully covered
 
 ## 2.9.3
