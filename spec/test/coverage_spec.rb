@@ -66,6 +66,18 @@ RSpec.describe OpenapiFirst::Test::Coverage do
       oad = double(key: 'unknown')
       described_class.track_request(double, oad)
     end
+
+    it 'ignores skipped request' do
+      OpenapiFirst::Test.definitions.clear
+      OpenapiFirst::Test.setup do |test|
+        test.register(definition)
+        test.skip_coverage { true }
+        test.report_coverage = false
+      end
+
+      validated = definition.validate_request(valid_request)
+      described_class.track_request(validated, definition)
+    end
   end
 
   describe '.track_response' do
