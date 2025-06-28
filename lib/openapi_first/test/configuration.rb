@@ -29,9 +29,9 @@ module OpenapiFirst
         @apps[api] = app
       end
 
-      attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error, :minimum_coverage,
+      attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error,
                     :ignore_unknown_requests
-      attr_reader :registry, :apps, :report_coverage, :ignored_unknown_status
+      attr_reader :registry, :apps, :report_coverage, :ignored_unknown_status, :minimum_coverage
 
       # Configure report coverage
       # @param [Boolean, :warn] value Whether to report coverage or just warn.
@@ -42,6 +42,13 @@ module OpenapiFirst
         end
 
         @report_coverage = value
+      end
+
+      # @deprecated Use skip_response_coverage, ignored_unknown_status to configure coverage
+      def minimum_coverage=(value)
+        warn 'OpenapiFirst::Test::Configuration#minimum_coverage= is deprecated. ' \
+             'Use skip_response_coverage, ignored_unknown_status to configure coverage instead.'
+        @minimum_coverage = value
       end
 
       def skip_response_coverage(&block)
