@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix Test::Coverage.result returning < 100 even if plan is fully covered
+
 ## 2.9.3
 
 - Fix OpenapiFirst.load when MultiJson is configured to return symbol keys

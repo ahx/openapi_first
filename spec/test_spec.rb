@@ -281,7 +281,7 @@ RSpec.describe OpenapiFirst::Test do
       definition.validate_response(valid_request, response, raise_error: true)
 
       described_class.report_coverage
-      expect(output.string).to include('API validation coverage for ./spec/data/dice.yaml: 100.0%')
+      expect(output.string).to include('API validation coverage for ./spec/data/dice.yaml: 100%')
     end
 
     context 'when passing verbose: true' do
