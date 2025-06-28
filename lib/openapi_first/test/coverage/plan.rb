@@ -12,9 +12,11 @@ module OpenapiFirst
       class Plan
         class UnknownRequestError < StandardError; end
 
-        def self.for(oad, skip_response: nil)
+        def self.for(oad, skip_response: nil, skip_route: nil)
           plan = new(definition_key: oad.key, filepath: oad.filepath)
-          oad.routes.each do |route|
+          routes = oad.routes
+          routes = routes.reject { |route| skip_route[route.path, route.request_method] } if skip_route
+          routes.each do |route|
             responses = skip_response ? route.responses.reject(&skip_response) : route.responses
             plan.add_route request_method: route.request_method,
                            path: route.path,

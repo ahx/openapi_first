@@ -41,7 +41,7 @@ module OpenapiFirst
 
       configuration.registry.each { |name, oad| register(oad, as: name) }
       configuration.apps.each { |name, app| observe(app, api: name) }
-      Coverage.start(skip_response: configuration.skip_response_coverage)
+      Coverage.start(skip_response: configuration.skip_response_coverage, skip_route: configuration.skip_coverage)
 
       if definitions.empty?
         raise NotRegisteredError,

@@ -70,9 +70,9 @@ Here is how to set it up:
       end
       ```
     - Or inject a Module to wrap (prepend) the `call` method of your Rack app Class.
-    
+
       NOTE: This is still work in progress. It works with basic Sinatra apps, but does not work with Hanami or Rails out of the box, yet. PRs welcome 🤗
-      
+
       ```ruby
       OpenapiFirst::Test.observe(MyApplication)
       ```
@@ -80,11 +80,36 @@ Here is how to set it up:
 
 (✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the [middlewares](#rack-middlewares) or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
 
-OpenapiFirst' request validation raises an error when a request is not defined. You can deactivate this during testing:
+### Configure test coverage
+
+OpenapiFirst::Test raises an error when a request is not defined. You can deactivate this with:
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
+  # …
   test.ignore_unknown_requests = true
+end
+```
+
+Exclude certain _responses_ from coverage with `skip_coverage`:
+
+```ruby
+OpenapiFirst::Test.setup do |test|
+  # …
+  test.skip_response_coverage do |response_definition|
+    response_definition.status == '5XX'
+  end
+end
+```
+
+Skip coverage for a request and all responses alltogether of a route with `skip_coverage`:
+
+```ruby
+OpenapiFirst::Test.setup do |test|
+  # …
+  test.skip_coverage do |path, request_method|
+    path == '/bookings/{bookingId}' && requests_method == 'DELETE'
+  end
 end
 ```
 

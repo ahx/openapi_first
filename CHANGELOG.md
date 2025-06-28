@@ -2,8 +2,12 @@
 
 ## Unreleased
 
+## 2.10.0
+
+- Add Test::Configuration#skip_coverage to skip test coverage for specific paths + request methods and all responses
+- Deprecate setting minimum_coverage value. Use skip_response_coverage, ignored_unknown_status to configure coverage instead.
 - Update openapi_parameters to make parsing array query parameters more consistent.
-  Now parsing an empty array query parameter like `ids=&` or `ids&` both result in an empty array value (`[]`) instead of `nil` or `""`.
+  Now parsing empty array query parameter like `ids=&` or `ids&` both result in an empty array value (`[]`) instead of `nil` or `""`.
 - Fix Test::Coverage.result returning < 100 even if plan is fully covered
 
 ## 2.9.3
