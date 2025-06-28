@@ -9,6 +9,7 @@ module OpenapiFirst
         @coverage_formatter = Coverage::TerminalFormatter
         @coverage_formatter_options = {}
         @skip_response_coverage = nil
+        @skip_coverage = nil
         @response_raise_error = true
         @ignored_unknown_status = [404]
         @report_coverage = true
@@ -44,7 +45,7 @@ module OpenapiFirst
         @report_coverage = value
       end
 
-      # @deprecated Use skip_response_coverage, ignored_unknown_status to configure coverage
+      # @deprecated Use skip_response_coverage, ignored_unknown_status or skip_coverage to configure coverage
       def minimum_coverage=(value)
         warn 'OpenapiFirst::Test::Configuration#minimum_coverage= is deprecated. ' \
              'Use skip_response_coverage, ignored_unknown_status to configure coverage instead.'
@@ -55,6 +56,12 @@ module OpenapiFirst
         return @skip_response_coverage unless block_given?
 
         @skip_response_coverage = block
+      end
+
+      def skip_coverage(&block)
+        return @skip_coverage unless block_given?
+
+        @skip_coverage = block
       end
     end
   end

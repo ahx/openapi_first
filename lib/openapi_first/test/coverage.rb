@@ -19,9 +19,9 @@ module OpenapiFirst
 
         def install = Test.install
 
-        def start(skip_response: nil)
+        def start(skip_response: nil, skip_route: nil)
           @current_run = Test.definitions.values.to_h do |oad|
-            plan = Plan.for(oad, skip_response:)
+            plan = Plan.for(oad, skip_response:, skip_route:)
             [oad.key, plan]
           end
         end

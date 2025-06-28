@@ -141,12 +141,22 @@ RSpec.describe OpenapiFirst::Test do
       expect(described_class::Coverage.plans.first.tasks.count).to eq(2)
     end
 
-    it 'can skip_response_coverage' do
+    it 'can skip_coverage for whole routes' do
       described_class.setup do |test|
-        test.register('./examples/openapi.yaml')
-        test.skip_response_coverage { |res| res.status == '401' }
+        test.register('./spec/data/petstore.yaml')
+        test.skip_coverage { |path, request_method| path == '/pets' && request_method == 'POST' }
       end
-      expect(described_class::Coverage.plans.first.tasks.count).to eq(2)
+      route_tasks = described_class::Coverage.plans.first.routes
+      expect(route_tasks.map { |route| [route.path, route.request_method] }).to eq([['/pets', 'GET'], ['/pets/{petId}', 'GET']])
+    end
+
+    it 'can skip_coverage for paths' do
+      described_class.setup do |test|
+        test.register('./spec/data/petstore.yaml')
+        test.skip_coverage { |path| path == '/pets' }
+      end
+      route_tasks = described_class::Coverage.plans.first.routes
+      expect(route_tasks.map { |route| [route.path, route.request_method] }).to eq([['/pets/{petId}', 'GET']])
     end
 
     it 'raises an error if no block is given' do
