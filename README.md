@@ -55,28 +55,35 @@ Here is how to set it up:
       config.register('openapi/openapi.yaml')
     end
     ```
-2. Observe your application. You can do this in one of two ways:
-    - Add an `app` method to your tests, which wraps your application with silent request / response validation. (✷1)
+2. Observe your application. You can do this in multiple ways:
+    - Add an `app` method to your tests, which wraps your application with silent request / response validation. (✷1)     
+      ```ruby
+      module RequestSpecHelpers
+        def app
+          OpenapiFirst::Test.app(MyApp)
+        end
+      end
+
+      RSpec.configure do |config|
+        config.include RequestSpecHelpers, type: :request
+      end
+      ```      
+      
+      Or do this by creating a Module and including it to add an "app" method.
+      
       ```ruby
       RSpec.configure do |config|
         config.include OpenapiFirst::Test::Methods[MyApp], type: :request
       end
       ```
-      Or add the `app` method yourself:
-
-      ```ruby
-      def app
-        OpenapiFirst::Test.app(MyApp)
-      end
-      ```
-    - Or inject a Module to wrap (prepend) the `call` method of your Rack app Class.
+    - Or modify your app to wrap the `call` method of your Rack app Class.
 
       NOTE: This is still work in progress. It works with basic Sinatra apps, but does not work with Hanami or Rails out of the box, yet. PRs welcome 🤗
 
       ```ruby
       OpenapiFirst::Test.observe(MyApplication)
       ```
-3. Run your tests. The Coverage feature will tell you about missing or invalid requests/responses.
+4. Run your tests. The Coverage feature will tell you about missing or invalid requests/responses.
 
 (✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the [middlewares](#rack-middlewares) or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
 
