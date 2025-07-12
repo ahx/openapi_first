@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- OpenapiFirst::Test.observe now works with `Rack::URLMap` (returned by `Rack::Builder.app`) and probably all objects that respond to `.call`
+
 ## 2.10.1
 
 - Don't try to track coverage for skipped requests
