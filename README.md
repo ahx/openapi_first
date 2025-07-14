@@ -16,8 +16,11 @@ require 'openapi_first'
 OpenapiFirst::Test.setup do |config|
   config.register('openapi/openapi.yaml')
 end
+
 require 'application' # Load Application code
-OpenapiFirst::Test.observe(Application)
+RSpec.configure do |config|
+  config.include OpenapiFirst::Test::Methods[MyApp], type: :request  
+end
 ```
 
 ## Contents
