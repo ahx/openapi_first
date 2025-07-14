@@ -17,11 +17,13 @@ OpenapiFirst::Test.setup do |config|
   config.register('openapi/openapi.yaml')
 end
 
-require 'application' # Load Application code
+require 'application' # Load Application code after calling OpenapiFirst::Test.setup.
 RSpec.configure do |config|
   config.include OpenapiFirst::Test::Methods[MyApp], type: :request  
 end
 ```
+
+Or use `OpenapiFirst::Test.app(MyApp)` to observe your app during tests. See [Contract testing](#contract-testing) for details.
 
 ## Contents
 
