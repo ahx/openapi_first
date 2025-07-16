@@ -23,11 +23,14 @@ module OpenapiFirst
 
     def read_body(rack_response)
       buffered_body = +''
+
       if rack_response.body.respond_to?(:each)
         rack_response.body.each { |chunk| buffered_body.to_s << chunk }
         return buffered_body
       end
       rack_response.body
+    rescue TypeError
+      raise Error, "Cannot not read response body. Response should have a string-like value, but was a #{rack_response.body.class}."
     end
 
     def build_headers_parser(headers)

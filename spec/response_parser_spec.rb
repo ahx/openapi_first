@@ -28,6 +28,19 @@ RSpec.describe OpenapiFirst::ResponseParser do
       end
     end
 
+    context 'with a non string-like body' do
+      let(:rack_response) do
+        app_response = Rack::Response.new({ foo: :bar }, 200, { 'Content-Type' => 'application/json' }).to_a
+        Rack::Response[*app_response]
+      end
+
+      it 'raises an error that explains the issue' do
+        expect do
+          parsed.body
+        end.to raise_error 'Cannot not read response body. Response is no string-like, but is a Hash.'
+      end
+    end
+
     context 'when request has no content-type' do
       let(:rack_response) do
         Rack::Response.new(JSON.generate({ foo: :bar }))
