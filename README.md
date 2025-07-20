@@ -19,7 +19,7 @@ end
 
 require 'application' # Load Application code after calling OpenapiFirst::Test.setup.
 RSpec.configure do |config|
-  config.include OpenapiFirst::Test::Methods[MyApp], type: :request  
+  config.include OpenapiFirst::Test::Methods[MyApp], type: :request
 end
 ```
 
@@ -61,7 +61,7 @@ Here is how to set it up:
     end
     ```
 2. Observe your application. You can do this in multiple ways:
-    - Add an `app` method to your tests, which wraps your application with silent request / response validation. (✷1)     
+    - Add an `app` method to your tests, which wraps your application with silent request / response validation. (✷1)
       ```ruby
       module RequestSpecHelpers
         def app
@@ -72,21 +72,14 @@ Here is how to set it up:
       RSpec.configure do |config|
         config.include RequestSpecHelpers, type: :request
       end
-      ```      
-      
+      ```
+
       Or do this by creating a Module and including it to add an "app" method.
-      
+
       ```ruby
       RSpec.configure do |config|
         config.include OpenapiFirst::Test::Methods[MyApp], type: :request
       end
-      ```
-    - Or modify your app to wrap the `call` method of your Rack app Class.
-
-      NOTE: This is still work in progress. It works with basic Sinatra apps, but does not work with Hanami or Rails out of the box, yet. PRs welcome 🤗
-
-      ```ruby
-      OpenapiFirst::Test.observe(MyApplication)
       ```
 4. Run your tests. The Coverage feature will tell you about missing or invalid requests/responses.
 
