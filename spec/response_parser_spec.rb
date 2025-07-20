@@ -37,7 +37,7 @@ RSpec.describe OpenapiFirst::ResponseParser do
       it 'raises an error that explains the issue' do
         expect do
           parsed.body
-        end.to raise_error 'Cannot not read response body. Response is no string-like, but is a Hash.'
+        end.to raise_error 'Cannot not read response body. Response is not string-like, but is a Hash.'
       end
     end
 
