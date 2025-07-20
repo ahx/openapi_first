@@ -85,4 +85,33 @@ RSpec.describe OpenapiFirst::Test::Observe do
 
     it_behaves_like 'an observed app'
   end
+
+  context 'with a proc' do
+    let(:app) do
+      ->(_env) { Rack::Response.new.finish }
+    end
+
+    it_behaves_like 'an observed app'
+
+    it 'injects request/response validation only once' do
+      2.times { described_class.observe(app) }
+
+      expect(definition).to receive(:validate_request).once
+      expect(definition).to receive(:validate_response).once
+
+      callable.call({})
+    end
+  end
+
+  context 'with Rack::Builder.app' do
+    let(:app) do
+      Rack::Builder.app do
+        map '/' do
+          run ->(_env) { Rack::Response.new.finish }
+        end
+      end
+    end
+
+    it_behaves_like 'an observed app'
+  end
 end
