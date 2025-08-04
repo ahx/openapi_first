@@ -27,7 +27,7 @@ module OpenapiFirst
 
       # Observe a rack app
       def observe(app, api: :default)
-        @apps[api] = app
+        (@apps[api] ||= []) << app
       end
 
       attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error,

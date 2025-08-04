@@ -125,6 +125,24 @@ RSpec.describe OpenapiFirst::Test do
       app.new.call({})
     end
 
+    it 'observes multiple apps' do
+      other_app = Class.new do
+        def call(_env)
+          Rack::Response.new.finish
+        end
+      end
+
+      described_class.setup do |test|
+        test.register(definition, as: :some)
+        test.observe(app, api: :some)
+        test.observe(other_app, api: :some)
+      end
+
+      expect(definition).to receive(:validate_request).twice
+      app.new.call({})
+      other_app.new.call({})
+    end
+
     it 'sets up minimum_coverage' do
       described_class.setup do |test|
         test.register('./examples/openapi.yaml')
