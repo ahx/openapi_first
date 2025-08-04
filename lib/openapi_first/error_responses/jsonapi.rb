@@ -5,6 +5,7 @@ module OpenapiFirst
     # A JSON:API conform error response. See https://jsonapi.org/.
     class Jsonapi
       include OpenapiFirst::ErrorResponse
+
       OpenapiFirst.register_error_response(:jsonapi, self)
 
       def body
