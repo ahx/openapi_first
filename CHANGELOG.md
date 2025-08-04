@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.11.0
+
 - OpenapiFirst::Test.observe now works with `Rack::URLMap` (returned by `Rack::Builder.app`) and probably all objects that respond to `.call`
 
 ## 2.10.1
