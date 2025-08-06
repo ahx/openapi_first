@@ -192,6 +192,9 @@ Here is how to set it up:
 
 (✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the [middlewares](#rack-middlewares) or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
 
+> [!NOTE]
+> Check out [faraday-openapi](https://codeberg.org/ahx/faraday-openapi) to have your API _client_ validate request/responses against an OAD, which is useful to validate HTTP mocks during testing.
+
 ### Configure test coverage
 
 OpenapiFirst::Test raises an error when a request is not defined. You can deactivate this with:
