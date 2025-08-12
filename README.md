@@ -203,12 +203,11 @@ Here is how to set it up:
 
 ### Configure test coverage
 
-OpenapiFirst::Test raises an error when a request is not defined. You can deactivate this with:
+OpenapiFirst::Test raises an error when a response status is not defined. You can deactivate this with:
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
-  # …
-  test.ignore_unknown_requests = true
+  [403, 401].each { test.ignored_unknown_status << it }
 end
 ```
 
@@ -231,6 +230,15 @@ OpenapiFirst::Test.setup do |test|
   test.skip_coverage do |path, request_method|
     path == '/bookings/{bookingId}' && requests_method == 'DELETE'
   end
+end
+```
+
+OpenapiFirst::Test raises an error when a request is not defined. You can deactivate this with:
+
+```ruby
+OpenapiFirst::Test.setup do |test|
+  # …
+  test.ignore_unknown_requests = true
 end
 ```
 
