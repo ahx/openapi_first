@@ -44,7 +44,7 @@ module OpenapiFirst
             name = part.match(TEMPLATE_EXPRESSION_NAME)[1]
             parameter = @path_parameters.find { |p| p['name'] == name }
             if @use_patterns_for_path_matching && parameter&.[]('schema')&.[]('pattern')
-              single_capturing_group(parameter['schema']['pattern'])
+              transform_pattern(parameter['schema']['pattern'])
             else
               ALLOWED_PARAMETER_CHARACTERS
             end
@@ -56,8 +56,29 @@ module OpenapiFirst
         %r{^#{parts.join}/?$}
       end
 
+      def transform_pattern(pattern)
+        pattern = pattern_with_correct_start(pattern)
+        pattern = pattern_with_correct_end(pattern)
+        single_capturing_group(pattern)
+      end
+
+      def pattern_with_correct_start(pattern)
+        return pattern[1..] if pattern.start_with?('^')
+        return pattern[2..] if pattern.start_with?('\A')
+
+        "[^/?#]*#{pattern}"
+      end
+
+      def pattern_with_correct_end(pattern)
+        return pattern[..-2] if pattern.end_with?('$')
+        return pattern[..-3] if pattern.end_with?('\Z')
+        return pattern[..-4] if pattern.end_with?('\z')
+
+        "#{pattern}[^/?#]*$"
+      end
+
       def single_capturing_group(pattern)
-        %r{(#{pattern.gsub(/(?<!\\)\((?!\?[:\-!=])/) { "(?:" }})}
+        %r{(#{pattern.gsub(/(?<!\\)\((?!\?[:<!=])/) { "(?:" }})}
       end
     end
   end
