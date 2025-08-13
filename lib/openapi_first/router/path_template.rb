@@ -72,7 +72,7 @@ module OpenapiFirst
       def pattern_with_correct_end(pattern)
         return pattern[..-2] if pattern.end_with?('$')
         return pattern[..-3] if pattern.end_with?('\Z')
-        return pattern[..-4] if pattern.end_with?('\z')
+        return pattern[..-3] if pattern.end_with?('\z')
 
         "#{pattern}[^/?#]*$"
       end
