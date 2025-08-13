@@ -168,7 +168,7 @@ Here is how to set it up:
     end
     ```
 2. Observe your application. You can do this in multiple ways:
-    - Add an `app` method to your tests, which wraps your application with silent request / response validation. (✷1)
+    - Add an `app` method to your tests (which is called by rack-test) that wraps your application with silent request / response validation.
       ```ruby
       module RequestSpecHelpers
         def app
@@ -188,21 +188,26 @@ Here is how to set it up:
         config.include OpenapiFirst::Test::Methods[MyApp], type: :request
       end
       ```
-4. Run your tests. The Coverage feature will tell you about missing or invalid requests/responses.
+4. Run your tests. The Coverage feature will tell you about missing or invalid requests/responses:
+      ```
+      ✓ GET /stations
+        ✓ 200(application/json)
+        ❌ 200(application/xml) – No responses tracked!
+        ❌ 400(application/problem+json) – No responses tracked!
+      ```
 
-(✷1): It does not matter what method of openapi_first you use to validate requests/responses. Instead of using `OpenapiFirstTest.app` to wrap your application, you could also use the [middlewares](#rack-middlewares) or [test assertion method](#test-assertions), but you would have to do that for all requests/responses defined in your API description to make coverage work.
+      Now add tests for all those "❌" to make them "✓" and you're green!
 
 > [!NOTE]
 > Check out [faraday-openapi](https://codeberg.org/ahx/faraday-openapi) to have your API _client_ validate request/responses against an OAD, which is useful to validate HTTP mocks during testing.
 
 ### Configure test coverage
 
-OpenapiFirst::Test raises an error when a request is not defined. You can deactivate this with:
+OpenapiFirst::Test raises an error when a response status is not defined. You can deactivate this with:
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
-  # …
-  test.ignore_unknown_requests = true
+  [403, 401].each { test.ignored_unknown_status << it }
 end
 ```
 
@@ -225,6 +230,15 @@ OpenapiFirst::Test.setup do |test|
   test.skip_coverage do |path, request_method|
     path == '/bookings/{bookingId}' && requests_method == 'DELETE'
   end
+end
+```
+
+OpenapiFirst::Test raises an error when a request is not defined. You can deactivate this with:
+
+```ruby
+OpenapiFirst::Test.setup do |test|
+  # …
+  test.ignore_unknown_requests = true
 end
 ```
 
