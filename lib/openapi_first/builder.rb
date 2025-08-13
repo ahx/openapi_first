@@ -73,6 +73,8 @@ module OpenapiFirst
               request,
               request_method:,
               path:,
+              path_parameters: parameters.path,
+              use_patterns_for_path_matching: config.use_patterns_for_path_matching,
               content_type: request.content_type,
               allow_empty_content: request.allow_empty_content?
             )
@@ -81,6 +83,8 @@ module OpenapiFirst
                 response,
                 request_method:,
                 path:,
+                path_parameters: parameters.path,
+                use_patterns_for_path_matching: config.use_patterns_for_path_matching,
                 status: response.status,
                 response_content_type: response.content_type
               )

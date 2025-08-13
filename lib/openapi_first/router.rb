@@ -39,16 +39,16 @@ module OpenapiFirst
     end
 
     # Add a request definition
-    def add_request(request, request_method:, path:, content_type: nil, allow_empty_content: false)
-      route = route_at(path, request_method)
+    def add_request(request, request_method:, path:, path_parameters: [], use_patterns_for_path_matching: false, content_type: nil, allow_empty_content: false)
+      route = route_at(path, request_method, path_parameters, use_patterns_for_path_matching)
       requests = route[:requests]
       requests[content_type] = request
       requests[nil] = request if allow_empty_content
     end
 
     # Add a response definition
-    def add_response(response, request_method:, path:, status:, response_content_type: nil)
-      (route_at(path, request_method)[:responses][status] ||= {})[response_content_type] = response
+    def add_response(response, request_method:, path:, path_parameters: [], use_patterns_for_path_matching: false, status:, response_content_type: nil)
+      (route_at(path, request_method, path_parameters, use_patterns_for_path_matching)[:responses][status] ||= {})[response_content_type] = response
     end
 
     # Return all request objects that match the given path and request method
@@ -74,10 +74,12 @@ module OpenapiFirst
 
     private
 
-    def route_at(path, request_method)
+    def route_at(path, request_method, path_parameters, use_patterns_for_path_matching)
       request_method = request_method.upcase
       path_item = if PathTemplate.template?(path)
-                    @dynamic[path] ||= { template: PathTemplate.new(path) }
+                    @dynamic[path] ||= {
+                      template: PathTemplate.new(path, path_parameters, use_patterns_for_path_matching)
+                    }
                   else
                     @static[path] ||= {}
                   end

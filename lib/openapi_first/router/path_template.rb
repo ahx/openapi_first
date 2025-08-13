@@ -13,8 +13,10 @@ module OpenapiFirst
         string.include?('{')
       end
 
-      def initialize(template)
+      def initialize(template, path_parameters, use_patterns_for_path_matching)
         @template = template
+        @path_parameters = path_parameters
+        @use_patterns_for_path_matching = use_patterns_for_path_matching
         @names = template.scan(TEMPLATE_EXPRESSION_NAME).flatten
         @pattern = build_pattern(template)
       end
@@ -38,10 +40,24 @@ module OpenapiFirst
 
       def build_pattern(template)
         parts = template.split(TEMPLATE_EXPRESSION).map! do |part|
-          part.start_with?('{') ? ALLOWED_PARAMETER_CHARACTERS : Regexp.escape(part)
+          if part.start_with?('{')
+            name = part.match(TEMPLATE_EXPRESSION_NAME)[1]
+            parameter = @path_parameters.find { |p| p['name'] == name }
+            if @use_patterns_for_path_matching && parameter&.[]('schema')&.[]('pattern')
+              single_capturing_group(parameter['schema']['pattern'])
+            else
+              ALLOWED_PARAMETER_CHARACTERS
+            end
+          else
+            Regexp.escape(part)
+          end
         end
 
         %r{^#{parts.join}/?$}
+      end
+
+      def single_capturing_group(pattern)
+        %r{(#{pattern.gsub(/(?<!\\)\((?!\?[:\-!=])/) { "(?:" }})}
       end
     end
   end
