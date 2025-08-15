@@ -11,7 +11,7 @@ module OpenapiFirst
       def self.call(responses, status, content_type, request_method:, path:)
         contents = find_status(responses, status)
         if contents.nil?
-          message = "Status #{status} is not defined for #{request_method} #{path}. " \
+          message = "Status #{status} is not defined for #{request_method.upcase} #{path}. " \
                     "Defined statuses are: #{responses.keys.join(', ')}."
           return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
         end
