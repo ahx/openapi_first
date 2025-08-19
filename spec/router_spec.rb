@@ -9,7 +9,7 @@ RSpec.describe OpenapiFirst::Router do
         double(path: '/{id}', request_method: 'get'),
         double(path: '/{id}', request_method: 'patch'),
         double(path: '/a', request_method: 'get'),
-        double(path: '/a.{format}', request_method: 'get')
+        double(path: '/a{format}', request_method: 'get')
       ]
     end
 
