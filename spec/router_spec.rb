@@ -8,7 +8,8 @@ RSpec.describe OpenapiFirst::Router do
       [
         double(path: '/{id}', request_method: 'get'),
         double(path: '/{id}', request_method: 'patch'),
-        double(path: '/a', request_method: 'get')
+        double(path: '/a', request_method: 'get'),
+        double(path: '/a.{format}', request_method: 'get')
       ]
     end
 
@@ -28,6 +29,12 @@ RSpec.describe OpenapiFirst::Router do
 
     it 'returns an incomplete match for unknown path' do
       expect(router.match('GET', '/c/d').error).to have_attributes(type: :not_found)
+    end
+
+    it 'returns a match with only a request method' do
+      match = router.match('GET', '/a.json')
+      expect(match.request_definition.path).to eq('/a.{format}')
+      expect(match.request_definition).to be(requests[3])
     end
 
     it 'returns an incomplete match for unknown request method' do
