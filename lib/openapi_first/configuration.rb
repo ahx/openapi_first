@@ -14,7 +14,7 @@ module OpenapiFirst
       @request_validation_error_response = OpenapiFirst.find_error_response(:default)
       @request_validation_raise_error = false
       @response_validation_raise_error = true
-      @hooks = (HOOKS.map { [_1, Set.new] }).to_h
+      @hooks = HOOKS.to_h { [_1, Set.new] }
       @path = nil
     end
 
