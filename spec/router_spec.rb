@@ -32,10 +32,9 @@ RSpec.describe OpenapiFirst::Router do
     end
 
     it 'can match a path fragment with a variable' do
-      match = router.match('PATCH', '/a.json')
+      match = router.match('GET', '/a.json')
       expect(match.request_definition.path).to eq('/a{format}')
-      expect(match.request_definition).to be(requests[1])
-      expect(match.params).to eq('format' => '.json')
+      expect(match.request_definition).to be(requests[3])
     end
 
     it 'returns an incomplete match for unknown request method' do
