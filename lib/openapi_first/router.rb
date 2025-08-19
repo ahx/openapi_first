@@ -101,11 +101,11 @@ module OpenapiFirst
         params = path_item[:template].match(request_path)
         next unless params
 
-        [path_item, params, params.values.sum(&:length)]
+        [path_item, params]
       end
+      return matches.first if matches.length == 1
 
-      matches&.min_by { |_path_item, _params, length| length }
-             &.then { |path_item, params, _length| [path_item, params] }
+      matches&.min_by { |match| match[1].values.sum(&:length) }
     end
   end
 end
