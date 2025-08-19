@@ -97,10 +97,15 @@ module OpenapiFirst
       found = @static[request_path]
       return [found, {}] if found
 
-      @dynamic.find do |_path, path_item|
+      matches = @dynamic.filter_map do |_path, path_item|
         params = path_item[:template].match(request_path)
-        return [path_item, params] if params
+        next unless params
+
+        [path_item, params]
       end
+      return matches.first if matches.length == 1
+
+      matches&.min_by { |match| match[1].values.sum(&:length) }
     end
   end
 end
