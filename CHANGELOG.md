@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.11.1
+
+- OpenapiFirst can now route requests correctly for paths like `/stuffs` and `/stuffs{format}` (https://github.com/ahx/openapi_first/issues/386)
+
 ## 2.11.0
 
 - OpenapiFirst::Test.observe now works with `Rack::URLMap` (returned by `Rack::Builder.app`) and probably all objects that respond to `.call`
