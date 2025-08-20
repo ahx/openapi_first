@@ -92,7 +92,7 @@ content-type: "application/problem+json"
 openapi_first offers a [JSON:API](https://jsonapi.org/) error response by passing `error_response: :jsonapi`:
 
 ```ruby
-use OpenapiFirst::Middlewares::RequestValidation, 'openapi.yaml, error_response: :jsonapi'
+use OpenapiFirst::Middlewares::RequestValidation, 'openapi.yaml', error_response: :jsonapi
 ```
 
 <details>
