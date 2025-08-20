@@ -244,6 +244,9 @@ end
 
 ### Test assertions
 
+> [!WARNING]
+> You probably don't need this. Just setup [Contract testing and API coverage](#contract-testing) and use your normal assertions.
+
 openapi_first ships with a simple but powerful Test method to run request and response validation in your tests without using the middlewares. This is designed to be used with rack-test or Ruby on Rails integration tests or request specs.
 
 Here is how to set it up for Rails integration tests:
