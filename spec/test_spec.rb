@@ -623,5 +623,17 @@ RSpec.describe OpenapiFirst::Test do
         end.not_to raise_error
       end
     end
+
+    context 'with ignore_unknown_responses = true' do
+      before(:each) do
+        described_class.configuration.ignore_unknown_responses = true
+      end
+
+      it 'does not raise an error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        end.not_to raise_error
+      end
+    end
   end
 end

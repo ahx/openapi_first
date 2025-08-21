@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `OpenapiFirst::Test::Configuration#ignore_unknown_responses=` (use only temporarily when working with an unmaintained OAD)
+
 ## 2.11.1
 
 - OpenapiFirst can now route requests correctly for paths like `/stuffs` and `/stuffs{format}` (https://github.com/ahx/openapi_first/issues/386)
