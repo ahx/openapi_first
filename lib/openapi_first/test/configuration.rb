@@ -12,6 +12,7 @@ module OpenapiFirst
         @skip_coverage = nil
         @response_raise_error = true
         @ignored_unknown_status = [404]
+        @ignore_unknown_responses = false
         @report_coverage = true
         @ignore_unknown_requests = false
         @registry = {}
@@ -31,7 +32,7 @@ module OpenapiFirst
       end
 
       attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error,
-                    :ignore_unknown_requests
+                    :ignore_unknown_requests, :ignore_unknown_responses
       attr_reader :registry, :apps, :report_coverage, :ignored_unknown_status, :minimum_coverage
 
       # Configure report coverage
@@ -62,6 +63,12 @@ module OpenapiFirst
         return @skip_coverage unless block_given?
 
         @skip_coverage = block
+      end
+
+      def ignore_response?(validated_response)
+        return true if @ignore_unknown_responses
+
+        ignored_unknown_status.include?(validated_response.status)
       end
     end
   end

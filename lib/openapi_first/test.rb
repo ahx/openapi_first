@@ -124,7 +124,7 @@ module OpenapiFirst
     end
 
     def self.raise_response_error?(validated_response)
-      configuration.response_raise_error && !configuration.ignored_unknown_status.include?(validated_response.status)
+      configuration.response_raise_error && !configuration.ignore_response?(validated_response)
     end
 
     def self.uninstall
