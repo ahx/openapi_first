@@ -10,18 +10,15 @@ module OpenapiFirst
 
       def self.call(responses, status, content_type, request_method:, path:)
         contents = find_status(responses, status)
-        if contents.nil?
-          message = "Status #{status} is not defined for #{request_method.upcase} #{path}. " \
-                    "Defined statuses are: #{responses.keys.join(', ')}."
-          return Match.new(error: Failure.new(:response_not_found, message:), response: nil)
-        end
+        return response_status_not_found(status:, request_method:, path:, responses:) if contents.nil?
+
         response = FindContent.call(contents, content_type)
-        return response_not_found(content_type:, contents:, request_method:, path:) unless response
+        return response_content_type_not_found(content_type:, contents:, request_method:, path:) unless response
 
         Match.new(response:, error: nil)
       end
 
-      def self.response_not_found(content_type:, contents:, request_method:, path:)
+      def self.response_content_type_not_found(content_type:, contents:, request_method:, path:)
         empty_content = content_type.nil? || content_type.empty?
         message =
           "Content-Type should be #{contents.keys.join(' or ')}, " \
@@ -29,11 +26,18 @@ module OpenapiFirst
           "#{request_method.upcase} #{path}"
 
         Match.new(
-          error: Failure.new(:response_not_found, message:),
+          error: Failure.new(:response_content_type_not_found, message:),
           response: nil
         )
       end
-      private_class_method :response_not_found
+      private_class_method :response_content_type_not_found
+
+      def self.response_status_not_found(status:, request_method:, path:, responses:)
+        message = "Status #{status} is not defined for #{request_method.upcase} #{path}. " \
+                  "Defined statuses are: #{responses.keys.join(', ')}."
+        Match.new(error: Failure.new(:response_status_not_found, message:), response: nil)
+      end
+      private_class_method :response_status_not_found
 
       def self.find_status(responses, status)
         # According to OAS status has to be a string,
