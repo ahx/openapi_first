@@ -123,8 +123,8 @@ module OpenapiFirst
       !configuration.ignore_unknown_requests
     end
 
-    def self.raise_response_error?(validated_response)
-      configuration.response_raise_error && !configuration.ignore_response?(validated_response)
+    def self.raise_response_error?(invalid_response)
+      configuration.response_raise_error && !configuration.ignore_response?(invalid_response)
     end
 
     def self.uninstall

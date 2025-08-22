@@ -13,7 +13,8 @@ module OpenapiFirst
       invalid_header: [RequestInvalidError, 'Request header is invalid:'],
       invalid_path: [RequestInvalidError, 'Path segment is invalid:'],
       invalid_cookie: [RequestInvalidError, 'Cookie value is invalid:'],
-      response_not_found: [ResponseNotFoundError],
+      response_content_type_not_found: [ResponseNotFoundError],
+      response_status_not_found: [ResponseNotFoundError],
       invalid_response_body: [ResponseInvalidError, 'Response body is invalid:'],
       invalid_response_header: [ResponseInvalidError, 'Response header is invalid:']
     }.freeze

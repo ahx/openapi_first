@@ -211,6 +211,15 @@ OpenapiFirst::Test.setup do |test|
 end
 ```
 
+Or you can ignore all unknown response status:
+
+```ruby
+OpenapiFirst::Test.setup do |test|
+  # …
+  test.ignore_all_unknown_status = true
+end
+```
+
 Exclude certain _responses_ from coverage with `skip_coverage`:
 
 ```ruby

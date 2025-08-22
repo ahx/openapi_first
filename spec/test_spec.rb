@@ -606,10 +606,20 @@ RSpec.describe OpenapiFirst::Test do
       end
     end
 
-    it 'raises an error' do
-      expect do
-        app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
-      end.to raise_error(OpenapiFirst::ResponseNotFoundError)
+    context 'when response status is unknown' do
+      it 'raises an error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        end.to raise_error(OpenapiFirst::ResponseNotFoundError)
+      end
+    end
+
+    context 'when response content-type is unknown' do
+      it 'raises an error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        end.to raise_error(OpenapiFirst::ResponseNotFoundError)
+      end
     end
 
     context 'with ignored_unknown_status' do
@@ -624,9 +634,9 @@ RSpec.describe OpenapiFirst::Test do
       end
     end
 
-    context 'with ignore_unknown_responses = true' do
+    context 'with ignore_all_unknown_response_status = true' do
       before(:each) do
-        described_class.configuration.ignore_unknown_responses = true
+        described_class.configuration.ignore_all_unknown_response_status = true
       end
 
       it 'does not raise an error' do

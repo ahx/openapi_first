@@ -23,7 +23,7 @@ RSpec.describe OpenapiFirst::Test::Configuration do
   describe '#ignore_response?' do
     let(:valid_response) { double(valid?: true, known?: true, status: 302) }
     let(:invalid_response) { double(valid?: false, known?: true, status: 302) }
-    let(:unknown_response) { double(valid?: false, known?: false, status: 302) }
+    let(:unknown_response_status) { double(valid?: false, known?: false, status: 302, error: OpenapiFirst::Failure.new(:response_status_not_found)) }
 
     it 'returns false by default for a valid responses' do
       expect(configuration.ignore_response?(valid_response)).to eq(false)
@@ -34,22 +34,33 @@ RSpec.describe OpenapiFirst::Test::Configuration do
     end
 
     it 'returns false by default for an unkonwn responses' do
-      expect(configuration.ignore_response?(unknown_response)).to eq(false)
+      expect(configuration.ignore_response?(unknown_response_status)).to eq(false)
     end
 
     context 'when status is ignored' do
-      before { configuration.ignored_unknown_status << invalid_response.status }
+      before { configuration.ignored_unknown_status << unknown_response_status.status }
 
-      it 'returns true' do
-        expect(configuration.ignore_response?(invalid_response)).to eq(true)
+      it 'returns true for an unknown response with that status' do
+        expect(configuration.ignore_response?(unknown_response_status)).to eq(true)
+      end
+
+      it 'returns false for an unknown response with another status' do
+        unknown_response_status = double(valid?: false, known?: false, status: 409)
+        expect(configuration.ignore_response?(unknown_response_status)).to eq(false)
       end
     end
 
-    context 'when all responses are ignored' do
-      before { configuration.ignore_unknown_responses = true }
+    context 'when all unknown response status are ignored' do
+      before { configuration.ignore_all_unknown_response_status = true }
 
-      it 'returns true' do
-        expect(configuration.ignore_response?(invalid_response)).to eq(true)
+      it 'returns true for any unknown response status' do
+        expect(configuration.ignore_response?(unknown_response_status)).to eq(true)
+      end
+
+      it 'returns false for an unknown response with a known status' do
+        unknown_response_content_type = double(valid?: false, known?: false, status: 302, error: OpenapiFirst::Failure.new(:response_content_type_not_found))
+
+        expect(configuration.ignore_response?(unknown_response_content_type)).to eq(false)
       end
     end
   end

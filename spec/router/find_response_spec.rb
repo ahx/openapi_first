@@ -57,7 +57,7 @@ RSpec.describe OpenapiFirst::Router::FindResponse do
         ]
         expect(find(responses, 409, 'application/json')).to have_attributes(
           response: nil, error: have_attributes(
-            type: :response_not_found,
+            type: :response_status_not_found,
             message: 'Status 409 is not defined for GET /stations. Defined statuses are: 200, 201.'
           )
         )
@@ -85,7 +85,7 @@ RSpec.describe OpenapiFirst::Router::FindResponse do
         message = 'Content-Type should be application/text or application/xml, but was application/json for GET /stations'
         expect(find(responses, 200, 'application/json')).to have_attributes(
           response: nil,
-          error: have_attributes(type: :response_not_found, message:)
+          error: have_attributes(type: :response_content_type_not_found, message:)
         )
       end
     end
