@@ -634,9 +634,9 @@ RSpec.describe OpenapiFirst::Test do
       end
     end
 
-    context 'with ignore_all_unknown_response_status = true' do
+    context 'with ignore_unknown_response_status = true' do
       before(:each) do
-        described_class.configuration.ignore_all_unknown_response_status = true
+        described_class.configuration.ignore_unknown_response_status = true
       end
 
       it 'does not raise an error' do

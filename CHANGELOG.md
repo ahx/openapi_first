@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Add `OpenapiFirst::Test::Configuration#ignore_all_unknown_status=`. When this is set to true, it won't complain about undefined response statuses it sees during a test run. Use with caution.
+- Add `OpenapiFirst::Test::Configuration#ignore_unknown_response_status=`. When this is set to true, it won't complain about undefined response statuses it sees during a test run. Use with caution.
 - Failure type `:response_not_found` was split into two more specific types `:response_content_type_not_found` and `:response_status_not_found`. This should be mostly internal stuff.
 
 ## 2.11.1

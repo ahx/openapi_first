@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'callable'
+
 module OpenapiFirst
   module Test
     class ObserveError < Error; end

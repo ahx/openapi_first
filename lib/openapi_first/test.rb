@@ -8,7 +8,6 @@ module OpenapiFirst
   module Test
     autoload :Coverage, 'openapi_first/test/coverage'
     autoload :Methods, 'openapi_first/test/methods'
-    autoload :Callable, 'openapi_first/test/callable'
     autoload :Observe, 'openapi_first/test/observe'
     extend Registry
 

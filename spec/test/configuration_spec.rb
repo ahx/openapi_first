@@ -51,7 +51,7 @@ RSpec.describe OpenapiFirst::Test::Configuration do
     end
 
     context 'when all unknown response status are ignored' do
-      before { configuration.ignore_all_unknown_response_status = true }
+      before { configuration.ignore_unknown_response_status = true }
 
       it 'returns true for any unknown response status' do
         expect(configuration.ignore_response?(unknown_response_status)).to eq(true)
