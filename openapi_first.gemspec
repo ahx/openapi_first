@@ -25,6 +25,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'hana', '~> 1.3'
   spec.add_dependency 'json_schemer', '>= 2.1', '< 3.0'
-  spec.add_dependency 'openapi_parameters', '>= 0.6.1', '< 2.0'
+  spec.add_dependency 'openapi_parameters', '>= 0.7.0', '< 2.0'
   spec.add_dependency 'rack', '>= 2.2', '< 4.0'
 end
