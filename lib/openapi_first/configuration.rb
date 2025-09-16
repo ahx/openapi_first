@@ -18,6 +18,10 @@ module OpenapiFirst
       @path = nil
     end
 
+    def register(path_or_definition, as: :default)
+      OpenapiFirst.register(path_or_definition, as:)
+    end
+
     attr_reader :request_validation_error_response, :hooks
     attr_accessor :request_validation_raise_error, :response_validation_raise_error, :path
 

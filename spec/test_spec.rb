@@ -73,7 +73,7 @@ RSpec.describe OpenapiFirst::Test do
       described_class.register('./examples/openapi.yaml')
       expect do
         described_class.register('./examples/openapi.yaml')
-      end.to raise_error(described_class::AlreadyRegisteredError)
+      end.to raise_error(OpenapiFirst::AlreadyRegisteredError)
     end
   end
 
@@ -154,7 +154,7 @@ RSpec.describe OpenapiFirst::Test do
     it 'raises an error if no API description was registered' do
       expect do
         described_class.setup { |_test| } # rubocop:disable Lint/EmptyBlock
-      end.to raise_error described_class::NotRegisteredError
+      end.to raise_error OpenapiFirst::NotRegisteredError
     end
   end
 
@@ -397,13 +397,13 @@ RSpec.describe OpenapiFirst::Test do
     it 'complaints about an unknown api' do
       expect do
         described_class[:default]
-      end.to raise_error(OpenapiFirst::Test::NotRegisteredError)
+      end.to raise_error(OpenapiFirst::NotRegisteredError)
     end
 
     it 'complaints about an unknown api' do
       expect do
         described_class[:mine]
-      end.to raise_error(OpenapiFirst::Test::NotRegisteredError)
+      end.to raise_error(OpenapiFirst::NotRegisteredError)
     end
   end
 

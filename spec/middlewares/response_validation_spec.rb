@@ -9,10 +9,12 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
 
   let(:app) do
     res = response
-    definition = spec
+    OpenapiFirst.configure do |config|
+      config.register spec
+    end
     Rack::Builder.app do
       use Rack::Lint
-      use OpenapiFirst::Middlewares::ResponseValidation, spec: definition
+      use OpenapiFirst::Middlewares::ResponseValidation
       run ->(_env) { res.finish }
     end
   end

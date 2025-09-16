@@ -4,17 +4,24 @@ openapi_first is a Ruby gem for request / response validation and contract-testi
 
 ## Usage
 
+Configure
+```ruby
+OpenapiFirst.configure do |config|
+  config.register('openapi/openapi.yaml')
+end
+```
+
 Use an OAD to validate incoming requests:
 ```ruby
-use OpenapiFirst::Middlewares::RequestValidation, 'openapi/openapi.yaml'
+use OpenapiFirst::Middlewares::RequestValidation
 ```
 
 Turn your request tests into [contract tests](#contract-testing) against an OAD:
 ```ruby
 # spec_helper.rb
 require 'openapi_first'
-OpenapiFirst::Test.setup do |config|
-  config.register('openapi/openapi.yaml')
+OpenapiFirst::Test.setup do |test|
+  test.register('openapi/openapi.yaml')
 end
 
 require 'my_app'

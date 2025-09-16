@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'test/configuration'
-require_relative 'test/registry'
+require_relative 'registry'
 
 module OpenapiFirst
   # Test integration
