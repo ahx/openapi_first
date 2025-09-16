@@ -41,6 +41,34 @@ RSpec.describe OpenapiFirst::Router do
       expect(router.match('DELETE', '/b').error).to have_attributes(type: :method_not_allowed)
     end
 
+    context 'with ambiguous paths' do
+      let(:requests) do
+        [
+          double(path: '/api/{tenant_id}/tickets/extra', request_method: 'get'),
+          double(path: '/api/{tenant_id}/tickets/{id}', request_method: 'get')
+        ]
+      end
+
+      it 'matches the exact path' do
+        match = router.match('GET', '/api/42/tickets/extra')
+        expect(match.request_definition.path).to eq('/api/{tenant_id}/tickets/extra')
+      end
+    end
+
+    context 'with ambiguous paths reversed' do
+      let(:requests) do
+        [
+          double(path: '/api/{tenant_id}/tickets/{id}', request_method: 'get'),
+          double(path: '/api/{tenant_id}/tickets/extra', request_method: 'get')
+        ]
+      end
+
+      it 'matches the exact path' do
+        match = router.match('GET', '/api/42/tickets/extra')
+        expect(match.request_definition.path).to eq('/api/{tenant_id}/tickets/extra')
+      end
+    end
+
     context 'with matching content_type' do
       subject(:router) do
         described_class.new.tap do |router|
