@@ -24,14 +24,16 @@ module OpenapiFirst
     attr_reader :response_definition
 
     # The parsed headers
-    # @!method parsed_headers
-    # @return [Hash<String,anything>]
-    def_delegator :@parsed_values, :headers, :parsed_headers
+    # @return [Hash<String,anything>, nil]
+    def parsed_headers
+      @parsed_values&.headers
+    end
 
     # The parsed body
-    # @!method parsed_body
-    # @return [Hash<String,anything>]
-    def_delegator :@parsed_values, :body, :parsed_body
+    # @return [Hash<String,anything>, nil]
+    def parsed_body
+      @parsed_values&.body
+    end
 
     # Checks if the response is valid.
     # @return [Boolean] true if the response is valid, false otherwise.
