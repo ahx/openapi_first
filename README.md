@@ -256,25 +256,27 @@ end
 > [!WARNING]
 > You probably don't need this. Just setup [Contract testing and API coverage](#contract-testing) and use your normal assertions.
 
-openapi_first ships with a simple but powerful Test method to run request and response validation in your tests without using the middlewares. This is designed to be used with rack-test or Ruby on Rails integration tests or request specs.
+openapi_first ships with a simple but powerful Test method `assert_api_conform` to run request and response validation in your tests without using the middlewares. This is designed to be used with rack-test.
 
-Here is how to set it up for Rails integration tests:
+Here is how to use it with RSpec, but MiniTest works just as good:
 
-Inside your test:
+Inside your test :
 ```ruby
-# test/integration/trips_api_test.rb
-require 'test_helper'
-
-class TripsApiTest < ActionDispatch::IntegrationTest
+RSpec.describe 'Example App' do
+  include Rack::Test::Methods
   include OpenapiFirst::Test::Methods
 
-  test 'GET /trips' do
-    get '/trips',
-        params: { origin: 'efdbb9d1-02c2-4bc3-afb7-6788d8782b1e', destination: 'b2e783e1-c824-4d63-b37a-d8d698862f1d',
-                  date: '2024-07-02T09:00:00Z' }
+  before do
+    OpenapiFirst::Test.register(File.join(__dir__, '../examples/openapi.yaml'), as: :example_app)
+  end
 
-    assert_api_conform(status: 200)
-    # assert_api_conform(status: 200, api: :v1) # Or this if you have multiple API descriptions
+  def app
+    App
+  end
+
+  it 'is API conform' do
+    get '/'
+    assert_api_conform(status: 200, api: :example_app)
   end
 end
 ```
@@ -392,11 +394,10 @@ end
 ## Framework integration
 
 Using rack middlewares is supported in probably all Ruby web frameworks.
-If you are using Ruby on Rails for example, you can add the request validation middleware globally in `config/application.rb` or inside specific controllers.
 
 The contract testing feature is designed to be used via rack-test, which should be compatible all Ruby web frameworks as well.
 
-That aside, closer integration with specific frameworks like Sinatra, Hanami, Roda or Rails would be great. If you have ideas, pain points or PRs, please don't hesitate to [share](https://github.com/ahx/openapi_first/discussions).
+That aside, closer integration with specific frameworks like Sinatra, Hanami, Roda or others would be great. If you have ideas, pain points or PRs, please don't hesitate to [share](https://github.com/ahx/openapi_first/discussions).
 
 ## Alternatives
 
