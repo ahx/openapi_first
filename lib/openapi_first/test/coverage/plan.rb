@@ -37,11 +37,11 @@ module OpenapiFirst
         private attr_reader :index
 
         def track_request(validated_request)
-          index[validated_request.request_definition.key]&.track(validated_request) if validated_request.known?
+          index[validated_request.key]&.track(validated_request)
         end
 
         def track_response(validated_response)
-          index[validated_response.response_definition.key]&.track(validated_response) if validated_response.known?
+          index[validated_response.key]&.track(validated_response)
         end
 
         def done?

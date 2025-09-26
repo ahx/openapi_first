@@ -47,12 +47,14 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
 
   let(:valid_request) do
     request = Rack::Request.new(Rack::MockRequest.env_for('/stuff/24'))
-    oad.validate_request(request)
+    request = oad.validate_request(request)
+    OpenapiFirst::Test::Coverage::CoveredRequest.new(key: request.request_definition.key, error: request.error)
   end
 
   let(:invalid_request) do
     request = Rack::Request.new(Rack::MockRequest.env_for('/stuff/2t4'))
-    oad.validate_request(request)
+    request = oad.validate_request(request)
+    OpenapiFirst::Test::Coverage::CoveredRequest.new(key: request.request_definition.key, error: request.error)
   end
 
   let(:valid_response) do
@@ -60,7 +62,8 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     response = Rack::Response.new
     response.content_type = 'application/json'
     response.write JSON.generate({})
-    oad.validate_response(request, response)
+    response = oad.validate_response(request, response)
+    OpenapiFirst::Test::Coverage::CoveredResponse.new(key: response.response_definition.key, error: response.error)
   end
 
   let(:invalid_response) do
@@ -68,7 +71,8 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     response = Rack::Response.new
     response.content_type = 'application/json'
     response.write JSON.generate('foo')
-    oad.validate_response(request, response)
+    response = oad.validate_response(request, response)
+    OpenapiFirst::Test::Coverage::CoveredResponse.new(key: response.response_definition.key, error: response.error)
   end
 
   let(:valid_400_response) do
@@ -77,7 +81,8 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     response.status = 400
     response.content_type = 'application/json'
     response.write JSON.generate({})
-    oad.validate_response(request, response)
+    response = oad.validate_response(request, response)
+    OpenapiFirst::Test::Coverage::CoveredResponse.new(key: response.response_definition.key, error: response.error)
   end
 
   subject(:plan) { described_class.for(oad) }
@@ -114,20 +119,6 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     expect(request.requested?).to eq(true)
     expect(request.any_valid_request?).to eq(false)
     expect(request.last_error_message).to eq('Path segment is invalid: value at `/id` is not an integer')
-  end
-
-  it 'ignores unknown requests' do
-    request = Rack::Request.new(Rack::MockRequest.env_for('/unknown/24'))
-    plan.track_request(oad.validate_request(request))
-    expect(plan.coverage).to eq(0)
-  end
-
-  it 'ignores unknown responses' do
-    request = Rack::Request.new(Rack::MockRequest.env_for('/stuff/24'))
-    response = Rack::Response.new
-    response.status = 309
-    plan.track_response(oad.validate_response(request, response))
-    expect(plan.coverage).to eq(0)
   end
 
   it 'returns coverage in percentage' do
@@ -167,17 +158,6 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     expect(plan.tasks[0].path).to eq('/stuff/{id}')
     expect(plan.tasks[1].status).to eq('200')
     expect(plan.tasks[2].status).to eq('4XX')
-  end
-
-  it 'ignores unknown responses' do
-    request = Rack::Request.new(Rack::MockRequest.env_for('/stuff/24'))
-    response = Rack::Response.new
-    response.status = 208
-    unknown_response = oad.validate_response(request, response)
-
-    plan.track_response(unknown_response)
-
-    expect(plan.tasks.count(&:finished?)).to eq(0)
   end
 
   it 'ignores skipped responses' do
