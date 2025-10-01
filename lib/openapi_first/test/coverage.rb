@@ -51,12 +51,12 @@ module OpenapiFirst
           Result.new(plans:, coverage:)
         end
 
+        private
+
         # Returns all plans (Plan) that were registered for this run
         def plans
           current_run.values
         end
-
-        private
 
         def coverage
           return 0 if plans.empty?

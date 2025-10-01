@@ -156,7 +156,7 @@ RSpec.describe OpenapiFirst::Test do
         test.register('./examples/openapi.yaml')
         test.skip_response_coverage { |res| res.status == '401' }
       end
-      expect(described_class::Coverage.plans.first.tasks.count).to eq(2)
+      expect(described_class::Coverage.result.plans.first.tasks.count).to eq(2)
     end
 
     it 'can skip_coverage for whole routes' do
@@ -164,7 +164,7 @@ RSpec.describe OpenapiFirst::Test do
         test.register('./spec/data/petstore.yaml')
         test.skip_coverage { |path, request_method| path == '/pets' && request_method == 'POST' }
       end
-      route_tasks = described_class::Coverage.plans.first.routes
+      route_tasks = described_class::Coverage.result.plans.first.routes
       expect(route_tasks.map { |route| [route.path, route.request_method] }).to eq([['/pets', 'GET'], ['/pets/{petId}', 'GET']])
     end
 
@@ -173,7 +173,7 @@ RSpec.describe OpenapiFirst::Test do
         test.register('./spec/data/petstore.yaml')
         test.skip_coverage { |path| path == '/pets' }
       end
-      route_tasks = described_class::Coverage.plans.first.routes
+      route_tasks = described_class::Coverage.result.plans.first.routes
       expect(route_tasks.map { |route| [route.path, route.request_method] }).to eq([['/pets/{petId}', 'GET']])
     end
 
