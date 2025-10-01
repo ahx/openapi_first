@@ -65,42 +65,6 @@ RSpec.describe OpenapiFirst::Test do
       expect(described_class[:from_definition]).to eq(definition)
     end
 
-    it 'uses filepath as key for Definition objects with filepath' do
-      # Register a definition with filepath and start tracking
-      definition = OpenapiFirst.load('./spec/data/dice.yaml')
-      described_class.register(definition, as: :with_filepath)
-      OpenapiFirst::Test::Coverage.start
-
-      # Verify the plan was registered with the filepath key
-      filepath = './spec/data/dice.yaml'
-      plan = OpenapiFirst::Test::Coverage.current_run[filepath]
-
-      expect(plan).not_to be_nil
-      expect(plan.filepath).to eq(filepath)
-      expect(plan.api_identifier).to eq(filepath)
-    end
-
-    it 'uses the definition key for Definition objects without filepath' do
-      # Create a definition without filepath
-      dice_hash = YAML.load_file('./spec/data/dice.yaml')
-      dice_hash['info'] = {
-        'title' => 'Dice API',
-        'version' => '1.0.0'
-      }
-      definition = OpenapiFirst.parse(dice_hash)
-
-      # Register and start tracking
-      described_class.register(definition, as: :without_filepath)
-      OpenapiFirst::Test::Coverage.start
-
-      expected_key = definition.key
-      plan = OpenapiFirst::Test::Coverage.current_run[expected_key]
-
-      # Verify the plan was registered with the definition key
-      expect(plan).to be_a(OpenapiFirst::Test::Coverage::Plan)
-      expect(plan.api_identifier).to eq(expected_key)
-    end
-
     it 'raises an error if the same API description is registered twice' do
       described_class.register('./examples/openapi.yaml')
       expect do
@@ -156,7 +120,7 @@ RSpec.describe OpenapiFirst::Test do
         test.register('./examples/openapi.yaml')
         test.skip_response_coverage { |res| res.status == '401' }
       end
-      expect(described_class::Coverage.plans.first.tasks.count).to eq(2)
+      expect(described_class::Coverage.result.plans.first.tasks.count).to eq(2)
     end
 
     it 'can skip_coverage for whole routes' do
@@ -164,7 +128,7 @@ RSpec.describe OpenapiFirst::Test do
         test.register('./spec/data/petstore.yaml')
         test.skip_coverage { |path, request_method| path == '/pets' && request_method == 'POST' }
       end
-      route_tasks = described_class::Coverage.plans.first.routes
+      route_tasks = described_class::Coverage.result.plans.first.routes
       expect(route_tasks.map { |route| [route.path, route.request_method] }).to eq([['/pets', 'GET'], ['/pets/{petId}', 'GET']])
     end
 
@@ -173,7 +137,7 @@ RSpec.describe OpenapiFirst::Test do
         test.register('./spec/data/petstore.yaml')
         test.skip_coverage { |path| path == '/pets' }
       end
-      route_tasks = described_class::Coverage.plans.first.routes
+      route_tasks = described_class::Coverage.result.plans.first.routes
       expect(route_tasks.map { |route| [route.path, route.request_method] }).to eq([['/pets/{petId}', 'GET']])
     end
 

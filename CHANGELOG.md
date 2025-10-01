@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Remove superflous `Test::Coverage.current_run, .plans, .install, .uninstall`
 - Update dependency `openapi_paramters` to >= 0.7.0, because that version fixes unpacking exploded deepObject paramters
 - Add `OpenapiFirst::Test::Configuration#ignore_unknown_response_status=`. When this is set to true, it won't complain about undefined response statuses it sees during a test run. Use with caution.
 - Failure type `:response_not_found` was split into two more specific types `:response_content_type_not_found` and `:response_status_not_found`. This should be mostly internal stuff.
