@@ -17,7 +17,10 @@ module OpenapiFirst
       class << self
         attr_reader :current_run
 
-        def install = Test.install
+        # @visibility private
+        def install
+          raise NoMethodError, 'Coverage.install was removed. Please use Test.setup instead'
+        end
 
         def start(skip_response: nil, skip_route: nil)
           @current_run = Test.definitions.values.to_h do |oad|
@@ -26,7 +29,10 @@ module OpenapiFirst
           end
         end
 
-        def uninstall = Test.uninstall
+        # @visibility private
+        def uninstall
+          raise NoMethodError, 'Coverage.uninstall was removed. Please use Test.uninstall instead'
+        end
 
         # Clear current coverage run
         def reset
