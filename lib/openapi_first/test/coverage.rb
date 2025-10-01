@@ -15,8 +15,6 @@ module OpenapiFirst
       @current_run = {}
 
       class << self
-        attr_reader :current_run
-
         # @visibility private
         def install
           raise NoMethodError, 'Coverage.install was removed. Please use Test.setup instead'
@@ -52,6 +50,8 @@ module OpenapiFirst
         end
 
         private
+
+        attr_reader :current_run
 
         # Returns all plans (Plan) that were registered for this run
         def plans
