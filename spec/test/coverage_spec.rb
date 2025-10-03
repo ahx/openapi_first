@@ -61,10 +61,29 @@ RSpec.describe OpenapiFirst::Test::Coverage do
     end
   end
 
+  describe '.start' do
+    before do
+      described_class.reset
+    end
+
+    it 'starts drb service only once' do
+      expect(DRb).to receive(:regist_server).once
+      2.times { described_class.start }
+    end
+  end
+
   describe '.track_request' do
     it 'ignores unregistered OADs' do
       oad = double(key: 'unknown')
-      described_class.track_request(double, oad)
+      described_class.track_request(
+        double(:request, known?: true, request_definition: double(key: nil), error: nil),
+        oad
+      )
+    end
+
+    it 'ignores unknown requests' do
+      request = double(known?: false)
+      described_class.track_request(request, definition)
     end
 
     it 'ignores skipped request' do
@@ -83,7 +102,16 @@ RSpec.describe OpenapiFirst::Test::Coverage do
   describe '.track_response' do
     it 'ignores unregistered OADs' do
       oad = double(key: 'unknown')
-      described_class.track_response(double(:response), double(:request), oad)
+      described_class.track_response(
+        double(:response, known?: true, response_definition: double(key: nil), error: nil),
+        double(:request),
+        oad
+      )
+    end
+
+    it 'ignores unknown response' do
+      response = double(known?: false)
+      described_class.track_response(response, double(:request), definition)
     end
   end
 end

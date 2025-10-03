@@ -14,6 +14,10 @@ RSpec.describe OpenapiFirst::Test do
   end
 
   describe 'Callable[]' do
+    before do
+      require 'openapi_first/test/callable'
+    end
+
     it 'returns a Module that can call the api' do
       mod = described_class::Callable[definition]
       app.prepend(mod)

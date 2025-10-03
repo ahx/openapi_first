@@ -51,9 +51,11 @@ module OpenapiFirst
 
       @exit_handler = method(:handle_exit)
 
+      main_process = Process.pid
       @setup ||= at_exit do
         # :nocov:
-        @exit_handler&.call
+        # Only handle exit once in the main process
+        @exit_handler&.call if Process.pid == main_process
         # :nocov:
       end
     end
