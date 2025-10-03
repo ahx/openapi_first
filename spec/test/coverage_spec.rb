@@ -61,6 +61,17 @@ RSpec.describe OpenapiFirst::Test::Coverage do
     end
   end
 
+  describe '.start' do
+    before do
+      described_class.reset
+    end
+
+    it 'starts drb service only once' do
+      expect(DRb).to receive(:regist_server).once
+      2.times { described_class.start }
+    end
+  end
+
   describe '.track_request' do
     it 'ignores unregistered OADs' do
       oad = double(key: 'unknown')

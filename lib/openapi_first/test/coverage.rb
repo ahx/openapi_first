@@ -23,6 +23,8 @@ module OpenapiFirst
         end
 
         def start(skip_response: nil, skip_route: nil)
+          return if @drb_uri
+
           tracker = Tracker.new(Test.definitions, skip_response:, skip_route:)
 
           # We need a custom DRbServer (not using DRb.start_service) because otherwise
