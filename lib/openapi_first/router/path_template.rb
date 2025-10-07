@@ -41,7 +41,7 @@ module OpenapiFirst
           part.start_with?('{') ? ALLOWED_PARAMETER_CHARACTERS : Regexp.escape(part)
         end
 
-        %r{^#{parts.join}/?$}
+        /^#{parts.join}$/
       end
     end
   end

@@ -23,8 +23,8 @@ RSpec.describe OpenapiFirst::Router::PathTemplate do
       expect(described_class.new('/{a}/{b}').match('/1/2')).to eq({ 'a' => '1', 'b' => '2' })
     end
 
-    it 'ignores trailing slashes in paths' do
-      expect(described_class.new('/{a}/{b}').match('/1/2/')).to eq({ 'a' => '1', 'b' => '2' })
+    it 'respect trailing slashes in paths' do
+      expect(described_class.new('/{a}/{b}').match('/1/2/')).to be_nil
     end
 
     it 'returns params with kebab-case names' do
