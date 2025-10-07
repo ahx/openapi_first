@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breaking: Trailing slashes are no longer ignored in dynamic paths. See [#403](https://github.com/ahx/openapi_first/issues/403).
 - Remove superflous `Test::Coverage.current_run, .plans, .install, .uninstall`
 - Update dependency `openapi_paramters` to >= 0.7.0, because that version fixes unpacking exploded deepObject paramters
 - Add `OpenapiFirst::Test::Configuration#ignore_unknown_response_status=`. When this is set to true, it won't complain about undefined response statuses it sees during a test run. Use with caution.

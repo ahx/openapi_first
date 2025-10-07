@@ -41,6 +41,16 @@ RSpec.describe OpenapiFirst::Router do
       expect(router.match('DELETE', '/b').error).to have_attributes(type: :method_not_allowed)
     end
 
+    it 'does not match a dynamic path with a trailing slash' do
+      match = router.match('GET', '/42/')
+      expect(match.request_definition).to be_nil
+    end
+
+    it 'does not match a static path with a trailing slash' do
+      match = router.match('GET', '/a/')
+      expect(match.request_definition).to be_nil
+    end
+
     context 'with ambiguous paths' do
       let(:requests) do
         [
@@ -52,6 +62,35 @@ RSpec.describe OpenapiFirst::Router do
       it 'matches the exact path' do
         match = router.match('GET', '/api/42/tickets/extra')
         expect(match.request_definition.path).to eq('/api/{tenant_id}/tickets/extra')
+      end
+    end
+
+    context 'with trailing slashes in path definitions' do
+      let(:requests) do
+        [
+          double(path: '/{id}/', request_method: 'get'),
+          double(path: '/a/', request_method: 'get')
+        ]
+      end
+
+      it 'matches a dynamic path' do
+        match = router.match('GET', '/42/')
+        expect(match.request_definition.path).to eq('/{id}/')
+      end
+
+      it 'does not match a dynamic path with missing trailing slash' do
+        match = router.match('GET', '/42')
+        expect(match.error.type).to eq(:not_found)
+      end
+
+      it 'matches a static path' do
+        match = router.match('GET', '/a/')
+        expect(match.request_definition.path).to eq('/a/')
+      end
+
+      it 'does not match a static path with missing trailing slash' do
+        match = router.match('GET', '/a')
+        expect(match.error.type).to eq(:not_found)
       end
     end
 
