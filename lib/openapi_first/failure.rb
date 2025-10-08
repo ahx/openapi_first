@@ -66,12 +66,6 @@ module OpenapiFirst
       [message_prefix, @message || generate_message].compact.join(' ')
     end
 
-    # @deprecated Please use {#type} instead
-    def error_type
-      warn 'OpenapiFirst::Failure#error_type is deprecated. Use #type instead.'
-      type
-    end
-
     private
 
     def generate_message
