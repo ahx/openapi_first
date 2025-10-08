@@ -2,16 +2,28 @@
 
 ## Unreleased
 
-- Breaking: Trailing slashes are no longer ignored in dynamic paths. See [#403](https://github.com/ahx/openapi_first/issues/403).
-- Remove superflous `Test::Coverage.current_run, .plans, .install, .uninstall`
-- Update dependency `openapi_paramters` to >= 0.7.0, because that version fixes unpacking exploded deepObject paramters
+### Added
+- New feature: The Coverage  feature in `OpenapiFirst::Test` now supports parallel tests via a DRB client/sever. Thanks to Richard! See [#394](https://github.com/ahx/openapi_first/issues/394).
+- `OpenapiFirst::Test` Configuration options which are useful when adopting OpenAPI:
+  - `ignore_unknown_response_status = true` to make API coverage no longer complain about undefined response statuses it sees during a test run.
+  - `minimum_coverage=` is no longer deprecated. This is useful when gradually adopting OpenAPI
 - Add support to register OADs globally via:
   ```ruby
   OpenapiFirst.configure { |config| config.register('openapi.yaml')  }
   ```
-  This removes the necessity to load the OAD in the same place where you use the middlewares and adds a cache for parsed OADs.
-- Add `OpenapiFirst::Test::Configuration#ignore_unknown_response_status=`. When this is set to true, it won't complain about undefined response statuses it sees during a test run. Use with caution.
-- Failure type `:response_not_found` was split into two more specific types `:response_content_type_not_found` and `:response_status_not_found`. This should be mostly internal stuff.
+  This makes the `spec` argument in middlewares optional and removes the necessity to load the OAD in the same place where you use the middlewares and adds a cache for parsed OADs.
+
+### Changed
+- Breaking: Trailing slashes are no longer ignored in dynamic paths. See [#403](https://github.com/ahx/openapi_first/issues/403).
+  Before this change `GET /things/24/` matched `/things/{id}:`, but it no longer does.
+- Failure type `:response_not_found` was split into two more specific types `:response_content_type_not_found` and `:response_status_not_found`. This should be mostly internal stuff. So if your custom error response used `response_not_found`, you will have to adapt.
+
+### Removed
+- Removed deprecated methods which produced a warning since 2.0.0.
+- Remove internally used `Test::Coverage.current_run, .plans, .install, .uninstall`. If you are using these, use `OpenapiFirst::Test.setup` instead.
+
+### Fixed
+- Update dependency `openapi_parameters` to >= 0.7.0, because that version supports unpacking parameters the use `style: deepObject` with `explode: true`.
 
 ## 2.11.1
 
