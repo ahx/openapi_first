@@ -58,6 +58,10 @@ module OpenapiFirst
       "#{title} @ #{version}"
     end
 
+    def inspect
+      "#<#{self.class.name} @key=#{key}>"
+    end
+
     # Validates the request against the API description.
     # @param [Rack::Request] request The Rack request object.
     # @param [Boolean] raise_error Whether to raise an error if validation fails.
