@@ -12,6 +12,13 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe '#inspect' do
+    it 'returns a frozen configuration' do
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml')
+      expect(definition.inspect).to eq("#<OpenapiFirst::Definition @key='./spec/data/petstore.yaml'>")
+    end
+  end
+
   describe '#[]' do
     it 'gives access to the raw hash' do
       definition = OpenapiFirst.load('./spec/data/train-travel-api/openapi.yaml')

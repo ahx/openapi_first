@@ -59,7 +59,7 @@ module OpenapiFirst
     end
 
     def inspect
-      "#<#{self.class.name} @key=#{key}>"
+      "#<#{self.class.name} @key='#{key}'>"
     end
 
     # Validates the request against the API description.
