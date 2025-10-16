@@ -17,11 +17,6 @@ module OpenapiFirst
       Result = Data.define(:plans, :coverage)
 
       class << self
-        # @visibility private
-        def install
-          raise NoMethodError, 'Coverage.install was removed. Please use Test.setup instead'
-        end
-
         def start(skip_response: nil, skip_route: nil)
           return if @drb_uri
 
@@ -30,11 +25,6 @@ module OpenapiFirst
           # We need a custom DRbServer (not using DRb.start_service) because otherwise
           # we'd conflict with Rails's DRb server
           @drb_uri = DRb::DRbServer.new(nil, tracker).uri
-        end
-
-        # @visibility private
-        def uninstall
-          raise NoMethodError, 'Coverage.uninstall was removed. Please use Test.uninstall instead'
         end
 
         # Clear current coverage run
