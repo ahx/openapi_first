@@ -3,6 +3,7 @@
 require_relative 'openapi_first/json'
 require_relative 'openapi_first/file_loader'
 require_relative 'openapi_first/errors'
+require_relative 'openapi_first/registry'
 require_relative 'openapi_first/configuration'
 require_relative 'openapi_first/definition'
 require_relative 'openapi_first/version'
@@ -11,6 +12,8 @@ require_relative 'openapi_first/middlewares/request_validation'
 
 # OpenapiFirst is a toolchain to build HTTP APIS based on OpenAPI API descriptions.
 module OpenapiFirst
+  extend Registry
+
   autoload :Test, 'openapi_first/test'
 
   # Key in rack to find instance of Request
@@ -54,6 +57,7 @@ module OpenapiFirst
   # @return [Definition]
   def self.load(filepath_or_definition, only: nil, &)
     return filepath_or_definition if filepath_or_definition.is_a?(Definition)
+    return self[filepath_or_definition] if filepath_or_definition.is_a?(Symbol)
 
     filepath = filepath_or_definition
     raise FileNotFoundError, "File not found: #{filepath}" unless File.exist?(filepath)

@@ -32,7 +32,7 @@ RSpec.describe OpenapiFirst::Test::Methods do
       it 'targets that api when calling assert_api_conform' do
         expect do
           assert_api_conform(status: 200)
-        end.to raise_error(OpenapiFirst::Test::NotRegisteredError) do |ex|
+        end.to raise_error(OpenapiFirst::NotRegisteredError) do |ex|
           expect(ex.message).to start_with("API description ':v1' not found.")
         end
       end
@@ -44,7 +44,7 @@ RSpec.describe OpenapiFirst::Test::Methods do
       it 'targets the api from the argument when calling assert_api_conform' do
         expect do
           assert_api_conform(status: 200)
-        end.to raise_error(OpenapiFirst::Test::NotRegisteredError) do |ex|
+        end.to raise_error(OpenapiFirst::NotRegisteredError) do |ex|
           expect(ex.message).to start_with("API description ':v1' not found.")
         end
       end
@@ -145,7 +145,7 @@ RSpec.describe OpenapiFirst::Test::Methods do
 
       expect do
         test_class.new.assert_api_conform(status: 444, api: :other)
-      end.to raise_error(OpenapiFirst::Test::NotRegisteredError) do |ex|
+      end.to raise_error(OpenapiFirst::NotRegisteredError) do |ex|
         expect(ex.message).to start_with("API description ':other' not found.")
       end
     end

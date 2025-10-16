@@ -19,7 +19,8 @@ module OpenapiFirst
         end
         @raise = options.fetch(:raise_error, OpenapiFirst.configuration.response_validation_raise_error)
 
-        raise "You have to pass spec: when initializing #{self.class}" unless spec
+        spec ||= :default
+        spec = OpenapiFirst[spec] if spec.is_a?(Symbol)
 
         @definition = spec.is_a?(Definition) ? spec : OpenapiFirst.load(spec)
       end

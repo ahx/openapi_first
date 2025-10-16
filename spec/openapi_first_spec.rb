@@ -91,6 +91,18 @@ RSpec.describe OpenapiFirst do
       expect(time).to be < 1
     end
 
+    context 'with a symbol' do
+      it 'raises an exception if OAD has not been registered' do
+        expect { OpenapiFirst.load(:unknown) }.to raise_error(OpenapiFirst::NotRegisteredError)
+      end
+
+      it 'returns the registered OAD' do
+        OpenapiFirst.register(spec_path)
+        oad = OpenapiFirst.load(:default)
+        expect(oad.key).to eq(spec_path)
+      end
+    end
+
     describe 'only option' do
       specify 'with empty filter' do
         definition = OpenapiFirst.load(spec_path, only: nil)
