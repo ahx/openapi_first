@@ -9,10 +9,10 @@
 
 ### Added
 - The Coverage feature in `OpenapiFirst::Test` now supports parallel tests via a DRB client/sever. Thanks to Richard! See [#394](https://github.com/ahx/openapi_first/issues/394).
-- Add `OpenapiFirst::Test` Configuration options which are useful when adopting OpenAPI:
+- Added `OpenapiFirst::Test` Configuration options which are useful when adopting OpenAPI:
   - `ignore_unknown_response_status = true` to make API coverage no longer complain about undefined response statuses it sees during a test run.
   - `minimum_coverage=` is no longer deprecated. This is useful when gradually adopting OpenAPI
-- Add support to register OADs globally via:
+- Added support to register OADs globally via:
   ```ruby
   OpenapiFirst.configure { |config| config.register('openapi.yaml')  }
   ```
@@ -20,7 +20,7 @@
 
 ### Removed
 - Removed deprecated methods which produced a warning since 2.0.0.
-- Remove internally used `Test::Coverage.current_run, .plans, .install, .uninstall`. If you are using these, use `OpenapiFirst::Test.setup` instead.
+- Removed internally used `Test::Coverage.current_run, .plans, .install, .uninstall`. If you are using these, use `OpenapiFirst::Test.setup` instead.
 
 ### Fixed
 - Update dependency `openapi_parameters` to >= 0.7.0, because that version supports unpacking parameters the use `style: deepObject` with `explode: true`.
