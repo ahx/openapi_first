@@ -41,9 +41,7 @@ module OpenapiFirst
     #       The uploaded file should not be read during request validation.
     module MultipartBodyParser
       def self.call(request)
-        request.POST.transform_values do |value|
-          unpack_value(value)
-        end
+        call_with_encoding(request, {})
       end
 
       def self.call_with_encoding(request, encoding)
@@ -56,7 +54,7 @@ module OpenapiFirst
             content_type = part_encoding['contentType']
             
             if content_type && parsed_value.is_a?(String)
-              parsed_value = parse_content_by_type(parsed_value, content_type)
+              parsed_value = parse_content_by_type(parsed_value, content_type, key)
             end
           end
           
@@ -64,13 +62,14 @@ module OpenapiFirst
         end
       end
 
-      def self.parse_content_by_type(content, content_type)
+      def self.parse_content_by_type(content, content_type, field_name)
         case content_type.downcase
         when 'application/json'
           begin
             JSON.parse(content)
-          rescue JSON::ParserError
-            # If JSON parsing fails, return the original content
+          rescue JSON::ParserError => e
+            # Log the parsing failure for debugging, but return original content to maintain compatibility
+            warn "Warning: Failed to parse JSON for field '#{field_name}': #{e.message}. Returning original content."
             content
           end
         else

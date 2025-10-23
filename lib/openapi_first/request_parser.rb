@@ -41,7 +41,8 @@ module OpenapiFirst
     def parse_body(request)
       return unless @body_parsers
 
-      if @encoding && @body_parsers.respond_to?(:call_with_encoding)
+      # Use encoding-aware parsing for multipart requests when encoding is specified
+      if @encoding && @body_parsers == RequestBodyParsers::MultipartBodyParser
         @body_parsers.call_with_encoding(request, @encoding)
       else
         @body_parsers.call(request)
