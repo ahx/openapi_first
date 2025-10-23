@@ -208,6 +208,41 @@ paths:
       responses:
         "200":
           description: ok
+  /multipart-with-encoding:
+    post:
+      requestBody:
+        description: Contains a file and data attributes with different encodings
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - data
+                - file
+              properties:
+                data:
+                  type: object
+                  required:
+                    - name
+                    - description
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                file:
+                  type: string
+                  format: binary
+                  description: Sample file
+            encoding:
+              file:
+                contentType: text/csv
+              data:
+                contentType: application/json
+      responses:
+        "200":
+          description: ok
 components:
   schemas:
     Pet:

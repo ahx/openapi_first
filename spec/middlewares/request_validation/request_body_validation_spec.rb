@@ -84,6 +84,21 @@ RSpec.describe 'Request body validation' do
       expect(names).to eq(['Quentin'])
     end
 
+    it 'succeeds with multipart form data with encoding specification' do
+      csv_file = Rack::Test::UploadedFile.new(fixture_path('test.csv'), 'text/csv')
+      json_data = { name: 'Test Product', description: 'A sample product' }
+
+      post '/multipart-with-encoding', 
+           'file' => csv_file,
+           'data' => json_data.to_json
+
+      expect(last_response.status).to eq(200), last_response.body
+
+      parsed_body = last_request.env[OpenapiFirst::REQUEST].parsed_body
+      expect(parsed_body['file']).to eq File.read(fixture_path('test.csv'))
+      expect(parsed_body['data']).to eq(json_data.transform_keys(&:to_s))
+    end
+
     it 'succeeds without optional file upload' do
       header Rack::CONTENT_TYPE,  'multipart/form-data'
       post '/multipart-with-file', 'petId' => '12'

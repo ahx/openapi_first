@@ -141,11 +141,13 @@ module OpenapiFirst
           configuration: schemer_configuration,
           after_property_validation: config.hooks[:after_request_body_property_validation]
         )
+        encoding = content_object['encoding']&.resolved || {}
         Request.new(path:, request_method:, parameters:,
                     operation_object: operation_object.resolved,
                     content_type:,
                     content_schema:,
                     required_body:,
+                    encoding:,
                     key: [path, request_method, content_type].join(':'))
       end
     end
@@ -156,6 +158,7 @@ module OpenapiFirst
                   content_type: nil,
                   content_schema: nil,
                   required_body: false,
+                  encoding: nil,
                   key: [path, request_method, nil].join(':'))
     end
 

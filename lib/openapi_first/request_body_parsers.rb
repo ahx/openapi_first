@@ -46,6 +46,39 @@ module OpenapiFirst
         end
       end
 
+      def self.call_with_encoding(request, encoding)
+        request.POST.each_with_object({}) do |(key, value), result|
+          parsed_value = unpack_value(value)
+          
+          # Apply encoding-specific parsing if specified
+          if encoding.key?(key)
+            part_encoding = encoding[key]
+            content_type = part_encoding['contentType']
+            
+            if content_type && parsed_value.is_a?(String)
+              parsed_value = parse_content_by_type(parsed_value, content_type)
+            end
+          end
+          
+          result[key] = parsed_value
+        end
+      end
+
+      def self.parse_content_by_type(content, content_type)
+        case content_type.downcase
+        when 'application/json'
+          begin
+            JSON.parse(content)
+          rescue JSON::ParserError
+            # If JSON parsing fails, return the original content
+            content
+          end
+        else
+          # For other content types (like text/csv), return as-is for now
+          content
+        end
+      end
+
       def self.unpack_value(value)
         return value.map { unpack_value(_1) } if value.is_a?(Array)
         return value unless value.is_a?(Hash)

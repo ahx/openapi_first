@@ -12,7 +12,7 @@ module OpenapiFirst
   class Request
     # rubocop:disable Metrics/MethodLength
     def initialize(path:, request_method:, operation_object:,
-                   parameters:, content_type:, content_schema:, required_body:, key:)
+                   parameters:, content_type:, content_schema:, required_body:, key:, encoding: nil)
       @path = path
       @request_method = request_method
       @content_type = content_type
@@ -20,12 +20,14 @@ module OpenapiFirst
       @operation = operation_object
       @allow_empty_content = content_type.nil? || required_body == false
       @key = key
+      @encoding = encoding
       @request_parser = RequestParser.new(
         query_parameters: parameters.query,
         path_parameters: parameters.path,
         header_parameters: parameters.header,
         cookie_parameters: parameters.cookie,
-        content_type:
+        content_type:,
+        encoding:
       )
       @validator = RequestValidator.new(
         content_schema:,
@@ -38,7 +40,7 @@ module OpenapiFirst
     end
     # rubocop:enable Metrics/MethodLength
 
-    attr_reader :content_type, :content_schema, :operation, :request_method, :path, :key
+    attr_reader :content_type, :content_schema, :operation, :request_method, :path, :key, :encoding
 
     def allow_empty_content?
       @allow_empty_content
