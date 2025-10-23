@@ -17,7 +17,7 @@ module OpenapiFirst
       if definitions.key?(as) && as == :default
         raise(
           AlreadyRegisteredError,
-          "#{definitions[as].filepath.inspect} is already registered " \
+          "#{definitions[as].inspect} is already registered " \
           "as ':default' so you cannot register #{path_or_definition.inspect} without " \
           'giving it a custom name. Please call register with a custom key like: ' \
           "#{name}.register(#{path_or_definition.inspect}, as: :my_other_api)"
