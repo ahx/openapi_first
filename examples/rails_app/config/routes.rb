@@ -12,4 +12,6 @@ Rails.application.routes.draw do
   get '/trips', to: 'trips#index'
 
   resources :attachments, only: :show
+
+  mount Weather::Engine, at: '/weather', as: "weather_engine"
 end
