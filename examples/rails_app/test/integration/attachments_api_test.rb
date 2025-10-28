@@ -2,7 +2,7 @@
 
 require 'test_helper'
 
-class StationsApiTest < ActionDispatch::IntegrationTest
+class AttachmentsApiTest < ActionDispatch::IntegrationTest
   test 'GET /attachments/{attachment_id}' do
     get '/attachments/42abc', as: :json
 
