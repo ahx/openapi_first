@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe OpenapiFirst::Configuration do
-  describe '#after' do
+  describe '#after_...' do
     it 'adds a hook' do
       config = OpenapiFirst::Configuration.new
       called = []
@@ -9,7 +9,7 @@ RSpec.describe OpenapiFirst::Configuration do
         called << request
       end
 
-      config.hooks[:after_request_validation].each { |hook| hook.call('request') }
+      config.after_request_validation.each { |hook| hook.call('request') }
       expect(called).to eq(%w[request])
     end
 
@@ -18,7 +18,7 @@ RSpec.describe OpenapiFirst::Configuration do
       config.after_request_validation { _1 }
       config.after_request_validation { _1 }
 
-      expect(config.hooks[:after_request_validation].size).to eq(2)
+      expect(config.after_request_validation.size).to eq(2)
     end
   end
 
@@ -54,22 +54,34 @@ RSpec.describe OpenapiFirst::Configuration do
     end
   end
 
-  describe '#clone' do
+  describe '#child' do
     it 'clones actions' do
       config = OpenapiFirst::Configuration.new
       config.after_request_validation { |request| request }
-      expect(config.hooks[:after_request_validation].size).to eq(1)
-      cloned = config.clone
+      expect(config.after_request_validation.size).to eq(1)
+      cloned = config.child
       cloned.after_request_validation { |request| request }
-      expect(cloned.hooks[:after_request_validation].size).to eq(2)
-      expect(config.hooks[:after_request_validation].size).to eq(1)
+      expect(cloned.after_request_validation.size).to eq(2)
+      expect(config.after_request_validation.size).to eq(1)
     end
 
     it 'clones empty configs' do
       config = OpenapiFirst::Configuration.new
-      expect(config.hooks.values.all?(&:empty?)).to be(true)
-      cloned = config.clone
-      expect(cloned.hooks.values.all?(&:empty?)).to be(true)
+      expect(config.after_request_validation.to_a).to be_empty
+      cloned = config.child
+      expect(cloned.after_request_validation.to_a).to be_empty
+    end
+
+    it 'allows adding hooks to the parent config after cloning' do
+      parent = OpenapiFirst::Configuration.new
+      parent.after_request_validation { |request| request }
+
+      child = parent.child
+
+      expect(child.after_request_validation.size).to eq(1)
+      parent.after_request_validation { |request| request }
+      expect(parent.after_request_validation.size).to eq(2)
+      expect(child.after_request_validation.size).to eq(2)
     end
   end
 end

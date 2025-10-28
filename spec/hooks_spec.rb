@@ -16,7 +16,7 @@ RSpec.describe 'Hooks' do
         config.after_request_validation(&myproc)
       end
       definition.validate_request(build_request('/pets?limit=24'))
-      definition.config.hooks[:after_request_validation].delete(myproc)
+      definition.config.after_request_validation.delete(myproc)
       definition.validate_request(build_request('/pets?limit=24'))
 
       expect(called).to eq([['listPets', true]])
