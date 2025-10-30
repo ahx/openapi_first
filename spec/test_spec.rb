@@ -379,17 +379,17 @@ RSpec.describe OpenapiFirst::Test do
     it 'installs global hooks' do
       described_class.install
 
-      hooks = OpenapiFirst.configuration.hooks
-      expect(hooks[:after_request_validation]).not_to be_empty
-      expect(hooks[:after_response_validation]).not_to be_empty
+      config = OpenapiFirst.configuration
+      expect(config.after_request_validation).not_to be_empty
+      expect(config.after_response_validation).not_to be_empty
     end
 
     it 'does not install hooks multiple times' do
       2.times { described_class.install }
 
-      hooks = OpenapiFirst.configuration.hooks
-      expect(hooks[:after_request_validation].count).to eq(1)
-      expect(hooks[:after_response_validation].count).to eq(1)
+      config = OpenapiFirst.configuration
+      expect(config.after_request_validation.count).to eq(1)
+      expect(config.after_response_validation.count).to eq(1)
     end
   end
 

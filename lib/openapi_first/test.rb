@@ -130,8 +130,8 @@ module OpenapiFirst
 
     def self.uninstall
       configuration = OpenapiFirst.configuration
-      configuration.hooks[:after_request_validation].delete(@after_request_validation)
-      configuration.hooks[:after_response_validation].delete(@after_response_validation)
+      configuration.after_request_validation.delete(@after_request_validation)
+      configuration.after_response_validation.delete(@after_response_validation)
       definitions.clear
       @configuration = nil
       @installed = nil

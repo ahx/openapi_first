@@ -25,14 +25,14 @@ module OpenapiFirst
     attr_reader :request_validation_error_response, :hooks
     attr_accessor :request_validation_raise_error, :response_validation_raise_error, :path
 
-    def clone
-      copy = super
-      copy.instance_variable_set(:@hooks, @hooks&.transform_values(&:clone))
-      copy
+    def child
+      ChildConfiguration.new(parent: self)
     end
 
     HOOKS.each do |hook|
       define_method(hook) do |&block|
+        return hooks[hook] if block.nil?
+
         hooks[hook] << block
         block
       end

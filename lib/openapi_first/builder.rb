@@ -125,7 +125,7 @@ module OpenapiFirst
       end
 
       Schema::Hash.new(schemas, required:, configuration: schemer_configuration,
-                                after_property_validation: config.hooks[:after_request_parameter_property_validation])
+                                after_property_validation: config.after_request_parameter_property_validation)
     end
 
     def build_requests(path:, request_method:, operation_object:, parameters:)
@@ -139,7 +139,7 @@ module OpenapiFirst
       content_objects.map do |content_type, content_object|
         content_schema = content_object['schema'].schema(
           configuration: schemer_configuration,
-          after_property_validation: config.hooks[:after_request_body_property_validation]
+          after_property_validation: config.after_request_body_property_validation
         )
         Request.new(path:, request_method:, parameters:,
                     operation_object: operation_object.resolved,

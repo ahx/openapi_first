@@ -5,6 +5,7 @@ require_relative 'openapi_first/file_loader'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/registry'
 require_relative 'openapi_first/configuration'
+require_relative 'openapi_first/child_configuration'
 require_relative 'openapi_first/definition'
 require_relative 'openapi_first/version'
 require_relative 'openapi_first/middlewares/response_validation'
@@ -29,7 +30,8 @@ module OpenapiFirst
   # @return [Configuration]
   # @yield [Configuration]
   def self.configure
-    yield configuration
+    @configuration = Configuration.new
+    yield @configuration if block_given?
   end
 
   ERROR_RESPONSES = {} # rubocop:disable Style/MutableConstant
