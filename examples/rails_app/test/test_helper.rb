@@ -1,13 +1,15 @@
 ENV['RAILS_ENV'] ||= 'test'
 
+require_relative '../config/environment'
+
 require 'openapi_first'
 OpenapiFirst::Test.setup do |test|
   test.register Rails.root.join('../../spec/data/train-travel-api/openapi.yaml')
   test.register Rails.root.join('../../spec/data/attachments_openapi.yaml'), as: :attachments
+  test.register Rails.root.join('../../spec/data/weather_openapi.yaml'), as: :weather
   test.coverage_formatter_options = { verbose: true }
 end
 
-require_relative '../config/environment'
 require 'rails/test_help'
 
 module ActiveSupport

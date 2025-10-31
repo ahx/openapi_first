@@ -1,10 +1,10 @@
 module Weather
   class TemperatureController < ApplicationController
     def index
-      render json: {
+      render status: :ok, json: {
         latitude:, longitude:, temperature: {
           celsius: "11.94",
-          fahenheit: "53.5"
+          fahrenheit: "53.5"
         }
       }
     end
