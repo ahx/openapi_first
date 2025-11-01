@@ -22,9 +22,12 @@
 ### Removed
 - Removed deprecated methods which produced a warning since 2.0.0.
 - Removed internally used `Test::Coverage.current_run, .plans, .install, .uninstall`. If you are using these, use `OpenapiFirst::Test.setup` instead.
+- Removed `OpenapiFirst::Configuration#clone`. Use `#child` instead.
+- It's not possible to remove locally added hooks. But you can restart with a blank list of hooks by calling `OpenapiFirst.configure`
 
 ### Fixed
 - Update dependency `openapi_parameters` to >= 0.7.0, because that version supports unpacking parameters the use `style: deepObject` with `explode: true`.
+- Make `OpenapiFirst::Test.setup` more robust by adding `OpenapiFirst::Configuration#child` so it does not matter if you load our OAD before callig `OpenapiFirst::Test.setup`.
 
 ## 2.11.1
 
