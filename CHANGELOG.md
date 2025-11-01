@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0
+
 ### Changed
 - Breaking: Trailing slashes are no longer ignored in dynamic paths. See [#403](https://github.com/ahx/openapi_first/issues/403).
   Before this change `GET /things/24/` matched `/things/{id}:`, but it no longer does.
@@ -16,7 +18,7 @@
 - Added `OpenapiFirst::Test` Configuration options which are useful when adopting OpenAPI:
   - `ignore_unknown_response_status = true` to make API coverage no longer complain about undefined response statuses it sees during a test run.
   - `minimum_coverage=` is no longer deprecated. This is useful when gradually adopting OpenAPI
-- Added `OpenapiFirst::Test::Configuration#ignored_unknown_status=` to overwrite the whole list
+- `ignored_unknown_status=` to overwrite the whole list of ignored unknown status at once
 - Added support to register OADs globally via:
   ```ruby
   OpenapiFirst.configure { |config| config.register('openapi.yaml')  }
@@ -27,7 +29,7 @@
 - Removed deprecated methods which produced a warning since 2.0.0.
 - Removed internally used `Test::Coverage.current_run, .plans, .install, .uninstall`. If you are using these, use `OpenapiFirst::Test.setup` instead.
 - Removed `OpenapiFirst::Configuration#clone`. Use `#child` instead.
-- It's not possible to remove locally added hooks. But you can restart with a blank list of hooks by calling `OpenapiFirst.configure`
+- It's no longer supported to remove locally added hooks during runtime.
 
 ### Fixed
 - Update dependency `openapi_parameters` to >= 0.7.0, because that version supports unpacking parameters the use `style: deepObject` with `explode: true`.
