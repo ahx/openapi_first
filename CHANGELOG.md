@@ -9,12 +9,14 @@
 - `OpenapiFirst::Test.app` now returns an instance of `OpenapiFirst::Test::App`, instead of `Rack::Builer` and delegates methods other than `#call` to the original app. This wrapper adds validated requests, responses to the rack env at `env[OpenapiFirst::Test::REQUEST]`, `env[OpenapiFirst::Test::RESPONSE]`. This makes it possible to test Rails engines. Thanks to Josh! See [#410](https://github.com/ahx/openapi_first/issues/410).
 - `OpenapiFirst::Test` now falls back to using globally registered OADs if nothing was registered inside `OpenapiFirst::Test.setup`.
 - Deprecated configuration fields `request_validation_raise_error` and `response_validation_raise_error`. Please pass the `raise_error:` option to the middlewares directly.
+- 401er and 500er status are okay to not be described.
 
 ### Added
 - The Coverage feature in `OpenapiFirst::Test` now supports parallel tests via a DRB client/sever. Thanks to Richard! See [#394](https://github.com/ahx/openapi_first/issues/394).
 - Added `OpenapiFirst::Test` Configuration options which are useful when adopting OpenAPI:
   - `ignore_unknown_response_status = true` to make API coverage no longer complain about undefined response statuses it sees during a test run.
   - `minimum_coverage=` is no longer deprecated. This is useful when gradually adopting OpenAPI
+- Added `OpenapiFirst::Test::Configuration#ignored_unknown_status=` to overwrite the whole list
 - Added support to register OADs globally via:
   ```ruby
   OpenapiFirst.configure { |config| config.register('openapi.yaml')  }

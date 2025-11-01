@@ -11,7 +11,7 @@ module OpenapiFirst
         @skip_response_coverage = nil
         @skip_coverage = nil
         @response_raise_error = true
-        @ignored_unknown_status = [404]
+        @ignored_unknown_status = Set.new([401, 404, 500])
         @ignore_unknown_response_status = false
         @report_coverage = true
         @ignore_unknown_requests = false
@@ -32,6 +32,12 @@ module OpenapiFirst
       attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error,
                     :ignore_unknown_requests, :ignore_unknown_response_status, :minimum_coverage
       attr_reader :report_coverage, :ignored_unknown_status
+
+      # Set ignored unknown status codes.
+      # @param [Array<Integer>] status Status codes that are okay not to cover in an OAD
+      def ignored_unknown_status=(status)
+        @ignored_unknown_status = status.to_set
+      end
 
       # Configure report coverage
       # @param [Boolean, :warn] value Whether to report coverage or just warn.

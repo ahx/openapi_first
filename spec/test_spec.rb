@@ -614,6 +614,18 @@ RSpec.describe OpenapiFirst::Test do
       end
     end
 
+    context 'with ignored_unknown_status =' do
+      before(:each) do
+        described_class.configuration.ignored_unknown_status = [302]
+      end
+
+      it 'does not raise an error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        end.not_to raise_error
+      end
+    end
+
     context 'with ignore_unknown_response_status = true' do
       before(:each) do
         described_class.configuration.ignore_unknown_response_status = true
