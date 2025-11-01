@@ -30,6 +30,8 @@ module OpenapiFirst
     end
 
     def [](api)
+      return api if api.is_a?(Definition)
+
       definitions.fetch(api) do
         option = api == :default ? '' : ", as: #{api.inspect}"
         raise(NotRegisteredError,

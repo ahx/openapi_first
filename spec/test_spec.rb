@@ -389,6 +389,11 @@ RSpec.describe OpenapiFirst::Test do
         described_class[:mine]
       end.to raise_error(OpenapiFirst::NotRegisteredError)
     end
+
+    it 'just returns a Definition' do
+      oad = definition
+      expect(described_class[oad]).to be(oad)
+    end
   end
 
   describe 'handling invalid requests' do
