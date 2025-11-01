@@ -6,9 +6,7 @@ openapi_first is a Ruby gem for request / response validation and contract-testi
 
 Configure
 ```ruby
-OpenapiFirst.configure do |config|
-  config.register('openapi/openapi.yaml')
-end
+OpenapiFirst.register('openapi/openapi.yaml')
 ```
 
 Use an OAD to validate incoming requests:
@@ -20,9 +18,7 @@ Turn your request tests into [contract tests](#contract-testing) against an OAD:
 ```ruby
 # spec_helper.rb
 require 'openapi_first'
-OpenapiFirst::Test.setup do |test|
-  test.register('openapi/openapi.yaml')
-end
+OpenapiFirst::Test.setup
 
 require 'my_app'
 RSpec.configure do |config|
@@ -34,6 +30,7 @@ end
 
 <!-- TOC -->
 
+- [Configuration](#configuration)
 - [Rack Middlewares](#rack-middlewares)
   - [Request validation](#request-validation)
   - [Response validation](#response-validation)
@@ -41,7 +38,6 @@ end
   - [Test assertions](#test-assertions)
 - [Manual use](#manual-use)
 - [Framework integration](#framework-integration)
-- [Configuration](#configuration)
 - [Hooks](#hooks)
 - [Alternatives](#alternatives)
 - [Frequently Asked Questions](#frequently-asked-questions)
@@ -51,6 +47,33 @@ end
 
 <!-- /TOC -->
 
+## Configuration
+
+You should register OADs globally so you don't have to load the file multiple times or to refernce them by Symbol (like :v1 in this example).
+```ruby
+OpenapiFirst.configure do |config|
+  config.register('openapi/openapi.yaml') # :default
+  config.register('openapi/v1.openapi.yaml', as: :v1)
+end
+```
+
+You can configure default options globally:
+
+```ruby
+OpenapiFirst.configure do |config|
+  # Specify which plugin is used to render error responses returned by the request validation middleware (defaults to :default)
+  config.request_validation_error_response = :jsonapi
+end
+```
+
+or configure per instance:
+
+```ruby
+OpenapiFirst.load('openapi.yaml') do |config|
+  config.request_validation_error_response = :jsonapi
+end
+```
+
 ## Rack Middlewares
 
 ### Request validation
@@ -58,10 +81,10 @@ end
 The request validation middleware returns a 4xx if the request is invalid or not defined in the API description. It adds a request object to the current Rack environment at `env[OpenapiFirst::REQUEST]` with the request parameters parsed exactly as described in your API description plus access to meta information from your API description. See _[Manual use](#manual-use)_ for more details about that object.
 
 ```ruby
-use OpenapiFirst::Middlewares::RequestValidation, 'openapi.yaml'
+use OpenapiFirst::Middlewares::RequestValidation
 
 # Pass `raise_error: true` to raise an error if request is invalid:
-use OpenapiFirst::Middlewares::RequestValidation, 'openapi.yaml', raise_error: true
+use OpenapiFirst::Middlewares::RequestValidation, raise_error: true
 ```
 
 #### Error responses
@@ -152,10 +175,10 @@ This middleware raises an error by default if the response is not valid.
 This can be useful in a test or staging environment, especially if you are adopting OpenAPI for an existing implementation.
 
 ```ruby
-use OpenapiFirst::Middlewares::ResponseValidation, 'openapi.yaml' if ENV['RACK_ENV'] == 'test'
+use OpenapiFirst::Middlewares::ResponseValidation if ENV['RACK_ENV'] == 'test'
 
 # Pass `raise_error: false` to not raise an error:
-use OpenapiFirst::Middlewares::ResponseValidation, 'openapi.yaml', raise_error: false
+use OpenapiFirst::Middlewares::ResponseValidation, raise_error: false
 ```
 
 If you are adopting OpenAPI you can use these options together with [hooks](#hooks) to get notified about requests/responses that do match your API description.
@@ -166,13 +189,11 @@ You can see your OpenAPI API description as a contract that your clients can rel
 
 Here is how to set it up:
 
-1. Register all OpenAPI documents to track coverage for.
-  This should go at the top of your test helper file before loading your application code.
+1. Setup the test mode
     ```ruby
+    # spec_helper.rb
     require 'openapi_first'
-    OpenapiFirst::Test.setup do |config|
-      config.register('openapi/openapi.yaml')
-    end
+    OpenapiFirst::Test.setup
     ```
 2. Observe your application. You can do this in multiple ways:
     - Add an `app` method to your tests (which is called by rack-test) that wraps your application with silent request / response validation.
@@ -195,7 +216,7 @@ Here is how to set it up:
         config.include OpenapiFirst::Test::Methods[MyApp], type: :request
       end
       ```
-4. Run your tests. The Coverage feature will tell you about missing or invalid requests/responses:
+3. Run your tests. The Coverage feature will tell you about missing or invalid requests/responses:
       ```
       ✓ GET /stations
         ✓ 200(application/json)
@@ -210,11 +231,11 @@ Here is how to set it up:
 
 ### Configure test coverage
 
-OpenapiFirst::Test raises an error when a response status is not defined. You can deactivate this with:
+OpenapiFirst::Test raises an error when a response status is not defined except for 404 and 500. You can change this:
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
-  [403, 401].each { test.ignored_unknown_status << it }
+  test.ignored_unknown_status << 403
 end
 ```
 
@@ -222,7 +243,6 @@ Or you can ignore all unknown response status:
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
-  # …
   test.ignore_all_unknown_status = true
 end
 ```
@@ -231,7 +251,6 @@ Exclude certain _responses_ from coverage with `skip_coverage`:
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
-  # …
   test.skip_response_coverage do |response_definition|
     response_definition.status == '5XX'
   end
@@ -242,7 +261,6 @@ Skip coverage for a request and all responses alltogether of a route with `skip_
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
-  # …
   test.skip_coverage do |path, request_method|
     path == '/bookings/{bookingId}' && requests_method == 'DELETE'
   end
@@ -253,7 +271,6 @@ OpenapiFirst::Test raises an error when a request is not defined. You can deacti
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
-  # …
   test.ignore_unknown_requests = true
 end
 ```
@@ -267,23 +284,23 @@ openapi_first ships with a simple but powerful Test method `assert_api_conform` 
 
 Here is how to use it with RSpec, but MiniTest works just as good:
 
+```ruby
+# spec_helper.rb
+OpenapiFirst::Test.setup do |test|
+  test.register(File.join(__dir__, '../examples/openapi.yaml'), as: :example_app)
+end
+```
+
+
 Inside your test :
 ```ruby
 RSpec.describe 'Example App' do
   include Rack::Test::Methods
-  include OpenapiFirst::Test::Methods
-
-  before do
-    OpenapiFirst::Test.register(File.join(__dir__, '../examples/openapi.yaml'), as: :example_app)
-  end
-
-  def app
-    App
-  end
+  include OpenapiFirst::Test::Methods[App]
 
   it 'is API conform' do
     get '/'
-    assert_api_conform(status: 200, api: :example_app)
+    assert_api_conform(status: 200)
   end
 end
 ```
@@ -339,27 +356,6 @@ validated_response.parsed_headers
 
 # Or you can raise an exception if validation fails:
 definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
-```
-
-## Configuration
-
-You can configure default options globally:
-
-```ruby
-OpenapiFirst.configure do |config|
-  # Specify which plugin is used to render error responses returned by the request validation middleware (defaults to :default)
-  config.request_validation_error_response = :jsonapi
-  # Configure if the request validation middleware should raise an exception (defaults to false)
-  config.request_validation_raise_error = true
-end
-```
-
-or configure per instance:
-
-```ruby
-OpenapiFirst.load('openapi.yaml') do |config|
-  config.request_validation_error_response = :jsonapi
-end
 ```
 
 ## Hooks
