@@ -36,12 +36,8 @@ module OpenapiFirst
     # Sets up OpenAPI test coverage and OAD registration.
     # @yieldparam [OpenapiFirst::Test::Configuration] configuration A configuration to setup test integration
     def self.setup
-      unless block_given?
-        raise ArgumentError, "Please provide a block to #{self.class}.confgure to register you API descriptions"
-      end
-
       install
-      yield configuration
+      yield configuration if block_given?
 
       Coverage.start(skip_response: configuration.skip_response_coverage, skip_route: configuration.skip_coverage)
 

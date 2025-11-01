@@ -129,10 +129,9 @@ RSpec.describe OpenapiFirst::Test do
       expect(route_tasks.map { |route| [route.path, route.request_method] }).to eq([['/pets/{petId}', 'GET']])
     end
 
-    it 'raises an error if no block is given' do
-      expect do
-        described_class.setup
-      end.to raise_error ArgumentError
+    it 'is okay if no block is given if an OAD is registered ' do
+      OpenapiFirst.register('./spec/data/dice.yaml', as: :dice)
+      expect(described_class.setup)
     end
 
     it 'returns the globally registered OADs if nothing was registered inside the block' do
@@ -606,6 +605,18 @@ RSpec.describe OpenapiFirst::Test do
     context 'with ignored_unknown_status' do
       before(:each) do
         described_class.configuration.ignored_unknown_status << 302
+      end
+
+      it 'does not raise an error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        end.not_to raise_error
+      end
+    end
+
+    context 'with ignored_unknown_status =' do
+      before(:each) do
+        described_class.configuration.ignored_unknown_status = [302]
       end
 
       it 'does not raise an error' do

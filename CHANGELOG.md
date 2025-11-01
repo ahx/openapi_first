@@ -2,32 +2,50 @@
 
 ## Unreleased
 
-### Changed
+## 3.0.0
+
+### openapi_first
+
+#### Changed
 - Breaking: Trailing slashes are no longer ignored in dynamic paths. See [#403](https://github.com/ahx/openapi_first/issues/403).
   Before this change `GET /things/24/` matched `/things/{id}:`, but it no longer does.
 - Breaking: Failure type `:response_not_found` was split into two more specific types `:response_content_type_not_found` and `:response_status_not_found`. This should be mostly internal stuff. So if your custom error response used `response_not_found`, you will have to adapt.
-- `OpenapiFirst::Test.app` now returns an instance of `OpenapiFirst::Test::App`, instead of `Rack::Builer` and delegates methods other than `#call` to the original app. This wrapper adds validated requests, responses to the rack env at `env[OpenapiFirst::Test::REQUEST]`, `env[OpenapiFirst::Test::RESPONSE]`. This makes it possible to test Rails engines. Thanks to Josh! See [#410](https://github.com/ahx/openapi_first/issues/410).
-- `OpenapiFirst::Test` now falls back to using globally registered OADs if nothing was registered inside `OpenapiFirst::Test.setup`.
+- Deprecated configuration fields `request_validation_raise_error` and `response_validation_raise_error`. Please pass the `raise_error:` option to the middlewares directly.
 
-### Added
-- The Coverage feature in `OpenapiFirst::Test` now supports parallel tests via a DRB client/sever. Thanks to Richard! See [#394](https://github.com/ahx/openapi_first/issues/394).
-- Added `OpenapiFirst::Test` Configuration options which are useful when adopting OpenAPI:
-  - `ignore_unknown_response_status = true` to make API coverage no longer complain about undefined response statuses it sees during a test run.
-  - `minimum_coverage=` is no longer deprecated. This is useful when gradually adopting OpenAPI
+#### Added
 - Added support to register OADs globally via:
   ```ruby
   OpenapiFirst.configure { |config| config.register('openapi.yaml')  }
   ```
   This makes the `spec` argument in middlewares optional and removes the necessity to load the OAD in the same place where you use the middlewares and adds a cache for parsed OADs.
 
-### Removed
+#### Removed
 - Removed deprecated methods which produced a warning since 2.0.0.
-- Removed internally used `Test::Coverage.current_run, .plans, .install, .uninstall`. If you are using these, use `OpenapiFirst::Test.setup` instead.
 - Removed `OpenapiFirst::Configuration#clone`. Use `#child` instead.
-- It's not possible to remove locally added hooks. But you can restart with a blank list of hooks by calling `OpenapiFirst.configure`
+- It's no longer supported to remove locally added hooks during runtime.
 
-### Fixed
+#### Fixed
 - Update dependency `openapi_parameters` to >= 0.7.0, because that version supports unpacking parameters the use `style: deepObject` with `explode: true`.
+- Make `OpenapiFirst::Test.setup` more robust by adding `OpenapiFirst::Configuration#child` so it does not matter if you load our OAD before callig `OpenapiFirst::Test.setup`.
+
+### openapi_first/test
+
+#### Changed
+- `OpenapiFirst::Test.app` now returns an instance of `OpenapiFirst::Test::App`, instead of `Rack::Builer` and delegates methods other than `#call` to the original app. This wrapper adds validated requests, responses to the rack env at `env[OpenapiFirst::Test::REQUEST]`, `env[OpenapiFirst::Test::RESPONSE]`. This makes it possible to test Rails engines. Thanks to Josh! See [#410](https://github.com/ahx/openapi_first/issues/410).
+- `OpenapiFirst::Test` now falls back to using globally registered OADs if nothing was registered inside `OpenapiFirst::Test.setup`.
+- 401er and 500er status are okay to not be described.
+
+#### Added
+- The Coverage feature in `OpenapiFirst::Test` now supports parallel tests via a DRB client/sever. Thanks to Richard! See [#394](https://github.com/ahx/openapi_first/issues/394).
+- Added `OpenapiFirst::Test` Configuration options which are useful when adopting OpenAPI:
+  - `ignore_unknown_response_status = true` to make API coverage no longer complain about undefined response statuses it sees during a test run.
+  - `minimum_coverage=` is no longer deprecated. This is useful when gradually adopting OpenAPI
+- `ignored_unknown_status=` to overwrite the whole list of ignored unknown status at once
+
+#### Removed
+- Removed internally used `Test::Coverage.current_run, .plans, .install, .uninstall`. If you are using these, use `OpenapiFirst::Test.setup` instead.
+
+#### Fixed
 - Make `OpenapiFirst::Test.setup` more robust by adding `OpenapiFirst::Configuration#child` so it does not matter if you load our OAD before callig `OpenapiFirst::Test.setup`.
 
 ## 2.11.1

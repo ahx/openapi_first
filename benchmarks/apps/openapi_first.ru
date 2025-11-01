@@ -4,5 +4,7 @@ require 'json'
 require 'openapi_first'
 require_relative 'app'
 
-use OpenapiFirst::Middlewares::RequestValidation, spec: File.absolute_path('./openapi.yaml', __dir__)
+OpenapiFirst.register File.absolute_path('./openapi.yaml', __dir__)
+
+use OpenapiFirst::Middlewares::RequestValidation
 run App

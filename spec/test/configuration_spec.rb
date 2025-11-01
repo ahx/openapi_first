@@ -11,12 +11,12 @@ RSpec.describe OpenapiFirst::Test::Configuration do
 
   describe 'ignored_unknown_status' do
     it 'has a default value' do
-      expect(configuration.ignored_unknown_status).to eq [404]
+      expect(configuration.ignored_unknown_status).to contain_exactly(401, 404, 500)
     end
 
     it 'can be extended' do
       configuration.ignored_unknown_status << 401
-      expect(configuration.ignored_unknown_status).to eq [404, 401]
+      expect(configuration.ignored_unknown_status).to include(401)
     end
   end
 

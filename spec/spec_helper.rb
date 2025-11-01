@@ -2,6 +2,7 @@
 
 ENV['RACK_ENV'] = 'test'
 
+Warning[:deprecated] = true
 require 'bundler/setup'
 require 'openapi_first'
 require 'json'

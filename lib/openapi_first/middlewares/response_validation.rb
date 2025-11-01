@@ -6,7 +6,9 @@ module OpenapiFirst
   module Middlewares
     # A Rack middleware to validate requests against an OpenAPI API description
     class ResponseValidation
-      # @param spec [String, OpenapiFirst::Definition] Path to the OpenAPI file or an instance of Definition
+      # @param spec [String, Symbol, OpenapiFirst::Definition] Path to the OpenAPI file or an instance of Definition.
+      #   If you pass a Symbol, it will load the OAD registered via `OpenapiFirst.register`
+      #   If you leave this blank, it will load the OAD registered as `:default`
       # @param options Hash
       #   :spec [String, OpenapiFirst::Definition] Path to the OpenAPI file or an instance of Definition.
       #         This will be deprecated. Please use spec argument instead.

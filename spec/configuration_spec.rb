@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe OpenapiFirst::Configuration do
+  after { Warning[:deprecated] = true }
+
   describe '#after_...' do
     it 'adds a hook' do
       config = OpenapiFirst::Configuration.new
@@ -28,6 +30,7 @@ RSpec.describe OpenapiFirst::Configuration do
     end
 
     it 'can be set to true' do
+      Warning[:deprecated] = false
       config = OpenapiFirst::Configuration.new
       config.request_validation_raise_error = true
       expect(config.request_validation_raise_error).to be(true)
@@ -40,6 +43,7 @@ RSpec.describe OpenapiFirst::Configuration do
     end
 
     it 'can be set to false' do
+      Warning[:deprecated] = false
       config = OpenapiFirst::Configuration.new
       config.response_validation_raise_error = false
       expect(config.response_validation_raise_error).to be(false)
