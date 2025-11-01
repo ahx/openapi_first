@@ -30,8 +30,7 @@ module OpenapiFirst
   # @return [Configuration]
   # @yield [Configuration]
   def self.configure
-    @configuration = Configuration.new
-    yield @configuration if block_given?
+    yield configuration if block_given?
   end
 
   ERROR_RESPONSES = {} # rubocop:disable Style/MutableConstant
