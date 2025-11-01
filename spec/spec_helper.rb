@@ -28,7 +28,6 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    OpenapiFirst.configure
     OpenapiFirst::Test.definitions.clear
     OpenapiFirst.definitions.clear
     OpenapiFirst::Test.uninstall

@@ -15,25 +15,23 @@ module OpenapiFirst
         @ignore_unknown_response_status = false
         @report_coverage = true
         @ignore_unknown_requests = false
-        @registry = {}
-        @apps = {}
       end
 
       # Register OADs, but don't load them just yet
       # @param [OpenapiFirst::OAD] oad The OAD to register
       # @param [Symbol] as The name to register the OAD under
       def register(oad, as: :default)
-        @registry[as] = oad
+        Test.register(oad, as:)
       end
 
       # Observe a rack app
       def observe(app, api: :default)
-        (@apps[api] ||= []) << app
+        Observe.observe(app, api:)
       end
 
       attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error,
                     :ignore_unknown_requests, :ignore_unknown_response_status, :minimum_coverage
-      attr_reader :registry, :apps, :report_coverage, :ignored_unknown_status
+      attr_reader :report_coverage, :ignored_unknown_status
 
       # Configure report coverage
       # @param [Boolean, :warn] value Whether to report coverage or just warn.

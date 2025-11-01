@@ -37,6 +37,16 @@ RSpec.describe OpenapiFirst do
     end
   end
 
+  describe '.configure' do
+    it 'does not reset .configuration' do
+      old_config_instance = described_class.configuration
+      described_class.configure do |_|
+        24
+      end
+      expect(described_class.configuration).to be(old_config_instance)
+    end
+  end
+
   describe '.load' do
     begin
       require 'multi_json'
