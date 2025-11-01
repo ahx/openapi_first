@@ -302,11 +302,18 @@ RSpec.describe OpenapiFirst::Test do
     let(:filename) { './spec/data/dice.yaml' }
     let(:oad) { OpenapiFirst.load(filename) }
 
+    let(:original_app) do
+      Class.new do
+        def call(_env)
+          [200, { 'content-type' => 'application/json' }, ['1']]
+        end
+
+        def color = 'red'
+      end.new
+    end
+
     let(:app) do
-      described_class.app(
-        ->(_env) { [200, { 'content-type' => 'application/json' }, ['1']] },
-        spec: oad
-      )
+      described_class.app(original_app, api: oad)
     end
 
     include Rack::Test::Methods
@@ -324,6 +331,18 @@ RSpec.describe OpenapiFirst::Test do
       post '/roll'
 
       expect(called).to eq(%i[request response])
+    end
+
+    it 'keeps instance methods of the original app intact' do
+      expect(app.color).to eq('red')
+    end
+
+    it 'adds last validated request, reponse in the rack env' do
+      post '/roll'
+
+      last_env = last_request.env
+      expect(last_env[described_class::REQUEST]).to be_a(OpenapiFirst::ValidatedRequest)
+      expect(last_env[described_class::RESPONSE]).to be_a(OpenapiFirst::ValidatedResponse)
     end
 
     context 'when using registered OAD' do
