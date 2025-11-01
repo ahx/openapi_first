@@ -9,6 +9,7 @@ module OpenapiFirst
     autoload :Coverage, 'openapi_first/test/coverage'
     autoload :Methods, 'openapi_first/test/methods'
     autoload :Observe, 'openapi_first/test/observe'
+    autoload :App, 'openapi_first/test/app'
     extend Registry
 
     class CoverageError < Error; end
@@ -89,11 +90,7 @@ module OpenapiFirst
     # the middlewares or manual request, response validation.
     def self.app(app, spec: nil, api: :default)
       spec ||= self[api]
-      Rack::Builder.app do
-        use OpenapiFirst::Middlewares::ResponseValidation, spec:, raise_error: false
-        use OpenapiFirst::Middlewares::RequestValidation, spec:, raise_error: false, error_response: false
-        run app
-      end
+      App.new(app, api: spec)
     end
 
     def self.install

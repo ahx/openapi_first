@@ -59,7 +59,7 @@ RSpec.describe OpenapiFirst::Test::Methods do
 
         get('/')
 
-        expect(last_request.env[OpenapiFirst::REQUEST].operation_id).to eq('example#root')
+        expect(last_request.env[OpenapiFirst::Test::REQUEST].operation_id).to eq('example#root')
       end
     end
   end
@@ -100,7 +100,7 @@ RSpec.describe OpenapiFirst::Test::Methods do
       test_app = minitest_class.new(1).app
       env = Rack::MockRequest.env_for('/')
       expect(test_app.call(env)).to eq(Rack::Response.new('hello').finish)
-      expect(env[OpenapiFirst::REQUEST]).to be_valid
+      expect(env[OpenapiFirst::Test::REQUEST]).to be_valid
     end
 
     it 'adds an app method that wraps the app for a specific API' do
@@ -115,7 +115,7 @@ RSpec.describe OpenapiFirst::Test::Methods do
       test_app = minitest_class.new(1).app
       env = Rack::MockRequest.env_for('/')
       expect(test_app.call(env)).to eq(Rack::Response.new('hello').finish)
-      expect(env[OpenapiFirst::REQUEST]).to be_valid
+      expect(env[OpenapiFirst::Test::REQUEST]).to be_valid
     end
 
     it 'adds an assert_api_conform method that targets the specified API' do
