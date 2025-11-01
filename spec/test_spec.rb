@@ -129,10 +129,9 @@ RSpec.describe OpenapiFirst::Test do
       expect(route_tasks.map { |route| [route.path, route.request_method] }).to eq([['/pets/{petId}', 'GET']])
     end
 
-    it 'raises an error if no block is given' do
-      expect do
-        described_class.setup
-      end.to raise_error ArgumentError
+    it 'is okay if no block is given if an OAD is registered ' do
+      OpenapiFirst.register('./spec/data/dice.yaml', as: :dice)
+      expect(described_class.setup)
     end
 
     it 'returns the globally registered OADs if nothing was registered inside the block' do
