@@ -22,8 +22,13 @@ module OpenapiFirst
       OpenapiFirst.register(path_or_definition, as:)
     end
 
-    attr_reader :request_validation_error_response, :hooks
-    attr_accessor :request_validation_raise_error, :response_validation_raise_error, :path
+    attr_reader :hooks, :request_validation_error_response
+    attr_accessor :path
+
+    # @deprecated
+    attr_reader :request_validation_raise_error
+    # @deprecated
+    attr_reader :response_validation_raise_error
 
     # Return a child configuration that still receives updates of global hooks.
     def child
@@ -33,6 +38,22 @@ module OpenapiFirst
     # @visibility private
     def clone
       raise NoMethodError, 'OpenapiFirst::Configuration#clone was removed. You want to call #child instead'
+    end
+
+    # @deprecated Pass `raise_error:` to OpenapiFirst::Middlewares::RequestValidation directly
+    def request_validation_raise_error=(value)
+      message = 'Setting OpenapiFirst::Configuration#request_validation_raise_error will be removed. ' \
+                'Please pass `raise_error:` to `OpenapiFirst::Middlewares::RequestValidation directly`'
+      warn message, category: :deprecated
+      @request_validation_raise_error = value
+    end
+
+    # @deprecated Pass `raise_error:` to OpenapiFirst::Middlewares::ResponseValidation directly
+    def response_validation_raise_error=(value)
+      message = 'Setting OpenapiFirst::Configuration#request_validation_raise_error will be removed. ' \
+                'Please pass `raise_error:` to `OpenapiFirst::Middlewares::ResponseValidation directly`'
+      warn message
+      @response_validation_raise_error = value
     end
 
     HOOKS.each do |hook|

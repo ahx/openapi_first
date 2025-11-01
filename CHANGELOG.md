@@ -8,6 +8,7 @@
 - Breaking: Failure type `:response_not_found` was split into two more specific types `:response_content_type_not_found` and `:response_status_not_found`. This should be mostly internal stuff. So if your custom error response used `response_not_found`, you will have to adapt.
 - `OpenapiFirst::Test.app` now returns an instance of `OpenapiFirst::Test::App`, instead of `Rack::Builer` and delegates methods other than `#call` to the original app. This wrapper adds validated requests, responses to the rack env at `env[OpenapiFirst::Test::REQUEST]`, `env[OpenapiFirst::Test::RESPONSE]`. This makes it possible to test Rails engines. Thanks to Josh! See [#410](https://github.com/ahx/openapi_first/issues/410).
 - `OpenapiFirst::Test` now falls back to using globally registered OADs if nothing was registered inside `OpenapiFirst::Test.setup`.
+- Deprecated configuration fields `request_validation_raise_error` and `response_validation_raise_error`. Please pass the `raise_error:` option to the middlewares directly.
 
 ### Added
 - The Coverage feature in `OpenapiFirst::Test` now supports parallel tests via a DRB client/sever. Thanks to Richard! See [#394](https://github.com/ahx/openapi_first/issues/394).
