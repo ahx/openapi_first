@@ -47,6 +47,26 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
     end
   end
 
+  context 'without spec argument and option' do
+    let(:response_body) { '2' }
+
+    let(:app) do
+      res = response
+      definition = spec
+      Rack::Builder.app do
+        use Rack::Lint
+        use OpenapiFirst::Middlewares::ResponseValidation, spec: definition
+        run ->(_env) { res.finish }
+      end
+    end
+
+    it 'fails if request is inavlid' do
+      expect do
+        get '/pets'
+      end.to raise_error OpenapiFirst::ResponseInvalidError
+    end
+  end
+
   context 'without content-type header' do
     let(:headers) do
       { 'X-HEAD' => '/api/next-page' }
@@ -274,6 +294,27 @@ RSpec.describe OpenapiFirst::Middlewares::ResponseValidation do
       let(:app) do
         Rack::Builder.new.tap do |builder|
           builder.use(described_class, './spec/data/petstore.yaml', raise_error: false)
+          builder.run lambda { |_env|
+            Rack::Response.new('{"foo": "bar"}', 200, { 'Content-Type' => 'application/json' }).finish
+          }
+        end.to_app
+      end
+
+      it 'does not raise an error' do
+        get '/pets'
+
+        expect(last_response.status).to eq 200
+      end
+    end
+
+    context 'with option and registered OAD' do
+      before do
+        OpenapiFirst.register('./spec/data/petstore.yaml')
+      end
+
+      let(:app) do
+        Rack::Builder.new.tap do |builder|
+          builder.use(described_class, raise_error: false)
           builder.run lambda { |_env|
             Rack::Response.new('{"foo": "bar"}', 200, { 'Content-Type' => 'application/json' }).finish
           }

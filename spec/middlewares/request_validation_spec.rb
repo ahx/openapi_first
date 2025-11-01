@@ -141,6 +141,25 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
   end
 
+  context 'with option and registered OAD' do
+    before do
+      OpenapiFirst.register('./spec/data/request-body-validation.yaml')
+    end
+
+    let(:app) do
+      Rack::Builder.app do
+        use OpenapiFirst::Middlewares::RequestValidation, raise_error: true
+        run ->(_) {}
+      end
+    end
+
+    it 'returns 400' do
+      expect do
+        post '/pets'
+      end.to raise_error OpenapiFirst::RequestInvalidError
+    end
+  end
+
   context 'with error_response: MyCustomClass' do
     let(:app) do
       custom_class = Class.new do

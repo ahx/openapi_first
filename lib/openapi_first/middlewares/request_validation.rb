@@ -22,7 +22,7 @@ module OpenapiFirst
         @app = app
         if spec.is_a?(Hash)
           options = spec
-          spec = options.fetch(:spec)
+          spec = options[:spec]
         end
         @raise = options.fetch(:raise_error, OpenapiFirst.configuration.request_validation_raise_error)
         @error_response_class = error_response_option(options[:error_response])
