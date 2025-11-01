@@ -13,22 +13,6 @@ RSpec.describe OpenapiFirst::Test do
     end
   end
 
-  describe 'Callable[]' do
-    before do
-      require 'openapi_first/test/callable'
-    end
-
-    it 'returns a Module that can call the api' do
-      mod = described_class::Callable[definition]
-      app.prepend(mod)
-
-      expect(definition).to receive(:validate_request)
-      expect(definition).to receive(:validate_response)
-
-      app.new.call({})
-    end
-  end
-
   describe '.observe' do
     it 'injects request/response validation in the app' do
       described_class.register(definition, as: :some)
