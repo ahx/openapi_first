@@ -25,8 +25,14 @@ module OpenapiFirst
     attr_reader :request_validation_error_response, :hooks
     attr_accessor :request_validation_raise_error, :response_validation_raise_error, :path
 
+    # Return a child configuration that still receives updates of global hooks.
     def child
       ChildConfiguration.new(parent: self)
+    end
+
+    # @visibility private
+    def clone
+      raise NoMethodError, 'OpenapiFirst::Configuration#clone was removed. You want to call #child instead'
     end
 
     HOOKS.each do |hook|

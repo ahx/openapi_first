@@ -22,7 +22,7 @@ module OpenapiFirst
     # @param filepath [String] The file path of the OpenAPI document.
     def initialize(contents, filepath = nil)
       @filepath = filepath
-      @config = OpenapiFirst.configuration.clone
+      @config = OpenapiFirst.configuration.child
       yield @config if block_given?
       @config.freeze
       @router = Builder.build_router(contents, filepath:, config:)

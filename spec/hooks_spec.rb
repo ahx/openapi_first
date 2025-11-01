@@ -5,7 +5,7 @@ RSpec.describe 'Hooks' do
     Rack::Request.new(Rack::MockRequest.env_for(path, method:, input: body, 'CONTENT_TYPE' => 'application/json'))
   end
 
-  describe 'adding and removing a hook' do
+  describe 'adding a hook' do
     specify do
       called = []
       myproc = proc do |request|
@@ -15,8 +15,6 @@ RSpec.describe 'Hooks' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
         config.after_request_validation(&myproc)
       end
-      definition.validate_request(build_request('/pets?limit=24'))
-      definition.config.after_request_validation.delete(myproc)
       definition.validate_request(build_request('/pets?limit=24'))
 
       expect(called).to eq([['listPets', true]])
