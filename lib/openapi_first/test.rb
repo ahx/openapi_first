@@ -25,6 +25,10 @@ module OpenapiFirst
       false
     end
 
+    def self.definitions
+      super.empty? ? OpenapiFirst.definitions : super
+    end
+
     def self.configuration
       @configuration ||= Configuration.new
     end
@@ -39,15 +43,16 @@ module OpenapiFirst
       install
       yield configuration
 
-      configuration.registry.each { |name, oad| register(oad, as: name) }
-      configuration.apps.each { |name, apps| apps.each { |app| observe(app, api: name) } }
       Coverage.start(skip_response: configuration.skip_response_coverage, skip_route: configuration.skip_coverage)
 
       if definitions.empty?
         raise NotRegisteredError,
               'No API descriptions have been registered. ' \
               'Please register your API description via ' \
-              "OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }"
+              "`OpenapiFirst.register('myopenapi.yaml)` or " \
+              'in a block passed to `OpenapiFirst::Test.setup` like this: ' \
+              "`OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }` " \
+
       end
 
       @exit_handler = method(:handle_exit)

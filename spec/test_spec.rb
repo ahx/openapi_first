@@ -135,6 +135,15 @@ RSpec.describe OpenapiFirst::Test do
       end.to raise_error ArgumentError
     end
 
+    it 'returns the globally registered OADs if nothing was registered inside the block' do
+      oad = OpenapiFirst.load('./spec/data/dice.yaml')
+      OpenapiFirst.register(oad, as: :dice)
+
+      described_class.setup { |_test| } # rubocop:disable Lint/EmptyBlock
+
+      expect(described_class.definitions).to be(OpenapiFirst.definitions)
+    end
+
     it 'raises an error if no API description was registered' do
       expect do
         described_class.setup { |_test| } # rubocop:disable Lint/EmptyBlock
