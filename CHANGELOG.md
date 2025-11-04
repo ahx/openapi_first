@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 3.0.1
+- Add missing gem dependency "drb", which is no longer installed by default with newer rubies. This is used in openapi_first/test to make parallel tests work.
+
 ## 3.0.0
 
 ### openapi_first
