@@ -243,7 +243,7 @@ Or you can ignore all unknown response status:
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
-  test.ignore_all_unknown_status = true
+  test.ignore_unknown_response_status = true
 end
 ```
 
