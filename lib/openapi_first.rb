@@ -47,8 +47,8 @@ module OpenapiFirst
   # @return [Class] The error response class
   def self.find_error_response(name)
     ERROR_RESPONSES.fetch(name) do
-      raise "Unknown error response: #{name}. " /
-            'Register your error response class via `OpenapiFirst.register_error_response(name, klass)`. ' /
+      raise "Unknown error response: #{name}. " \
+            'Register your error response class via `OpenapiFirst.register_error_response(name, klass)`. ' \
             "Registered error responses are: #{ERROR_RESPONSES.keys.join(', ')}."
     end
   end

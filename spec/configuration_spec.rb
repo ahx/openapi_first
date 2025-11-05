@@ -56,6 +56,15 @@ RSpec.describe OpenapiFirst::Configuration do
       config.request_validation_error_response = :jsonapi
       expect(config.request_validation_error_response).to be(OpenapiFirst::ErrorResponses::Jsonapi)
     end
+
+    it 'complains about unknown response Symbol' do
+      config = OpenapiFirst::Configuration.new
+      expect do
+        config.request_validation_error_response = :unregistered
+      end.to raise_error do |err|
+        expect(err.message).to start_with('Unknown error response')
+      end
+    end
   end
 
   describe '#child' do
