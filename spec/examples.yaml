@@ -1,0 +1,26 @@
+- description: nullable array items in response body
+  oad:
+    openapi: 3.0.3
+    info:
+      title: Response Validation Middleware Example
+      version: 1.0.0
+    paths:
+      /:
+        get:
+          responses:
+            '200':
+              content:
+                application/json:
+                  schema:
+                    properties:
+                      path:
+                        type: array
+                        items:
+                          type: string
+                          nullable: true
+  valid_response:
+    content_type: application/json
+    body: { "path": ["1", "2", null] }
+  invalid_response:
+    content_type: application/json
+    body: { "path": ["1", "2", 3] }
