@@ -6,7 +6,7 @@ require_relative 'spec_helper'
 RSpec.describe 'request/response validation examples' do
   include Rack::Test::Methods
 
-  Dir.glob(File.join(__dir__, '/examples/*.yaml')).each do |filepath|
+  Dir.glob(File.join(__dir__, '/test_cases/*.yaml')).each do |filepath|
     describe filepath do
       YAML.load_file(filepath).each do |example|
         context example['description'] do
