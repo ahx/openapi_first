@@ -510,6 +510,64 @@ RSpec.describe OpenapiFirst::Test do
     end
   end
 
+  describe 'handling unknown query parameters' do
+    let(:definition) do
+      OpenapiFirst.parse(
+        {
+          'openapi' => '3.1.0',
+          'paths' => {
+            '/stuff' => {
+              'get' => {
+                'parameters' => [
+                  {
+                    'name' => 'color',
+                    'in' => 'query',
+                    'required' => true,
+                    'schema' => {
+                      'enum' => %w[red green]
+                    }
+                  }
+                ],
+                'responses' => {
+                  '200' => {
+                    'descrition' => 'Ok'
+                  }
+                }
+              }
+            }
+          }
+        },
+        filepath: 'somefile'
+      )
+    end
+
+    let(:app) do
+      described_class.app(
+        ->(_env) { [200, { 'content-type' => 'application/json' }, ['foo']] },
+        spec: definition
+      )
+    end
+
+    before(:each) do
+      described_class.setup do |test|
+        test.register(definition)
+        test.report_coverage = false
+      end
+    end
+
+    it 'raises an error' do
+      expect do
+        app.call(Rack::MockRequest.env_for('/stuff?color=red&unknown=12'))
+      end.to raise_error OpenapiFirst::Test::UnknownQueryParameterError, 'Unknown query parameter "unknown" for /stuff?color=red&unknown=12'
+    end
+
+    it 'raises another error if request is unknown' do
+      expect do
+        app.call(Rack::MockRequest.env_for('/unknown?unknown=12'))
+      end.to raise_error OpenapiFirst::NotFoundError
+    end
+  end
+
   describe 'handling invalid responses' do
     let(:definition) do
       OpenapiFirst.parse(YAML.load(%(

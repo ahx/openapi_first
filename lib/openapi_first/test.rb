@@ -5,7 +5,7 @@ require_relative 'registry'
 
 module OpenapiFirst
   # Test integration
-  module Test
+  module Test # rubocop:disable Metrics/ModuleLength
     autoload :Coverage, 'openapi_first/test/coverage'
     autoload :Methods, 'openapi_first/test/methods'
     autoload :Observe, 'openapi_first/test/observe'
@@ -13,6 +13,7 @@ module OpenapiFirst
     extend Registry
 
     class CoverageError < Error; end
+    class UnknownQueryParameterError < Error; end
 
     # Inject request/response validation in a rack app class
     def self.observe(app, api: :default)
@@ -101,6 +102,8 @@ module OpenapiFirst
         @after_request_validation = config.after_request_validation do |validated_request, oad|
           raise validated_request.error.exception if raise_request_error?(validated_request)
 
+          check_unknown_query_parameters(validated_request)
+
           Coverage.track_request(validated_request, oad)
         end
 
@@ -115,17 +118,6 @@ module OpenapiFirst
       @installed = true
     end
 
-    def self.raise_request_error?(validated_request)
-      return false if validated_request.valid?
-      return false if validated_request.known?
-
-      !configuration.ignore_unknown_requests
-    end
-
-    def self.raise_response_error?(invalid_response)
-      configuration.response_raise_error && !configuration.ignore_response?(invalid_response)
-    end
-
     def self.uninstall
       configuration = OpenapiFirst.configuration
       configuration.after_request_validation.delete(@after_request_validation)
@@ -134,6 +126,39 @@ module OpenapiFirst
       @configuration = nil
       @installed = nil
       @exit_handler = nil
+    end
+
+    class << self
+      private
+
+      def check_unknown_query_parameters(validated_request)
+        return unless validated_request.known?
+
+        unknown_parameters = validated_request.unknown_query_parameters
+        return unless unknown_parameters
+
+        message = unknown_parameters_message(unknown_parameters, validated_request)
+        raise UnknownQueryParameterError, message
+      end
+
+      def unknown_parameters_message(unknown_parameters, validated_request)
+        s = 's' if many?(unknown_parameters)
+        list = unknown_parameters.keys.map(&:inspect).join(', ')
+        "Unknown query parameter#{s} #{list} for #{validated_request.fullpath}"
+      end
+
+      def raise_request_error?(validated_request)
+        return false if validated_request.valid?
+        return false if validated_request.known?
+
+        !configuration.ignore_unknown_requests
+      end
+
+      def many?(array) = array.length > 1
+
+      def raise_response_error?(invalid_response)
+        configuration.response_raise_error && !configuration.ignore_response?(invalid_response)
+      end
     end
   end
 end

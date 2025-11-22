@@ -1,4 +1,10 @@
 PATH
+  remote: ../openapi_parameters
+  specs:
+    openapi_parameters (0.9.0)
+      rack (>= 2.2)
+
+PATH
   remote: .
   specs:
     openapi_first (3.0.1)
@@ -157,8 +163,6 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.10-x86_64-linux-musl)
       racc (~> 1.4)
-    openapi_parameters (0.8.0)
-      rack (>= 2.2)
     parallel (1.27.0)
     parser (3.3.10.0)
       ast (~> 2.4.1)
@@ -303,6 +307,7 @@ DEPENDENCIES
   bundler
   minitest
   openapi_first!
+  openapi_parameters!
   rack (>= 3.0.0)
   rack-test
   rackup

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### openapi_first/test
+
+#### Changed
+- Test now raises a `OpenapiFirst::Test::UnknownQueryParameterError` when it sees unknown query parameters
+
 ## 3.0.1
 - Add missing gem dependency "drb", which is no longer installed by default with newer rubies. This is used in openapi_first/test to make parallel tests work.
 
