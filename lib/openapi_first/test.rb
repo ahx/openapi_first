@@ -34,6 +34,11 @@ module OpenapiFirst
       @configuration ||= Configuration.new
     end
 
+    def self.registered?(oad)
+      key = oad.key
+      definitions.any? { |(_name, registered)| registered.key == key }
+    end
+
     # Sets up OpenAPI test coverage and OAD registration.
     # @yieldparam [OpenapiFirst::Test::Configuration] configuration A configuration to setup test integration
     def self.setup

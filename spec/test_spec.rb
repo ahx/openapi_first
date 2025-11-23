@@ -419,6 +419,22 @@ RSpec.describe OpenapiFirst::Test do
     end
   end
 
+  describe '.registered?' do
+    it 'returns false for an unknown OAD' do
+      expect(described_class.registered?(definition)).to be false
+    end
+
+    it 'returns true for a globally registered OAD' do
+      OpenapiFirst.register(definition)
+      expect(described_class.registered?(definition)).to be true
+    end
+
+    it 'returns true for an OAD registered in Test' do
+      OpenapiFirst::Test.register(definition)
+      expect(described_class.registered?(definition)).to be true
+    end
+  end
+
   describe 'handling invalid requests' do
     let(:definition) do
       OpenapiFirst.parse(
