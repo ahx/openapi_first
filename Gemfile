@@ -7,8 +7,6 @@ gemspec
 gem 'rack', '>= 3.0.0'
 gem 'rackup'
 
-gem 'openapi_parameters', path: '../openapi_parameters'
-
 group :test, :development do
   gem 'actionpack'
   gem 'bundler'
