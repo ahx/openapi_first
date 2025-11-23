@@ -105,6 +105,7 @@ module OpenapiFirst
 
       OpenapiFirst.configure do |config|
         @after_request_validation = config.after_request_validation do |validated_request, oad|
+          next unless registered?(oad)
           raise validated_request.error.exception if raise_request_error?(validated_request)
 
           check_unknown_query_parameters(validated_request)
@@ -113,6 +114,7 @@ module OpenapiFirst
         end
 
         @after_response_validation = config.after_response_validation do |validated_response, rack_request, oad|
+          next unless registered?(oad)
           if validated_response.invalid? && raise_response_error?(validated_response)
             raise validated_response.error.exception
           end

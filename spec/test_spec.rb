@@ -485,6 +485,19 @@ RSpec.describe OpenapiFirst::Test do
 
       expect(described_class::Coverage.result.coverage).to eq 50
     end
+
+    it 'tracks the request' do
+      expect(described_class::Coverage).to receive(:track_request)
+
+      app.call(Rack::MockRequest.env_for('/stuff/nostring'))
+    end
+
+    it 'does not track the request for for unregistered OADs' do
+      expect(described_class).to receive(:registered?).twice.and_return(false) # once for request, once for response tracking
+      expect(described_class::Coverage).not_to receive(:track_request)
+
+      app.call(Rack::MockRequest.env_for('/stuff/1'))
+    end
   end
 
   describe 'handling unknown requests paths' do
@@ -710,6 +723,54 @@ RSpec.describe OpenapiFirst::Test do
           app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
         end.not_to raise_error
       end
+    end
+  end
+
+  describe 'handling valid responses' do
+    let(:definition) do
+      OpenapiFirst.parse(YAML.load(%(
+        openapi: 3.1.0
+        info:
+          title: Dice
+          version: 1
+        paths:
+          "/roll":
+            post:
+              responses:
+                '200':
+                  content:
+                    application/json:
+                      schema:
+                        type: integer
+                        min: 1
+                        max:
+      )))
+    end
+
+    let(:app) do
+      described_class.app(
+        ->(_env) { [200, { 'content-type' => 'application/json' }, ['1']] },
+        spec: definition
+      )
+    end
+
+    before(:each) do
+      described_class.setup do |test|
+        test.register(definition)
+      end
+    end
+
+    it 'tracks the response' do
+      expect(described_class::Coverage).to receive(:track_response)
+
+      app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+    end
+
+    it 'does not track the response for for unregistered OADs' do
+      expect(described_class).to receive(:registered?).twice.and_return(false) # once for request, once for response tracking
+      expect(described_class::Coverage).not_to receive(:track_response)
+
+      app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
     end
   end
 end
