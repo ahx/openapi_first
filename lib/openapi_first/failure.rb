@@ -3,7 +3,7 @@
 module OpenapiFirst
   # A failure object returned when validation or parsing of a request or response has failed.
   # This returned in ValidatedRequest#error and ValidatedResponse#error.
-  class Failure
+  class Failure < Data.define(:type, :message, :errors) # rubocop:disable Style/DataInheritance
     TYPES = {
       not_found: [NotFoundError, 'Not found.'],
       method_not_allowed: [RequestInvalidError, 'Request method is not defined.'],
@@ -33,27 +33,25 @@ module OpenapiFirst
     # @param type [Symbol] See TYPES.keys
     # @param message [String] A generic error message
     # @param errors [Array<OpenapiFirst::Schema::ValidationError>]
-    def initialize(type, message: nil, errors: nil)
+    def self.new(type, message: nil, errors: nil)
       unless TYPES.key?(type)
         raise ArgumentError,
               "type must be one of #{TYPES.keys} but was #{type.inspect}"
       end
-
-      @type = type
-      @message = message
-      @errors = errors
+      super(type:, message:, errors:)
     end
 
-    # @attr_reader [Symbol] type The type of the failure. See TYPES.keys.
+    # @method type [Symbol] type The type of the failure. See TYPES.keys.
     # Example: :invalid_body
-    attr_reader :type
 
-    # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>, nil] errors Schema validation errors
-    attr_reader :errors
+    # @method errors [Array<OpenapiFirst::Schema::ValidationError>, nil] errors Schema validation errors
+
+    alias original_message message
+    private :original_message
 
     # A generic error message
     def message
-      @message ||= exception_message
+      original_message || exception_message
     end
 
     def exception(context = nil)
@@ -63,7 +61,7 @@ module OpenapiFirst
     def exception_message
       _, message_prefix = TYPES.fetch(type)
 
-      [message_prefix, @message || generate_message].compact.join(' ')
+      [message_prefix, original_message || generate_message].compact.join(' ')
     end
 
     private
