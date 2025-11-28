@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Return uniqe errors in default error responses
+## 3.1.1
+
+- Changed: Return uniqe errors in default error responses
 
 ## 3.1.0
 
