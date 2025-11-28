@@ -27,7 +27,7 @@ module OpenapiFirst
             title: error.message,
             code: error.type
           }
-        end
+        end.uniq
       end
 
       def default_errors

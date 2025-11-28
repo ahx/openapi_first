@@ -77,6 +77,32 @@ RSpec.describe OpenapiFirst::ErrorResponses::Default do
     end
   end
 
+  context 'with duplicated errors' do
+    subject(:error_response) do
+      error = instance_double(OpenapiFirst::Schema::ValidationError, message: 'hey', data_pointer: '/data', type: 'fail')
+      described_class.new(
+        failure: OpenapiFirst::Failure.new(
+          :invalid_body,
+          errors: [error, error]
+        )
+      )
+    end
+
+    it 'returns unique errors' do
+      response = Rack::MockResponse[*error_response.render]
+      expect(response.status).to eq(400)
+      expect(JSON.parse(response.body, symbolize_names: true).fetch(:errors)).to eq(
+        [
+          {
+            message: 'hey',
+            pointer: '/data',
+            code: 'fail'
+          }
+        ]
+      )
+    end
+  end
+
   context 'with invalid query parameter' do
     let(:schema) do
       {

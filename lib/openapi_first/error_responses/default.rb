@@ -48,7 +48,7 @@ module OpenapiFirst
             key => pointer(error.data_pointer),
             code: error.type
           }
-        end
+        end.uniq
       end
 
       def pointer_key
