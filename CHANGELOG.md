@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Return uniqe errors in default error responses
+
 ## 3.1.0
 
 ### openapi_first/test
