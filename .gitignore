@@ -11,3 +11,6 @@
 # rspec failure tracking
 .rspec_status
 Gemfile.*.lock
+
+# MacOS
+.DS_Store

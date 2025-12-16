@@ -89,9 +89,9 @@ module OpenapiFirst
     # Returns the Rack app wrapped with silent request, response validation
     # You can use this if you want to track coverage via Test::Coverage, but don't want to use
     # the middlewares or manual request, response validation.
-    def self.app(app, spec: nil, api: :default)
+    def self.app(app, spec: nil, api: :default, validate_request_after_handling: false)
       spec ||= self[api]
-      App.new(app, api: spec)
+      App.new(app, api: spec, validate_request_after_handling:)
     end
 
     def self.install
