@@ -302,18 +302,8 @@ RSpec.describe OpenapiFirst::Definition do
       {
         'openapi' => '3.1.0',
         'paths' => {
-          '/stuff/{id}' => {
+          '/stuff' => {
             'get' => {
-              'parameters' => [
-                {
-                  'name' => 'id',
-                  'in' => 'path',
-                  'required' => true,
-                  'schema' => {
-                    'type' => 'integer'
-                  }
-                }
-              ],
               'responses' => {
                 '200' => {
                   'description' => 'OK',
@@ -341,7 +331,7 @@ RSpec.describe OpenapiFirst::Definition do
       OpenapiFirst.parse(definition_contents)
     end
 
-    let(:request) { build_request('/stuff/42') }
+    let(:request) { build_request('/stuff') }
 
     context 'when response is valid' do
       let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
@@ -403,7 +393,7 @@ RSpec.describe OpenapiFirst::Definition do
       let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
 
       it 'returns a valid response' do
-        request = build_request('/prefix/stuff/42')
+        request = build_request('/prefix/stuff')
         validated = definition.validate_response(request, response)
         expect(validated).to be_valid
         expect(validated.parsed_body).to eq({ 'id' => 42 })
@@ -420,7 +410,7 @@ RSpec.describe OpenapiFirst::Definition do
       let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
 
       it 'returns a valid response, and path_prefix takes precedence over config' do
-        request = build_request('/static_prefix/stuff/42')
+        request = build_request('/static_prefix/stuff')
         validated = definition.validate_response(request, response)
         expect(validated).to be_valid
         expect(validated.parsed_body).to eq({ 'id' => 42 })
