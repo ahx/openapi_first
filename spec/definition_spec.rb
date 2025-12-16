@@ -266,7 +266,7 @@ RSpec.describe OpenapiFirst::Definition do
       end
     end
 
-    context 'with an alternate path used for schema matching' do
+    context 'with an alternate path for schema matching, from global config' do
       let(:definition) do
         OpenapiFirst.parse(definition_contents) do |config|
           config.path = ->(req) { req.path.delete_prefix('/prefix') }
@@ -275,6 +275,21 @@ RSpec.describe OpenapiFirst::Definition do
 
       it 'returns a valid request' do
         request = build_request('/prefix/stuff/42')
+        validated = definition.validate_request(request)
+        expect(validated).to be_valid
+        expect(validated.parsed_path_parameters).to eq({ 'id' => 42 })
+      end
+    end
+
+    context 'with an alternate path for schema matching, from path_prefix' do
+      let(:definition) do
+        OpenapiFirst.parse(definition_contents, path_prefix: '/static_prefix') do |config|
+          config.path = ->(req) { req.path.delete_prefix('/config_prefix') }
+        end
+      end
+
+      it 'returns a valid request, and path_prefix takes precedence over config' do
+        request = build_request('/static_prefix/stuff/42')
         validated = definition.validate_request(request)
         expect(validated).to be_valid
         expect(validated.parsed_path_parameters).to eq({ 'id' => 42 })
@@ -368,7 +383,7 @@ RSpec.describe OpenapiFirst::Definition do
       end
     end
 
-    context 'with an alternate path used for schema matching' do
+    context 'with an alternate path used for schema matching, from global config' do
       let(:definition) do
         OpenapiFirst.parse(definition_contents) do |config|
           config.path = ->(req) { req.path.delete_prefix('/prefix') }
@@ -378,6 +393,24 @@ RSpec.describe OpenapiFirst::Definition do
       let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
 
       it 'returns a valid response' do
+        request = build_request('/prefix/stuff/42')
+        validated = definition.validate_response(request, response)
+        expect(validated).to be_valid
+        expect(validated.parsed_body).to eq({ 'id' => 42 })
+      end
+    end
+
+    context 'with an alternate path for schema matching, from path_prefix' do
+      let(:definition) do
+        OpenapiFirst.parse(definition_contents, path_prefix: '/static_prefix') do |config|
+          config.path = ->(req) { req.path.delete_prefix('/config_prefix') }
+        end
+      end
+
+      let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }
+
+      it 'returns a valid response, and path_prefix takes precedence over config' do
+        request = build_request('/static_prefix/stuff/42')
         validated = definition.validate_response(request, response)
         expect(validated).to be_valid
         expect(validated.parsed_body).to eq({ 'id' => 42 })

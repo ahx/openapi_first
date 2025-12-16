@@ -11,6 +11,8 @@ module OpenapiFirst
 
     # @return [String,nil]
     attr_reader :filepath
+    # @return [String,nil]
+    attr_reader :path_prefix
     # @return [Configuration]
     attr_reader :config
     # @return [Enumerable[String]]
@@ -20,8 +22,10 @@ module OpenapiFirst
 
     # @param contents [Hash] The OpenAPI document.
     # @param filepath [String] The file path of the OpenAPI document.
-    def initialize(contents, filepath = nil)
+    # @param path_prefix [String,nil] An optional path prefix, that is not documented, that all requests begin with.
+    def initialize(contents, filepath = nil, path_prefix = nil)
       @filepath = filepath
+      @path_prefix = path_prefix
       @config = OpenapiFirst.configuration.child
       yield @config if block_given?
       @config.freeze
@@ -104,6 +108,7 @@ module OpenapiFirst
     private
 
     def resolve_path(rack_request)
+      return rack_request.path.delete_prefix(path_prefix) if path_prefix && rack_request.path.start_with?(path_prefix)
       return rack_request.path unless @config.path
 
       @config.path.call(rack_request)

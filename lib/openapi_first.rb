@@ -55,8 +55,10 @@ module OpenapiFirst
 
   # Load and dereference an OpenAPI spec file or return the Definition if it's already loaded
   # @param filepath_or_definition [String, Definition] The path to the file or a Definition object
+  # @param only [Proc, nil] An optional proc to filter paths. It is called with the path string and should return true/false
+  # @param path_prefix [String, nil] An optional path prefix, that is not documented, that all requests begin with.
   # @return [Definition]
-  def self.load(filepath_or_definition, only: nil, &)
+  def self.load(filepath_or_definition, only: nil, path_prefix: nil, &)
     return filepath_or_definition if filepath_or_definition.is_a?(Definition)
     return self[filepath_or_definition] if filepath_or_definition.is_a?(Symbol)
 
@@ -64,16 +66,16 @@ module OpenapiFirst
     raise FileNotFoundError, "File not found: #{filepath}" unless File.exist?(filepath)
 
     contents = FileLoader.load(filepath)
-    parse(contents, only:, filepath:, &)
+    parse(contents, only:, filepath:, path_prefix:, &)
   end
 
   # Parse a dereferenced Hash
   # @return [Definition]
   # TODO: This needs to work with unresolved contents as well
-  def self.parse(contents, only: nil, filepath: nil, &)
+  def self.parse(contents, only: nil, filepath: nil, path_prefix: nil, &)
     contents = ::JSON.parse(::JSON.generate(contents)) # Deeply stringify keys, because of YAML. See https://github.com/ahx/openapi_first/issues/367
     contents['paths'].filter!(&->(key, _) { only.call(key) }) if only
-    Definition.new(contents, filepath, &)
+    Definition.new(contents, filepath, path_prefix, &)
   end
 end
 
