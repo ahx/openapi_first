@@ -249,7 +249,7 @@ RSpec.describe OpenapiFirst::Test do
       allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
     end
 
-    it 'reports 50% if halfe of requests/responses have been tracked' do
+    it 'reports 50% if half of requests/responses have been tracked' do
       definition = OpenapiFirst.load('./spec/data/dice.yaml')
       valid_request = Rack::Request.new(Rack::MockRequest.env_for('/roll', method: 'POST'))
       definition.validate_request(valid_request, raise_error: true)
@@ -397,6 +397,77 @@ RSpec.describe OpenapiFirst::Test do
       config = OpenapiFirst.configuration
       expect(config.after_request_validation.count).to eq(1)
       expect(config.after_response_validation.count).to eq(1)
+    end
+
+    let(:filename) { './spec/data/dice.yaml' }
+    let(:oad) { OpenapiFirst.load(filename) }
+
+    context 'after_request_validation hook' do
+      let(:invalid_request) do
+        OpenapiFirst::ValidatedRequest.new(
+          Rack::Request.new(Rack::MockRequest.env_for('/')),
+          error: OpenapiFirst::Failure.new(:invalid_body)
+        )
+      end
+
+      it 'raises an error for an invalid request' do
+        described_class.install
+
+        config = OpenapiFirst.configuration
+        expect(config.after_request_validation.count).to eq(1)
+        expect do
+          config.after_request_validation.first.call(invalid_request, oad)
+        end.to raise_error(OpenapiFirst::RequestInvalidError)
+      end
+
+      it 'does not raise an error for an invalid request when raises_error_for_request returns false' do
+        described_class.setup do |test|
+          test.register(oad)
+          test.raise_error_for_request = ->(_validated_request) { false }
+        end
+
+        config = OpenapiFirst.configuration
+        expect(config.after_request_validation.count).to eq(1)
+        expect do
+          config.after_request_validation.first.call(invalid_request, oad)
+        end.not_to raise_error
+      end
+    end
+
+    context 'after_response_validation hook' do
+      let(:invalid_response) do
+        OpenapiFirst::ValidatedResponse.new(
+          Rack::Response.new('{"foo": "bar"}', 200, { 'Content-Type' => 'application/json' }),
+          error: OpenapiFirst::Failure.new(:invalid_response_body)
+        )
+      end
+
+      let(:rack_request) do
+        Rack::Request.new(Rack::MockRequest.env_for('/'))
+      end
+
+      it 'raises an error for an invalid response' do
+        described_class.install
+
+        config = OpenapiFirst.configuration
+        expect(config.after_response_validation.count).to eq(1)
+        expect do
+          config.after_response_validation.first.call(invalid_response, rack_request)
+        end.to raise_error(OpenapiFirst::ResponseInvalidError)
+      end
+
+      it 'does not raise an error for an invalid response when raises_error_for_response returns false' do
+        described_class.setup do |test|
+          test.register(oad)
+          test.raise_error_for_response = ->(_validated_response, _rack_request) { false }
+        end
+
+        config = OpenapiFirst.configuration
+        expect(config.after_response_validation.count).to eq(1)
+        expect do
+          config.after_response_validation.first.call(invalid_response, rack_request)
+        end.not_to raise_error
+      end
     end
   end
 
