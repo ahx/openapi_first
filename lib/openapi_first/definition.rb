@@ -83,23 +83,22 @@ module OpenapiFirst
     end
 
     # Validates the response against the API description.
-    # @param rack_request [Rack::Request] The Rack request object.
-    # @param rack_response [Rack::Response] The Rack response object.
-    # @param raise_error [Boolean] Whethir to raise an error if validation fails.
+    # @param request [Rack::Request] The Rack request object.
+    # @param response [Rack::Response] The Rack response object.
+    # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [ValidatedResponse] The validated response object.
-    def validate_response(rack_request, rack_response, raise_error: false)
-      route = @router.match(rack_request.request_method, resolve_path(rack_request),
-                            content_type: rack_request.content_type)
+    def validate_response(request, response, raise_error: false)
+      route = @router.match(request.request_method, resolve_path(request), content_type: request.content_type)
       return if route.error # Skip response validation for unknown requests
 
-      response_match = route.match_response(status: rack_response.status, content_type: rack_response.content_type)
+      response_match = route.match_response(status: response.status, content_type: response.content_type)
       error = response_match.error
       validated = if error
-                    ValidatedResponse.new(rack_response, error:)
+                    ValidatedResponse.new(response, error:)
                   else
-                    response_match.response.validate(rack_response)
+                    response_match.response.validate(response)
                   end
-      @config.after_response_validation&.each { |hook| hook.call(validated, rack_request, self) }
+      @config.after_response_validation&.each { |hook| hook.call(validated, request, self) }
       raise validated.error.exception(validated) if raise_error && validated.invalid?
 
       validated

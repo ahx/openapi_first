@@ -302,8 +302,18 @@ RSpec.describe OpenapiFirst::Definition do
       {
         'openapi' => '3.1.0',
         'paths' => {
-          '/stuff' => {
+          '/stuff/{id}' => {
             'get' => {
+              'parameters' => [
+                {
+                  'name' => 'id',
+                  'in' => 'path',
+                  'required' => true,
+                  'schema' => {
+                    'type' => 'integer'
+                  }
+                }
+              ],
               'responses' => {
                 '200' => {
                   'description' => 'OK',
@@ -331,7 +341,7 @@ RSpec.describe OpenapiFirst::Definition do
       OpenapiFirst.parse(definition_contents)
     end
 
-    let(:request) { build_request('/stuff') }
+    let(:request) { build_request('/stuff/42') }
 
     context 'when response is valid' do
       let(:response) { Rack::Response.new(JSON.generate({ 'id' => 42 }), 200, { 'Content-Type' => 'application/json' }) }

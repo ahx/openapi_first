@@ -55,7 +55,8 @@ module OpenapiFirst
 
   # Load and dereference an OpenAPI spec file or return the Definition if it's already loaded
   # @param filepath_or_definition [String, Definition] The path to the file or a Definition object
-  # @param only [Proc, nil] An optional proc to filter paths. It is called with the path string and should return true/false
+  # @param only [Proc, nil] An optional proc to filter paths. It is called with the path string and should return
+  # true/false
   # @param path_prefix [String, nil] An optional path prefix, that is not documented, that all requests begin with.
   # @return [Definition]
   def self.load(filepath_or_definition, only: nil, path_prefix: nil, &)
