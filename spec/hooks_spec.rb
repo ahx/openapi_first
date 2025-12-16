@@ -191,22 +191,6 @@ RSpec.describe 'Hooks' do
                 }
               }
             ],
-            'get' => {
-              'parameters' => [
-                {
-                  'name' => 'page',
-                  'in' => 'query',
-                  'schema' => {
-                    'type' => 'integer'
-                  }
-                }
-              ],
-              'responses' => {
-                '200' => {
-                  'description' => 'ok'
-                }
-              }
-            },
             'post' => {
               'requestBody' => {
                 'content' => {
@@ -232,12 +216,82 @@ RSpec.describe 'Hooks' do
         end
       end
 
-      definition.validate_request(build_request('/blue?page=2', method: 'POST', body: '{"name": "Quentin"}'))
+      request = build_request('/blue?page=2', method: 'POST', body: '{"name": "Quentin"}')
+      validated = definition.validate_request(request)
 
+      expect(validated).to be_valid
       expect(called).to eq([
-                             [{ 'name' => 'Quentin' }, 'name', {
-                               'type' => 'string'
-                             }]
+                             [{ 'name' => 'Quentin' }, 'name', { 'type' => 'string' }]
+                           ])
+    end
+  end
+
+  describe 'after_response_body_property_validation' do
+    let(:called) { [] }
+
+    it 'calls the hook' do
+      spec = {
+        'openapi' => '3.1.0',
+        'paths' => {
+          '/{color}' => {
+            'parameters' => [
+              {
+                'name' => 'color',
+                'in' => 'path',
+                'schema' => {
+                  'type' => 'string'
+                }
+              }
+            ],
+            'post' => {
+              'requestBody' => {
+                'content' => {
+                  'application/json' => {
+                    'schema' => {
+                      'type' => 'object',
+                      'properties' => {
+                        'name' => {
+                          'type' => 'string'
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              'responses' => {
+                '200' => {
+                  'description' => 'ok',
+                  'content' => {
+                    'application/json' => {
+                      'schema' => {
+                        'type' => 'object',
+                        'properties' => {
+                          'foo' => {
+                            'type' => 'string'
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      definition = OpenapiFirst.parse(spec) do |config|
+        config.after_response_body_property_validation do |data, property, property_schema|
+          called << [data, property, property_schema]
+        end
+      end
+
+      request = build_request('/blue?page=2', method: 'POST', body: '{"name": "Quentin"}')
+      response = Rack::Response.new('{"foo": "bar"}', 200, { 'Content-Type' => 'application/json' })
+      validated = definition.validate_response(request, response)
+
+      expect(validated).to be_valid
+      expect(called).to eq([
+                             [{ 'foo' => 'bar' }, 'foo', { 'type' => 'string' }]
                            ])
     end
   end

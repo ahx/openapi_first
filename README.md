@@ -368,6 +368,7 @@ Available hooks:
 - `after_response_validation`
 - `after_request_parameter_property_validation`
 - `after_request_body_property_validation`
+- `after_response_body_property_validation`
 
 Setup per per instance:
 
