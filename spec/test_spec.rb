@@ -563,6 +563,31 @@ RSpec.describe OpenapiFirst::Test do
       end.to raise_error(OpenapiFirst::NotFoundError)
     end
 
+    context 'with raise_error_for_request returning false' do
+      before(:each) do
+        described_class.uninstall
+        described_class.setup do |test|
+          test.register(definition)
+          test.ignore_unknown_requests = false
+          test.report_coverage = false
+        end
+      end
+
+      it 'does not raise an error' do
+        called = false
+        described_class.configuration.raise_error_for_request = lambda do |validated_request|
+          called = true
+          expect(validated_request).to be_a(OpenapiFirst::ValidatedRequest)
+          false
+        end
+
+        expect do
+          app.call(Rack::MockRequest.env_for('/unknown'))
+        end.not_to raise_error
+        expect(called).to eq(true)
+      end
+    end
+
     context 'with ignore_unknown_requests = true' do
       before(:each) do
         described_class.uninstall
@@ -619,6 +644,30 @@ RSpec.describe OpenapiFirst::Test do
       expect do
         app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
       end.to raise_error(OpenapiFirst::ResponseInvalidError)
+    end
+
+    context 'with raise_error_for_response returning false' do
+      before(:each) do
+        described_class.uninstall
+        described_class.setup do |test|
+          test.register(definition)
+        end
+      end
+
+      it 'does not raise an error' do
+        called = false
+        described_class.configuration.raise_error_for_response = lambda do |validated_response, rack_request|
+          called = true
+          expect(validated_response).to be_a(OpenapiFirst::ValidatedResponse)
+          expect(rack_request).to be_a(Rack::Request)
+          false
+        end
+
+        expect do
+          app.call(Rack::MockRequest.env_for('/roll', method: 'POST'))
+        end.not_to raise_error
+        expect(called).to eq(true)
+      end
     end
 
     context 'with response_raise_error = false' do
