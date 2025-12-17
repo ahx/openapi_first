@@ -114,7 +114,7 @@ module OpenapiFirst
         end
 
         @after_response_validation = config.after_response_validation do |validated_response, rack_request, oad|
-          next unless registered?
+          next unless registered?(oad)
           raise validated_response.error.exception if raise_response_error?(validated_response, rack_request)
 
           Coverage.track_response(validated_response, rack_request, oad)

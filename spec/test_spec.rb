@@ -399,8 +399,13 @@ RSpec.describe OpenapiFirst::Test do
       expect(config.after_response_validation.count).to eq(1)
     end
 
-    let(:filename) { './spec/data/dice.yaml' }
-    let(:oad) { OpenapiFirst.load(filename) }
+    before(:each) do
+      described_class.register(definition)
+    end
+
+    after do
+      described_class.uninstall
+    end
 
     context 'after_request_validation hook' do
       let(:invalid_request) do
@@ -416,20 +421,19 @@ RSpec.describe OpenapiFirst::Test do
         config = OpenapiFirst.configuration
         expect(config.after_request_validation.count).to eq(1)
         expect do
-          config.after_request_validation.first.call(invalid_request, oad)
+          config.after_request_validation.first.call(invalid_request, definition)
         end.to raise_error(OpenapiFirst::RequestInvalidError)
       end
 
       it 'does not raise an error for an invalid request when raises_error_for_request returns false' do
         described_class.setup do |test|
-          test.register(oad)
           test.raise_error_for_request = ->(_validated_request) { false }
         end
 
         config = OpenapiFirst.configuration
         expect(config.after_request_validation.count).to eq(1)
         expect do
-          config.after_request_validation.first.call(invalid_request, oad)
+          config.after_request_validation.first.call(invalid_request, definition)
         end.not_to raise_error
       end
     end
@@ -452,20 +456,19 @@ RSpec.describe OpenapiFirst::Test do
         config = OpenapiFirst.configuration
         expect(config.after_response_validation.count).to eq(1)
         expect do
-          config.after_response_validation.first.call(invalid_response, rack_request)
+          config.after_response_validation.first.call(invalid_response, rack_request, definition)
         end.to raise_error(OpenapiFirst::ResponseInvalidError)
       end
 
       it 'does not raise an error for an invalid response when raises_error_for_response returns false' do
         described_class.setup do |test|
-          test.register(oad)
           test.raise_error_for_response = ->(_validated_response, _rack_request) { false }
         end
 
         config = OpenapiFirst.configuration
         expect(config.after_response_validation.count).to eq(1)
         expect do
-          config.after_response_validation.first.call(invalid_response, rack_request)
+          config.after_response_validation.first.call(invalid_response, rack_request, definition)
         end.not_to raise_error
       end
     end
