@@ -8,11 +8,12 @@ module OpenapiFirst
   class ValidatedRequest < SimpleDelegator
     extend Forwardable
 
-    def initialize(original_request, error:, parsed_request: nil, request_definition: nil)
+    def initialize(original_request, error:, parsed_request: nil, request_definition: nil, query_parser: nil)
       super(original_request)
       @parsed_request = parsed_request
       @error = error
       @request_definition = request_definition
+      @query_parser = query_parser
     end
 
     # A Failure object if the request is invalid
@@ -30,6 +31,11 @@ module OpenapiFirst
     # @!method operation
     # @return [Hash] The raw OpenAPI 3 operation object
     def_delegator :request_definition, :operation
+
+    # @return [Hash] Query parameters and values that are not defined in the OpenAPI spec.
+    def unknown_query_parameters
+      @query_parser&.unknown_values(query_string)
+    end
 
     # Parsed path parameters
     # @return [Hash<String, anything>]

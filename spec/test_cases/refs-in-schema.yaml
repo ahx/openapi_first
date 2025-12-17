@@ -1,0 +1,31 @@
+- description: Modeling inheritance with JSON Schema $ref and unevaluatedProperties
+  oad:
+    openapi: 3.1.0
+    paths:
+      "/":
+        get:
+          responses:
+            '200':
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/fish'
+    components:
+      schemas:
+        withEyes:
+          properties:
+            numberOfEyes:
+              type: integer
+        fish:
+          $ref: '#/components/schemas/withEyes'
+          type: object
+          properties:
+            name:
+              type: string
+          unevaluatedProperties: false
+  valid_response:
+    content_type: application/json
+    body: { "name": "Moritz", numberOfEyes: 2 }
+  invalid_response:
+    content_type: application/json
+    body: { "name": "Moritz", numberOfEyes: 2, foo: 'bar' }
