@@ -11,6 +11,8 @@ module OpenapiFirst
 
     # @return [String,nil]
     attr_reader :filepath
+    # @return [String,nil]
+    attr_reader :path_prefix
     # @return [Configuration]
     attr_reader :config
     # @return [Enumerable[String]]
@@ -20,8 +22,10 @@ module OpenapiFirst
 
     # @param contents [Hash] The OpenAPI document.
     # @param filepath [String] The file path of the OpenAPI document.
-    def initialize(contents, filepath = nil)
+    # @param path_prefix [String,nil] An optional path prefix, that is not documented, that all requests begin with.
+    def initialize(contents, filepath = nil, path_prefix = nil)
       @filepath = filepath
+      @path_prefix = path_prefix
       @config = OpenapiFirst.configuration.child
       yield @config if block_given?
       @config.freeze
@@ -79,23 +83,22 @@ module OpenapiFirst
     end
 
     # Validates the response against the API description.
-    # @param rack_request [Rack::Request] The Rack request object.
-    # @param rack_response [Rack::Response] The Rack response object.
-    # @param raise_error [Boolean] Whethir to raise an error if validation fails.
+    # @param request [Rack::Request] The Rack request object.
+    # @param response [Rack::Response] The Rack response object.
+    # @param raise_error [Boolean] Whether to raise an error if validation fails.
     # @return [ValidatedResponse] The validated response object.
-    def validate_response(rack_request, rack_response, raise_error: false)
-      route = @router.match(rack_request.request_method, resolve_path(rack_request),
-                            content_type: rack_request.content_type)
+    def validate_response(request, response, raise_error: false)
+      route = @router.match(request.request_method, resolve_path(request), content_type: request.content_type)
       return if route.error # Skip response validation for unknown requests
 
-      response_match = route.match_response(status: rack_response.status, content_type: rack_response.content_type)
+      response_match = route.match_response(status: response.status, content_type: response.content_type)
       error = response_match.error
       validated = if error
-                    ValidatedResponse.new(rack_response, error:)
+                    ValidatedResponse.new(response, error:)
                   else
-                    response_match.response.validate(rack_response)
+                    response_match.response.validate(response)
                   end
-      @config.after_response_validation&.each { |hook| hook.call(validated, rack_request, self) }
+      @config.after_response_validation&.each { |hook| hook.call(validated, request, self) }
       raise validated.error.exception(validated) if raise_error && validated.invalid?
 
       validated
@@ -104,6 +107,7 @@ module OpenapiFirst
     private
 
     def resolve_path(rack_request)
+      return rack_request.path.delete_prefix(path_prefix) if path_prefix && rack_request.path.start_with?(path_prefix)
       return rack_request.path unless @config.path
 
       @config.path.call(rack_request)

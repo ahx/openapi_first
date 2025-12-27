@@ -5,8 +5,6 @@ require 'rack'
 require 'rack/test'
 require 'openapi_first'
 
-# frozen_string_literal: true
-
 RSpec.describe OpenapiFirst do
   it 'has a version number' do
     expect(OpenapiFirst::VERSION).not_to be nil
@@ -29,6 +27,13 @@ RSpec.describe OpenapiFirst do
       paths = definition.paths
       expect(paths).to include('/pets')
       expect(paths).not_to include('/pets/{petId}')
+    end
+
+    it 'supports :path_prefix' do
+      hash = YAML.safe_load_file('./spec/data/petstore.yaml')
+      path_prefix = '/api/v1'
+      definition = OpenapiFirst.parse(hash, path_prefix:)
+      expect(definition.path_prefix).to eq(path_prefix)
     end
 
     it 'loads a Hash' do
@@ -124,6 +129,18 @@ RSpec.describe OpenapiFirst do
         definition = OpenapiFirst.load spec_path, only: ->(path) { path == '/pets' }
         expected = %w[/pets]
         expect(definition.paths).to eq expected
+      end
+    end
+
+    describe 'path_prefix option' do
+      specify 'without a path prefix' do
+        definition = OpenapiFirst.load(spec_path, path_prefix: nil)
+        expect(definition.path_prefix).to be_nil
+      end
+
+      specify 'with a path prefix' do
+        definition = OpenapiFirst.load(spec_path, path_prefix: '/api/v1')
+        expect(definition.path_prefix).to eq('/api/v1')
       end
     end
   end
