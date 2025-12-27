@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Added
+
+- Added support for a static `path_prefix` value to be set on the creation of a Definition. See [PR #432](https://github.com/ahx/openapi_first/pull/432):
+  ```ruby
+  OpenapiFirst.configure do |config|
+    config.register('openapi/openapi.yaml' path_prefix: '/weather')
+  end
+  ```
+
 ## 3.1.1
 
 - Changed: Return uniqe errors in default error responses
