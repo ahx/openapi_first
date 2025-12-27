@@ -10,21 +10,21 @@ module OpenapiFirst
     # A wrapper of the original app
     # with silent request/response validation to track requests/responses.
     class App < SimpleDelegator
-      def initialize(app, api:, validate_request_after_handling:)
+      def initialize(app, api:, validate_request_before_handling:)
         super(app)
         @app = app
         @definition = Test[api]
-        @validate_request_after_handling = validate_request_after_handling
+        @validate_request_before_handling = validate_request_before_handling
       end
 
       def call(env)
         request = Rack::Request.new(env)
-        unless @validate_request_after_handling
+        if @validate_request_before_handling
           env[Test::REQUEST] = @definition.validate_request(request, raise_error: false)
         end
 
         response = @app.call(env)
-        if @validate_request_after_handling
+        unless @validate_request_before_handling
           env[Test::REQUEST] = @definition.validate_request(request, raise_error: false)
         end
 
