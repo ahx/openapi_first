@@ -12,12 +12,13 @@ module OpenapiFirst
         base.include(AssertionMethod)
       end
 
-      def self.[](application_under_test = nil, api: nil)
+      def self.[](application_under_test = nil, api: nil, validate_request_before_handling: false)
         mod = Module.new do
           def self.included(base)
             base.include OpenapiFirst::Test::Methods::AssertionMethod
           end
         end
+        mod.define_method(:openapi_first_validate_request_before_handling?) { validate_request_before_handling }
 
         if api
           mod.define_method(:openapi_first_default_api) { api }
@@ -26,7 +27,12 @@ module OpenapiFirst
         end
 
         if application_under_test
-          mod.define_method(:app) { OpenapiFirst::Test.app(application_under_test, api: openapi_first_default_api) }
+          mod.define_method(:app) do
+            OpenapiFirst::Test.app(
+              application_under_test, api: openapi_first_default_api,
+                                      validate_request_before_handling: openapi_first_validate_request_before_handling?
+            )
+          end
         end
 
         mod

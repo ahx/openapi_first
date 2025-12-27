@@ -24,6 +24,25 @@ RSpec.describe OpenapiFirst::Test::Methods do
     end.to raise_error(OpenapiFirst::Error)
   end
 
+  it 'runs request validation after handling the request' do
+    OpenapiFirst::Test.register('./examples/openapi.yaml')
+    myapp = lambda do |env|
+      expect(env[OpenapiFirst::Test::REQUEST]).to be_nil
+      Rack::Response.new('hello').finish
+    end
+
+    minitest_class = Class.new(Minitest::Test) do
+      include OpenapiFirst::Test::Methods[myapp]
+    end
+
+    expect(minitest_class.included_modules).to include(OpenapiFirst::Test::MinitestHelpers)
+    test_app = minitest_class.new(1).app
+    env = Rack::MockRequest.env_for('/')
+    expect(test_app.call(env)).to eq(Rack::Response.new('hello').finish)
+    expect(env[OpenapiFirst::Test::REQUEST]).to be_valid
+    expect(env[OpenapiFirst::Test::RESPONSE]).to be_a(OpenapiFirst::ValidatedResponse)
+  end
+
   context 'with RSpec' do
     context 'with metadata', api: :v1 do
       include OpenapiFirst::Test::Methods
@@ -88,12 +107,15 @@ RSpec.describe OpenapiFirst::Test::Methods do
   end
 
   context 'with [arguments]' do
-    it 'adds an app method that wraps the default API' do
+    it 'can run validation before handling the request' do
       OpenapiFirst::Test.register('./examples/openapi.yaml')
-      myapp = ->(_env) { Rack::Response.new('hello').finish }
+      myapp = lambda do |env|
+        expect(env[OpenapiFirst::Test::REQUEST]).to be_a(OpenapiFirst::ValidatedRequest)
+        Rack::Response.new('hello').finish
+      end
 
       minitest_class = Class.new(Minitest::Test) do
-        include OpenapiFirst::Test::Methods[myapp]
+        include OpenapiFirst::Test::Methods[myapp, validate_request_before_handling: true]
       end
 
       expect(minitest_class.included_modules).to include(OpenapiFirst::Test::MinitestHelpers)
@@ -101,11 +123,15 @@ RSpec.describe OpenapiFirst::Test::Methods do
       env = Rack::MockRequest.env_for('/')
       expect(test_app.call(env)).to eq(Rack::Response.new('hello').finish)
       expect(env[OpenapiFirst::Test::REQUEST]).to be_valid
+      expect(env[OpenapiFirst::Test::RESPONSE]).to be_a(OpenapiFirst::ValidatedResponse)
     end
 
     it 'adds an app method that wraps the app for a specific API' do
       OpenapiFirst::Test.register('./examples/openapi.yaml', as: :v1)
-      myapp = ->(_env) { Rack::Response.new('hello').finish }
+      myapp = lambda do |env|
+        expect(env[OpenapiFirst::Test::REQUEST]).to be_nil
+        Rack::Response.new('hello').finish
+      end
 
       minitest_class = Class.new(Minitest::Test) do
         include OpenapiFirst::Test::Methods[myapp, api: :v1]
@@ -116,6 +142,26 @@ RSpec.describe OpenapiFirst::Test::Methods do
       env = Rack::MockRequest.env_for('/')
       expect(test_app.call(env)).to eq(Rack::Response.new('hello').finish)
       expect(env[OpenapiFirst::Test::REQUEST]).to be_valid
+      expect(env[OpenapiFirst::Test::RESPONSE]).to be_a(OpenapiFirst::ValidatedResponse)
+    end
+
+    it 'can run validation before handling the request, for a specific API' do
+      OpenapiFirst::Test.register('./examples/openapi.yaml', as: :v1)
+      myapp = lambda do |env|
+        expect(env[OpenapiFirst::Test::REQUEST]).to be_a(OpenapiFirst::ValidatedRequest)
+        Rack::Response.new('hello').finish
+      end
+
+      minitest_class = Class.new(Minitest::Test) do
+        include OpenapiFirst::Test::Methods[myapp, api: :v1, validate_request_before_handling: true]
+      end
+
+      expect(minitest_class.included_modules).to include(OpenapiFirst::Test::MinitestHelpers)
+      test_app = minitest_class.new(1).app
+      env = Rack::MockRequest.env_for('/')
+      expect(test_app.call(env)).to eq(Rack::Response.new('hello').finish)
+      expect(env[OpenapiFirst::Test::REQUEST]).to be_valid
+      expect(env[OpenapiFirst::Test::RESPONSE]).to be_a(OpenapiFirst::ValidatedResponse)
     end
 
     it 'adds an assert_api_conform method that targets the specified API' do
