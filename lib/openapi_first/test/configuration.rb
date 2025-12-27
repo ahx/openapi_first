@@ -15,6 +15,8 @@ module OpenapiFirst
         @ignore_unknown_response_status = false
         @report_coverage = true
         @ignore_unknown_requests = false
+        @raise_error_for_request = ->(_validated_request) { true }
+        @raise_error_for_response = ->(_validated_response, _rack_request) { true }
       end
 
       # Register OADs, but don't load them just yet
@@ -30,7 +32,8 @@ module OpenapiFirst
       end
 
       attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error,
-                    :ignore_unknown_requests, :ignore_unknown_response_status, :minimum_coverage
+                    :ignore_unknown_requests, :ignore_unknown_response_status, :minimum_coverage,
+                    :raise_error_for_request, :raise_error_for_response
       attr_reader :report_coverage, :ignored_unknown_status
 
       # Set ignored unknown status codes.
@@ -66,7 +69,6 @@ module OpenapiFirst
 
       def ignore_response?(validated_response)
         return false if validated_response.known?
-
         return true if ignored_unknown_status.include?(validated_response.status)
 
         ignore_unknown_response_status? && validated_response.error.type == :response_status_not_found

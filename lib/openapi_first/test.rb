@@ -115,9 +115,7 @@ module OpenapiFirst
 
         @after_response_validation = config.after_response_validation do |validated_response, rack_request, oad|
           next unless registered?(oad)
-          if validated_response.invalid? && raise_response_error?(validated_response)
-            raise validated_response.error.exception
-          end
+          raise validated_response.error.exception if raise_response_error?(validated_response, rack_request)
 
           Coverage.track_response(validated_response, rack_request, oad)
         end
@@ -156,6 +154,7 @@ module OpenapiFirst
 
       def raise_request_error?(validated_request)
         return false if validated_request.valid?
+        return false unless configuration.raise_error_for_request.call(validated_request)
         return false if validated_request.known?
 
         !configuration.ignore_unknown_requests
@@ -163,8 +162,12 @@ module OpenapiFirst
 
       def many?(array) = array.length > 1
 
-      def raise_response_error?(invalid_response)
-        configuration.response_raise_error && !configuration.ignore_response?(invalid_response)
+      def raise_response_error?(validated_response, rack_request)
+        return false if validated_response.valid?
+        return false unless configuration.response_raise_error
+        return false unless configuration.raise_error_for_response.call(validated_response, rack_request)
+
+        !configuration.ignore_response?(validated_response)
       end
     end
   end

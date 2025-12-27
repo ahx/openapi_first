@@ -20,6 +20,20 @@ RSpec.describe OpenapiFirst::Test::Configuration do
     end
   end
 
+  describe 'raise_error_for_request' do
+    it 'has a default lambda that returns true always' do
+      expect(configuration.raise_error_for_request).to be_a(Proc)
+      expect(configuration.raise_error_for_request.call(nil)).to eq(true)
+    end
+  end
+
+  describe 'raise_error_for_response' do
+    it 'has a default lambda that returns true always' do
+      expect(configuration.raise_error_for_response).to be_a(Proc)
+      expect(configuration.raise_error_for_response.call(nil, nil)).to eq(true)
+    end
+  end
+
   describe '#ignore_response?' do
     let(:valid_response) { double(valid?: true, known?: true, status: 302) }
     let(:invalid_response) { double(valid?: false, known?: true, status: 302) }
