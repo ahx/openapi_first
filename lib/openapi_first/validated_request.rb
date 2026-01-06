@@ -69,6 +69,9 @@ module OpenapiFirst
     # Returns true if the request is defined.
     def known? = request_definition != nil
 
+    # Returns true if the request is not defined.
+    def unknown? = !known?
+
     # Merged path, query, body parameters.
     # Here path has the highest precedence, then query, then body.
     # @return [Hash<String, anything>]

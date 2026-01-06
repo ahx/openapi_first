@@ -14,4 +14,28 @@ RSpec.describe OpenapiFirst::ValidatedResponse do
       expect(validated.parsed_headers).to be_nil
     end
   end
+
+  describe '#known?' do
+    it 'returns false if response is unknown' do
+      unknown_response = described_class.new(double(:response), error: double(:error))
+      expect(unknown_response).not_to be_known
+    end
+
+    it 'returns true if response is known' do
+      valid_response = described_class.new(double(:response), error: nil, response_definition: double(:response_definition))
+      expect(valid_response).to be_known
+    end
+  end
+
+  describe '#unknown?' do
+    it 'returns true if response is unknown' do
+      unknown_response = described_class.new(double(:response), error: double(:error))
+      expect(unknown_response).to be_unknown
+    end
+
+    it 'returns false if response is known' do
+      valid_response = described_class.new(double(:response), error: nil, response_definition: double(:response_definition))
+      expect(valid_response).not_to be_unknown
+    end
+  end
 end

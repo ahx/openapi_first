@@ -17,6 +17,8 @@
   end
   ```
 
+- Added `OpenapiFirst::ValidatedRequest#unknown?` and `OpenapiFirst::ValidatedResponse#unknown?`
+
 ## 3.1.1
 
 - Changed: Return uniqe errors in default error responses
