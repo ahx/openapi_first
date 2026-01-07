@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.2.0
+
 ### Changed
 - Changed OpenapiFirst::Test to track the request _after_ the app has handled the request. See [PR #434](https://github.com/ahx/openapi_first/pull/434). You can restore the old behavior with 
 ```ruby
@@ -10,16 +12,28 @@
 
 ### Added
 
+- Added `OpenapiFirst::ValidatedRequest#unknown?` and `OpenapiFirst::ValidatedResponse#unknown?`
+- Added new hook: `after_response_body_property_validation`
 - Added support for a static `path_prefix` value to be set on the creation of a Definition. See [PR #432](https://github.com/ahx/openapi_first/pull/432):
   ```ruby
   OpenapiFirst.configure do |config|
     config.register('openapi/openapi.yaml' path_prefix: '/weather')
   end
   ```
-
-- Added `OpenapiFirst::ValidatedRequest#unknown?` and `OpenapiFirst::ValidatedResponse#unknown?`
-
-- Added `OpenapiFirst::Test::Configuration#ignore_response_error` and `OpenapiFirst::Test::Configuration#ignore_request_error` to configure which request/response errors should not raise an error during testing.
+- Added `OpenapiFirst::Test::Configuration#ignore_response_error` and `#ignore_request_error` to configure which request/response errors should not raise an error during testing:
+  ```ruby
+  OpenapiFirst::Test.setup do |test|
+    test.ignore_request_error do |validated_request|
+      # Ignore unknown requests on certain paths
+      validated_request.path.start_with?('/api/v1') && validated_request.unknown?
+    end
+    
+    test.ignore_response_error do |validated_response, rack_request|
+      # Ignore invalid response bodies on certain paths
+      validated_request.path.start_with?('/api/legacy/stuff') && validated_request.error.type ==  :invalid_body      
+    end
+  end
+  ```
 
 ## 3.1.1
 

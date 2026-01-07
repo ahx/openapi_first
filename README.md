@@ -231,7 +231,7 @@ Here is how to set it up:
 
 ### Configure test coverage
 
-You can ignore errors for certain requests/responses:
+You can ignore errors for certain requests/responses. This will stop `OpenapiFirst::Test` from raising an exception if the block returns true. 
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
