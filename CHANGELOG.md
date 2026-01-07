@@ -17,6 +17,10 @@
   end
   ```
 
+- Added `OpenapiFirst::ValidatedRequest#unknown?` and `OpenapiFirst::ValidatedResponse#unknown?`
+
+- Added `OpenapiFirst::Test::Configuration#ignore_response_error` and `OpenapiFirst::Test::Configuration#ignore_request_error` to configure which request/response errors should not raise an error during testing.
+
 ## 3.1.1
 
 - Changed: Return uniqe errors in default error responses

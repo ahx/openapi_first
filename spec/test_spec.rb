@@ -425,9 +425,9 @@ RSpec.describe OpenapiFirst::Test do
         end.to raise_error(OpenapiFirst::RequestInvalidError)
       end
 
-      it 'does not raise an error for an invalid request when raises_error_for_request returns false' do
+      it 'does not raise an error for an invalid request when request is ignored' do
         described_class.setup do |test|
-          test.raise_error_for_request = ->(_validated_request) { false }
+          test.ignore_request_error { true }
         end
 
         config = OpenapiFirst.configuration
@@ -460,9 +460,9 @@ RSpec.describe OpenapiFirst::Test do
         end.to raise_error(OpenapiFirst::ResponseInvalidError)
       end
 
-      it 'does not raise an error for an invalid response when raises_error_for_response returns false' do
+      it 'does not raise an error for an invalid response when response error is ignored' do
         described_class.setup do |test|
-          test.raise_error_for_response = ->(_validated_response, _rack_request) { false }
+          test.ignore_response_error { true }
         end
 
         config = OpenapiFirst.configuration
@@ -595,22 +595,22 @@ RSpec.describe OpenapiFirst::Test do
       end.to raise_error(OpenapiFirst::NotFoundError)
     end
 
-    context 'with raise_error_for_request returning false' do
+    context 'with ignore_request_error returning true' do
       before(:each) do
         described_class.uninstall
-        described_class.setup do |test|
-          test.register(definition)
-          test.ignore_unknown_requests = false
-          test.report_coverage = false
-        end
       end
 
       it 'does not raise an error' do
         called = false
-        described_class.configuration.raise_error_for_request = lambda do |validated_request|
-          called = true
-          expect(validated_request).to be_a(OpenapiFirst::ValidatedRequest)
-          false
+        described_class.setup do |test|
+          test.register(definition)
+          test.ignore_unknown_requests = false
+          test.report_coverage = false
+          test.ignore_request_error do |validated_request|
+            called = true
+            expect(validated_request).to be_a(OpenapiFirst::ValidatedRequest)
+            true
+          end
         end
 
         expect do
@@ -736,21 +736,21 @@ RSpec.describe OpenapiFirst::Test do
       end.to raise_error(OpenapiFirst::ResponseInvalidError)
     end
 
-    context 'with raise_error_for_response returning false' do
+    context 'with ignore_response_error? returning true' do
       before(:each) do
         described_class.uninstall
-        described_class.setup do |test|
-          test.register(definition)
-        end
       end
 
       it 'does not raise an error' do
         called = false
-        described_class.configuration.raise_error_for_response = lambda do |validated_response, rack_request|
-          called = true
-          expect(validated_response).to be_a(OpenapiFirst::ValidatedResponse)
-          expect(rack_request).to be_a(Rack::Request)
-          false
+        described_class.setup do |test|
+          test.register(definition)
+          test.ignore_response_error do |validated_response, rack_request|
+            called = true
+            expect(validated_response).to be_a(OpenapiFirst::ValidatedResponse)
+            expect(rack_request).to be_a(Rack::Request)
+            true
+          end
         end
 
         expect do

@@ -231,6 +231,23 @@ Here is how to set it up:
 
 ### Configure test coverage
 
+You can ignore errors for certain requests/responses:
+
+```ruby
+OpenapiFirst::Test.setup do |test|
+  test.ignore_request_error do |validated_request|
+    # Ignore unknown requests on certain paths
+    validated_request.path.start_with?('/api/v1') && validated_request.unknown?
+  end
+  
+  test.ignore_response_error do |validated_response, rack_request|
+    # Ignore invalid response bodies on certain paths
+    validated_request.path.start_with?('/api/legacy/stuff') && validated_request.error.type ==  :invalid_body      
+  end
+end
+```
+
+
 OpenapiFirst::Test raises an error when a response status is not defined except for 404 and 500. You can change this:
 
 ```ruby

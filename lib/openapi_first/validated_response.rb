@@ -44,6 +44,9 @@ module OpenapiFirst
     # Returns true if the response is defined.
     def known? = response_definition != nil
 
+    # Returns true if the response is not defined.
+    def unknown? = !known?
+
     # Checks if the response is invalid.
     # @return [Boolean]
     def invalid?

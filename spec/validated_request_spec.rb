@@ -76,6 +76,16 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
     end
   end
 
+  describe '#unknown?' do
+    it 'returns false if request is known' do
+      expect(valid_request).not_to be_unknown
+    end
+
+    it 'returns true if request is known' do
+      expect(unknown_request).to be_unknown
+    end
+  end
+
   describe '#parsed_params' do
     it 'returns merged path, query and body params' do
       parsed_request = double(
