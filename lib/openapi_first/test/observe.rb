@@ -23,7 +23,7 @@ module OpenapiFirst
           return
         end
 
-        unless app.instance_methods.include?(:call)
+        unless app.method_defined?(:call)
           raise ObserveError, "Don't know how to observe #{app}, because it has no call instance method."
         end
 

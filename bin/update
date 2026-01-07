@@ -5,6 +5,6 @@
 Dir.glob('Gemfile*')
    .reject { _1.end_with?('.lock') }
    .each do |filename|
-  puts `BUNDLE_GEMFILE=#{filename} bundle update`
+     puts `BUNDLE_GEMFILE=#{filename} bundle update`
 end
 puts `cd benchmarks && bundle update && cd ..`

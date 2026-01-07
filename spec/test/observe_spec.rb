@@ -52,7 +52,7 @@ RSpec.describe OpenapiFirst::Test::Observe do
         described_class.observe(app)
       end.to raise_error OpenapiFirst::Test::ObserveError
 
-      app.instance_methods.include?(:call)
+      app.method_defined?(:call)
     end
   end
 
