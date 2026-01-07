@@ -11,6 +11,7 @@ jobs:
           - "3.2"
           - "3.3"
           - "3.4"
+          - "4.0"
         gemfiles:
           - Gemfile
           - Gemfile.multi_json
