@@ -40,7 +40,7 @@ module OpenapiFirst
     end
 
     # Sets up OpenAPI test coverage and OAD registration.
-    # @yieldparam [OpenapiFirst::Test::Configuration] configuration A configuration to setup test integration
+    # @yield [OpenapiFirst::Test::Configuration] configuration A configuration to setup test integration
     def self.setup
       install
       yield configuration if block_given?
@@ -154,20 +154,16 @@ module OpenapiFirst
 
       def raise_request_error?(validated_request)
         return false if validated_request.valid?
-        return false unless configuration.raise_error_for_request.call(validated_request)
-        return false if validated_request.known?
 
-        !configuration.ignore_unknown_requests
+        configuration.raise_request_error?(validated_request)
       end
 
       def many?(array) = array.length > 1
 
       def raise_response_error?(validated_response, rack_request)
         return false if validated_response.valid?
-        return false unless configuration.response_raise_error
-        return false unless configuration.raise_error_for_response.call(validated_response, rack_request)
 
-        !configuration.ignore_response?(validated_response)
+        configuration.raise_response_error?(validated_response, rack_request)
       end
     end
   end

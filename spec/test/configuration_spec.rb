@@ -20,61 +20,48 @@ RSpec.describe OpenapiFirst::Test::Configuration do
     end
   end
 
-  describe 'raise_error_for_request' do
-    it 'has a default lambda that returns true always' do
-      expect(configuration.raise_error_for_request).to be_a(Proc)
-      expect(configuration.raise_error_for_request.call(nil)).to eq(true)
-    end
-  end
+  describe '#raise_response_error?' do
+    let(:valid_response) { double(valid?: true, unknown?: false, status: 302) }
+    let(:invalid_response) { double(valid?: false, unknown?: false, status: 302) }
+    let(:unknown_response_status) { double(valid?: false, unknown?: true, status: 302, error: OpenapiFirst::Failure.new(:response_status_not_found)) }
+    let(:rack_request) { Rack::Request.new({}) }
 
-  describe 'raise_error_for_response' do
-    it 'has a default lambda that returns true always' do
-      expect(configuration.raise_error_for_response).to be_a(Proc)
-      expect(configuration.raise_error_for_response.call(nil, nil)).to eq(true)
-    end
-  end
-
-  describe '#ignore_response?' do
-    let(:valid_response) { double(valid?: true, known?: true, status: 302) }
-    let(:invalid_response) { double(valid?: false, known?: true, status: 302) }
-    let(:unknown_response_status) { double(valid?: false, known?: false, status: 302, error: OpenapiFirst::Failure.new(:response_status_not_found)) }
-
-    it 'returns false by default for a valid responses' do
-      expect(configuration.ignore_response?(valid_response)).to eq(false)
+    it 'returns true by default for valid responses' do
+      expect(configuration.raise_response_error?(valid_response, rack_request)).to eq(true)
     end
 
-    it 'returns false by default for an invalid responses' do
-      expect(configuration.ignore_response?(invalid_response)).to eq(false)
+    it 'returns true by default for invalid responses' do
+      expect(configuration.raise_response_error?(invalid_response, rack_request)).to eq(true)
     end
 
-    it 'returns false by default for an unkonwn responses' do
-      expect(configuration.ignore_response?(unknown_response_status)).to eq(false)
+    it 'returns true by default for unkonwn responses' do
+      expect(configuration.raise_response_error?(unknown_response_status, rack_request)).to eq(true)
     end
 
     context 'when status is ignored' do
       before { configuration.ignored_unknown_status << unknown_response_status.status }
 
-      it 'returns true for an unknown response with that status' do
-        expect(configuration.ignore_response?(unknown_response_status)).to eq(true)
+      it 'returns false for an unknown response with that status' do
+        expect(configuration.raise_response_error?(unknown_response_status, rack_request)).to eq(false)
       end
 
-      it 'returns false for an unknown response with another status' do
-        unknown_response_status = double(valid?: false, known?: false, status: 409)
-        expect(configuration.ignore_response?(unknown_response_status)).to eq(false)
+      it 'returns true for an unknown response with another status' do
+        unknown_response_status = double(valid?: false, unknown?: true, status: 409, error: OpenapiFirst::Failure.new(:response_status_not_found))
+        expect(configuration.raise_response_error?(unknown_response_status, rack_request)).to eq(true)
       end
     end
 
     context 'when all unknown response status are ignored' do
       before { configuration.ignore_unknown_response_status = true }
 
-      it 'returns true for any unknown response status' do
-        expect(configuration.ignore_response?(unknown_response_status)).to eq(true)
+      it 'returns false for any unknown response status' do
+        expect(configuration.raise_response_error?(unknown_response_status, rack_request)).to eq(false)
       end
 
-      it 'returns false for an unknown response with a known status' do
-        unknown_response_content_type = double(valid?: false, known?: false, status: 302, error: OpenapiFirst::Failure.new(:response_content_type_not_found))
+      it 'returns true for an unknown response with a known status' do
+        unknown_response_content_type = double(valid?: false, unknown?: true, status: 302, error: OpenapiFirst::Failure.new(:response_content_type_not_found))
 
-        expect(configuration.ignore_response?(unknown_response_content_type)).to eq(false)
+        expect(configuration.raise_response_error?(unknown_response_content_type, rack_request)).to eq(true)
       end
     end
   end

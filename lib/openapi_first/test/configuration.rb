@@ -15,8 +15,8 @@ module OpenapiFirst
         @ignore_unknown_response_status = false
         @report_coverage = true
         @ignore_unknown_requests = false
-        @raise_error_for_request = ->(_validated_request) { true }
-        @raise_error_for_response = ->(_validated_response, _rack_request) { true }
+        @ignore_request_error = nil
+        @ignore_response_error = nil
       end
 
       # Register OADs, but don't load them just yet
@@ -32,8 +32,7 @@ module OpenapiFirst
       end
 
       attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error,
-                    :ignore_unknown_requests, :ignore_unknown_response_status, :minimum_coverage,
-                    :raise_error_for_request, :raise_error_for_response
+                    :ignore_unknown_requests, :ignore_unknown_response_status, :minimum_coverage
       attr_reader :report_coverage, :ignored_unknown_status
 
       # Set ignored unknown status codes.
@@ -53,6 +52,23 @@ module OpenapiFirst
         @report_coverage = value
       end
 
+      # Ignore certain errors for certain requests
+      # @param block A Proc that will be called with [OpenapiFirst::ValidatedRequest]
+      def ignore_request_error(&block)
+        raise ArgumentError, 'You have to pass a block' unless block_given?
+
+        @ignore_request_error = block
+      end
+
+      # Ignore certain errors for certain responses
+      # @param block A Proc that will be called with [OpenapiFirst::ValidatedResponse, Rack::Request]
+      def ignore_response_error(&block)
+        raise ArgumentError, 'You have to pass a block' unless block_given?
+
+        @ignore_response_error = block
+      end
+
+      # @param block A Proc that will be called with [OpenapiFirst::ValidatedResponse, Rack::Request]
       def skip_response_coverage(&block)
         return @skip_response_coverage unless block_given?
 
@@ -66,12 +82,22 @@ module OpenapiFirst
       end
 
       alias ignore_unknown_response_status? ignore_unknown_response_status
+      alias ignore_unknown_requests? ignore_unknown_requests
 
-      def ignore_response?(validated_response)
-        return false if validated_response.known?
-        return true if ignored_unknown_status.include?(validated_response.status)
+      def raise_request_error?(validated_request)
+        return false if @ignore_request_error&.call(validated_request)
+        return false if ignore_unknown_requests? && validated_request.unknown?
 
-        ignore_unknown_response_status? && validated_response.error.type == :response_status_not_found
+        validated_request.unknown?
+      end
+
+      def raise_response_error?(validated_response, rack_request)
+        return false if @ignore_response_error&.call(validated_response, rack_request)
+        return false if response_raise_error == false
+        return false if ignored_unknown_status.include?(validated_response.status)
+        return false if ignore_unknown_response_status? && validated_response.error.type == :response_status_not_found
+
+        true
       end
     end
   end
