@@ -9,6 +9,7 @@ gem 'rackup'
 
 group :test, :development do
   gem 'actionpack'
+  gem 'benchmark'
   gem 'bundler'
   gem 'minitest'
   gem 'rack-test'
