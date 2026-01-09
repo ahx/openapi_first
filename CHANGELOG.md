@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Don't raise `UnknownQueryParameterError` if request is ignored in tests. Fixes [#441](https://github.com/ahx/openapi_first/issues/441).
+
 ## 3.2.0
 
 ### Changed
