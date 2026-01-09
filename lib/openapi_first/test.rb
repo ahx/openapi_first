@@ -106,9 +106,12 @@ module OpenapiFirst
       OpenapiFirst.configure do |config|
         @after_request_validation = config.after_request_validation do |validated_request, oad|
           next unless registered?(oad)
-          raise validated_request.error.exception if raise_request_error?(validated_request)
 
-          check_unknown_query_parameters(validated_request)
+          if configuration.raise_request_error?(validated_request)
+            raise validated_request.error.exception if validated_request.unknown?
+
+            check_unknown_query_parameters(validated_request)
+          end
 
           Coverage.track_request(validated_request, oad)
         end
@@ -150,12 +153,6 @@ module OpenapiFirst
         s = 's' if many?(unknown_parameters)
         list = unknown_parameters.keys.map(&:inspect).join(', ')
         "Unknown query parameter#{s} #{list} for #{validated_request.fullpath}"
-      end
-
-      def raise_request_error?(validated_request)
-        return false if validated_request.valid?
-
-        configuration.raise_request_error?(validated_request)
       end
 
       def many?(array) = array.length > 1

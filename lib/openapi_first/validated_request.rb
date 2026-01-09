@@ -33,6 +33,7 @@ module OpenapiFirst
     def_delegator :request_definition, :operation
 
     # @return [Hash] Query parameters and values that are not defined in the OpenAPI spec.
+    # FIXME: Optimize this so it does not have to parse the query string a second time to find unknown parameters
     def unknown_query_parameters
       @query_parser&.unknown_values(query_string)
     end

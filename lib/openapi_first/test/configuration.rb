@@ -88,7 +88,7 @@ module OpenapiFirst
         return false if @ignore_request_error&.call(validated_request)
         return false if ignore_unknown_requests? && validated_request.unknown?
 
-        validated_request.unknown?
+        true
       end
 
       def raise_response_error?(validated_response, rack_request)

@@ -694,6 +694,23 @@ RSpec.describe OpenapiFirst::Test do
         app.call(Rack::MockRequest.env_for('/unknown?unknown=12'))
       end.to raise_error OpenapiFirst::NotFoundError
     end
+
+    context 'when request is ignored' do
+      before(:each) do
+        described_class.uninstall
+        described_class.setup do |test|
+          test.register(definition)
+          test.report_coverage = false
+          test.ignore_request_error { |req| req.path == '/stuff' }
+        end
+      end
+
+      it 'raises no error' do
+        expect do
+          app.call(Rack::MockRequest.env_for('/stuff?color=red&unknown=12'))
+        end.not_to raise_error
+      end
+    end
   end
 
   describe 'handling invalid responses' do
