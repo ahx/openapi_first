@@ -30,6 +30,4 @@ components:
         - name
       properties:
         name:
-          type: string
-          nullable: true
-
+          $ref: './nullable-string.yaml'
