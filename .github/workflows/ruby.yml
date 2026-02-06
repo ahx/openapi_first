@@ -23,10 +23,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - uses: ruby/setup-ruby@v1
+      - uses: appraisal-rb/setup-ruby-flash@v1
         with:
           ruby-version: ${{ matrix.ruby }}
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: true
       - run: bundle lock --add-platform x86_64-linux && bundle install && bundle exec rake
         env:
           BUNDLE_GEMFILE: ${{ matrix.gemfile }}
