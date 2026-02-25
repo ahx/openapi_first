@@ -33,6 +33,13 @@ RSpec.describe 'request/response validation examples' do
             oad['paths'][test_path].keys.first.upcase
           end
 
+          let(:response) do
+            example['valid_response'] || {
+              content_type: 'application/json',
+              body: {}
+            }
+          end
+
           if example['valid_response']
             context 'with valid response' do
               let(:response) { example['valid_response'] }
@@ -72,6 +79,34 @@ RSpec.describe 'request/response validation examples' do
                 validated = definition.validate_response(request, response)
                 expect(validated).not_to be_valid
                 expect(validated.error).not_to be_nil
+              end
+            end
+          end
+
+          if example['valid_request']
+            context 'with valid request' do
+              let(:request) { example['valid_request'] }
+
+              it 'passes validation' do
+                send(test_method.downcase, test_path, JSON.generate(request['body']), 'CONTENT_TYPE' => request['content_type'])
+
+                validated = definition.validate_request(last_request)
+                expect(validated.error).to be_nil
+                expect(validated).to be_valid
+              end
+            end
+          end
+
+          if example['invalid_request']
+            let(:request) { example['invalid_request'] }
+
+            context 'with invalid request' do
+              it 'fails validation' do
+                send(test_method.downcase, test_path, JSON.generate(request['body']), 'CONTENT_TYPE' => request['content_type'])
+
+                validated = definition.validate_request(last_request)
+                expect(validated.error).not_to be_nil
+                expect(validated).to be_invalid
               end
             end
           end
