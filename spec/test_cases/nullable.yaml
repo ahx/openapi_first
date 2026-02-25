@@ -45,8 +45,12 @@
             '200':
               description: ok
   valid_request:
+    method: post
+    uri: '/'
     content_type: application/json
     body: { "value": null }
   invalid_request:
+    method: post
+    uri: '/'
     content_type: application/json
     body: { "foo": "bar" }
