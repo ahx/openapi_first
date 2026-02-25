@@ -14,10 +14,7 @@
                 type: object
                 properties:
                   ids:
-                    type: array
-                    minItems: 2
-                    items:
-                      type: integer
+                    $ref: '../data/components/schemas/integers.yaml'
           responses:
             '200':
               description: ok
