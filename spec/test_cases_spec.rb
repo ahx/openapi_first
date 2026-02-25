@@ -37,7 +37,7 @@ RSpec.describe 'request/response validation examples' do
             oad['paths'].keys.first
           end
 
-          let(:test_method) do
+          let(:request_method) do
             oad['paths'][test_path].keys.first.upcase
           end
 
@@ -50,7 +50,7 @@ RSpec.describe 'request/response validation examples' do
               let(:response) { example['valid_response'] }
 
               it 'passes validation' do
-                send(test_method.downcase, test_path)
+                send(request_method.downcase, test_path)
 
                 request = Rack::Request.new(last_request.env)
                 response = Rack::Response.new(
@@ -70,7 +70,7 @@ RSpec.describe 'request/response validation examples' do
               let(:response) { example['invalid_response'] }
 
               it 'fails validation' do
-                send(test_method.downcase, test_path)
+                send(request_method.downcase, test_path)
 
                 request = Rack::Request.new(last_request.env)
                 response = Rack::Response.new(
