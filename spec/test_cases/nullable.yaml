@@ -24,3 +24,33 @@
   invalid_response:
     content_type: application/json
     body: { "path": ["1", "2", 3] }
+- description: nullable value in request body
+  oad:
+    openapi: 3.0.2
+    paths:
+      /:
+        post:
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  required: [value]
+                  additionalProperties: false
+                  properties:
+                    value:
+                      type: string
+                      nullable: true
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "value": null }
+  invalid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "foo": "bar" }
