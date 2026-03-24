@@ -51,6 +51,10 @@ module OpenapiFirst
     # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>] errors Schema validation errors
     attr_reader :errors
 
+    def inspect
+      "#<OpenapiFirst::Failure:#{object_id} type: #{type}, message: #{message}>"
+    end
+
     # A generic error message
     def message
       @message ||= exception_message
