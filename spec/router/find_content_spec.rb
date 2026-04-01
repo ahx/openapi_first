@@ -12,8 +12,8 @@ RSpec.describe OpenapiFirst::Router::FindContent do
     end
 
     let(:contents) do
-      requests.each_with_object({}) do |req, hash|
-        hash[req.content_type] = req
+      requests.to_h do |req|
+        [req.content_type, req]
       end
     end
 
@@ -40,14 +40,14 @@ RSpec.describe OpenapiFirst::Router::FindContent do
 
     it 'finds */* wildcard matcher' do
       requests = [double(content_type: 'application/json'), double(content_type: '*/*')]
-      contents = requests.each_with_object({}) { |req, m| m[req.content_type] = req }
+      contents = requests.to_h { |req| [req.content_type, req] }
       expect(described_class.call(contents, 'some/foobar').content_type).to eq('*/*')
       expect(described_class.call(contents, 'some/foobar; Chartset=utf8').content_type).to eq('*/*')
     end
 
     it 'finds a match if content_type is not defined' do
       requests = [double(content_type: 'application/json'), double(content_type: nil)]
-      contents = requests.each_with_object({}) { |req, m| m[req.content_type] = req }
+      contents = requests.to_h { |req| [req.content_type, req] }
       expect(described_class.call(contents, 'some/foobar')).to be(requests[1])
     end
   end

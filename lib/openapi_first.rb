@@ -27,7 +27,6 @@ module OpenapiFirst
     FileLoader.clear_cache!
   end
 
-
   # @return [Configuration]
   def self.configuration
     @configuration ||= Configuration.new
