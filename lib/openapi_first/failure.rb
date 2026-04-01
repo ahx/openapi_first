@@ -48,7 +48,7 @@ module OpenapiFirst
     # Example: :invalid_body
     attr_reader :type
 
-    # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>] errors Schema validation errors
+    # @attr_reader [Array<OpenapiFirst::Schema::ValidationError>, nil] errors Schema validation errors
     attr_reader :errors
 
     # A generic error message
