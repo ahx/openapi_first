@@ -52,6 +52,15 @@ RSpec.describe OpenapiFirst do
     end
   end
 
+  describe '.clear_cache!' do
+    it 'clears the file cache so files are reloaded on next load' do
+      first = OpenapiFirst.load(spec_path)
+      OpenapiFirst.clear_cache!
+      second = OpenapiFirst.load(spec_path)
+      expect(second).not_to be(first)
+    end
+  end
+
   describe '.load' do
     begin
       require 'multi_json'
