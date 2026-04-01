@@ -30,15 +30,18 @@ module OpenapiFirst
         matches = path.match(@pattern)
         return unless matches
 
-        values = matches.captures
-        @names.zip(values).to_h
+        matches.named_captures
       end
 
       private
 
       def build_pattern(template)
         parts = template.split(TEMPLATE_EXPRESSION).map! do |part|
-          part.start_with?('{') ? ALLOWED_PARAMETER_CHARACTERS : Regexp.escape(part)
+          if part.start_with?('{')
+            "(?<#{part[1..-2]}>[^/?#]+)"
+          else
+            Regexp.escape(part)
+          end
         end
 
         /^#{parts.join}$/
