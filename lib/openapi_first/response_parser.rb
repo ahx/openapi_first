@@ -25,7 +25,7 @@ module OpenapiFirst
       buffered_body = +''
 
       if rack_response.body.respond_to?(:each)
-        rack_response.body.each { |chunk| buffered_body.to_s << chunk }
+        rack_response.body.each { |chunk| buffered_body << chunk }
         return buffered_body
       end
       rack_response.body
