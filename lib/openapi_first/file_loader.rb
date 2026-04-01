@@ -30,7 +30,7 @@ module OpenapiFirst
       end
     end
 
-    def clear_cache
+    def clear_cache!
       @mutex.synchronize { @cache.clear }
     end
   end
