@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `OpenapiFirst::FileLoader` will now cache the contents of files that have been loaded. This cache
+  is keyed on the file's path. If you need to reload your OpenAPI definition for tests or server hot
+  reloading, you can run `OpenapiFirst::FileLoader.clear_cache!`.
+
 ## 3.2.1
 
 - Don't raise `UnknownQueryParameterError` if request is ignored in tests. Fixes [#441](https://github.com/ahx/openapi_first/issues/441).
