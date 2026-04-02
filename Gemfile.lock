@@ -147,6 +147,8 @@ GEM
     nio4r (2.7.5)
     nokogiri (1.19.2-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.19.2-x86_64-linux-gnu)
+      racc (~> 1.4)
     openapi_parameters (0.11.0)
       rack (>= 2.2)
     parallel (1.27.0)
@@ -280,6 +282,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-25
+  x86_64-linux
 
 DEPENDENCIES
   actionpack
