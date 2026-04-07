@@ -6,8 +6,6 @@ module OpenapiFirst
     class PathTemplate
       # See also https://spec.openapis.org/oas/v3.1.0#path-templating
       TEMPLATE_EXPRESSION = /(\{[^{}]+\})/
-      TEMPLATE_EXPRESSION_NAME = /\{([^{}]+)\}/
-      ALLOWED_PARAMETER_CHARACTERS = %r{([^/?#]+)}
 
       def self.template?(string)
         string.include?('{')
@@ -15,7 +13,6 @@ module OpenapiFirst
 
       def initialize(template)
         @template = template
-        @names = template.scan(TEMPLATE_EXPRESSION_NAME).flatten
         @pattern = build_pattern(template)
       end
 
@@ -25,20 +22,22 @@ module OpenapiFirst
 
       def match(path)
         return {} if path == @template
-        return if @names.empty?
 
         matches = path.match(@pattern)
         return unless matches
 
-        values = matches.captures
-        @names.zip(values).to_h
+        matches.named_captures
       end
 
       private
 
       def build_pattern(template)
         parts = template.split(TEMPLATE_EXPRESSION).map! do |part|
-          part.start_with?('{') ? ALLOWED_PARAMETER_CHARACTERS : Regexp.escape(part)
+          if part.start_with?('{')
+            "(?<#{part[1..-2]}>[^/?#]+)"
+          else
+            Regexp.escape(part)
+          end
         end
 
         /^#{parts.join}$/

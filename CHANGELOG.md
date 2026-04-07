@@ -3,7 +3,8 @@
 ## Unreleased
 
 - OpenapiFirst will now cache the contents of files that have been loaded. If you need to reload your OpenAPI definition for tests or server hot reloading, you can call `OpenapiFirst.clear_cache!`.
-
+- Optimized `OpenapiFirst::Router#match` for faster path matching and reduced memory allocation.
+- 
 ## 3.2.1
 
 - Don't raise `UnknownQueryParameterError` if request is ignored in tests. Fixes [#441](https://github.com/ahx/openapi_first/issues/441).

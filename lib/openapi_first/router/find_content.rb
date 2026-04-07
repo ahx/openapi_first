@@ -8,8 +8,10 @@ module OpenapiFirst
         return contents[nil] if content_type.nil? || content_type.empty?
 
         contents.fetch(content_type) do
-          type = content_type.split(';')[0]
-          contents[type] || contents["#{type.split('/')[0]}/*"] || contents['*/*'] || contents[nil]
+          semi = content_type.index(';')
+          type = semi ? content_type[0, semi] : content_type
+          slash = type.index('/') || type.length
+          contents[type] || contents["#{type[0, slash]}/*"] || contents['*/*'] || contents[nil]
         end
       end
     end
