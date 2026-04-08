@@ -5,28 +5,40 @@ require 'json_schemer'
 module OpenapiFirst
   # This is here to give traverse an OAD while keeping $refs intact
   # @visibility private
-  module RefResolver
-    def self.load(filepath)
-      contents = OpenapiFirst::FileLoader.load(filepath)
+  class RefResolver
+    def initialize(file_loader:)
+      @file_loader = file_loader
+    end
+
+    private attr_reader :file_loader
+
+    def load(filepath)
+      contents = file_loader.load(filepath)
       self.for(contents, filepath:)
     end
 
-    def self.for(value, filepath: nil, context: value)
+    def for(value, filepath: nil, context: value)
       case value
       when ::Hash
-        resolver = Hash.new(value, context:, filepath:)
+        resolver = Hash.new(value, context:, filepath:, ref_resolver: self)
         if value.key?('$ref')
           probe = resolver.resolve_ref(value['$ref'])
           return probe if probe.is_a?(Array)
         end
         resolver
       when ::Array
-        Array.new(value, context:, filepath:)
+        Array.new(value, context:, filepath:, ref_resolver: self)
       when ::NilClass
         nil
       else
-        Simple.new(value)
+        Simple.new(value, ref_resolver: self)
       end
+    end
+
+    def file_at(filepath, file_pointer)
+      file_contents = file_loader.load(filepath)
+      value = Hana::Pointer.new(file_pointer).eval(file_contents)
+      self.for(value, filepath: filepath, context: file_contents)
     end
 
     # @visibility private
@@ -42,10 +54,11 @@ module OpenapiFirst
 
     # @visibility private
     module Resolvable
-      def initialize(value, context: value, filepath: nil)
+      def initialize(value, ref_resolver:, context: value, filepath: nil)
         @value = value
         @context = context
         @filepath = filepath
+        @ref_resolver = ref_resolver
         @dir = if filepath
                  File.dirname(File.absolute_path(filepath))
                else
@@ -62,6 +75,8 @@ module OpenapiFirst
 
       attr_reader :filepath
 
+      private attr_reader :ref_resolver
+
       def ==(_other)
         raise "Don't call == on an unresolved value. Use .value == other instead."
       end
@@ -71,16 +86,14 @@ module OpenapiFirst
           value = Hana::Pointer.new(pointer[1..]).eval(context)
           raise "Unknown reference #{pointer} in #{context}" unless value
 
-          return RefResolver.for(value, filepath:, context:)
+          return ref_resolver.for(value, filepath:, context:)
         end
 
         relative_path, file_pointer = pointer.split('#')
         full_path = File.expand_path(relative_path, dir)
-        return RefResolver.load(full_path) unless file_pointer
+        return ref_resolver.load(full_path) unless file_pointer
 
-        file_contents = FileLoader.load(full_path)
-        value = Hana::Pointer.new(file_pointer).eval(file_contents)
-        RefResolver.for(value, filepath: full_path, context: file_contents)
+        ref_resolver.file_at(full_path, file_pointer)
       rescue OpenapiFirst::FileNotFoundError => e
         message = "Problem with reference resolving #{pointer.inspect} in " \
                   "file #{File.absolute_path(filepath).inspect}: #{e.message}"
@@ -114,13 +127,13 @@ module OpenapiFirst
       def [](key)
         return resolve_ref(@value['$ref'])[key] if !@value.key?(key) && @value.key?('$ref')
 
-        RefResolver.for(@value[key], filepath:, context:)
+        ref_resolver.for(@value[key], filepath:, context:)
       end
 
       def fetch(key)
         return resolve_ref(@value['$ref']).fetch(key) if !@value.key?(key) && @value.key?('$ref')
 
-        RefResolver.for(@value.fetch(key), filepath:, context:)
+        ref_resolver.for(@value.fetch(key), filepath:, context:)
       end
 
       def each
@@ -170,7 +183,7 @@ module OpenapiFirst
         item = @value[index]
         return resolve_ref(item['$ref']) if item.is_a?(::Hash) && item.key?('$ref')
 
-        RefResolver.for(item, filepath:, context:)
+        ref_resolver.for(item, filepath:, context:)
       end
 
       def each

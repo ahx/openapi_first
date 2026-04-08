@@ -22,11 +22,6 @@ module OpenapiFirst
 
   FAILURE = :openapi_first_validation_failure
 
-  # Clears cached files
-  def self.clear_cache!
-    FileLoader.clear_cache!
-  end
-
   # @return [Configuration]
   def self.configuration
     @configuration ||= Configuration.new

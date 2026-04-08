@@ -2,9 +2,11 @@
 
 ## Unreleased
 
+- Optimized caching towards reducing retained memory after calling `OpenapiFirst.load` without using a global cache. Removed `OpenapiFirst.clear_cache!`.
+
 ## 3.3.0
 
-- OpenapiFirst will now cache the contents of files that have been loaded. If you need to reload your OpenAPI definition for tests or server hot reloading, you can call `OpenapiFirst.clear_cache!`.
+- ~OpenapiFirst will now cache the contents of files that have been loaded. If you need to reload your OpenAPI definition for tests or server hot reloading, you can call `OpenapiFirst.clear_cache!`.~
 - Optimized `OpenapiFirst::Router#match` for faster path matching and reduced memory allocation.
  
 ## 3.2.1

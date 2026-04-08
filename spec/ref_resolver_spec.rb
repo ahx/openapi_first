@@ -19,14 +19,16 @@ RSpec.describe OpenapiFirst::RefResolver do
     }
   end
 
+  let(:resolver) { described_class.new(file_loader: OpenapiFirst::FileLoader.new) }
+
   subject(:doc) do
-    described_class.for(contents)
+    resolver.for(contents)
   end
 
   describe '#dir' do
     it 'returns the directory path' do
       filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
-      doc = described_class.load(filepath)
+      doc = resolver.load(filepath)
       expect(doc.dir).to eq(File.expand_path('./spec/data/splitted-train-travel-api'))
 
       node = doc['paths']['/stations']['get']
@@ -40,28 +42,28 @@ RSpec.describe OpenapiFirst::RefResolver do
   describe '#context' do
     it 'returns contents of the main file' do
       filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
-      doc = described_class.load(filepath)
+      doc = resolver.load(filepath)
       node = doc['info']
       expect(node.context['openapi']).to eq('3.1.0')
     end
 
     it 'returns contents of the main file when following internal refs' do
       filepath = './spec/data/train-travel-api/openapi.yaml'
-      doc = described_class.load(filepath)
+      doc = resolver.load(filepath)
       node = doc['paths']['/stations']['get']['responses']['200']['headers']['RateLimit']['schema']
       expect(node.context['openapi']).to eq('3.1.0')
     end
 
     it 'returns contents of the referenced file' do
       filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
-      doc = described_class.load(filepath)
+      doc = resolver.load(filepath)
       node = doc['paths']['/stations']['get']['responses']
       expect(node.context.dig('get', 'description')).to start_with('Returns a list of all train stations')
     end
 
     it 'returns contents of the referenced file when pointing inside referenced files' do
       filepath = './spec/data/petstore.yaml'
-      doc = described_class.load(filepath)
+      doc = resolver.load(filepath)
       node = doc['components']['schemas']['Pet']['required']
       expect(node.context).to eq(YAML.load_file('./spec/data/components/schemas/pet.yaml'))
     end
@@ -73,19 +75,19 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
 
     it 'returns a schema' do
-      node = described_class.load('./spec/data/components/schemas/dog.yaml')
+      node = resolver.load('./spec/data/components/schemas/dog.yaml')
       schema = node.schema(ref_resolver:)
       expect(schema.valid?({ bark: 'woff' })).to eq(true)
       expect(schema.valid?({ bark: 2 })).to eq(false)
     end
 
     it 'accepts options' do
-      node = described_class.for({ 'properties' => {
-                                   'color' => {
-                                     'type' => 'string',
-                                     'default' => 'black'
-                                   }
-                                 } })
+      node = resolver.for({ 'properties' => {
+                            'color' => {
+                              'type' => 'string',
+                              'default' => 'black'
+                            }
+                          } })
       data = {}
       schema = node.schema(insert_property_defaults: true)
       expect(schema.valid?(data)).to eq(true)
@@ -93,14 +95,14 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
 
     it 'uses the right context' do
-      node = described_class.load('./spec/data/petstore.yaml')
+      node = resolver.load('./spec/data/petstore.yaml')
       schema = node.dig('paths', '/pets/{petId}', 'get', 'responses', '200', 'content', 'application/json', 'schema').schema(ref_resolver:)
       expect(schema.valid?([{ id: 2, name: 'Spet' }])).to eq(true)
       expect(schema.valid?([{ id: 'two', name: 'Spet' }])).to eq(false)
     end
 
     it 'works with relative paths in the schema' do
-      node = described_class.load('./spec/data/splitted-train-travel-api/openapi.yaml')
+      node = resolver.load('./spec/data/splitted-train-travel-api/openapi.yaml')
       schema = node.dig('paths', '/bookings', 'get', 'responses', '200', 'content', 'application/json', 'schema').schema(ref_resolver:)
       expect(schema.valid?({ data: [{ has_bicycle: true }] })).to eq(true)
       expect(schema.valid?({ data: [{ has_bicycle: 'red' }] })).to eq(false)
@@ -111,7 +113,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     it 'works across files' do
       filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
       contents = OpenapiFirst::FileLoader.load(filepath)
-      doc = described_class.for(contents, filepath:)
+      doc = resolver.for(contents, filepath:)
       node = doc['paths']['/stations']['get']['responses']['200']['headers']['RateLimit']['schema']
       expect(node.context['description']).to start_with('The RateLimit header')
       expect(node.resolved['type']).to eq('string')
@@ -120,7 +122,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     it 'follows pointers through files' do
       filepath = './spec/data/petstore.yaml'
       contents = OpenapiFirst::FileLoader.load(filepath)
-      doc = described_class.for(contents, filepath:)
+      doc = resolver.for(contents, filepath:)
       target = doc['components']['schemas']['Pet']
 
       expect(target.value).to eq({ '$ref' => './components/schemas/pet.yaml#/Pet' })
@@ -128,12 +130,12 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
 
     it 'returns nil if key is not found' do
-      doc = described_class.for(contents)
+      doc = resolver.for(contents)
       expect(doc['definitions']['unknown']).to eq(nil)
     end
 
     it 'works with arrays' do
-      doc = described_class.for(contents)['array']
+      doc = resolver.for(contents)['array']
       expect(doc[0].resolved).to eq({ 'name' => 'A' })
       expect(doc[1].resolved).to eq({ 'name' => 'B' })
       # expect(doc.dig('array', 1, 'name').value).to eq('B')
@@ -147,7 +149,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     it 'works across files' do
       filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
       contents = OpenapiFirst::FileLoader.load(filepath)
-      doc = described_class.for(contents, filepath:)
+      doc = resolver.for(contents, filepath:)
       node = doc.dig('paths', '/stations', 'get', 'responses', '200', 'headers', 'RateLimit', 'schema')
       expect(node.context['description']).to start_with('The RateLimit header')
       expect(node.resolved['type']).to eq('string')
@@ -156,7 +158,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     it 'follows pointers through files' do
       filepath = './spec/data/petstore.yaml'
       contents = OpenapiFirst::FileLoader.load(filepath)
-      doc = described_class.for(contents, filepath:)
+      doc = resolver.for(contents, filepath:)
       target = doc.dig('components', 'schemas', 'Pet')
 
       expect(target.value).to eq({ '$ref' => './components/schemas/pet.yaml#/Pet' })
@@ -164,7 +166,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
 
     it 'works with arrays' do
-      doc = described_class.for(contents)
+      doc = resolver.for(contents)
       expect(doc.dig('array', 0, 'name').value).to eq('A')
       expect(doc.dig('array', 1, 'name').value).to eq('B')
       expect(doc.dig('array', 0, 'unknown')).to eq(nil)
@@ -173,12 +175,12 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
 
     it 'returns nil if key is not found' do
-      doc = described_class.for(contents)
+      doc = resolver.for(contents)
       expect(doc.dig('definitions', 'unknown')).to eq(nil)
     end
 
     it 'returns nil if multiple keys are not found is not found' do
-      doc = described_class.for(contents)
+      doc = resolver.for(contents)
       expect(doc.dig('definitions', 'unknown', 'funknown')).to eq(nil)
     end
   end
@@ -187,13 +189,13 @@ RSpec.describe OpenapiFirst::RefResolver do
     it 'works across files' do
       filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
       contents = OpenapiFirst::FileLoader.load(filepath)
-      doc = described_class.for(contents, filepath:)
+      doc = resolver.for(contents, filepath:)
       target = doc.fetch('paths').fetch('/stations')['get']['responses']['200']['headers']['RateLimit']['schema']
       expect(target.resolved['type']).to eq('string')
     end
 
     it 'raises KeyError if key is not found' do
-      doc = described_class.for(contents)
+      doc = resolver.for(contents)
       expect do
         doc.fetch('unknown')
       end.to raise_error KeyError
@@ -224,7 +226,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
 
     it 'works with arrays' do
-      doc = described_class.for(contents)
+      doc = resolver.for(contents)
       expect(doc['array'].resolved).to eq([{ 'name' => 'A' }, { 'name' => 'B' }])
     end
   end
@@ -233,7 +235,7 @@ RSpec.describe OpenapiFirst::RefResolver do
     it 'works across files' do
       filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
       contents = OpenapiFirst::FileLoader.load(filepath)
-      doc = described_class.for(contents, filepath:)
+      doc = resolver.for(contents, filepath:)
 
       items = []
       doc.fetch('paths').each { |path, path_item| items << [path, path_item] }
@@ -266,7 +268,7 @@ RSpec.describe OpenapiFirst::RefResolver do
         }
       }
 
-      doc = described_class.for(contents)
+      doc = resolver.for(contents)
       parameters = doc.fetch('paths').first[1]['parameters']
       expect(parameters.resolved[0]['name']).to eq('page')
     end
@@ -308,7 +310,7 @@ RSpec.describe OpenapiFirst::RefResolver do
           },
           'array' => { '$ref' => '#/definitions/array' }
         }
-        doc = described_class.for(contents)
+        doc = resolver.for(contents)
 
         results = []
         doc['array'].each do |node|
