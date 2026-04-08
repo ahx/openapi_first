@@ -1,0 +1,17 @@
+---
+GoalCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - properties:
+      name:
+        description: The name of the goal.
+        example: Grow web traffic by 30%
+        type: string
+      owner:
+        allOf:
+        - "$ref": "#/components/schemas/UserCompact"
+        - nullable: true
+          type: object
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: goal

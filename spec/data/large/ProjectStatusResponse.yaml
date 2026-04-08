@@ -1,0 +1,24 @@
+---
+ProjectStatusResponse:
+  allOf:
+  - "$ref": "#/components/schemas/ProjectStatusBase"
+  - properties:
+      author:
+        "$ref": "#/components/schemas/UserCompact"
+      created_at:
+        description: The time at which this resource was created.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+      created_by:
+        "$ref": "#/components/schemas/UserCompact"
+      modified_at:
+        description: |-
+          The time at which this project status was last modified.
+          *Note: This does not currently reflect any changes in associations such as comments that may have been added or removed from the project status.*
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+    type: object

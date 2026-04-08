@@ -1,0 +1,25 @@
+---
+UserTaskListCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: A user task list represents the tasks assigned to a particular user.
+      It provides API access to a user’s “My Tasks” view in Asana.
+    properties:
+      name:
+        description: The name of the user task list.
+        example: My Tasks in My Workspace
+        type: string
+      owner:
+        allOf:
+        - "$ref": "#/components/schemas/UserCompact"
+        description: The owner of the user task list, i.e. the person whose My Tasks
+          is represented by this resource.
+        readOnly: true
+      workspace:
+        allOf:
+        - "$ref": "#/components/schemas/WorkspaceCompact"
+        description: The workspace in which the user task list is located.
+        readOnly: true
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: user_task_list

@@ -1,0 +1,20 @@
+---
+CustomFieldResponse:
+  allOf:
+  - "$ref": "#/components/schemas/CustomFieldBase"
+  - properties:
+      created_by:
+        "$ref": "#/components/schemas/UserCompact"
+      enum_value:
+        allOf:
+        - "$ref": "#/components/schemas/EnumOption"
+        - description: "*Conditional*. Only relevant for custom fields of type `enum`.
+            This object is the chosen value of an enum custom field."
+          type: object
+      multi_enum_values:
+        description: "*Conditional*. Only relevant for custom fields of type `multi_enum`.
+          This object is the chosen values of a multi_enum custom field."
+        items:
+          "$ref": "#/components/schemas/EnumOption"
+        type: array
+    type: object

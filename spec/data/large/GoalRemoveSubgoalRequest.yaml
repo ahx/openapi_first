@@ -1,0 +1,10 @@
+---
+GoalRemoveSubgoalRequest:
+  properties:
+    subgoal:
+      description: The goal gid to remove as subgoal from the parent goal
+      example: '1331'
+      type: string
+  required:
+  - subgoal
+  type: object

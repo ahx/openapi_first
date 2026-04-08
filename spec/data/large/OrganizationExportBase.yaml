@@ -1,0 +1,3 @@
+---
+OrganizationExportBase:
+  "$ref": "#/components/schemas/OrganizationExportCompact"

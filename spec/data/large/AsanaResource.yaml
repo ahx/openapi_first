@@ -1,0 +1,17 @@
+---
+AsanaResource:
+  description: A generic Asana Resource, containing a globally unique identifier.
+  properties:
+    gid:
+      description: Globally unique identifier of the resource, as a string.
+      example: '12345'
+      readOnly: true
+      type: string
+      x-insert-after: false
+    resource_type:
+      description: The base type of this resource.
+      example: task
+      readOnly: true
+      type: string
+      x-insert-after: gid
+  type: object

@@ -1,0 +1,13 @@
+---
+WorkspaceMembershipCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: This object determines if a user is a member of a workspace.
+    properties:
+      user:
+        "$ref": "#/components/schemas/UserCompact"
+      workspace:
+        "$ref": "#/components/schemas/WorkspaceCompact"
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: workspace_membership

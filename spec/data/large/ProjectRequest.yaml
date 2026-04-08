@@ -1,0 +1,32 @@
+---
+ProjectRequest:
+  allOf:
+  - "$ref": "#/components/schemas/ProjectBase"
+  - properties:
+      custom_fields:
+        additionalProperties:
+          description: '"{custom_field_gid}" => Value (Can be text, number, etc.)'
+          type: string
+        description: An object where each key is a Custom Field gid and each value
+          is an enum gid, string, or number.
+        example:
+          '4578152156': Not Started
+          '5678904321': On Hold
+        type: object
+      followers:
+        description: "*Create-only*. Comma separated string of users. Followers are
+          a subset of members who receive all notifications for a project, the default
+          notification setting when adding members to a project in-product."
+        example: 1234523456
+        type: string
+      owner:
+        description: The current owner of the project, may be null.
+        example: '12345'
+        nullable: true
+        type: string
+      team:
+        description: "*Create-only*. The team that this project is base with. This
+          field only exists for projects in organizations."
+        example: '12345'
+        type: string
+    type: object

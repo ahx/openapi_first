@@ -1,0 +1,29 @@
+---
+TimePeriodCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - properties:
+      end_on:
+        description: The localized end date of the time period in `YYYY-MM-DD` format.
+        example: 2019-09-14
+        type: string
+      period:
+        description: 'The cadence and index of the time period. The value is one of:
+          `FY`, `H1`, `H2`, `Q1`, `Q2`, `Q3`, or `Q4`.'
+        enum:
+        - FY
+        - H1
+        - H2
+        - Q1
+        - Q2
+        - Q3
+        - Q4
+        example: Q1
+        type: string
+      start_on:
+        description: The localized start date of the time period in `YYYY-MM-DD` format.
+        example: 2019-09-13
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: time_period

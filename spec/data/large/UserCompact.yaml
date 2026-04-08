@@ -1,0 +1,14 @@
+---
+UserCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: A *user* object represents an account in Asana that can be given
+      access to various workspaces, projects, and tasks.
+    properties:
+      name:
+        description: "*Read-only except when same user as requester*. The user’s name."
+        example: Greg Sanchez
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: user

@@ -1,0 +1,17 @@
+---
+ProjectStatusCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: 'A *project status* is an update on the progress of a particular
+      project, and is sent out to all project followers when created. These updates
+      include both text describing the update and a color code intended to represent
+      the overall state of the project: "green" for projects that are on track, "yellow"
+      for projects at risk, and "red" for projects that are behind.'
+    properties:
+      title:
+        description: The title of the project status update.
+        example: Status Update - Jun 15
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: project_status

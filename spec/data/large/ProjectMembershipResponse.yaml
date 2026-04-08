@@ -1,0 +1,19 @@
+---
+ProjectMembershipResponse:
+  allOf:
+  - "$ref": "#/components/schemas/ProjectMembershipBase"
+  - properties:
+      project:
+        "$ref": "#/components/schemas/ProjectCompact"
+        description: "[Opt In](/docs/input-output-options). The project the user is
+          a member of."
+      write_access:
+        description: Whether the user has full access to the project or has comment-only
+          access.
+        enum:
+        - full_write
+        - comment_only
+        example: full_write
+        readOnly: true
+        type: string
+    type: object

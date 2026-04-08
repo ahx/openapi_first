@@ -1,0 +1,74 @@
+---
+ProjectResponse:
+  allOf:
+  - "$ref": "#/components/schemas/ProjectBase"
+  - properties:
+      custom_fields:
+        description: Array of Custom Fields.
+        items:
+          "$ref": "#/components/schemas/CustomFieldCompact"
+        readOnly: true
+        type: array
+      followers:
+        description: Array of users following this project. Followers are a subset
+          of members who receive all notifications for a project, the default notification
+          setting when adding members to a project in-product.
+        items:
+          "$ref": "#/components/schemas/UserCompact"
+        readOnly: true
+        type: array
+      icon:
+        description: The icon for a project.
+        enum:
+        - list
+        - board
+        - timeline
+        - calendar
+        - rocket
+        - people
+        - graph
+        - star
+        - bug
+        - light_bulb
+        - globe
+        - gear
+        - notebook
+        - computer
+        - check
+        - target
+        - html
+        - megaphone
+        - chat_bubbles
+        - briefcase
+        - page_layout
+        - mountain_flag
+        - puzzle
+        - presentation
+        - line_and_symbols
+        - speed_dial
+        - ribbon
+        - shoe
+        - shopping_basket
+        - map
+        - ticket
+        - coins
+        example: chat_bubbles
+        nullable: true
+        type: string
+      owner:
+        allOf:
+        - "$ref": "#/components/schemas/UserCompact"
+        description: The current owner of the project, may be null.
+        nullable: true
+      permalink_url:
+        description: A url that points directly to the object within Asana.
+        example: https://app.asana.com/0/resource/123456789/list
+        readOnly: true
+        type: string
+      team:
+        allOf:
+        - "$ref": "#/components/schemas/TeamCompact"
+        - description: "*Create-only*. The team that this project is base with. This
+            field only exists for projects in organizations."
+          type: object
+    type: object

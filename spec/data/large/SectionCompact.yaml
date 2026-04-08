@@ -1,0 +1,16 @@
+---
+SectionCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: A *section* is a subdivision of a project that groups tasks together.
+      It can either be a header above a list of tasks in a list view or a column in
+      a board view of a project.
+    properties:
+      name:
+        description: The name of the section (i.e. the text displayed as the section
+          header).
+        example: Next Actions
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: section

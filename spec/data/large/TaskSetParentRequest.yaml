@@ -1,0 +1,20 @@
+---
+TaskSetParentRequest:
+  properties:
+    insert_after:
+      description: A subtask of the parent to insert the task after, or `null` to
+        insert at the beginning of the list.
+      example: 'null'
+      type: string
+    insert_before:
+      description: A subtask of the parent to insert the task before, or `null` to
+        insert at the end of the list.
+      example: '124816'
+      type: string
+    parent:
+      description: The new parent of the task, or `null` for no parent.
+      example: '987654'
+      type: string
+  required:
+  - parent
+  type: object

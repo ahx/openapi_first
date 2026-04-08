@@ -1,0 +1,34 @@
+---
+CustomFieldSettingResponse:
+  allOf:
+  - "$ref": "#/components/schemas/CustomFieldSettingBase"
+  - properties:
+      custom_field:
+        allOf:
+        - "$ref": "#/components/schemas/CustomFieldResponse"
+        - description: The custom field that is applied to the `parent`.
+          readOnly: true
+          type: object
+      is_important:
+        description: "`is_important` is used in the Asana web application to determine
+          if this custom field is displayed in the list/grid view of a project or
+          portfolio."
+        example: false
+        readOnly: true
+        type: boolean
+      parent:
+        allOf:
+        - "$ref": "#/components/schemas/ProjectCompact"
+        - description: The parent to which the custom field is applied. This can be
+            a project or portfolio and indicates that the tasks or projects that the
+            parent contains may be given custom field values for this custom field.
+          readOnly: true
+          type: object
+      project:
+        allOf:
+        - "$ref": "#/components/schemas/ProjectCompact"
+        - description: "*Deprecated: new integrations should prefer the `parent` field.*
+            The id of the project that this custom field settings refers to."
+          readOnly: true
+          type: object
+    type: object

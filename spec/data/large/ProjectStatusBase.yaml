@@ -1,0 +1,27 @@
+---
+ProjectStatusBase:
+  allOf:
+  - "$ref": "#/components/schemas/ProjectStatusCompact"
+  - properties:
+      color:
+        description: The color associated with the status update.
+        enum:
+        - green
+        - yellow
+        - red
+        - blue
+        type: string
+      html_text:
+        description: "[Opt In](/docs/input-output-options). The text content of the
+          status update with formatting as HTML."
+        example: "<body>The project <strong>is</strong> moving forward according to
+          plan...</body>"
+        type: string
+      text:
+        description: The text content of the status update.
+        example: The project is moving forward according to plan...
+        type: string
+    required:
+    - text
+    - color
+    type: object

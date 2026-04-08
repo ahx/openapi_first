@@ -1,0 +1,208 @@
+---
+TaskBase:
+  allOf:
+  - "$ref": "#/components/schemas/TaskCompact"
+  - properties:
+      approval_status:
+        description: "*Conditional* Reflects the approval status of this task. This
+          field is kept in sync with `completed`, meaning `pending` translates to
+          false while `approved`, `rejected`, and `changes_requested` translate to
+          true. If you set completed to true, this field will be set to `approved`."
+        enum:
+        - pending
+        - approved
+        - rejected
+        - changes_requested
+        example: pending
+        type: string
+      assignee_status:
+        description: '*Deprecated* Scheduling status of this task for the user it
+          is assigned to. This field can only be set if the assignee is non-null.
+          Setting this field to "inbox" or "upcoming" inserts it at the top of the
+          section, while the other options will insert at the bottom.'
+        enum:
+        - today
+        - upcoming
+        - later
+        - new
+        - inbox
+        example: upcoming
+        type: string
+      completed:
+        description: True if the task is currently marked complete, false if not.
+        example: false
+        type: boolean
+      completed_at:
+        description: The time at which this task was completed, or null if the task
+          is incomplete.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        nullable: true
+        readOnly: true
+        type: string
+      completed_by:
+        "$ref": "#/components/schemas/UserCompact"
+        readOnly: true
+      created_at:
+        description: The time at which this resource was created.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+      dependencies:
+        description: "[Opt In](/docs/input-output-options). Array of resources referencing
+          tasks that this task depends on. The objects contain only the gid of the
+          dependency."
+        items:
+          "$ref": "#/components/schemas/AsanaResource"
+        readOnly: true
+        type: array
+      dependents:
+        description: "[Opt In](/docs/input-output-options). Array of resources referencing
+          tasks that depend on this task. The objects contain only the ID of the dependent."
+        items:
+          "$ref": "#/components/schemas/AsanaResource"
+        readOnly: true
+        type: array
+      due_at:
+        description: The UTC date and time on which this task is due, or null if the
+          task has no due time. This takes an ISO 8601 date string in UTC and should
+          not be used together with `due_on`.
+        example: 2019-09-15 02:06:58.147000000 Z
+        format: date
+        nullable: true
+        type: string
+      due_on:
+        description: The localized date on which this task is due, or null if the
+          task has no due date. This takes a date with `YYYY-MM-DD` format and should
+          not be used together with due_at.
+        example: 2019-09-15
+        format: date
+        nullable: true
+        type: string
+      external:
+        description: |-
+          *OAuth Required*. *Conditional*. This field is returned only if external values are set or included by using [Opt In] (/docs/input-output-options).
+          The external field allows you to store app-specific metadata on tasks, including a gid that can be used to retrieve tasks and a data blob that can store app-specific character strings. Note that you will need to authenticate with Oauth to access or modify this data. Once an external gid is set, you can use the notation `external:custom_gid` to reference your object anywhere in the API where you may use the original object gid. See the page on Custom External Data for more details.
+        example:
+          data: A blob of information
+          gid: my_gid
+        properties:
+          data:
+            example: A blob of information.
+            type: string
+          gid:
+            example: '1234'
+            type: string
+        type: object
+      hearted:
+        description: "*Deprecated - please use liked instead* True if the task is
+          hearted by the authorized user, false if not."
+        example: true
+        readOnly: true
+        type: boolean
+      hearts:
+        description: "*Deprecated - please use likes instead* Array of likes for users
+          who have hearted this task."
+        items:
+          "$ref": "#/components/schemas/Like"
+        readOnly: true
+        type: array
+      html_notes:
+        description: "[Opt In](/docs/input-output-options). The notes of the text
+          with formatting as HTML."
+        example: "<body>Mittens <em>really</em> likes the stuff from Humboldt.</body>"
+        type: string
+      is_rendered_as_separator:
+        description: "[Opt In](/docs/input-output-options). In some contexts tasks
+          can be rendered as a visual separator; for instance, subtasks can appear
+          similar to [sections](/docs/asana-sections) without being true `section`
+          objects. If a `task` object is rendered this way in any context it will
+          have the property `is_rendered_as_separator` set to `true`."
+        example: false
+        readOnly: true
+        type: boolean
+      liked:
+        description: True if the task is liked by the authorized user, false if not.
+        example: true
+        type: boolean
+      likes:
+        description: Array of likes for users who have liked this task.
+        items:
+          "$ref": "#/components/schemas/Like"
+        readOnly: true
+        type: array
+      memberships:
+        description: "*Create-only*. Array of projects this task is associated with
+          and the section it is in. At task creation time, this array can be used
+          to add the task to specific sections. After task creation, these associations
+          can be modified using the `addProject` and `removeProject` endpoints. Note
+          that over time, more types of memberships may be added to this property."
+        items:
+          properties:
+            project:
+              "$ref": "#/components/schemas/ProjectCompact"
+            section:
+              "$ref": "#/components/schemas/SectionCompact"
+          type: object
+        readOnly: true
+        type: array
+      modified_at:
+        description: |-
+          The time at which this task was last modified.
+
+          *Note: This does not currently reflect any changes in
+          associations such as projects or comments that may have been
+          added or removed from the task.*
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+      name:
+        description: Name of the task. This is generally a short sentence fragment
+          that fits on a line in the UI for maximum readability. However, it can be
+          longer.
+        example: Buy catnip
+        type: string
+      notes:
+        description: Free-form textual information associated with the task (i.e.
+          its description).
+        example: Mittens really likes the stuff from Humboldt.
+        type: string
+      num_hearts:
+        description: "*Deprecated - please use likes instead* The number of users
+          who have hearted this task."
+        example: 5
+        readOnly: true
+        type: integer
+      num_likes:
+        description: The number of users who have liked this task.
+        example: 5
+        readOnly: true
+        type: integer
+      num_subtasks:
+        description: "[Opt In](/docs/input-output-options). The number of subtasks
+          on this task.\n"
+        example: 3
+        readOnly: true
+        type: integer
+      resource_subtype:
+        description: |-
+          The subtype of this resource. Different subtypes retain many of the same fields and behavior, but may render differently in Asana or represent resources with different semantic meaning.
+          The resource_subtype `milestone` represent a single moment in time. This means tasks with this subtype cannot have a start_date.
+        enum:
+        - default_task
+        - milestone
+        - section
+        - approval
+        example: default_task
+        type: string
+      start_on:
+        description: |-
+          The day on which work begins for the task , or null if the task has no start date. This takes a date with `YYYY-MM-DD` format.
+          *Note: `due_on` or `due_at` must be present in the request when setting or unsetting the `start_on` parameter.*
+        example: 2019-09-14
+        format: date
+        nullable: true
+        type: string
+    type: object

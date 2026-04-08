@@ -1,0 +1,37 @@
+---
+WebhookFilter:
+  description: A WebhookFilter can be passed on creation of a webhook in order to
+    filter the types of actions that trigger delivery of an [Event](/docs/tocS_Event)
+  properties:
+    action:
+      description: The type of change on the **resource** to pass through the filter.
+        For more information refer to `Event.action` in the [Event](/docs/tocS_Event)
+        schema. This can be one of `changed`, `added`, `removed`, `deleted`, and `undeleted`
+        depending on the nature of what has occurred on the resource.
+      example: changed
+      type: string
+    fields:
+      description: "*Conditional.* A whitelist of fields for events which will pass
+        the filter when the resource is changed. These can be any combination of the
+        fields on the resources themselves. This field is only valid for `action`
+        of type `changed`"
+      example:
+      - due_at
+      - due_on
+      - dependencies
+      items:
+        type: string
+      type: array
+    resource_subtype:
+      description: The resource subtype of the resource that the filter applies to.
+        This should be set to the same value as is returned on the `resource_subtype`
+        field on the resources themselves.
+      example: milestone
+      type: string
+    resource_type:
+      description: The type of the resource which created the event when modified;
+        for example, to filter to changes on regular tasks this field should be set
+        to `task`.
+      example: task
+      type: string
+  type: object

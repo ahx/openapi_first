@@ -1,0 +1,14 @@
+---
+ModifyDependentsRequest:
+  description: A set of dependent tasks.
+  example:
+    dependents:
+    - '133713'
+    - '184253'
+  properties:
+    dependents:
+      description: An array of task gids that are dependents of the given task.
+      items:
+        type: string
+      type: array
+  type: object

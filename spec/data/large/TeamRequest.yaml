@@ -1,0 +1,24 @@
+---
+TeamRequest:
+  allOf:
+  - "$ref": "#/components/schemas/TeamBase"
+  - properties:
+      description:
+        description: 'The description of the team.
+
+          '
+        example: All developers should be members of this team.
+        type: string
+      html_description:
+        description: 'The description of the team with formatting as HTML.
+
+          '
+        example: "<body><em>All</em> developers should be members of this team.</body>"
+        type: string
+      organization:
+        description: 'The organization/workspace the team belongs to.
+
+          '
+        example: '123456789'
+        type: string
+    type: object

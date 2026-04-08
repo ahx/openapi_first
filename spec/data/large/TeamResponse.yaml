@@ -1,0 +1,28 @@
+---
+TeamResponse:
+  allOf:
+  - "$ref": "#/components/schemas/TeamBase"
+  - properties:
+      description:
+        description: "[Opt In](/docs/input-output-options). The description of the
+          team.\n"
+        example: All developers should be members of this team.
+        type: string
+      html_description:
+        description: "[Opt In](/docs/input-output-options). The description of the
+          team with formatting as HTML.\n"
+        example: "<body><em>All</em> developers should be members of this team.</body>"
+        type: string
+      organization:
+        allOf:
+        - "$ref": "#/components/schemas/WorkspaceCompact"
+        - description: 'The organization/workspace the team belongs to.
+
+            '
+          type: object
+      permalink_url:
+        description: A url that points directly to the object within Asana.
+        example: https://app.asana.com/0/resource/123456789/list
+        readOnly: true
+        type: string
+    type: object

@@ -1,0 +1,3 @@
+---
+UserTaskListBase:
+  "$ref": "#/components/schemas/UserTaskListCompact"

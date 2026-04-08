@@ -1,0 +1,10 @@
+---
+RemoveCustomFieldSettingRequest:
+  properties:
+    custom_field:
+      description: The custom field to remove from this portfolio.
+      example: '14916'
+      type: string
+  required:
+  - custom_field
+  type: object

@@ -1,0 +1,3 @@
+---
+WorkspaceMembershipBase:
+  "$ref": "#/components/schemas/WorkspaceMembershipCompact"

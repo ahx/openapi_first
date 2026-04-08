@@ -1,0 +1,3 @@
+---
+CustomFieldSettingBase:
+  "$ref": "#/components/schemas/CustomFieldSettingCompact"

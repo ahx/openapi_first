@@ -1,0 +1,14 @@
+---
+TeamCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: A *team* is used to group related projects and people together within
+      an organization. Each project in an organization is associated with a team.
+    properties:
+      name:
+        description: The name of the team.
+        example: Marketing
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: team

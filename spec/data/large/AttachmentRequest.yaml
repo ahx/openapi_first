@@ -1,0 +1,33 @@
+---
+AttachmentRequest:
+  properties:
+    file:
+      description: 'Required for file attachments.
+
+        '
+      format: binary
+      type: string
+    name:
+      description: 'The name of the external resource being attached. Required for
+        attachments of type ''external''.
+
+        '
+      type: string
+    resource_subtype:
+      description: 'The type of the attachment. Must be one of the given values. If
+        not specified, a file attachment of type `asana_file_attachments` will be
+        assumed.
+
+        '
+      enum:
+      - asana_file_attachments
+      - external
+      example: text
+      type: string
+    url:
+      description: 'The URL of the external resource being attached. Required for
+        attachments of type ''external''.
+
+        '
+      type: string
+  type: object

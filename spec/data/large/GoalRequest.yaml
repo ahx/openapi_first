@@ -1,0 +1,3 @@
+---
+GoalRequest:
+  "$ref": "#/components/schemas/GoalBase"

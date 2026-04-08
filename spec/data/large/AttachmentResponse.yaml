@@ -1,0 +1,42 @@
+---
+AttachmentResponse:
+  allOf:
+  - "$ref": "#/components/schemas/AttachmentBase"
+  - properties:
+      created_at:
+        description: The time at which this resource was created.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+      download_url:
+        description: |-
+          The URL containing the content of the attachment.
+          *Note:* May be null if the attachment is hosted by [Box](https://www.box.com/). If present, this URL may only be valid for two minutes from the time of retrieval. You should avoid persisting this URL somewhere and just refresh it on demand to ensure you do not keep stale URLs.
+        example: https://s3.amazonaws.com/assets/123/Screenshot.png
+        format: uri
+        nullable: true
+        readOnly: true
+        type: string
+      host:
+        description: The service hosting the attachment. Valid values are `asana`,
+          `dropbox`, `gdrive` and `box`.
+        example: dropbox
+        readOnly: true
+        type: string
+      parent:
+        allOf:
+        - "$ref": "#/components/schemas/TaskCompact"
+        - description: The task this attachment is attached to.
+          readOnly: true
+          type: object
+      view_url:
+        description: The URL where the attachment can be viewed, which may be friendlier
+          to users in a browser than just directing them to a raw file. May be null
+          if no view URL exists for the service.
+        example: https://www.dropbox.com/s/123/Screenshot.png
+        format: uri
+        nullable: true
+        readOnly: true
+        type: string
+    type: object

@@ -1,0 +1,3 @@
+---
+GoalMetricRequest:
+  "$ref": "#/components/schemas/GoalMetricBase"

@@ -1,0 +1,17 @@
+---
+GoalResponse:
+  allOf:
+  - "$ref": "#/components/schemas/GoalBase"
+  - properties:
+      likes:
+        description: Array of likes for users who have liked this goal.
+        items:
+          "$ref": "#/components/schemas/Like"
+        readOnly: true
+        type: array
+      num_likes:
+        description: The number of users who have liked this goal.
+        example: 5
+        readOnly: true
+        type: integer
+    type: object

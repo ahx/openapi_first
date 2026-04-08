@@ -1,0 +1,3 @@
+---
+JobResponse:
+  "$ref": "#/components/schemas/JobBase"

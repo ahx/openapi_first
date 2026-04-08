@@ -1,0 +1,11 @@
+---
+GoalMetricCurrentValueRequest:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - properties:
+      current_number_value:
+        description: "*Conditional*. This number is the current value of a goal metric
+          of type number."
+        example: 8.12
+        type: number
+    type: object

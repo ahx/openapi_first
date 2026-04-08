@@ -1,0 +1,20 @@
+---
+TagRequest:
+  allOf:
+  - "$ref": "#/components/schemas/TagBase"
+  - properties:
+      followers:
+        description: An array of strings identifying users. These can either be the
+          string "me", an email, or the gid of a user.
+        example:
+        - '12345'
+        - '42563'
+        items:
+          type: string
+        type: array
+      workspace:
+        description: Gid of an object.
+        example: '12345'
+        type: string
+        x-env-variable: true
+    type: object

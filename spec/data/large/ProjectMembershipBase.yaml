@@ -1,0 +1,3 @@
+---
+ProjectMembershipBase:
+  "$ref": "#/components/schemas/ProjectMembershipCompact"

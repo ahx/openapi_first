@@ -1,0 +1,13 @@
+---
+ModifyDependenciesRequest:
+  example:
+    dependencies:
+    - '133713'
+    - '184253'
+  properties:
+    dependencies:
+      description: An array of task gids that a task depends on.
+      items:
+        type: string
+      type: array
+  type: object

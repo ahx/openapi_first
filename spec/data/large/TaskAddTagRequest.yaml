@@ -1,0 +1,10 @@
+---
+TaskAddTagRequest:
+  properties:
+    tag:
+      description: The tag to add to the task.
+      example: '13579'
+      type: string
+  required:
+  - tag
+  type: object

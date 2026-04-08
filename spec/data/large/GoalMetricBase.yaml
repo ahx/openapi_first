@@ -1,0 +1,54 @@
+---
+GoalMetricBase:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - properties:
+      currency_code:
+        description: ISO 4217 currency code to format this custom field. This will
+          be null if the `format` is not `currency`.
+        example: EUR
+        nullable: true
+        type: string
+      current_display_value:
+        description: "*Conditional*. This string is the current value of a goal metric
+          of type string."
+        example: '8.12'
+        type: string
+      current_number_value:
+        description: "*Conditional*. This number is the current value of a goal metric
+          of type number."
+        example: 8.12
+        type: number
+      initial_number_value:
+        description: "*Conditional*. This number is the start value of a goal metric
+          of type number."
+        example: 5.2
+        type: number
+      precision:
+        description: |-
+          Only relevant for goal metrics of type ‘Number’. This field dictates the number of places after the decimal to round to, i.e. 0 is integer values, 1 rounds to the nearest tenth, and so on. Must be between 0 and 6, inclusive.
+          For percentage format, this may be unintuitive, as a value of 0.25 has a precision of 0, while a value of 0.251 has a precision of 1. This is due to 0.25 being displayed as 25%.
+        example: 2
+        type: integer
+      resource_subtype:
+        description: The subtype of this resource. Different subtypes retain many
+          of the same fields and behavior, but may render differently in Asana or
+          represent resources with different semantic meaning.
+        enum:
+        - number
+        example: number
+        readOnly: true
+        type: string
+      target_number_value:
+        description: "*Conditional*. This number is the end value of a goal metric
+          of type number."
+        example: 10.2
+        type: number
+      unit:
+        description: A supported unit of measure for the goal metric, or none.
+        enum:
+        - none
+        - currency
+        - percentage
+        type: string
+    type: object

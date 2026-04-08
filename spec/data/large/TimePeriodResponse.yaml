@@ -1,0 +1,5 @@
+---
+TimePeriodResponse:
+  allOf:
+  - "$ref": "#/components/schemas/TimePeriodBase"
+  - type: object

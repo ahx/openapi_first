@@ -1,0 +1,3 @@
+---
+StoryRequest:
+  "$ref": "#/components/schemas/StoryBase"

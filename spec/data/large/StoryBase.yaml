@@ -1,0 +1,54 @@
+---
+StoryBase:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: A story represents an activity associated with an object in the Asana
+      system.
+    properties:
+      created_at:
+        description: The time at which this resource was created.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+      html_text:
+        description: "[Opt In](/docs/input-output-options). HTML formatted text for
+          a comment. This will not include the name of the creator."
+        example: "<body>This is a comment.<body>"
+        type: string
+      is_pinned:
+        description: "*Conditional*. Whether the story should be pinned on the resource."
+        example: false
+        type: boolean
+      resource_subtype:
+        description: The subtype of this resource. Different subtypes retain many
+          of the same fields and behavior, but may render differently in Asana or
+          represent resources with different semantic meaning.
+        example: comment_added
+        readOnly: true
+        type: string
+      sticker_name:
+        description: The name of the sticker in this story. `null` if there is no
+          sticker.
+        enum:
+        - green_checkmark
+        - people_dancing
+        - dancing_unicorn
+        - heart
+        - party_popper
+        - people_waving_flags
+        - splashing_narwhal
+        - trophy
+        - yeti_riding_unicorn
+        - celebrating_people
+        - determined_climbers
+        - phoenix_spreading_love
+        example: dancing_unicorn
+        type: string
+      text:
+        description: The plain text of the comment to add. Cannot be used with html_text.
+        example: This is a comment.
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: story

@@ -1,0 +1,72 @@
+---
+GoalBase:
+  allOf:
+  - "$ref": "#/components/schemas/GoalCompact"
+  - properties:
+      due_on:
+        description: The localized day on which this goal is due. This takes a date
+          with format `YYYY-MM-DD`.
+        example: 2019-09-15
+        nullable: true
+        type: string
+      followers:
+        description: Array of users following this goal.
+        items:
+          "$ref": "#/components/schemas/UserCompact"
+        type: array
+      html_notes:
+        description: The notes of the goal with formatting as HTML.
+        example: "<body>Start building brand awareness.</body>"
+        type: string
+      is_workspace_level:
+        description: "*Conditional*. This property is only present when the `workspace`
+          provided is an organization. Whether the goal belongs to the `workspace`
+          (and is listed as part of the workspace’s goals) or not. If it isn’t a workspace-level
+          goal, it is a team-level goal, and is associated with the goal’s team."
+        example: true
+        type: boolean
+      liked:
+        description: True if the goal is liked by the authorized user, false if not.
+        example: false
+        type: boolean
+      metric:
+        allOf:
+        - "$ref": "#/components/schemas/GoalMetricBase"
+        - nullable: true
+          type: object
+      notes:
+        description: Free-form textual information associated with the goal (i.e.
+          its description).
+        example: Start building brand awareness.
+        type: string
+      start_on:
+        description: The day on which work for this goal begins, or null if the goal
+          has no start date. This takes a date with `YYYY-MM-DD` format, and cannot
+          be set unless there is an accompanying due date.
+        example: 2019-09-14
+        nullable: true
+        type: string
+      status:
+        description: The current status of this goal. When the goal is open, its status
+          can be `green`, `yellow`, and `red` to reflect "On Track", "At Risk", and
+          "Off Track", respectively. When the goal is closed, the value can be `missed`,
+          `achieved`, `partial`, or `dropped`.
+        nullable: true
+        type: string
+      team:
+        allOf:
+        - "$ref": "#/components/schemas/TeamCompact"
+        - nullable: true
+          type: object
+        description: "*Conditional*. This property is only present when the `workspace`
+          provided is an organization."
+      time_period:
+        allOf:
+        - "$ref": "#/components/schemas/TimePeriodCompact"
+        - nullable: true
+          type: object
+      workspace:
+        allOf:
+        - "$ref": "#/components/schemas/WorkspaceCompact"
+        - type: object
+    type: object

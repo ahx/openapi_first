@@ -1,0 +1,209 @@
+---
+StoryResponse:
+  allOf:
+  - "$ref": "#/components/schemas/StoryBase"
+  - properties:
+      assignee:
+        "$ref": "#/components/schemas/UserCompact"
+        description: "*Conditional*"
+        readOnly: true
+      created_by:
+        "$ref": "#/components/schemas/UserCompact"
+      custom_field:
+        "$ref": "#/components/schemas/CustomFieldCompact"
+        description: "*Conditional*"
+        readOnly: true
+      dependency:
+        "$ref": "#/components/schemas/TaskCompact"
+        description: "*Conditional*"
+        readOnly: true
+      duplicate_of:
+        "$ref": "#/components/schemas/TaskCompact"
+        description: "*Conditional*"
+        readOnly: true
+      duplicated_from:
+        "$ref": "#/components/schemas/TaskCompact"
+        description: "*Conditional*"
+        readOnly: true
+      follower:
+        "$ref": "#/components/schemas/UserCompact"
+        description: "*Conditional*"
+        readOnly: true
+      hearted:
+        description: |-
+          *Deprecated - please use likes instead*
+          *Conditional*. True if the story is hearted by the authorized user, false if not.
+        example: false
+        readOnly: true
+        type: boolean
+      hearts:
+        description: |-
+          *Deprecated - please use likes instead*
+
+          *Conditional*. Array of likes for users who have hearted this story.
+        items:
+          "$ref": "#/components/schemas/Like"
+        readOnly: true
+        type: array
+      is_edited:
+        description: "*Conditional*. Whether the text of the story has been edited
+          after creation."
+        example: false
+        readOnly: true
+        type: boolean
+      liked:
+        description: "*Conditional*. True if the story is liked by the authorized
+          user, false if not."
+        example: false
+        readOnly: true
+        type: boolean
+      likes:
+        description: "*Conditional*. Array of likes for users who have liked this
+          story."
+        items:
+          "$ref": "#/components/schemas/Like"
+        readOnly: true
+        type: array
+      new_approval_status:
+        description: "*Conditional*"
+        example: approved
+        readOnly: true
+        type: string
+      new_dates:
+        "$ref": "#/components/schemas/StoryResponseDates"
+      new_enum_value:
+        "$ref": "#/components/schemas/EnumOption"
+        description: "*Conditional*"
+        readOnly: true
+      new_multi_enum_values:
+        description: "*Conditional*"
+        items:
+          "$ref": "#/components/schemas/EnumOption"
+        readOnly: true
+        type: array
+      new_name:
+        description: "*Conditional*"
+        example: This is the New Name
+        readOnly: true
+        type: string
+      new_number_value:
+        description: "*Conditional*"
+        example: 2
+        readOnly: true
+        type: integer
+      new_resource_subtype:
+        description: "*Conditional*"
+        example: milestone
+        readOnly: true
+        type: string
+      new_section:
+        "$ref": "#/components/schemas/SectionCompact"
+        description: "*Conditional*"
+        readOnly: true
+      new_text_value:
+        description: "*Conditional*"
+        example: This is the New Text
+        readOnly: true
+        type: string
+      num_hearts:
+        description: |-
+          *Deprecated - please use likes instead*
+
+          *Conditional*. The number of users who have hearted this story.
+        example: 5
+        readOnly: true
+        type: integer
+      num_likes:
+        description: "*Conditional*. The number of users who have liked this story."
+        example: 5
+        readOnly: true
+        type: integer
+      old_approval_status:
+        description: "*Conditional*"
+        example: pending
+        readOnly: true
+        type: string
+      old_dates:
+        "$ref": "#/components/schemas/StoryResponseDates"
+      old_enum_value:
+        "$ref": "#/components/schemas/EnumOption"
+        description: "*Conditional*"
+        readOnly: true
+      old_multi_enum_values:
+        description: "*Conditional*"
+        items:
+          "$ref": "#/components/schemas/EnumOption"
+        readOnly: true
+        type: array
+      old_name:
+        description: "*Conditional*'"
+        example: This was the Old Name
+        type: string
+      old_number_value:
+        description: "*Conditional*"
+        example: 1
+        readOnly: true
+        type: integer
+      old_resource_subtype:
+        description: "*Conditional*"
+        example: default_task
+        readOnly: true
+        type: string
+      old_section:
+        "$ref": "#/components/schemas/SectionCompact"
+        description: "*Conditional*"
+        readOnly: true
+      old_text_value:
+        description: "*Conditional*"
+        example: This was the Old Text
+        readOnly: true
+        type: string
+      previews:
+        description: |-
+          *Conditional*. A collection of previews to be displayed in the story.
+
+          *Note: This property only exists for comment stories.*
+        items:
+          "$ref": "#/components/schemas/Preview"
+        readOnly: true
+        type: array
+      project:
+        "$ref": "#/components/schemas/ProjectCompact"
+        description: "*Conditional*"
+        readOnly: true
+      source:
+        description: The component of the Asana product the user used to trigger the
+          story.
+        enum:
+        - web
+        - email
+        - mobile
+        - api
+        - unknown
+        example: web
+        readOnly: true
+        type: string
+      story:
+        "$ref": "#/components/schemas/StoryCompact"
+        description: "*Conditional*"
+        readOnly: true
+      tag:
+        "$ref": "#/components/schemas/TagCompact"
+        description: "*Conditional*"
+        readOnly: true
+      target:
+        description: The object this story is associated with. Currently may only
+          be a task.
+        properties:
+          gid:
+            example: '1234'
+            type: string
+          name:
+            example: Bug Task
+            type: string
+        readOnly: true
+      task:
+        "$ref": "#/components/schemas/TaskCompact"
+        description: "*Conditional*"
+        readOnly: true
+    type: object

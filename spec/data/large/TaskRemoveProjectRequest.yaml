@@ -1,0 +1,10 @@
+---
+TaskRemoveProjectRequest:
+  properties:
+    project:
+      description: The project to remove the task from.
+      example: '13579'
+      type: string
+  required:
+  - project
+  type: object

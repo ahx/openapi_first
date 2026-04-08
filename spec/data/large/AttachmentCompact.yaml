@@ -1,0 +1,20 @@
+---
+AttachmentCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: An *attachment* object represents any file attached to a task in
+      Asana, whether it’s an uploaded file or one associated via a third-party service
+      such as Dropbox or Google Drive.
+    properties:
+      name:
+        description: The name of the file.
+        example: Screenshot.png
+        readOnly: true
+        type: string
+      resource_subtype:
+        description: |-
+          The service hosting the attachment. Valid values are `asana`, `dropbox`, `gdrive`, `onedrive`, `box`, and `external`.
+          `external` attachments are a beta feature currently limited to specific integrations.
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: attachment
