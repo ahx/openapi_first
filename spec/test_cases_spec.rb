@@ -15,8 +15,7 @@ RSpec.describe 'request/response validation examples' do
 
           let(:app) do
             lambda do |_env|
-              body = response['body']
-              body = JSON.generate(response['body']) unless response['body'].is_a?(String)
+              body = JSON.generate(response['body'])
               Rack::Response[
                 response['status'] || 200,
                 { 'Content-Type' => response['content_type'] || 'application/json' },
