@@ -55,6 +55,7 @@ RSpec.describe OpenapiFirst do
   describe '.load' do
     begin
       require 'multi_json'
+      # :nocov:
       before do
         MultiJson.load_options = { symbolize_keys: true }
       end
@@ -62,6 +63,7 @@ RSpec.describe OpenapiFirst do
       after do
         MultiJson.load_options = { symbolize_keys: false }
       end
+      # :nocov:
     rescue LoadError # rubocop:disable Lint/SuppressedException
     end
 
