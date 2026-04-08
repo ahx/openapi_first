@@ -1,0 +1,22 @@
+---
+GoalAddSubgoalRequest:
+  properties:
+    insert_after:
+      description: An id of a subgoal of this parent goal. The new subgoal will be
+        added after the one specified here. `insert_before` and `insert_after` parameters
+        cannot both be specified.
+      example: '1331'
+      type: string
+    insert_before:
+      description: An id of a subgoal of this parent goal. The new subgoal will be
+        added before the one specified here. `insert_before` and `insert_after` parameters
+        cannot both be specified.
+      example: '1331'
+      type: string
+    subgoal:
+      description: The goal gid to add as subgoal to a parent goal
+      example: '1331'
+      type: string
+  required:
+  - subgoal
+  type: object

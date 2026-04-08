@@ -1,0 +1,3 @@
+---
+PortfolioMembershipBase:
+  "$ref": "#/components/schemas/PortfolioMembershipCompact"

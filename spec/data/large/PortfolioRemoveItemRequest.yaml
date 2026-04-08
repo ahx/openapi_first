@@ -1,0 +1,10 @@
+---
+PortfolioRemoveItemRequest:
+  properties:
+    item:
+      description: The item to remove from the portfolio.
+      example: '1331'
+      type: string
+  required:
+  - item
+  type: object

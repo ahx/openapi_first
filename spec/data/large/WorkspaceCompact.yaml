@@ -1,0 +1,14 @@
+---
+WorkspaceCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: A *workspace* is the highest-level organizational unit in Asana.
+      All projects and tasks have an associated workspace.
+    properties:
+      name:
+        description: The name of the workspace.
+        example: My Company Workspace
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: workspace

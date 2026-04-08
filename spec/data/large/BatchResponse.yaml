@@ -1,0 +1,25 @@
+---
+BatchResponse:
+  description: A response object returned from a batch request.
+  properties:
+    body:
+      description: The JSON body that the invoked endpoint returned.
+      example:
+        data:
+          completed: false
+          gid: '1967'
+          name: Hello, world!
+          notes: How are you today?
+      type: object
+    headers:
+      description: A map of HTTP headers specific to this result. This is primarily
+        used for returning a `Location` header to accompany a `201 Created` result.  The
+        parent HTTP response will contain all common headers.
+      example:
+        location: "/tasks/1234"
+      type: object
+    status_code:
+      description: The HTTP status code that the invoked endpoint returned.
+      example: 200
+      type: integer
+  type: object

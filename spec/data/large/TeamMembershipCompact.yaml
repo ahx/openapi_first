@@ -1,0 +1,17 @@
+---
+TeamMembershipCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: This object represents a user's connection to a team.
+    properties:
+      is_guest:
+        description: Describes if the user is a guest in the team.
+        example: false
+        type: boolean
+      team:
+        "$ref": "#/components/schemas/TeamCompact"
+      user:
+        "$ref": "#/components/schemas/UserCompact"
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: team_membership

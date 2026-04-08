@@ -1,0 +1,43 @@
+---
+OrganizationExportCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: An *organization_export* object represents a request to export the
+      complete data of an Organization in JSON format.
+    properties:
+      created_at:
+        description: The time at which this resource was created.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+      download_url:
+        description: |-
+          Download this URL to retreive the full export of the organization
+          in JSON format. It will be compressed in a gzip (.gz) container.
+
+          *Note: May be null if the export is still in progress or
+          failed.  If present, this URL may only be valid for 1 hour from
+          the time of retrieval. You should avoid persisting this URL
+          somewhere and rather refresh on demand to ensure you do not keep
+          stale URLs.*
+        example: https://asana-export.s3.amazonaws.com/export-4632784536274-20170127-43246.json.gz?AWSAccessKeyId=xxxxxxxx
+        format: uri
+        nullable: true
+        readOnly: true
+        type: string
+      organization:
+        "$ref": "#/components/schemas/WorkspaceCompact"
+      state:
+        description: The current state of the export.
+        enum:
+        - pending
+        - started
+        - finished
+        - error
+        example: started
+        readOnly: true
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: organization_export

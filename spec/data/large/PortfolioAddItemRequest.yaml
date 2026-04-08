@@ -1,0 +1,22 @@
+---
+PortfolioAddItemRequest:
+  properties:
+    insert_after:
+      description: An id of an item in this portfolio. The new item will be added
+        after the one specified here. `insert_before` and `insert_after` parameters
+        cannot both be specified.
+      example: '1331'
+      type: string
+    insert_before:
+      description: An id of an item in this portfolio. The new item will be added
+        before the one specified here. `insert_before` and `insert_after` parameters
+        cannot both be specified.
+      example: '1331'
+      type: string
+    item:
+      description: The item to add to the portfolio.
+      example: '1331'
+      type: string
+  required:
+  - item
+  type: object

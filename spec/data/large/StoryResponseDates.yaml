@@ -1,0 +1,18 @@
+---
+StoryResponseDates:
+  description: "*Conditional*"
+  properties:
+    due_at:
+      example: 2019-09-15 02:06:58.158000000 Z
+      format: date-time
+      type: string
+    due_on:
+      example: 2019-09-15
+      format: date
+      type: string
+    start_on:
+      example: 2019-09-14
+      format: date
+      type: string
+  readOnly: true
+  type: object

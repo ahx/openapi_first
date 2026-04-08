@@ -1,0 +1,20 @@
+---
+SectionResponse:
+  allOf:
+  - "$ref": "#/components/schemas/SectionBase"
+  - properties:
+      created_at:
+        description: The time at which this resource was created.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+      project:
+        "$ref": "#/components/schemas/ProjectCompact"
+      projects:
+        description: "*Deprecated - please use project instead*"
+        items:
+          "$ref": "#/components/schemas/ProjectCompact"
+        readOnly: true
+        type: array
+    type: object

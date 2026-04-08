@@ -1,0 +1,3 @@
+---
+WorkspaceRequest:
+  "$ref": "#/components/schemas/WorkspaceBase"

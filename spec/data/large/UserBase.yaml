@@ -1,0 +1,3 @@
+---
+UserBase:
+  "$ref": "#/components/schemas/UserCompact"

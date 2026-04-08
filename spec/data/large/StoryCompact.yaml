@@ -1,0 +1,33 @@
+---
+StoryCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: A story represents an activity associated with an object in the Asana
+      system.
+    properties:
+      created_at:
+        description: The time at which this resource was created.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+      created_by:
+        "$ref": "#/components/schemas/UserCompact"
+      resource_subtype:
+        description: The subtype of this resource. Different subtypes retain many
+          of the same fields and behavior, but may render differently in Asana or
+          represent resources with different semantic meaning.
+        example: comment_added
+        readOnly: true
+        type: string
+      text:
+        description: |-
+          *Create-only*. Human-readable text for the story or comment.
+          This will not include the name of the creator.
+          *Note: This is not guaranteed to be stable for a given type of story. For example, text for a reassignment may not always say “assigned to …” as the text for a story can both be edited and change based on the language settings of the user making the request.*
+          Use the `resource_subtype` property to discover the action that created the story.
+        example: marked today
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: story

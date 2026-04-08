@@ -1,0 +1,15 @@
+---
+PortfolioMembershipCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: This object determines if a user is a member of a portfolio.
+    properties:
+      portfolio:
+        "$ref": "#/components/schemas/PortfolioCompact"
+        description: "[Opt In](/docs/input-output-options). The portfolio the user
+          is a member of."
+      user:
+        "$ref": "#/components/schemas/UserCompact"
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: portfolio_membership

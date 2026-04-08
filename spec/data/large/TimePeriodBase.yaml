@@ -1,0 +1,8 @@
+---
+TimePeriodBase:
+  allOf:
+  - "$ref": "#/components/schemas/TimePeriodCompact"
+  - properties:
+      parent:
+        "$ref": "#/components/schemas/TimePeriodCompact"
+    type: object

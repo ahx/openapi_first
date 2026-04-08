@@ -1,0 +1,16 @@
+---
+TagCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: A *tag* is a label that can be attached to any task in Asana. It
+      exists in a single workspace or organization.
+    properties:
+      name:
+        description: Name of the tag. This is generally a short sentence fragment
+          that fits on a line in the UI for maximum readability. However, it can be
+          longer.
+        example: Stuff to buy
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: tag

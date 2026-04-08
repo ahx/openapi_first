@@ -1,0 +1,18 @@
+---
+WorkspaceResponse:
+  allOf:
+  - "$ref": "#/components/schemas/WorkspaceBase"
+  - properties:
+      email_domains:
+        description: The email domains that are associated with this workspace.
+        example:
+        - asana.com
+        items:
+          format: uri
+          type: string
+        type: array
+      is_organization:
+        description: Whether the workspace is an *organization*.
+        example: false
+        type: boolean
+    type: object

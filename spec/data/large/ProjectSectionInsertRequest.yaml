@@ -1,0 +1,25 @@
+---
+ProjectSectionInsertRequest:
+  properties:
+    after_section:
+      description: Insert the given section immediately after the section specified
+        by this parameter.
+      example: '987654'
+      type: string
+    before_section:
+      description: Insert the given section immediately before the section specified
+        by this parameter.
+      example: '86420'
+      type: string
+    project:
+      description: The project in which to reorder the given section.
+      example: '123456'
+      type: string
+    section:
+      description: The section to reorder.
+      example: '321654'
+      type: string
+  required:
+  - project
+  - section
+  type: object

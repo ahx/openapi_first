@@ -1,0 +1,3 @@
+---
+TeamMembershipResponse:
+  "$ref": "#/components/schemas/TeamMembershipBase"

@@ -1,0 +1,9 @@
+---
+BatchRequest:
+  description: A request object for use in a batch request.
+  properties:
+    actions:
+      items:
+        "$ref": "#/components/schemas/BatchRequestAction"
+      type: array
+  type: object

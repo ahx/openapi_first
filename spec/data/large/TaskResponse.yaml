@@ -1,0 +1,78 @@
+---
+TaskResponse:
+  allOf:
+  - "$ref": "#/components/schemas/TaskBase"
+  - properties:
+      assignee:
+        allOf:
+        - "$ref": "#/components/schemas/UserCompact"
+        nullable: true
+      assignee_section:
+        allOf:
+        - "$ref": "#/components/schemas/SectionCompact"
+        - description: |-
+            The *assignee section* is a subdivision of a project that groups tasks together in the assignee's "My Tasks" list. It can either be a header above a list of tasks in a list view or a column in a board view of "My Tasks."
+            The `assignee_section` property will be returned in the response only if the request was sent by the user who is the assignee of the task. Note that you can only write to `assignee_section` with the gid of an existing section visible in the user's "My Tasks" list.
+        nullable: true
+      custom_fields:
+        description: Array of custom field values applied to the task. These represent
+          the custom field values recorded on this project for a particular custom
+          field. For example, these custom field values will contain an `enum_value`
+          property for custom fields of type `enum`, a `text_value` property for custom
+          fields of type `text`, and so on. Please note that the `gid` returned on
+          each custom field value *is identical* to the `gid` of the custom field,
+          which allows referencing the custom field metadata through the `/custom_fields/custom_field-gid`
+          endpoint.
+        items:
+          "$ref": "#/components/schemas/CustomFieldResponse"
+        readOnly: true
+        type: array
+      followers:
+        description: Array of users following this task.
+        items:
+          "$ref": "#/components/schemas/UserCompact"
+        readOnly: true
+        type: array
+      parent:
+        allOf:
+        - "$ref": "#/components/schemas/TaskCompact"
+        - description: The parent of this task, or `null` if this is not a subtask.
+            This property cannot be modified using a PUT request but you can change
+            it with the `setParent` endpoint. You can create subtasks by using the
+            subtasks endpoint.
+          nullable: true
+          readOnly: true
+          type: object
+      permalink_url:
+        description: A url that points directly to the object within Asana.
+        example: https://app.asana.com/0/resource/123456789/list
+        readOnly: true
+        type: string
+      projects:
+        description: "*Create-only.* Array of projects this task is associated with.
+          At task creation time, this array can be used to add the task to many projects
+          at once. After task creation, these associations can be modified using the
+          addProject and removeProject endpoints."
+        items:
+          "$ref": "#/components/schemas/ProjectCompact"
+        readOnly: true
+        type: array
+      tags:
+        description: Array of tags associated with this task. In order to change tags
+          on an existing task use `addTag` and `removeTag`.
+        example:
+        - gid: '59746'
+          name: Grade A
+        items:
+          "$ref": "#/components/schemas/TagCompact"
+        readOnly: true
+        type: array
+      workspace:
+        allOf:
+        - "$ref": "#/components/schemas/WorkspaceCompact"
+        - description: "*Create-only*. The workspace this task is associated with.
+            Once created, task cannot be moved to a different workspace. This attribute
+            can only be specified at creation time."
+          readOnly: true
+          type: object
+    type: object

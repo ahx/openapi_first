@@ -1,0 +1,43 @@
+---
+WebhookResponse:
+  allOf:
+  - "$ref": "#/components/schemas/WebhookCompact"
+  - properties:
+      created_at:
+        description: The time at which this resource was created.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+      filters:
+        description: Whitelist of filters to apply to events from this webhook. If
+          a webhook event passes any of the filters the event will be delivered; otherwise
+          no event will be sent to the receiving server.
+        items:
+          allOf:
+          - "$ref": "#/components/schemas/WebhookFilter"
+          - description: A set of filters to specify a whitelist for what types of
+              events will be delivered.
+          - type: object
+        type: array
+      last_failure_at:
+        description: The timestamp when the webhook last received an error when sending
+          an event to the target.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+      last_failure_content:
+        description: The contents of the last error response sent to the webhook when
+          attempting to deliver events to the target.
+        example: 500 Server Error\n\nCould not complete the request
+        readOnly: true
+        type: string
+      last_success_at:
+        description: The timestamp when the webhook last successfully sent an event
+          to the target.
+        example: 2012-02-22 02:06:58.147000000 Z
+        format: date-time
+        readOnly: true
+        type: string
+    type: object

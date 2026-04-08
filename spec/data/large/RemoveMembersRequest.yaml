@@ -1,0 +1,11 @@
+---
+RemoveMembersRequest:
+  properties:
+    members:
+      description: An array of strings identifying users. These can either be the
+        string "me", an email, or the gid of a user.
+      example: 521621621373
+      type: string
+  required:
+  - members
+  type: object

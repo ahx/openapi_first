@@ -1,0 +1,28 @@
+---
+TaskAddProjectRequest:
+  properties:
+    insert_after:
+      description: A task in the project to insert the task after, or `null` to insert
+        at the beginning of the list.
+      example: '124816'
+      nullable: true
+      type: string
+    insert_before:
+      description: A task in the project to insert the task before, or `null` to insert
+        at the end of the list.
+      example: '432134'
+      nullable: true
+      type: string
+    project:
+      description: The project to add the task to.
+      example: '13579'
+      type: string
+    section:
+      description: A section in the project to insert the task into. The task will
+        be inserted at the bottom of the section.
+      example: '987654'
+      nullable: true
+      type: string
+  required:
+  - project
+  type: object

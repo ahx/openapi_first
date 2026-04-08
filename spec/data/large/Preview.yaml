@@ -1,0 +1,41 @@
+---
+Preview:
+  description: |-
+    A collection of rich text that will be displayed as a preview to another app.
+
+    This is read-only except for a small group of whitelisted apps.
+  properties:
+    fallback:
+      description: Some fallback text to display if unable to display the full preview.
+      example: 'Greg: Great! I like this idea.\n\nhttps//a_company.slack.com/archives/ABCDEFG/12345678'
+      type: string
+    footer:
+      description: Text to display in the footer.
+      example: Mar 17, 2019 1:25 PM
+      type: string
+    header:
+      description: Text to display in the header.
+      example: Asana for Slack
+      type: string
+    header_link:
+      description: Where the header will link to.
+      example: https://asana.comn/apps/slack
+      type: string
+    html_text:
+      description: HTML formatted text for the body of the preview.
+      example: "<body>Great! I like this idea.</body>"
+      type: string
+    text:
+      description: Text for the body of the preview.
+      example: Great! I like this idea.
+      type: string
+    title:
+      description: Text to display as the title.
+      example: Greg
+      type: string
+    title_link:
+      description: Where to title will link to.
+      example: https://asana.slack.com/archives/ABCDEFG/12345678
+      type: string
+  readOnly: true
+  type: object

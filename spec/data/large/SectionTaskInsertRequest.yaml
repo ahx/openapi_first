@@ -1,0 +1,20 @@
+---
+SectionTaskInsertRequest:
+  properties:
+    insert_after:
+      description: An existing task within this section after which the added task
+        should be inserted. Cannot be provided together with insert_before.
+      example: '987654'
+      type: string
+    insert_before:
+      description: An existing task within this section before which the added task
+        should be inserted. Cannot be provided together with insert_after.
+      example: '86420'
+      type: string
+    task:
+      description: The task to add to this section.
+      example: '123456'
+      type: string
+  required:
+  - task
+  type: object

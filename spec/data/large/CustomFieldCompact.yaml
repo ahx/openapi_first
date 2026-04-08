@@ -1,0 +1,64 @@
+---
+CustomFieldCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: |-
+      Custom Fields store the metadata that is used in order to add user-specified information to tasks in Asana. Be sure to reference the [Custom Fields](/docs/asana-custom-fields) developer documentation for more information about how custom fields relate to various resources in Asana.
+
+      Users in Asana can [lock custom fields](https://asana.com/guide/help/premium/custom-fields#gl-lock-fields), which will make them read-only when accessed by other users. Attempting to edit a locked custom field will return HTTP error code `403 Forbidden`.
+    properties:
+      display_value:
+        description: A string representation for the value of the custom field. Integrations
+          that don't require the underlying type should use this field to read values.
+          Using this field will future-proof an app against new custom field types.
+        example: blue
+        readOnly: true
+        type: string
+      enabled:
+        description: "*Conditional*. Determines if the custom field is enabled or
+          not."
+        example: true
+        type: boolean
+      enum_options:
+        description: "*Conditional*. Only relevant for custom fields of type `enum`.
+          This array specifies the possible values which an `enum` custom field can
+          adopt. To modify the enum options, refer to [working with enum options](/docs/create-an-enum-option)."
+        items:
+          "$ref": "#/components/schemas/EnumOption"
+        type: array
+      name:
+        description: The name of the custom field.
+        example: Status
+        type: string
+      number_value:
+        description: "*Conditional*. This number is the value of a number custom field."
+        example: 5.2
+        type: number
+      resource_subtype:
+        description: 'The type of the custom field. Must be one of the given values.
+
+          '
+        enum:
+        - text
+        - enum
+        - multi_enum
+        - number
+        example: text
+        type: string
+      text_value:
+        description: "*Conditional*. This string is the value of a text custom field."
+        example: Some Value
+        type: string
+      type:
+        description: "*Deprecated: new integrations should prefer the resource_subtype
+          field.* The type of the custom field. Must be one of the given values.\n"
+        enum:
+        - text
+        - enum
+        - multi_enum
+        - number
+        readOnly: true
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: custom_field

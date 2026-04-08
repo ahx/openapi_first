@@ -1,0 +1,14 @@
+---
+TaskCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: The *task* is the basic object around which many operations in Asana
+      are centered.
+    properties:
+      name:
+        description: The name of the task.
+        example: Bug Task
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: task

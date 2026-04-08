@@ -1,0 +1,3 @@
+---
+ProjectStatusRequest:
+  "$ref": "#/components/schemas/ProjectStatusBase"

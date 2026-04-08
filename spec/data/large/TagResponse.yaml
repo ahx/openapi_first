@@ -1,0 +1,19 @@
+---
+TagResponse:
+  allOf:
+  - "$ref": "#/components/schemas/TagBase"
+  - properties:
+      followers:
+        description: Array of users following this tag.
+        items:
+          "$ref": "#/components/schemas/UserCompact"
+        readOnly: true
+        type: array
+      permalink_url:
+        description: A url that points directly to the object within Asana.
+        example: https://app.asana.com/0/resource/123456789/list
+        readOnly: true
+        type: string
+      workspace:
+        "$ref": "#/components/schemas/WorkspaceCompact"
+    type: object

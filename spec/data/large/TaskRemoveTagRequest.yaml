@@ -1,0 +1,10 @@
+---
+TaskRemoveTagRequest:
+  properties:
+    tag:
+      description: The tag to remove from the task.
+      example: '13579'
+      type: string
+  required:
+  - tag
+  type: object

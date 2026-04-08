@@ -1,0 +1,22 @@
+---
+WorkspaceMembershipResponse:
+  allOf:
+  - "$ref": "#/components/schemas/WorkspaceMembershipBase"
+  - properties:
+      is_active:
+        description: Reflects if this user still a member of the workspace.
+        readOnly: true
+        type: boolean
+      is_admin:
+        description: Reflects if this user is an admin of the workspace.
+        readOnly: true
+        type: boolean
+      is_guest:
+        description: Reflects if this user is a guest of the workspace.
+        readOnly: true
+        type: boolean
+      user_task_list:
+        "$ref": "#/components/schemas/UserTaskListResponse"
+        description: The user's "My Tasks" in the workspace.
+        readOnly: true
+    type: object

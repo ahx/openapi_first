@@ -1,0 +1,25 @@
+---
+TaskDuplicateRequest:
+  properties:
+    include:
+      description: The fields that will be duplicated to the new task.
+      enum:
+      - notes
+      - assignee
+      - subtasks
+      - attachments
+      - tags
+      - followers
+      - projects
+      - dates
+      - dependencies
+      - parent
+      example:
+      - notes
+      - assignee
+      type: string
+    name:
+      description: The name of the new task.
+      example: New Task Name
+      type: string
+  type: object

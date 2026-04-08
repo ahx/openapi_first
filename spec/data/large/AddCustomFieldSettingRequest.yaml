@@ -1,0 +1,27 @@
+---
+AddCustomFieldSettingRequest:
+  properties:
+    custom_field:
+      description: The custom field to associate with this container.
+      example: '14916'
+      type: string
+    insert_after:
+      description: A gid of a Custom Field Setting on this container, after which
+        the new Custom Field Setting will be added.  `insert_before` and `insert_after`
+        parameters cannot both be specified.
+      example: '1331'
+      type: string
+    insert_before:
+      description: A gid of a Custom Field Setting on this container, before which
+        the new Custom Field Setting will be added.  `insert_before` and `insert_after`
+        parameters cannot both be specified.
+      example: '1331'
+      type: string
+    is_important:
+      description: Whether this field should be considered important to this container
+        (for instance, to display in the list view of items in the container).
+      example: true
+      type: boolean
+  required:
+  - custom_field
+  type: object

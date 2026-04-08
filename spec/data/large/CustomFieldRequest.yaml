@@ -1,0 +1,12 @@
+---
+CustomFieldRequest:
+  allOf:
+  - "$ref": "#/components/schemas/CustomFieldBase"
+  - properties:
+      workspace:
+        description: "*Create-Only* The workspace to create a custom field in."
+        example: '1331'
+        type: string
+    required:
+    - workspace
+    type: object

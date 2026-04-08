@@ -1,0 +1,24 @@
+---
+Error:
+  properties:
+    help:
+      description: Additional information directing developers to resources on how
+        to address and fix the problem, if available.
+      example: 'For more information on API status codes and how to handle them, read
+        the docs on errors: https://asana.github.io/developer-docs/#errors'''
+      readOnly: true
+      type: string
+    message:
+      description: Message providing more detail about the error that occurred, if
+        available.
+      example: 'project: Missing input'
+      readOnly: true
+      type: string
+    phrase:
+      description: "*500 errors only*. A unique error phrase which can be used when
+        contacting developer support to help identify the exact occurrence of the
+        problem in Asana’s logs."
+      example: 6 sad squid snuggle softly
+      readOnly: true
+      type: string
+  type: object

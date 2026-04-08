@@ -1,0 +1,71 @@
+---
+TaskRequest:
+  allOf:
+  - "$ref": "#/components/schemas/TaskBase"
+  - properties:
+      assignee:
+        description: Gid of a user.
+        example: '12345'
+        nullable: true
+        readOnly: false
+        type: string
+        x-env-variable: true
+      assignee_section:
+        description: |-
+          The *assignee section* is a subdivision of a project that groups tasks together in the assignee's "My Tasks" list. It can either be a header above a list of tasks in a list view or a column in a board view of "My Tasks."
+          The `assignee_section` property will be returned in the response only if the request was sent by the user who is the assignee of the task. Note that you can only write to `assignee_section` with the gid of an existing section visible in the user's "My Tasks" list.
+        example: '12345'
+        nullable: true
+        type: string
+      custom_fields:
+        additionalProperties:
+          description: '"{custom_field_gid}" => Value (Can be text, number, etc.)'
+          type: string
+        description: An object where each key is a Custom Field gid and each value
+          is an enum gid, string, or number.
+        example:
+          '4578152156': Not Started
+          '5678904321': On Hold
+        type: object
+      followers:
+        description: '*Create-Only* An array of strings identifying users. These can
+          either be the string "me", an email, or the gid of a user. In order to change
+          followers on an existing task use `addFollowers` and `removeFollowers`.'
+        example:
+        - '12345'
+        items:
+          description: Gid of a user.
+          type: string
+        type: array
+      parent:
+        description: Gid of a task.
+        example: '12345'
+        nullable: true
+        readOnly: false
+        type: string
+        x-env-variable: true
+      projects:
+        description: "*Create-Only* Array of project gids. In order to change projects
+          on an existing task use `addProject` and `removeProject`."
+        example:
+        - '12345'
+        items:
+          description: Gid of a project.
+          type: string
+        type: array
+      tags:
+        description: "*Create-Only* Array of tag gids. In order to change tags on
+          an existing task use `addTag` and `removeTag`."
+        example:
+        - '12345'
+        items:
+          description: Gid of a tag.
+          type: string
+        type: array
+      workspace:
+        description: Gid of a workspace.
+        example: '12345'
+        readOnly: false
+        type: string
+        x-env-variable: true
+    type: object

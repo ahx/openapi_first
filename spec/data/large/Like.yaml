@@ -1,0 +1,12 @@
+---
+Like:
+  description: An object to represent a user's like.
+  properties:
+    gid:
+      description: Globally unique identifier of the object, as a string.
+      example: '12345'
+      readOnly: true
+      type: string
+    user:
+      "$ref": "#/components/schemas/UserCompact"
+  type: object

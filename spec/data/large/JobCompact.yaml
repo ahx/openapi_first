@@ -1,0 +1,30 @@
+---
+JobCompact:
+  allOf:
+  - "$ref": "#/components/schemas/AsanaResource"
+  - description: A *job* is an object representing a process that handles asynchronous
+      work.
+    properties:
+      new_project:
+        "$ref": "#/components/schemas/ProjectCompact"
+      new_task:
+        "$ref": "#/components/schemas/TaskCompact"
+      resource_subtype:
+        description: The subtype of this resource. Different subtypes retain many
+          of the same fields and behavior, but may render differently in Asana or
+          represent resources with different semantic meaning.
+        example: duplicate_task
+        readOnly: true
+        type: string
+      status:
+        enum:
+        - not_started
+        - in_progress
+        - completed
+        - failed
+        example: in_progress
+        readOnly: true
+        type: string
+    type: object
+    x-docs-overrides:
+      properties.resource_type.example: job

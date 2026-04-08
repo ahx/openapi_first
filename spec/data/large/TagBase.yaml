@@ -1,0 +1,29 @@
+---
+TagBase:
+  allOf:
+  - "$ref": "#/components/schemas/TagCompact"
+  - properties:
+      color:
+        description: Color of the tag.
+        enum:
+        - dark-pink
+        - dark-green
+        - dark-blue
+        - dark-red
+        - dark-teal
+        - dark-brown
+        - dark-orange
+        - dark-purple
+        - dark-warm-gray
+        - light-pink
+        - light-green
+        - light-blue
+        - light-red
+        - light-teal
+        - light-brown
+        - light-orange
+        - light-purple
+        - light-warm-gray
+        example: light-green
+        type: string
+    type: object

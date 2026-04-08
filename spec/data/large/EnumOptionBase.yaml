@@ -1,0 +1,3 @@
+---
+EnumOptionBase:
+  "$ref": "#/components/schemas/EnumOption"

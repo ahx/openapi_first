@@ -1,0 +1,29 @@
+---
+TaskCountResponse:
+  description: A response object returned from the task count endpoint.
+  properties:
+    num_completed_milestones:
+      description: The number of completed milestones in a project.
+      example: 3
+      type: integer
+    num_completed_tasks:
+      description: The number of completed tasks in a project.
+      example: 150
+      type: integer
+    num_incomplete_milestones:
+      description: The number of incomplete milestones in a project.
+      example: 7
+      type: integer
+    num_incomplete_tasks:
+      description: The number of incomplete tasks in a project.
+      example: 50
+      type: integer
+    num_milestones:
+      description: The number of milestones in a project.
+      example: 10
+      type: integer
+    num_tasks:
+      description: The number of tasks in a project.
+      example: 200
+      type: integer
+  type: object

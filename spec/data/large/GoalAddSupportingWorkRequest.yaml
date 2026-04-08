@@ -1,0 +1,10 @@
+---
+GoalAddSupportingWorkRequest:
+  properties:
+    supporting_work:
+      description: The project/portfolio gid to add as supporting work for a goal
+      example: '1331'
+      type: string
+  required:
+  - supporting_work
+  type: object
