@@ -82,9 +82,6 @@ The request validation middleware returns a 4xx if the request is invalid or not
 
 ```ruby
 use OpenapiFirst::Middlewares::RequestValidation
-
-# Pass `raise_error: true` to raise an error if request is invalid:
-use OpenapiFirst::Middlewares::RequestValidation, raise_error: true
 ```
 
 #### Error responses
