@@ -5,11 +5,15 @@ require 'yaml'
 
 module OpenapiFirst
   # @!visibility private
-  module FileLoader
-    @cache = {}
-    @mutex = Mutex.new
+  class FileLoader
+    def self.load(file_path)
+      new.load(file_path)
+    end
 
-    module_function
+    def initialize
+      @cache = {}
+      @mutex = Mutex.new
+    end
 
     def load(file_path)
       @cache[file_path] || @mutex.synchronize do
@@ -28,10 +32,6 @@ module OpenapiFirst
           end
         end
       end
-    end
-
-    def clear_cache!
-      @mutex.synchronize { @cache.clear }
     end
   end
 end
