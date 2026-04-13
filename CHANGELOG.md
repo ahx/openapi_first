@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- Optimized caching towards reducing retained memory after calling `OpenapiFirst.load` without using a global cache. Removed `OpenapiFirst.clear_cache!`.
+## 3.3.1
+
+- Optimized caching towards reducing retained memory after calling `OpenapiFirst.load` without using a global cache. (Removed `OpenapiFirst.clear_cache!`.)
+- Require ruby >= 3.3.0
 
 ## 3.3.0
 

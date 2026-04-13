@@ -5,7 +5,7 @@ inherit_mode:
 
 plugins: rubocop-performance
 AllCops:
-  TargetRubyVersion: 3.2.0
+  TargetRubyVersion: 3.3.0
   NewCops: enable
   SuggestExtensions: false
   Exclude:

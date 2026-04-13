@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    openapi_first (3.3.0)
+    openapi_first (3.3.1)
       drb (~> 2.0)
       hana (~> 1.3)
       json_schemer (>= 2.1, < 3.0)
@@ -42,7 +42,7 @@ GEM
       optparse
       uri
       webrick
-    puma (7.2.0)
+    puma (8.0.0)
       nio4r (~> 2.0)
     rack (3.2.6)
     rack-protection (4.2.1)
