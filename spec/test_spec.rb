@@ -13,6 +13,20 @@ RSpec.describe OpenapiFirst::Test do
     end
   end
 
+  describe '.logger' do
+    after { described_class.logger = nil }
+
+    it 'returns a Logger' do
+      expect(described_class.logger).to be_a Logger
+    end
+
+    it 'can be replaced' do
+      custom = Logger.new(nil)
+      described_class.logger = custom
+      expect(described_class.logger).to be(custom)
+    end
+  end
+
   describe '.observe' do
     it 'injects request/response validation in the app' do
       described_class.register(definition, as: :some)

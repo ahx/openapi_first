@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'logger'
 require_relative 'test/configuration'
 require_relative 'registry'
 
@@ -28,6 +29,14 @@ module OpenapiFirst
 
     def self.definitions
       super.empty? ? OpenapiFirst.definitions : super
+    end
+
+    def self.logger
+      @logger ||= Logger.new($stdout)
+    end
+
+    def self.logger=(logger)
+      @logger = logger
     end
 
     def self.configuration
