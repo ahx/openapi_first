@@ -6,7 +6,7 @@ module OpenapiFirst
   module Test
     class ObserveError < Error; end
 
-    # @visible private
+    # @visibility private
     module Observed; end
 
     # Inject silent request/response validation to observe rack apps during testing

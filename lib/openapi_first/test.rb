@@ -87,7 +87,7 @@ module OpenapiFirst
 
     # Print the coverage report
     # @param formatter A formatter to define the report.
-    # @output [IO] An output where to puts the report.
+    # @return [IO] An output where to puts the report.
     def self.report_coverage(formatter: Coverage::TerminalFormatter, **)
       puts formatter.new(**).format(Coverage.result)
     end

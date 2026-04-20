@@ -6,7 +6,7 @@ module OpenapiFirst
   module Schema
     # A hash of Schemas
     class Hash
-      # @param schema Hash of schemas
+      # @param schemas Hash of schemas
       # @param required Array of required keys
       def initialize(schemas, required: nil, **options)
         @schemas = schemas
