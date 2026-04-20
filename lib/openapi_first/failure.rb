@@ -49,6 +49,10 @@ module OpenapiFirst
     alias original_message message
     private :original_message
 
+    def inspect
+      "#<OpenapiFirst::Failure:#{object_id} type: #{type}, message: #{message}>"
+    end
+
     # A generic error message
     def message
       original_message || exception_message
