@@ -238,14 +238,21 @@ RSpec.describe 'Request body validation' do
         header Rack::CONTENT_TYPE, 'foo/bar'
         post path, JSON.generate({ say: 'no ' })
 
-        expect(last_response.status).to be(400), last_response.body
+        expect(last_response.status).to be(400)
+      end
+
+      it 'returns 200 if content-type is unknown and request body is valid' do
+        header Rack::CONTENT_TYPE, 'foo/bar'
+        post path, JSON.generate({ say: 'yes' })
+
+        expect(last_response.status).to be(200)
       end
 
       it 'returns 400 if request body is invalid' do
         header Rack::CONTENT_TYPE, 'application/json'
         post path, JSON.generate({ say: 'no ' })
 
-        expect(last_response.status).to be(400), last_response.body
+        expect(last_response.status).to be(400)
       end
     end
 
