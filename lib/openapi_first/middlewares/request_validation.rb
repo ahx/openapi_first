@@ -3,7 +3,19 @@
 require 'rack'
 module OpenapiFirst
   module Middlewares
-    # A Rack middleware to validate requests against an OpenAPI API description
+    # A Rack middleware to validate requests against an OpenAPI API description.
+    # All error responses can be customized via the +error_response:+ option.
+    # === Request body validation
+    #
+    # * Returns +415+ if the request content-type does not match the OpenAPI description.
+    # * Returns +400+ for invalid JSON, missing required fields, type/enum/schema violations, or +readOnly+ fields.
+    # * Empty bodies are accepted when the body is optional in the spec.
+    #
+    # === Parameter validation
+    #
+    # Query, path, header, and cookie parameters are validated and type-converted against the spec.
+    # Missing required parameters or type/format violations return +400+.
+    #
     class RequestValidation
       # @param app The parent Rack application
       # @param spec [String, Symbol, OpenapiFirst::Definition] Path to the OpenAPI file or an instance of Definition.

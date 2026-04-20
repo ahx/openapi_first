@@ -4,7 +4,8 @@ require 'rack'
 
 module OpenapiFirst
   module Middlewares
-    # A Rack middleware to validate requests against an OpenAPI API description
+    # A Rack middleware to validate requests against an OpenAPI API description.
+    # You probably want to use +OpenapiFirst::Test+ instead of this middleware.
     class ResponseValidation
       # @param spec [String, Symbol, OpenapiFirst::Definition] Path to the OpenAPI file or an instance of Definition.
       #   If you pass a Symbol, it will load the OAD registered via `OpenapiFirst.register`
