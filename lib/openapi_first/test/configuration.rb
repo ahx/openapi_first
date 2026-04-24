@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'logger'
+
 module OpenapiFirst
   module Test
     # Helper class to setup tests
@@ -17,9 +19,7 @@ module OpenapiFirst
         @ignore_unknown_requests = false
         @ignore_request_error = nil
         @ignore_response_error = nil
-        @logger = Logger.new($stdout, formatter: proc { |_severity, _time, _progname, msg|
-          %(#{msg}\n)
-        })
+        @logger = Logger.new($stdout)
       end
 
       # Register OADs, but don't load them just yet

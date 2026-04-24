@@ -12,7 +12,7 @@ module OpenapiFirst
         end
 
         def format(coverage_result)
-          warn 'DEPRECATION WARNING: TerminalFormatter#format is deprecated, use #report instead.'
+          logger.warn 'DEPRECATION WARNING: TerminalFormatter#format is deprecated, use #report instead.'
           report(coverage_result)
         end
 
@@ -25,7 +25,7 @@ module OpenapiFirst
           coverage_result.plans.each { |plan| format_plan(plan) } if coverage.positive?
         end
 
-        private attr_reader :out, :verbose, :focused, :logger, :is_tty
+        private attr_reader :out, :verbose, :focused, :logger
 
         private
 
@@ -65,18 +65,6 @@ module OpenapiFirst
               log_error "  ❌ #{response_label(response)} – #{explain_unfinished_response(response)}"
             end
           end
-        end
-
-        def green(text)
-          "\e[32m#{text}\e[0m"
-        end
-
-        def red(text)
-          "\e[31m#{text}\e[0m"
-        end
-
-        def orange(text)
-          "\e[33m#{text}\e[0m"
         end
 
         def request_label(request)
