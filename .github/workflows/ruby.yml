@@ -21,13 +21,13 @@ jobs:
           - Gemfile.rails6
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-      - run: bundle lock --add-platform x86_64-linux && bundle install && bundle exec rake
+      - run: bundle exec rake
         env:
           BUNDLE_GEMFILE: ${{ matrix.gemfile }}
