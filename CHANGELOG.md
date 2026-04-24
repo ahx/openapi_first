@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `OpenapiFirst::Test.logger` is now configurable via the setup block: `OpenapiFirst::Test.setup { |test| test.logger = Logger.new($stderr) }`. The logger defaults to `Logger.new($stdout)`.
+
 ## 3.3.1
 
 - Optimized caching towards reducing retained memory after calling `OpenapiFirst.load` without using a global cache. (Removed `OpenapiFirst.clear_cache!`.)

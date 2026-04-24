@@ -17,6 +17,9 @@ module OpenapiFirst
         @ignore_unknown_requests = false
         @ignore_request_error = nil
         @ignore_response_error = nil
+        @logger = Logger.new($stdout, formatter: proc { |_severity, _time, _progname, msg|
+          %(#{msg}\n)
+        })
       end
 
       # Register OADs, but don't load them just yet
@@ -32,7 +35,7 @@ module OpenapiFirst
       end
 
       attr_accessor :coverage_formatter_options, :coverage_formatter, :response_raise_error,
-                    :ignore_unknown_requests, :ignore_unknown_response_status, :minimum_coverage
+                    :ignore_unknown_requests, :ignore_unknown_response_status, :minimum_coverage, :logger
       attr_reader :report_coverage, :ignored_unknown_status
 
       # Set ignored unknown status codes.

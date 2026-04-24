@@ -14,15 +14,18 @@ RSpec.describe OpenapiFirst::Test do
   end
 
   describe '.logger' do
-    after { described_class.logger = nil }
+    after { described_class.uninstall }
 
     it 'returns a Logger' do
       expect(described_class.logger).to be_a Logger
     end
 
-    it 'can be replaced' do
+    it 'can be replaced via setup' do
       custom = Logger.new(nil)
-      described_class.logger = custom
+      described_class.setup do |test|
+        test.register('./examples/openapi.yaml')
+        test.logger = custom
+      end
       expect(described_class.logger).to be(custom)
     end
   end

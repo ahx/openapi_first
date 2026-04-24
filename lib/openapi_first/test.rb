@@ -32,11 +32,7 @@ module OpenapiFirst
     end
 
     def self.logger
-      @logger ||= Logger.new($stdout)
-    end
-
-    def self.logger=(logger)
-      @logger = logger
+      configuration.logger
     end
 
     def self.configuration
