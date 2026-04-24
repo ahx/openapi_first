@@ -261,9 +261,8 @@ RSpec.describe OpenapiFirst::Test do
     before do
       described_class.setup do |test|
         test.register('./spec/data/dice.yaml')
+        test.logger = Logger.new(output)
       end
-
-      allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
     end
 
     it 'reports 50% if half of requests/responses have been tracked' do
@@ -315,8 +314,6 @@ RSpec.describe OpenapiFirst::Test do
       end
 
       it 'reports no detected requests by default' do
-        output = StringIO.new
-        allow($stdout).to receive(:puts).and_invoke(output.method(:puts))
         described_class.report_coverage
         expect(output.string).to include('Coverage did not detect any API requests')
       end

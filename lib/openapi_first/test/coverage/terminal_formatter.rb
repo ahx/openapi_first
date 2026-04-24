@@ -5,36 +5,32 @@ module OpenapiFirst
     module Coverage
       # This is the default formatter
       class TerminalFormatter
-        def initialize(verbose: false, focused: true)
+        def initialize(verbose: false, focused: true, logger: Test.logger)
           @verbose = verbose
           @focused = focused && !verbose
+          @logger = logger
         end
 
         def format(coverage_result)
-          coverage = coverage_result.coverage
-          @out = StringIO.new
-          if coverage.zero?
-            @out.puts 'API Coverage did not detect any API requests for the registered API descriptions. ' \
-                      'Make sure to observe your application using OpenapiFirst::Test.'
-          end
-          coverage_result.plans.each { |plan| format_plan(plan) } if coverage.positive?
-          @out.string
+          warn 'DEPRECATION WARNING: TerminalFormatter#format is deprecated, use #report instead.'
+          report(coverage_result)
         end
 
-        private attr_reader :out, :verbose, :focused
+        def report(coverage_result)
+          coverage = coverage_result.coverage
+          if coverage.zero?
+            logger.warn 'API Coverage did not detect any API requests for the registered API descriptions. ' \
+                        'Make sure to observe your application using OpenapiFirst::Test.'
+          end
+          coverage_result.plans.each { |plan| format_plan(plan) } if coverage.positive?
+        end
+
+        private attr_reader :out, :verbose, :focused, :logger, :is_tty
 
         private
 
-        def puts(string)
-          @out.puts(string)
-        end
-
-        def print(string)
-          @out.print(string)
-        end
-
         def format_plan(plan) # rubocop:disable Metrics/PerceivedComplexity
-          puts ['', "API validation coverage for #{plan.api_identifier}: #{plan.coverage}%"]
+          logger.info "API validation coverage for #{plan.api_identifier}: #{plan.coverage}%"
           return if plan.done? && !verbose
 
           requested_routes_count = plan.routes.count { |route| route.requests.any?(&:requested?) }
@@ -54,9 +50,9 @@ module OpenapiFirst
         def format_requests(requests)
           requests.each do |request|
             if request.finished?
-              puts green "✓ #{request_label(request)}"
+              log_success "✓ #{request_label(request)}"
             else
-              puts red "❌ #{request_label(request)} – #{explain_unfinished_request(request)}"
+              log_error "❌ #{request_label(request)} – #{explain_unfinished_request(request)}"
             end
           end
         end
@@ -64,9 +60,9 @@ module OpenapiFirst
         def format_responses(responses)
           responses.each do |response|
             if response.finished?
-              puts green "  ✓  #{response_label(response)}" if verbose
+              log_success "  ✓  #{response_label(response)}" if verbose
             else
-              puts red "  ❌ #{response_label(response)} – #{explain_unfinished_response(response)}"
+              log_error "  ❌ #{response_label(response)} – #{explain_unfinished_response(response)}"
             end
           end
         end
@@ -108,6 +104,14 @@ module OpenapiFirst
           return 'No responses tracked!' unless response.responded?
 
           "All responses invalid! (#{response.last_error_message.inspect})" unless response.any_valid_response?
+        end
+
+        def log_success(msg)
+          logger.info "\e[32m#{msg}\e[0m"
+        end
+
+        def log_error(msg)
+          logger.error "\e[31m#{msg}\e[0m"
         end
       end
     end

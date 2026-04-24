@@ -94,7 +94,7 @@ module OpenapiFirst
     # @param formatter A formatter to define the report.
     # @return [IO] An output where to puts the report.
     def self.report_coverage(formatter: Coverage::TerminalFormatter, **)
-      puts formatter.new(**).format(Coverage.result)
+      formatter.new(**).report(Coverage.result)
     end
 
     # Returns the Rack app wrapped with silent request, response validation
