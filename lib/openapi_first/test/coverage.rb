@@ -76,10 +76,6 @@ module OpenapiFirst
 
         private
 
-        def current_run
-          tracker.plans_by_key
-        end
-
         # Returns all plans (Plan) that were registered for this run
         def plans
           tracker&.plans || []
