@@ -11,8 +11,6 @@ jobs:
           - "3.3"
           - "3.4"
           - "4.0"
-          - truffleruby
-          - truffleruby-head
         gemfiles:
           - Gemfile
           - Gemfile.multi_json
