@@ -78,6 +78,15 @@ RSpec.describe OpenapiFirst::Test do
     end
   end
 
+  describe '.definitions' do
+    it 'returns local definitions when they exist' do
+      oad = OpenapiFirst.load('./spec/data/dice.yaml')
+      described_class.instance_variable_set(:@definitions, { dice: oad })
+      expect(described_class.definitions).not_to be(OpenapiFirst.definitions)
+      expect(described_class.definitions[:dice]).to eq(oad)
+    end
+  end
+
   describe '.setup' do
     it 'registers an API description' do
       described_class.setup { |test| test.register('./examples/openapi.yaml') }
@@ -439,6 +448,11 @@ RSpec.describe OpenapiFirst::Test do
         end.to raise_error(OpenapiFirst::RequestInvalidError)
       end
 
+      it 'does nothing when request is not known' do
+        request = instance_double(OpenapiFirst::ValidatedRequest, known?: false)
+        expect { described_class.send(:check_unknown_query_parameters, request) }.not_to raise_error
+      end
+
       it 'does not raise an error for an invalid request when request is ignored' do
         described_class.setup do |test|
           test.ignore_request_error { true }
@@ -701,6 +715,13 @@ RSpec.describe OpenapiFirst::Test do
       expect do
         app.call(Rack::MockRequest.env_for('/stuff?color=red&unknown=12'))
       end.to raise_error OpenapiFirst::Test::UnknownQueryParameterError, 'Unknown query parameter "unknown" for /stuff?color=red&unknown=12'
+    end
+
+    it 'raises an error with plural message for multiple unknown parameters' do
+      expect do
+        app.call(Rack::MockRequest.env_for('/stuff?color=red&foo=1&bar=2'))
+      end.to raise_error OpenapiFirst::Test::UnknownQueryParameterError,
+                         'Unknown query parameters "foo", "bar" for /stuff?color=red&foo=1&bar=2'
     end
 
     it 'raises another error if request is unknown' do

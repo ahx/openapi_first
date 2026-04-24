@@ -45,7 +45,11 @@ module OpenapiFirst
           # the coverage collection.
           # To make this work we need to keep arguments trivial, which is the reason the request
           # is wrapped in a CoveredRequest data object.
-          tracker&.track_request(
+          # :nocov:
+          return unless tracker
+          # :nocov:
+
+          tracker.track_request(
             oad.key,
             CoveredRequest.new(
               key: request.request_definition.key,
@@ -61,7 +65,11 @@ module OpenapiFirst
           # the coverage collection.
           # To make this work we need to keep arguments trivial, which is the reason the response
           # is wrapped in a CoveredResponse data object.
-          tracker&.track_response(
+          # :nocov:
+          return unless tracker
+          # :nocov:
+
+          tracker.track_response(
             oad.key,
             CoveredResponse.new(
               key: response.response_definition.key,

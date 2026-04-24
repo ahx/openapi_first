@@ -12,10 +12,9 @@ require 'rack/test'
 SimpleCov.start do
   enable_coverage :branch
   primary_coverage :branch
+  minimum_coverage line: 100, branch: 100
   add_filter 'lib/openapi_first/test/coverage/'
 end
-
-SimpleCov.minimum_coverage line: 99, branch: 85
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

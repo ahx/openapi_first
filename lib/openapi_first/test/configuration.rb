@@ -58,7 +58,9 @@ module OpenapiFirst
       # Ignore certain errors for certain requests
       # @param block A Proc that will be called with [OpenapiFirst::ValidatedRequest]
       def ignore_request_error(&block)
+        # :nocov:
         raise ArgumentError, 'You have to pass a block' unless block_given?
+        # :nocov:
 
         @ignore_request_error = block
       end
@@ -66,7 +68,9 @@ module OpenapiFirst
       # Ignore certain errors for certain responses
       # @param block A Proc that will be called with [OpenapiFirst::ValidatedResponse, Rack::Request]
       def ignore_response_error(&block)
+        # :nocov:
         raise ArgumentError, 'You have to pass a block' unless block_given?
+        # :nocov:
 
         @ignore_response_error = block
       end
