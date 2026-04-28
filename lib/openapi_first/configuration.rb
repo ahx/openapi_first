@@ -66,6 +66,11 @@ module OpenapiFirst
       end
     end
 
+    def plugin(name, **)
+      require_relative 'plugins'
+      Plugins.load(name).configure(self, **)
+    end
+
     def request_validation_error_response=(mod)
       @request_validation_error_response = if mod.is_a?(Symbol)
                                              OpenapiFirst.find_error_response(mod)

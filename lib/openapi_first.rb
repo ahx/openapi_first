@@ -7,6 +7,7 @@ require_relative 'openapi_first/registry'
 require_relative 'openapi_first/configuration'
 require_relative 'openapi_first/child_configuration'
 require_relative 'openapi_first/definition'
+require_relative 'openapi_first/plugins'
 require_relative 'openapi_first/version'
 require_relative 'openapi_first/middlewares/response_validation'
 require_relative 'openapi_first/middlewares/request_validation'
@@ -51,6 +52,13 @@ module OpenapiFirst
             'Register your error response class via `OpenapiFirst.register_error_response(name, klass)`. ' \
             "Registered error responses are: #{ERROR_RESPONSES.keys.join(', ')}."
     end
+  end
+
+  # Load a plugin into the global configuration.
+  # @param name [Symbol] Plugin name. Looks up OpenapiFirst::Plugins::<Name> or requires "openapi_first/plugins/<name>".
+  # @param opts [Hash] Options forwarded to the plugin's .configure method.
+  def self.plugin(name, **)
+    configuration.plugin(name, **)
   end
 
   # Load and dereference an OpenAPI spec file or return the Definition if it's already loaded
