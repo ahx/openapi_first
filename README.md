@@ -378,6 +378,7 @@ You can integrate your code at certain points during request/response validation
 
 Available hooks:
 
+- `before_request_validation`
 - `after_request_validation`
 - `after_response_validation`
 - `after_request_parameter_property_validation`

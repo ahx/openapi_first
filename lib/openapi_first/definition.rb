@@ -72,14 +72,19 @@ module OpenapiFirst
     # @return [ValidatedRequest] The validated request object.
     def validate_request(request, raise_error: false)
       route = @router.match(request.request_method, resolve_path(request), content_type: request.content_type)
-      if route.error
-        ValidatedRequest.new(request, error: route.error)
-      else
-        route.request_definition.validate(request, route_params: route.params)
-      end.tap do |validated|
-        @config.after_request_validation.each { |hook| hook.call(validated, self) }
-        raise validated.error.exception(validated) if validated.error && raise_error
-      end
+      validated = if route.error
+                    ValidatedRequest.new(request, error: route.error)
+                  else
+                    result = catch(FAILURE) do
+                      call_before_request_validation_hooks(request, route.request_definition)
+                      route.request_definition.validate(request, route_params: route.params)
+                    end
+                    result.is_a?(Failure) ? ValidatedRequest.new(request, error: result) : result
+                  end
+      call_after_request_validation_hooks(validated)
+      raise validated.error.exception(validated) if validated.error && raise_error
+
+      validated
     end
 
     # Validates the response against the API description.
@@ -105,6 +110,16 @@ module OpenapiFirst
     end
 
     private
+
+    def call_before_request_validation_hooks(request, route_request_definition)
+      @config.before_request_validation.each do |hook|
+        hook.call(request, route_request_definition, self)
+      end
+    end
+
+    def call_after_request_validation_hooks(validated)
+      @config.after_request_validation.each { |hook| hook.call(validated, self) }
+    end
 
     def resolve_path(rack_request)
       return rack_request.path.delete_prefix(path_prefix) if path_prefix && rack_request.path.start_with?(path_prefix)
