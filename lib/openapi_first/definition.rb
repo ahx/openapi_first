@@ -81,7 +81,7 @@ module OpenapiFirst
                     end
                     result.is_a?(Failure) ? ValidatedRequest.new(request, error: result) : result
                   end
-      call_after_request_validation_hooks(validated)
+      validated = call_after_request_validation_hooks(request, validated)
       raise validated.error.exception(validated) if validated.error && raise_error
 
       validated
@@ -117,8 +117,13 @@ module OpenapiFirst
       end
     end
 
-    def call_after_request_validation_hooks(validated)
-      @config.after_request_validation.each { |hook| hook.call(validated, self) }
+    def call_after_request_validation_hooks(request, validated)
+      result = catch(FAILURE) do
+        @config.after_request_validation.each { |hook| hook.call(validated, self) }
+      end
+      return ValidatedRequest.new(request, error: result) if result.is_a?(Failure)
+
+      validated
     end
 
     def resolve_path(rack_request)

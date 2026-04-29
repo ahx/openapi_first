@@ -85,6 +85,16 @@ RSpec.describe 'Hooks' do
       expect(called).to eq([['listPets', false]])
     end
 
+    it 'supports short-circuiting via Failure.fail!' do
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+        config.after_request_validation do |_request|
+          OpenapiFirst::Failure.fail!(:not_found)
+        end
+      end
+      validated = definition.validate_request(build_request('/pets'))
+      expect(validated.error.type).to eq(:not_found)
+    end
+
     it 'can pass the doc as a second argument' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
         config.after_request_validation do |request, doc|

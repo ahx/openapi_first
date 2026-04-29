@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- The `after_request_validation` now supports throwing a Failure, which will result in a failed request
 - Added new hook `before_request_validation`. Called after a request routed to an operation but before the request is validated.
 - Deprecated `TerminalFormatter#format`. Use `#report` instead.
 - `OpenapiFirst::Test.logger` is now configurable via the setup block: `OpenapiFirst::Test.setup { |test| test.logger = Logger.new($stderr) }`. The logger defaults to `Logger.new($stdout)`.
