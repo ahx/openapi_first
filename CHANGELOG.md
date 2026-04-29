@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Apps using request validation middleware can call Failure.fail! to produce an error result
 - The `after_request_validation` now supports throwing a Failure, which will result in a failed request
 - Added new hook `before_request_validation`. Called after a request routed to an operation but before the request is validated. You can throw via `Failure.fail!` to abort request validation immediately.
 - Deprecated `TerminalFormatter#format`. Use `#report` instead.

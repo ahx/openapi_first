@@ -69,8 +69,11 @@ module OpenapiFirst
     # Validates the request against the API description.
     # @param [Rack::Request] request The Rack request object.
     # @param [Boolean] raise_error Whether to raise an error if validation fails.
+    # @yield [ValidatedRequest] Optional block called after successful validation.
+    #   The block runs inside the same catch(FAILURE) as the after_request_validation hooks,
+    #   so it may call OpenapiFirst::Failure.fail! to short-circuit and produce an error.
     # @return [ValidatedRequest] The validated request object.
-    def validate_request(request, raise_error: false)
+    def validate_request(request, raise_error: false, &after_block)
       route = @router.match(request.request_method, resolve_path(request), content_type: request.content_type)
       validated = if route.error
                     ValidatedRequest.new(request, error: route.error)
@@ -79,7 +82,7 @@ module OpenapiFirst
                     result ||= route.request_definition.validate(request, route_params: route.params)
                     result.is_a?(Failure) ? ValidatedRequest.new(request, error: result) : result
                   end
-      validated = call_after_request_validation_hooks(request, validated)
+      validated = call_after_request_validation_hooks(request, validated, &after_block)
       raise validated.error.exception(validated) if validated.error && raise_error
 
       validated
@@ -121,10 +124,12 @@ module OpenapiFirst
     end
 
     def call_after_request_validation_hooks(request, validated)
-      return validated if @config.after_request_validation.none?
+      hooks = @config.after_request_validation
+      return validated if hooks.none? && !block_given?
 
       error = catch(FAILURE) do
-        @config.after_request_validation.each { |hook| hook.call(validated, self) }
+        hooks.each { |hook| hook.call(validated, self) }
+        yield validated if block_given? && validated.valid?
         return validated
       end
       ValidatedRequest.new(request, error: error)

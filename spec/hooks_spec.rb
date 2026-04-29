@@ -106,6 +106,38 @@ RSpec.describe 'Hooks' do
     end
   end
 
+  describe 'block passed to validate_request' do
+    let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+
+    it 'is called with the validated request when the request is valid' do
+      received = []
+      definition.validate_request(build_request('/pets')) { |v| received << v.operation_id }
+      expect(received).to eq(['listPets'])
+    end
+
+    it 'is not called when the request is invalid' do
+      received = []
+      definition.validate_request(build_request('/unknown')) { |v| received << v }
+      expect(received).to be_empty
+    end
+
+    it 'is caught by Failure.fail! and produces a ValidatedRequest with the error' do
+      validated = definition.validate_request(build_request('/pets')) do
+        OpenapiFirst::Failure.fail!(:not_found)
+      end
+      expect(validated).to be_invalid
+      expect(validated.error.type).to eq(:not_found)
+    end
+
+    it 'raises when raise_error: true and the block calls Failure.fail!' do
+      expect do
+        definition.validate_request(build_request('/pets'), raise_error: true) do
+          OpenapiFirst::Failure.fail!(:not_found)
+        end
+      end.to raise_error(OpenapiFirst::NotFoundError)
+    end
+  end
+
   describe 'after_response_validation' do
     let(:called) { [] }
 
