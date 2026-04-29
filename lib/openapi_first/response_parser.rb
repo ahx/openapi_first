@@ -13,10 +13,13 @@ module OpenapiFirst
     end
 
     def parse(rack_response)
-      ParsedResponse.new(
-        body: @body_parser.call(read_body(rack_response)),
+      body = @body_parser.call(read_body(rack_response))
+      return [nil, body] if body.is_a?(Failure)
+
+      [ParsedResponse.new(
+        body:,
         headers: @headers_parser&.call(rack_response.headers) || {}
-      )
+      ), nil]
     end
 
     private

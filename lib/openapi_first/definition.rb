@@ -75,10 +75,8 @@ module OpenapiFirst
       validated = if route.error
                     ValidatedRequest.new(request, error: route.error)
                   else
-                    result = catch(FAILURE) do
-                      call_before_request_validation_hooks(request, route.request_definition)
-                      route.request_definition.validate(request, route_params: route.params)
-                    end
+                    result = call_before_request_validation_hooks(request, route.request_definition)
+                    result ||= route.request_definition.validate(request, route_params: route.params)
                     result.is_a?(Failure) ? ValidatedRequest.new(request, error: result) : result
                   end
       validated = call_after_request_validation_hooks(request, validated)
@@ -111,19 +109,25 @@ module OpenapiFirst
 
     private
 
-    def call_before_request_validation_hooks(request, route_request_definition)
-      @config.before_request_validation.each do |hook|
-        hook.call(request, route_request_definition, self)
+    def call_before_request_validation_hooks(request, request_definition)
+      return if @config.before_request_validation.none?
+
+      catch(FAILURE) do
+        @config.before_request_validation.each do |hook|
+          hook.call(request, request_definition, self)
+        end
+        nil
       end
     end
 
     def call_after_request_validation_hooks(request, validated)
-      result = catch(FAILURE) do
-        @config.after_request_validation.each { |hook| hook.call(validated, self) }
-      end
-      return ValidatedRequest.new(request, error: result) if result.is_a?(Failure)
+      return validated if @config.after_request_validation.none?
 
-      validated
+      error = catch(FAILURE) do
+        @config.after_request_validation.each { |hook| hook.call(validated, self) }
+        return validated
+      end
+      ValidatedRequest.new(request, error: error)
     end
 
     def resolve_path(rack_request)

@@ -25,19 +25,9 @@ module OpenapiFirst
     attr_reader :status, :content_type, :content_schema, :headers, :key
 
     def validate(response)
-      parsed_values = nil
-      error = catch FAILURE do
-        parsed_values = @parser.parse(response)
-        nil
-      end
-      error ||= @validator.call(parsed_values)
+      parsed_values, error = @parser.parse(response)
+      error ||= @validator.call(parsed_values) if parsed_values
       ValidatedResponse.new(response, parsed_values:, error:, response_definition: self)
-    end
-
-    private
-
-    def parse(request)
-      @parser.parse(request)
     end
   end
 end

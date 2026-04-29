@@ -6,28 +6,28 @@ module OpenapiFirst
       RequestHeaders = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.headers)
-          Failure.fail!(:invalid_header, errors: validation.errors) if validation.error?
+          Failure.new(:invalid_header, errors: validation.errors) if validation.error?
         end
       end
 
       Path = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.path)
-          Failure.fail!(:invalid_path, errors: validation.errors) if validation.error?
+          Failure.new(:invalid_path, errors: validation.errors) if validation.error?
         end
       end
 
       Query = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.query)
-          Failure.fail!(:invalid_query, errors: validation.errors) if validation.error?
+          Failure.new(:invalid_query, errors: validation.errors) if validation.error?
         end
       end
 
       RequestCookies = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.cookies)
-          Failure.fail!(:invalid_cookie, errors: validation.errors) if validation.error?
+          Failure.new(:invalid_cookie, errors: validation.errors) if validation.error?
         end
       end
 
