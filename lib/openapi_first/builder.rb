@@ -130,7 +130,7 @@ module OpenapiFirst
                                 after_property_validation: config.after_request_parameter_property_validation)
     end
 
-    def build_requests(path:, request_method:, operation_object:, parameters:)
+    def build_requests(path:, request_method:, operation_object:, parameters:) # rubocop:disable Metrics/MethodLength
       content_objects = operation_object.dig('requestBody', 'content')
       if content_objects.nil?
         return [
@@ -143,10 +143,12 @@ module OpenapiFirst
           configuration: schemer_configuration,
           after_property_validation: config.after_request_body_property_validation
         )
+        encoding = content_object['encoding']&.resolved
         Request.new(path:, request_method:, parameters:,
                     operation_object: operation_object.resolved,
                     content_type:,
                     content_schema:,
+                    encoding:,
                     required_body:,
                     key: [path, request_method, content_type].join(':'))
       end
@@ -157,6 +159,7 @@ module OpenapiFirst
                   operation_object: operation_object.resolved,
                   content_type: nil,
                   content_schema: nil,
+                  encoding: nil,
                   required_body: false,
                   key: [path, request_method, nil].join(':'))
     end

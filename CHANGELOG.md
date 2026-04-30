@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-
+- Support `encoding[<field>].contentType` on `multipart/form-data` request bodies. Fields whose encoding declares a JSON content type are JSON-parsed before schema validation. Fixes [#398](https://github.com/ahx/openapi_first/issues/398).
 - Deprecated `TerminalFormatter#format`. Use `#report` instead.
 - `OpenapiFirst::Test.logger` is now configurable via the setup block: `OpenapiFirst::Test.setup { |test| test.logger = Logger.new($stderr) }`. The logger defaults to `Logger.new($stdout)`.
 

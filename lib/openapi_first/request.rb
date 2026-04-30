@@ -12,8 +12,8 @@ module OpenapiFirst
   # An 3.x Operation object can accept multiple requests, because it can handle multiple content-types.
   # This class represents one of those requests.
   class Request
-    def initialize(path:, request_method:, operation_object:, # rubocop:disable Metrics/MethodLength
-                   parameters:, content_type:, content_schema:, required_body:, key:)
+    def initialize(path:, request_method:, operation_object:, # rubocop:disable Metrics/MethodLength,Metrics/ParameterLists
+                   parameters:, content_type:, content_schema:, required_body:, key:, encoding: nil)
       @path = path
       @request_method = request_method
       @content_type = content_type
@@ -25,7 +25,7 @@ module OpenapiFirst
       @path_parser = parameters.path&.then { |params| OpenapiParameters::Path.new(params) }
       @headers_parser = parameters.header&.then { |params| OpenapiParameters::Header.new(params) }
       @cookies_parser = parameters.cookie&.then { |params| OpenapiParameters::Cookie.new(params) }
-      @body_parsers = RequestBodyParsers[content_type] if content_type
+      @body_parsers = build_body_parser(content_type, encoding) if content_type
       @validator = RequestValidator.new(
         content_schema:,
         required_request_body: required_body == true,
@@ -58,6 +58,9 @@ module OpenapiFirst
       @operation['operationId']
     end
 
+    MULTIPART_CONTENT_TYPE = %r{\Amultipart/form-data\b}i
+    private_constant :MULTIPART_CONTENT_TYPE
+
     private
 
     def parse_request(request, route_params:)
@@ -74,6 +77,14 @@ module OpenapiFirst
       @query_parser&.unpack(query_string)
     rescue OpenapiParameters::InvalidParameterError
       Failure.fail!(:invalid_query, message: 'Invalid query parameter.')
+    end
+
+    def build_body_parser(content_type, encoding)
+      if content_type.match?(MULTIPART_CONTENT_TYPE)
+        RequestBodyParsers::MultipartBodyParser.new(encoding: encoding || {})
+      else
+        RequestBodyParsers[content_type]
+      end
     end
   end
 end
