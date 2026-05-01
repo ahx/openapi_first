@@ -13,7 +13,7 @@ module OpenapiFirst
     # Register an OpenAPI definition for testing
     # @param path_or_definition [String, Definition] Path to the OpenAPI file or a Definition object
     # @param as [Symbol] Name to register the API definition as
-    def register(path_or_definition, as: :default)
+    def register(path_or_definition, as: :default, &)
       if definitions.key?(as) && as == :default
         raise(
           AlreadyRegisteredError,
@@ -24,7 +24,7 @@ module OpenapiFirst
         )
       end
 
-      definition = OpenapiFirst.load(path_or_definition)
+      definition = OpenapiFirst.load(path_or_definition, &)
       definitions[as] = definition
       definition
     end

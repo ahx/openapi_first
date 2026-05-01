@@ -49,10 +49,17 @@ module OpenapiFirst
       attr_reader :app
 
       def call(env)
-        validated = @definition.validate_request(Rack::Request.new(env), raise_error: @raise)
+        rack_response = nil
+        app_called = false
+        validated = @definition.validate_request(Rack::Request.new(env), raise_error: @raise) do |v|
+          app_called = true
+          env[REQUEST] = v
+          rack_response = @app.call(env)
+        end
         env[REQUEST] = validated
         failure = validated.error
         return @error_response_class.new(failure:).render if failure && @error_response_class
+        return rack_response if app_called
 
         @app.call(env)
       end

@@ -15,12 +15,12 @@ module OpenapiFirst
         begin
           parsed_body = response.body
         rescue ParseError => e
-          Failure.fail!(:invalid_response_body, message: e.message)
+          return Failure.new(:invalid_response_body, message: e.message)
         end
         validation = Schema::ValidationResult.new(
           schema.validate(parsed_body, access_mode: 'read')
         )
-        Failure.fail!(:invalid_response_body, errors: validation.errors) if validation.error?
+        Failure.new(:invalid_response_body, errors: validation.errors) if validation.error?
       end
     end
   end

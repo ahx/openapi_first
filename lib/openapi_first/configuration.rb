@@ -4,6 +4,7 @@ module OpenapiFirst
   # Global configuration. Currently only used for the request validation middleware.
   class Configuration
     HOOKS = %i[
+      before_request_validation
       after_request_validation
       after_response_validation
       after_request_parameter_property_validation
@@ -64,6 +65,11 @@ module OpenapiFirst
         hooks[hook] << block
         block
       end
+    end
+
+    def plugin(name, **)
+      require_relative 'plugins'
+      Plugins.load(name).configure(self, **)
     end
 
     def request_validation_error_response=(mod)

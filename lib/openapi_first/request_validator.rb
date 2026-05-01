@@ -26,7 +26,11 @@ module OpenapiFirst
     end
 
     def call(parsed_request)
-      @validators.each { |v| v.call(parsed_request) }
+      @validators.each do |v|
+        result = v.call(parsed_request)
+        return result if result.is_a?(Failure)
+      end
+      nil
     end
   end
 end

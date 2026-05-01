@@ -1,10 +1,13 @@
 # Changelog
 
 ## Unreleased
-- Support `encoding[<field>].contentType` on `multipart/form-data` request bodies. Fields whose encoding declares a JSON content type are JSON-parsed before schema validation. Fixes [#398](https://github.com/ahx/openapi_first/issues/398).
+- Apps using request validation middleware can call Failure.fail! to produce an error result
+- The `after_request_validation` now supports throwing a Failure, which will result in a failed request
+- Added new hook `before_request_validation`. Called after a request routed to an operation but before the request is validated. You can throw via `Failure.fail!` to abort request validation immediately.
 - Deprecated `TerminalFormatter#format`. Use `#report` instead.
 - `OpenapiFirst::Test.logger` is now configurable via the setup block: `OpenapiFirst::Test.setup { |test| test.logger = Logger.new($stderr) }`. The logger defaults to `Logger.new($stdout)`.
-
+- Introduce a plugin system modeled after Sequels plugin system. 
+- Support `encoding[<field>].contentType` on `multipart/form-data` request bodies. Fields whose encoding declares a JSON content type are JSON-parsed before schema validation. Fixes [#398](https://github.com/ahx/openapi_first/issues/398).
 ## 3.3.1
 
 - Optimized caching towards reducing retained memory after calling `OpenapiFirst.load` without using a global cache. (Removed `OpenapiFirst.clear_cache!`.)

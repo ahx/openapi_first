@@ -33,7 +33,7 @@ module OpenapiFirst
       body = Utils.read_body(request)
       JSON.parse(body) unless body.nil? || body.empty?
     rescue JSON::ParserError
-      Failure.fail!(:invalid_body, message: 'Failed to parse request body as JSON')
+      Failure.new(:invalid_body, message: 'Failed to parse request body as JSON')
     end)
 
     # Parses multipart/form-data requests and currently puts the contents of a file upload at the parsed hash values.
@@ -72,8 +72,8 @@ module OpenapiFirst
 
         JSON.parse(raw)
       rescue JSON::ParserError => e
-        Failure.fail!(:invalid_body,
-                      message: %(Failed to parse multipart field "#{name}" as JSON: #{e.message}))
+        Failure.new(:invalid_body,
+                    message: %(Failed to parse multipart field "#{name}" as JSON: #{e.message}))
       end
 
       def json?(content_type)

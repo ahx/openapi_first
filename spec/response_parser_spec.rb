@@ -7,7 +7,8 @@ RSpec.describe OpenapiFirst::ResponseParser do
   let(:headers) { nil }
 
   subject(:parsed) do
-    described_class.new(content_type:, headers:).parse(rack_response)
+    parsed_response, _error = described_class.new(content_type:, headers:).parse(rack_response)
+    parsed_response
   end
 
   describe '#body' do
@@ -36,7 +37,7 @@ RSpec.describe OpenapiFirst::ResponseParser do
 
       it 'raises an error that explains the issue' do
         expect do
-          parsed.body
+          parsed
         end.to raise_error 'Cannot not read response body. Response is not string-like, but is a Hash.'
       end
     end
@@ -56,10 +57,10 @@ RSpec.describe OpenapiFirst::ResponseParser do
         Rack::Response.new('{foobar}', 200, { 'Content-Type' => 'application/json' })
       end
 
-      it 'raises an error' do
-        expect do
-          parsed.body
-        end.to throw_symbol OpenapiFirst::FAILURE
+      it 'returns a Failure' do
+        _parsed, error = described_class.new(content_type:, headers:).parse(rack_response)
+        expect(error).to be_a(OpenapiFirst::Failure)
+        expect(error.type).to eq(:invalid_response_body)
       end
     end
 

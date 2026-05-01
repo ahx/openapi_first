@@ -266,6 +266,81 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
   end
 
+  context 'when the downstream app calls Failure.fail!' do
+    let(:app) do
+      Rack::Builder.app do
+        use(OpenapiFirst::Middlewares::RequestValidation, File.expand_path('../data/petstore.yaml', __dir__))
+        run ->(_env) { OpenapiFirst::Failure.fail!(:not_found) }
+      end
+    end
+
+    it 'returns the configured error response' do
+      get '/pets'
+
+      expect(last_response.status).to eq 404
+      expect(last_response.content_type).to eq 'application/problem+json'
+      body = JSON.parse(last_response.body)
+      expect(body['status']).to eq 404
+      expect(body['title']).to eq 'Not Found'
+    end
+
+    it 'sets env[REQUEST] to the validated request with the failure' do
+      get '/pets'
+
+      expect(last_request.env[OpenapiFirst::REQUEST].error.type).to eq :not_found
+    end
+  end
+
+  context 'when the downstream app calls Failure.fail!(:invalid_body)' do
+    let(:app) do
+      Rack::Builder.app do
+        use(OpenapiFirst::Middlewares::RequestValidation, File.expand_path('../data/petstore.yaml', __dir__))
+        run ->(_env) { OpenapiFirst::Failure.fail!(:invalid_body) }
+      end
+    end
+
+    it 'returns 400 with the configured error response' do
+      get '/pets'
+
+      expect(last_response.status).to eq 400
+      body = JSON.parse(last_response.body)
+      expect(body['title']).to eq 'Bad Request Body'
+    end
+  end
+
+  context 'when the downstream app calls Failure.fail! with error_response: :jsonapi' do
+    let(:app) do
+      Rack::Builder.app do
+        use(OpenapiFirst::Middlewares::RequestValidation,
+            File.expand_path('../data/petstore.yaml', __dir__),
+            error_response: :jsonapi)
+        run ->(_env) { OpenapiFirst::Failure.fail!(:not_found) }
+      end
+    end
+
+    it 'renders a JSON:API error response' do
+      get '/pets'
+
+      expect(last_response.status).to eq 404
+      expect(last_response.content_type).to eq 'application/vnd.api+json'
+    end
+  end
+
+  context 'when the downstream app calls Failure.fail! with raise_error: true' do
+    let(:app) do
+      Rack::Builder.app do
+        use(OpenapiFirst::Middlewares::RequestValidation,
+            File.expand_path('../data/petstore.yaml', __dir__),
+            raise_error: true)
+        run ->(_env) { OpenapiFirst::Failure.fail!(:not_found) }
+      end
+    end
+
+    it 'raises NotFoundError' do
+      expect { get '/pets' }.to raise_error(OpenapiFirst::NotFoundError)
+    end
+  end
+
   describe '#app' do
     it 'returns the next app in the stack' do
       app = double

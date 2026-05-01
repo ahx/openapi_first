@@ -69,17 +69,23 @@ module OpenapiFirst
     # Validates the request against the API description.
     # @param [Rack::Request] request The Rack request object.
     # @param [Boolean] raise_error Whether to raise an error if validation fails.
+    # @yield [ValidatedRequest] Optional block called after successful validation.
+    #   The block runs inside the same catch(FAILURE) as the after_request_validation hooks,
+    #   so it may call OpenapiFirst::Failure.fail! to short-circuit and produce an error.
     # @return [ValidatedRequest] The validated request object.
-    def validate_request(request, raise_error: false)
+    def validate_request(request, raise_error: false, &after_block)
       route = @router.match(request.request_method, resolve_path(request), content_type: request.content_type)
-      if route.error
-        ValidatedRequest.new(request, error: route.error)
-      else
-        route.request_definition.validate(request, route_params: route.params)
-      end.tap do |validated|
-        @config.after_request_validation.each { |hook| hook.call(validated, self) }
-        raise validated.error.exception(validated) if validated.error && raise_error
-      end
+      validated = if route.error
+                    ValidatedRequest.new(request, error: route.error)
+                  else
+                    result = call_before_request_validation_hooks(request, route.request_definition)
+                    result ||= route.request_definition.validate(request, route_params: route.params)
+                    result.is_a?(Failure) ? ValidatedRequest.new(request, error: result) : result
+                  end
+      validated = call_after_request_validation_hooks(request, validated, &after_block)
+      raise validated.error.exception(validated) if validated.error && raise_error
+
+      validated
     end
 
     # Validates the response against the API description.
@@ -105,6 +111,29 @@ module OpenapiFirst
     end
 
     private
+
+    def call_before_request_validation_hooks(request, request_definition)
+      return if @config.before_request_validation.none?
+
+      catch(FAILURE) do
+        @config.before_request_validation.each do |hook|
+          hook.call(request, request_definition, self)
+        end
+        nil
+      end
+    end
+
+    def call_after_request_validation_hooks(request, validated)
+      hooks = @config.after_request_validation
+      return validated if hooks.none? && !block_given?
+
+      error = catch(FAILURE) do
+        hooks.each { |hook| hook.call(validated, self) }
+        yield validated if block_given? && validated.valid?
+        return validated
+      end
+      ValidatedRequest.new(request, error: error)
+    end
 
     def resolve_path(rack_request)
       return rack_request.path.delete_prefix(path_prefix) if path_prefix && rack_request.path.start_with?(path_prefix)

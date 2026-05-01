@@ -45,12 +45,8 @@ module OpenapiFirst
     end
 
     def validate(request, route_params:)
-      parsed_request = nil
-      error = catch FAILURE do
-        parsed_request = parse_request(request, route_params:)
-        @validator.call(parsed_request)
-        nil
-      end
+      parsed_request, error = parse_request(request, route_params:)
+      error ||= @validator.call(parsed_request) if parsed_request
       ValidatedRequest.new(request, parsed_request:, error:, request_definition: self, query_parser:)
     end
 
@@ -64,19 +60,25 @@ module OpenapiFirst
     private
 
     def parse_request(request, route_params:)
-      ParsedRequest.new(
+      query, query_error = parse_query(request.env[Rack::QUERY_STRING])
+      return [nil, query_error] if query_error
+
+      body = @body_parsers&.call(request)
+      return [nil, body] if body.is_a?(Failure)
+
+      [ParsedRequest.new(
         path: @path_parser&.unpack(route_params),
-        query: parse_query(request.env[Rack::QUERY_STRING]),
+        query:,
         headers: @headers_parser&.unpack_env(request.env),
         cookies: @cookies_parser&.unpack(request.env[Rack::HTTP_COOKIE]),
-        body: @body_parsers&.call(request)
-      )
+        body:
+      ), nil]
     end
 
     def parse_query(query_string)
-      @query_parser&.unpack(query_string)
+      [@query_parser&.unpack(query_string), nil]
     rescue OpenapiParameters::InvalidParameterError
-      Failure.fail!(:invalid_query, message: 'Invalid query parameter.')
+      [nil, Failure.new(:invalid_query, message: 'Invalid query parameter.')]
     end
 
     def build_body_parser(content_type, encoding)

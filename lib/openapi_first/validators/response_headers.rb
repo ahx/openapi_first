@@ -17,10 +17,11 @@ module OpenapiFirst
           validation_errors = header.schema.validate(header_value)
           next unless validation_errors.any?
 
-          Failure.fail!(:invalid_response_header,
-                        errors: [error_for(data_pointer: "/#{header.name}", value: header_value,
-                                           error: validation_errors.first)])
+          return Failure.new(:invalid_response_header,
+                             errors: [error_for(data_pointer: "/#{header.name}", value: header_value,
+                                                error: validation_errors.first)])
         end
+        nil
       end
 
       private

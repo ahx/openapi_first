@@ -21,6 +21,48 @@ RSpec.describe 'Hooks' do
     end
   end
 
+  describe 'before_request_validation' do
+    let(:called) { [] }
+    let(:definition) do
+      OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+        config.before_request_validation do |request, request_definition, doc|
+          called << [request.path, request_definition.operation_id, doc]
+        end
+      end
+    end
+
+    it 'calls the hook with request, request_definition and definition' do
+      definition.validate_request(build_request('/pets'))
+      expect(called).to eq([['/pets', 'listPets', definition]])
+    end
+
+    it 'is not called for unmatched routes' do
+      definition.validate_request(build_request('/unknown'))
+      expect(called).to be_empty
+    end
+
+    it 'skips validation when Failure.fail! is thrown' do
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+        config.before_request_validation do |_request, _request_definition|
+          OpenapiFirst::Failure.fail!(:not_found)
+        end
+      end
+      validated = definition.validate_request(build_request('/pets'))
+      expect(validated).to be_invalid
+      expect(validated.error.type).to eq(:not_found)
+    end
+
+    it 'still calls after_request_validation when failing early' do
+      after_called = []
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+        config.before_request_validation { OpenapiFirst::Failure.fail!(:not_found) }
+        config.after_request_validation { |validated| after_called << validated.error.type }
+      end
+      definition.validate_request(build_request('/pets'))
+      expect(after_called).to eq([:not_found])
+    end
+  end
+
   describe 'after_request_validation' do
     let(:called) { [] }
     let(:definition) do
@@ -43,6 +85,16 @@ RSpec.describe 'Hooks' do
       expect(called).to eq([['listPets', false]])
     end
 
+    it 'supports short-circuiting via Failure.fail!' do
+      definition = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+        config.after_request_validation do |_request|
+          OpenapiFirst::Failure.fail!(:not_found)
+        end
+      end
+      validated = definition.validate_request(build_request('/pets'))
+      expect(validated.error.type).to eq(:not_found)
+    end
+
     it 'can pass the doc as a second argument' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
         config.after_request_validation do |request, doc|
@@ -51,6 +103,38 @@ RSpec.describe 'Hooks' do
       end
       definition.validate_request(build_request('/pets'))
       expect(called).to eq([['/pets', definition]])
+    end
+  end
+
+  describe 'block passed to validate_request' do
+    let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+
+    it 'is called with the validated request when the request is valid' do
+      received = []
+      definition.validate_request(build_request('/pets')) { |v| received << v.operation_id }
+      expect(received).to eq(['listPets'])
+    end
+
+    it 'is not called when the request is invalid' do
+      received = []
+      definition.validate_request(build_request('/unknown')) { |v| received << v }
+      expect(received).to be_empty
+    end
+
+    it 'is caught by Failure.fail! and produces a ValidatedRequest with the error' do
+      validated = definition.validate_request(build_request('/pets')) do
+        OpenapiFirst::Failure.fail!(:not_found)
+      end
+      expect(validated).to be_invalid
+      expect(validated.error.type).to eq(:not_found)
+    end
+
+    it 'raises when raise_error: true and the block calls Failure.fail!' do
+      expect do
+        definition.validate_request(build_request('/pets'), raise_error: true) do
+          OpenapiFirst::Failure.fail!(:not_found)
+        end
+      end.to raise_error(OpenapiFirst::NotFoundError)
     end
   end
 
