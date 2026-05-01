@@ -84,6 +84,38 @@ RSpec.describe 'Request body validation' do
       expect(names).to eq(['Quentin'])
     end
 
+    context 'when raise_error is true and a multipart JSON-encoded part is malformed' do
+      let(:raise_error_option) { true }
+
+      it 'raises with a message naming the field' do
+        data_part = Rack::Test::UploadedFile.new(
+          StringIO.new('{not valid json'),
+          'application/json', original_filename: 'data.json'
+        )
+        csv_part = Rack::Test::UploadedFile.new(fixture_path('foo.txt'), 'text/csv')
+
+        expect do
+          post '/multipart-with-encoding', 'data' => data_part, 'file' => csv_part
+        end.to raise_error(OpenapiFirst::RequestInvalidError,
+                           /Failed to parse multipart field "data" as JSON/)
+      end
+    end
+
+    it 'parses a multipart part declared as application/json via encoding' do
+      data_part = Rack::Test::UploadedFile.new(
+        StringIO.new(JSON.generate(name: 'Quentin', description: 'Cat')),
+        'application/json', original_filename: 'data.json'
+      )
+      csv_part = Rack::Test::UploadedFile.new(fixture_path('foo.txt'), 'text/csv')
+
+      post '/multipart-with-encoding', 'data' => data_part, 'file' => csv_part
+
+      expect(last_response.status).to eq(200), last_response.body
+      parsed = last_request.env[OpenapiFirst::REQUEST].parsed_body
+      expect(parsed['data']).to eq('name' => 'Quentin', 'description' => 'Cat')
+      expect(parsed['file']).to eq(File.read(fixture_path('foo.txt')))
+    end
+
     it 'succeeds without optional file upload' do
       header Rack::CONTENT_TYPE,  'multipart/form-data'
       post '/multipart-with-file', 'petId' => '12'

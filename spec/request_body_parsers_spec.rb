@@ -26,6 +26,47 @@ RSpec.describe OpenapiFirst::RequestBodyParsers do
       body = parser.call(last_request)
       expect(body['file']).to eq(File.read('./spec/data/foo.txt'))
     end
+
+    context 'with an encoding map' do
+      subject(:parser) do
+        OpenapiFirst::RequestBodyParsers::MultipartBodyParser.new(
+          encoding: { 'data' => { 'contentType' => 'application/json' } }
+        )
+      end
+
+      it 'parses fields whose encoding contentType is JSON' do
+        json_part = Rack::Test::UploadedFile.new(
+          StringIO.new(JSON.generate(name: 'Quentin')),
+          'application/json', original_filename: 'data.json'
+        )
+        post '/', 'data' => json_part
+
+        body = parser.call(last_request)
+        expect(body['data']).to eq('name' => 'Quentin')
+      end
+
+      it 'throws a Failure when a JSON-encoded field is malformed' do
+        json_part = Rack::Test::UploadedFile.new(
+          StringIO.new('{not valid'),
+          'application/json', original_filename: 'data.json'
+        )
+        post '/', 'data' => json_part
+
+        expect do
+          parser.call(last_request)
+        end.to throw_symbol(OpenapiFirst::FAILURE)
+      end
+
+      it 'leaves fields without encoding untouched' do
+        post '/', 'data' => Rack::Test::UploadedFile.new(
+          StringIO.new(JSON.generate(name: 'Q')),
+          'application/json', original_filename: 'data.json'
+        ), 'other' => 'plain'
+
+        body = parser.call(last_request)
+        expect(body['other']).to eq('plain')
+      end
+    end
   end
 
   context 'with application/x-www-form-urlencoded' do
