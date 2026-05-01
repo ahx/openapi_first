@@ -72,8 +72,8 @@ module OpenapiFirst
 
         JSON.parse(raw)
       rescue JSON::ParserError => e
-        Failure.fail!(:invalid_body,
-                      message: %(Failed to parse multipart field "#{name}" as JSON: #{e.message}))
+        Failure.new(:invalid_body,
+                    message: %(Failed to parse multipart field "#{name}" as JSON: #{e.message}))
       end
 
       def json?(content_type)

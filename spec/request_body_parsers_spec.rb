@@ -45,16 +45,17 @@ RSpec.describe OpenapiFirst::RequestBodyParsers do
         expect(body['data']).to eq('name' => 'Quentin')
       end
 
-      it 'throws a Failure when a JSON-encoded field is malformed' do
+      it 'returns a Failure when a JSON-encoded field is malformed' do
         json_part = Rack::Test::UploadedFile.new(
           StringIO.new('{not valid'),
           'application/json', original_filename: 'data.json'
         )
         post '/', 'data' => json_part
 
-        expect do
-          parser.call(last_request)
-        end.to throw_symbol(OpenapiFirst::FAILURE)
+        result = parser.call(last_request)
+        expect(result).to be_a(OpenapiFirst::Failure)
+        expect(result.type).to eq(:invalid_body)
+        expect(result.message).to include(%(Failed to parse multipart field "data" as JSON))
       end
 
       it 'leaves fields without encoding untouched' do
