@@ -1,0 +1,179 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  background: #0f1117;
+  color: #e2e8f0;
+  margin: 0;
+  padding: 2rem;
+  line-height: 1.6;
+}
+
+h1 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-block: 0 1rem;
+  color: #f8fafc;
+
+  & .pct {
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: #94a3b8;
+    margin-inline-start: 0.5rem;
+  }
+}
+
+details.plan {
+  border: 1px solid #1e293b;
+  padding: 1.25rem 1.5rem;
+  margin-block-end: 1.5rem;
+  background: #161b27;
+
+  &[open] { border-color: #334155; }
+}
+
+details.plan > summary {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  user-select: none;
+
+  & .pct {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: #64748b;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  &::before {
+    content: '▶';
+    font-size: 0.6rem;
+    color: #475569;
+    transition: transform 0.15s ease;
+    align-self: center;
+  }
+
+  details[open] > &::before { transform: rotate(90deg); }
+}
+
+.plan-content {
+  margin-block-start: 1rem;
+}
+
+details.route {
+  border-inline-start: 2px solid #1e293b;
+  padding-inline-start: 1rem;
+  margin-block: 0.75rem;
+
+  &[open] { border-color: #334155; }
+}
+
+details.route > summary {
+  font-weight: 600;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-block: 0.2rem;
+  user-select: none;
+
+  &::before {
+    content: '▶';
+    font-size: 0.6rem;
+    color: #475569;
+    transition: transform 0.15s ease;
+  }
+
+  details[open] > &::before { transform: rotate(90deg); }
+}
+
+.operation-label {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #64748b;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.request-status,
+.response-summary {
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.route-content {
+  margin-block-start: 0.4rem;
+}
+
+ul.tasks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+ul.responses {
+  padding-inline-start: 1.5rem;
+}
+
+li {
+  font-size: 0.875rem;
+  padding: 0.2rem 0.4rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.covered { color: #4ade80; }
+
+.uncovered {
+  background: #1f1315;
+  font-weight: 500;
+}
+
+.status {
+  color: #e2e8f0;
+  font-weight: 600;
+  min-width: 3ch;
+}
+
+.content-type {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.problem {
+  color: #f87171;
+  font-size: 0.8rem;
+}
+
+.method {
+  color: #7dd3fc;
+  font-weight: 700;
+}
+
+.path {
+  color: #e2e8f0;
+}
+
+.warning {
+  color: #fbbf24;
+  background: #1c1a10;
+  border: 1px solid #3b3010;
+  padding: 0.75rem 1rem;
+}
