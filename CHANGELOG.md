@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- Added `OpenapiFirst::Test::Coverage::HtmlReporter` that writes a self-contained HTML coverage report to `coverage/openapi_coverage.html` and make that the default.
+- Renamed `OpenapiFirst::Test::Coverage::TerminalFormatter` to `TerminalReporter` and `Test::Configuration#coverage_formatter(_options)` to `#coverage_reporter(_options)`. The old names continue to work but emit a deprecation warning.
 - Apps using request validation middleware can call Failure.fail! to produce an error result
 - The `after_request_validation` now supports throwing a Failure, which will result in a failed request
 - Added new hook `before_request_validation`. Called after a request routed to an operation but before the request is validated. You can throw via `Failure.fail!` to abort request validation immediately.

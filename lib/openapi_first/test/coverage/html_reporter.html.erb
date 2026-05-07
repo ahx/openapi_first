@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OpenAPI API Coverage Report</title>
+  <style><%= File.read(File.join(__dir__, 'html_reporter.css')) %></style>
+</head>
+<body>
+  <h1>API Coverage <span class="pct"><%= coverage.round(1) %>%</span></h1>
+  <% if plans.empty? -%>
+  <p class="warning"><%= NO_REQUESTS_WARNING %></p>
+  <% else -%>
+  <% plans.each do |plan| -%>
+  <details class="plan"<%= ' open' unless plan.done? %>>
+    <summary>
+      <%= h plan.title || plan_identifier(plan) %>
+      <span class="pct"><%= plan_identifier(plan) %> · <%= plan.coverage.round(1) %>%</span>
+    </summary>
+    <div class="plan-content">
+    <% plan_verbose = expand_plan?(plan) -%>
+    <% visible_routes(plan).each do |route| -%>
+    <details class="route"<%= ' open' unless route.finished? %>>
+      <summary>
+        <span class="method"><%= h route.request_method.upcase %></span>
+        <span class="path"><%= h route.path %></span>
+        <% status = route_status(route) -%>
+        <% if status == :request_problem -%>
+        <span class="request-status problem">❌ <span class="problem"><%= h explain_unfinished_request(route.requests.first) %></span></span>
+        <% elsif status == :responses_problem -%>
+        <span class="response-summary problem">⚠️ <%= uncovered_responses_count(route) %> response(s) not covered</span>
+        <% else -%>
+        <span class="request-status covered">✅</span>
+        <% end -%>
+        <% if (label = route.summary) -%>
+        <span class="operation-label"><%= h label %></span>
+        <% end -%>
+      </summary>
+      <div class="route-content">
+        <% requests = request_items(route, plan_verbose: plan_verbose) -%>
+        <% unless requests.empty? -%>
+        <ul class="tasks">
+          <% requests.each do |request| -%>
+          <% if request.finished? -%>
+          <li class="covered">
+            <span>✅</span>
+            <% if request.content_type -%><span class="content-type"><%= h request.content_type %></span><% end -%>
+          </li>
+          <% else -%>
+          <li class="uncovered">
+            <span>❌</span>
+            <% if request.content_type -%><span class="content-type"><%= h request.content_type %></span><% end -%>
+            <span class="problem"><%= h explain_unfinished_request(request) %></span>
+          </li>
+          <% end -%>
+          <% end -%>
+        </ul>
+        <% end -%>
+        <% responses = response_items(route, plan_verbose: plan_verbose) -%>
+        <% unless responses.empty? -%>
+        <ul class="tasks responses">
+          <% responses.each do |response| -%>
+          <% if response.finished? -%>
+          <li class="covered">
+            <span>✅</span>
+            <span class="status"><%= h response.status %></span>
+            <% if response.content_type -%><span class="content-type"><%= h response.content_type %></span><% end -%>
+          </li>
+          <% else -%>
+          <li class="uncovered">
+            <span>❌</span>
+            <span class="status"><%= h response.status %></span>
+            <% if response.content_type -%><span class="content-type"><%= h response.content_type %></span><% end -%>
+            <span class="problem"><%= h explain_unfinished_response(response, request_made: any_request_made?(route)) %></span>
+          </li>
+          <% end -%>
+          <% end -%>
+        </ul>
+        <% end -%>
+      </div>
+    </details>
+    <% end -%>
+    </div>
+  </details>
+  <% end -%>
+  <% end -%>
+</body>
+</html>

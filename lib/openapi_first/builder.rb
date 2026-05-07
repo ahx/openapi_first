@@ -13,7 +13,7 @@ require_relative 'ref_resolver'
 module OpenapiFirst
   # Builds parts of a Definition
   # This knows how to read a resolved OpenAPI document and build {Request} and {Response} objects.
-  class Builder # rubocop:disable Metrics/ClassLength
+  class Builder
     REQUEST_METHODS = %w[get head post put patch delete trace options query].freeze
 
     # Builds a router from a resolved OpenAPI document.

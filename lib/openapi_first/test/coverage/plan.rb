@@ -13,7 +13,7 @@ module OpenapiFirst
         class UnknownRequestError < StandardError; end
 
         def self.for(oad, skip_response: nil, skip_route: nil)
-          plan = new(definition_key: oad.key, filepath: oad.filepath)
+          plan = new(definition_key: oad.key, filepath: oad.filepath, title: oad.title)
           routes = oad.routes
           routes = routes.reject { |route| skip_route[route.path, route.request_method] } if skip_route
           routes.each do |route|
@@ -26,14 +26,15 @@ module OpenapiFirst
           plan
         end
 
-        def initialize(definition_key:, filepath: nil)
+        def initialize(definition_key:, filepath: nil, title: nil)
           @routes = []
           @index = {}
           @api_identifier = filepath || definition_key
           @filepath = filepath
+          @title = title
         end
 
-        attr_reader :api_identifier, :filepath, :routes
+        attr_reader :api_identifier, :filepath, :routes, :title
         private attr_reader :index
 
         def track_request(validated_request)
