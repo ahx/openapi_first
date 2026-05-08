@@ -28,6 +28,22 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe '#title' do
+    it 'returns the title from info.title' do
+      definition = OpenapiFirst.parse({
+                                        'openapi' => '3.1.0',
+                                        'info' => { 'title' => 'My API', 'version' => '1.0.0' },
+                                        'paths' => {}
+                                      })
+      expect(definition.title).to eq('My API')
+    end
+
+    it 'returns nil when info is missing' do
+      definition = OpenapiFirst.parse({ 'openapi' => '3.1.0', 'paths' => {} }, filepath: '/x.yaml')
+      expect(definition.title).to be_nil
+    end
+  end
+
   describe '#key' do
     context 'when filepath is available' do
       it 'returns the filepath' do
