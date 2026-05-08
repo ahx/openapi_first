@@ -327,6 +327,15 @@ RSpec.describe OpenapiFirst::Test do
         expect(output.string).to include('Coverage did not detect any API requests')
       end
     end
+
+    context 'with the deprecated formatter: keyword' do
+      it 'forwards to reporter: and warns' do
+        warned = []
+        allow(described_class).to receive(:warn) { |msg| warned << msg }
+        described_class.report_coverage(formatter: OpenapiFirst::Test::Coverage::TerminalReporter)
+        expect(warned.join).to match(/DEPRECATION/)
+      end
+    end
   end
 
   describe '.app' do
