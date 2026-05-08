@@ -30,30 +30,20 @@ module OpenapiFirst
             plan.api_identifier.to_s.delete_prefix("#{Dir.pwd}/")
           end
 
-          # Render every row of a plan, even covered ones, when the user asked for
-          # verbose output or when the plan is fully covered (and collapsing would
-          # hide nothing useful).
           def expand_plan?(plan)
             verbose || plan.done?
           end
 
-          # Routes worth rendering for `plan` — drops finished routes unless the
-          # plan is being expanded.
           def visible_routes(plan)
             return plan.routes if expand_plan?(plan)
 
             plan.routes.reject(&:finished?)
           end
 
-          # Whether any request on `route` was actually observed during the run.
           def any_request_made?(route)
             route.requests.any?(&:requested?)
           end
 
-          # Coarse status for the route summary badge:
-          #   :request_problem   – no request was successfully validated
-          #   :responses_problem – requests succeeded but some responses are uncovered
-          #   :ok                – nothing to flag
           def route_status(route)
             return :request_problem if route.requests.none?(&:finished?)
             return :responses_problem if any_request_made?(route) && route.responses.any? { |r| !r.finished? }
@@ -65,22 +55,17 @@ module OpenapiFirst
             route.responses.count { |r| !r.finished? }
           end
 
-          # Request rows to render for `route`, given whether the plan is expanded.
-          # Empty unless at least one request was made and at least one request
-          # definition has a content type to display.
           def request_items(route, plan_verbose:)
             return [] unless any_request_made?(route) && route.requests.any?(&:content_type)
 
             plan_verbose ? route.requests : route.requests.reject(&:finished?)
           end
 
-          # Response rows to render for `route`. Skipped entirely when no request
-          # was made (and the plan is not expanded), since a "no responses tracked"
-          # list under an unrequested route is just noise.
           def response_items(route, plan_verbose:)
             return [] unless plan_verbose || any_request_made?(route)
+            return route.responses if plan_verbose || route.responses.any? { |r| !r.finished? }
 
-            plan_verbose ? route.responses : route.responses.reject(&:finished?)
+            []
           end
 
           def h(text)
