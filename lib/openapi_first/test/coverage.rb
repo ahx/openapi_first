@@ -12,7 +12,11 @@ module OpenapiFirst
     # to assess if all parts of the API description have been tested.
     # Currently it does not care about unknown requests that are not part of any API description.
     module Coverage
-      autoload :TerminalFormatter, 'openapi_first/test/coverage/terminal_formatter'
+      autoload :TerminalReporter, 'openapi_first/test/coverage/terminal_reporter'
+      autoload :HtmlReporter, 'openapi_first/test/coverage/html_reporter'
+
+      # @deprecated Use {TerminalReporter} instead.
+      TerminalFormatter = TerminalReporter
 
       Result = Data.define(:plans, :coverage)
 

@@ -26,6 +26,8 @@ Metrics/BlockLength:
   Exclude:
     - "spec/**/*.rb"
     - "*.gemspec"
+Metrics/ClassLength:
+  Enabled: false
 Layout/LineLength:
   Exclude:
     - "spec/**/*.rb"

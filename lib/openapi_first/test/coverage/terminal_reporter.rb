@@ -3,8 +3,8 @@
 module OpenapiFirst
   module Test
     module Coverage
-      # This is the default formatter
-      class TerminalFormatter
+      # Reports coverage to a logger using ANSI-coloured lines.
+      class TerminalReporter
         def initialize(verbose: false, focused: true, logger: Test.logger)
           @verbose = verbose
           @focused = focused && !verbose
@@ -12,7 +12,7 @@ module OpenapiFirst
         end
 
         def format(coverage_result)
-          logger.warn 'DEPRECATION WARNING: TerminalFormatter#format is deprecated, use #report instead.'
+          logger.warn 'DEPRECATION WARNING: TerminalReporter#format is deprecated, use #report instead.'
           report(coverage_result)
         end
 
