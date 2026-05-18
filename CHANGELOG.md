@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 3.4.1
+
+Fixed: Added missing ERB and css file to the gem
+
 ## 3.4.0
 
 ### Changed
