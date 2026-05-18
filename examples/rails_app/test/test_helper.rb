@@ -4,6 +4,7 @@ require_relative '../config/environment'
 
 require 'openapi_first'
 OpenapiFirst::Test.setup do |test|
+  test.coverage_reporter = OpenapiFirst::Test::Coverage::HtmlReporter
   test.register Rails.root.join('../../spec/data/train-travel-api/openapi.yaml')
   test.register Rails.root.join('../../spec/data/attachments_openapi.yaml'), as: :attachments
   test.register Rails.root.join('../../spec/data/weather_openapi.yaml'), as: :weather

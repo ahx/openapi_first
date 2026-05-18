@@ -44,6 +44,11 @@ module OpenapiFirst
     # @return [Enumerable[Router::Route]]
     def_delegators :@router, :routes
 
+    # @return [String,nil] The title from the OpenAPI document's `info.title`, if any.
+    def title
+      self['info']&.[]('title')
+    end
+
     # Returns a unique identifier for this API definition
     # @return [String] A unique key for this API definition
     def key

@@ -77,8 +77,8 @@ module OpenapiFirst
       return unless configuration.report_coverage
 
       report_coverage(
-        formatter: configuration.coverage_formatter,
-        **configuration.coverage_formatter_options
+        reporter: configuration.coverage_reporter,
+        **configuration.coverage_reporter_options
       )
       return unless configuration.report_coverage == true
 
@@ -91,10 +91,15 @@ module OpenapiFirst
     end
 
     # Print the coverage report
-    # @param formatter A formatter to define the report.
+    # @param reporter A reporter class to render the report.
+    # @param formatter @deprecated Alias for `reporter:`.
     # @return [IO] An output where to puts the report.
-    def self.report_coverage(formatter: Coverage::TerminalFormatter, **)
-      formatter.new(**).report(Coverage.result)
+    def self.report_coverage(reporter: Coverage::TerminalReporter, formatter: nil, **)
+      if formatter
+        warn 'DEPRECATION WARNING: Test.report_coverage(formatter:) is deprecated, use reporter: instead.'
+        reporter = formatter
+      end
+      reporter.new(**).report(Coverage.result)
     end
 
     # Returns the Rack app wrapped with silent request, response validation
