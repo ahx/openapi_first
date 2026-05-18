@@ -1,11 +1,11 @@
 PATH
   remote: ..
   specs:
-    openapi_first (3.3.1)
+    openapi_first (3.4.0)
       drb (~> 2.0)
       hana (~> 1.3)
       json_schemer (>= 2.1, < 3.0)
-      openapi_parameters (>= 0.10.0, < 2.0)
+      openapi_parameters (>= 0.12.0, < 2.0)
       rack (>= 2.2, < 4.0)
 
 GEM
@@ -16,8 +16,8 @@ GEM
     benchmark-ips (2.14.0)
     benchmark-memory (0.2.0)
       memory_profiler (~> 1)
-    bigdecimal (4.1.1)
-    committee (5.6.2)
+    bigdecimal (4.1.2)
+    committee (5.6.3)
       json_schema (~> 0.14, >= 0.14.3)
       openapi_parser (~> 2.0)
       rack (>= 1.5)
@@ -31,10 +31,9 @@ GEM
       simpleidn (~> 0.2)
     logger (1.7.0)
     memory_profiler (1.1.0)
-    mustermann (3.0.4)
-      ruby2_keywords (~> 0.0.1)
+    mustermann (3.1.1)
     nio4r (2.7.5)
-    openapi_parameters (0.11.0)
+    openapi_parameters (0.12.0)
       rack (>= 2.2)
     openapi_parser (2.3.1)
     optparse (0.8.1)
@@ -42,7 +41,7 @@ GEM
       optparse
       uri
       webrick
-    puma (8.0.0)
+    puma (8.0.1)
       nio4r (~> 2.0)
     rack (3.2.6)
     rack-protection (4.2.1)
@@ -53,7 +52,6 @@ GEM
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
     regexp_parser (2.12.0)
-    ruby2_keywords (0.0.5)
     simpleidn (0.2.3)
     sinatra (4.2.1)
       logger (>= 1.6.0)
@@ -64,7 +62,7 @@ GEM
       tilt (~> 2.0)
     tilt (2.7.0)
     uri (1.1.1)
-    vernier (1.10.0)
+    vernier (1.10.1)
     webrick (1.9.2)
 
 PLATFORMS
