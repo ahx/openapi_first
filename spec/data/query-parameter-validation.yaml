@@ -22,6 +22,19 @@ paths:
           schema:
             type: string
         - $ref: './components/parameters/filter.yaml'
+        - name: json_filter
+          in: query
+          description: Filter results
+          example: '{"tag": "foo"}'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tag:
+                    type: string
+                  other:
+                    type: object
         - name: limit
           in: query
           description: How many items to return at one time (max 100)
