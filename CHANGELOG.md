@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 3.4.2
+
+Fixed: Parsing of JSON-formatted query params [issue #476](https://github.com/ahx/openapi_first/issues/476) (thanks @Drowze)
+
 ## 3.4.1
 
 Fixed: Added missing ERB and css file to the gem
