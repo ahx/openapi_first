@@ -349,6 +349,14 @@ RSpec.describe 'Query Parameter validation' do
         expect(last_response.status).to eq(200), last_response.body
         expect(last_params.dig('filter', 'id')).to eq 100
       end
+
+      it 'converts JSON encoded params' do
+        get '/search', params.merge(json_filter: { tag: 'dogs' }.to_json)
+        expect(last_response.status).to eq(200), last_response.body
+
+        get '/search', params.merge(json_filter: { tag: true }.to_json)
+        expect(last_response.status).to eq(400), last_response.body
+      end
     end
   end
 end
