@@ -351,10 +351,13 @@ RSpec.describe 'Query Parameter validation' do
       end
 
       it 'converts JSON encoded params' do
-        get '/search', params.merge(json_filter: { tag: 'dogs' }.to_json)
+        get '/search', params.merge(json_filter: JSON.generate(tag: 'dogs', other: { stuff: 'books' }))
         expect(last_response.status).to eq(200), last_response.body
 
-        get '/search', params.merge(json_filter: { tag: true }.to_json)
+        filter_param = last_request.env[OpenapiFirst::REQUEST].parsed_query['json_filter']
+        expect(filter_param).to eq('other' => { 'stuff' => 'books' }, 'tag' => 'dogs')
+
+        get '/search', params.merge(json_filter: JSON.generate(tag: true))
         expect(last_response.status).to eq(400), last_response.body
       end
     end

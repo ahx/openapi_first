@@ -110,11 +110,8 @@ module OpenapiFirst
     def resolve_parameters(parameters)
       parameters&.map do |parameter|
         result = parameter.resolved
-        result['schema'] = if parameter['content'] && parameter['content']['application/json']
-                             parameter['content']['application/json']['schema'].resolved
-                           else
-                             parameter['schema'].resolved
-                           end
+        _media_type, media_type_object = parameter['content']&.first
+        result['schema'] = (media_type_object || parameter)['schema'].resolved
         result
       end.to_a
     end
