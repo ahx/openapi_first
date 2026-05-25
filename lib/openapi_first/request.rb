@@ -83,7 +83,7 @@ module OpenapiFirst
 
     def build_body_parser(content_type, encoding)
       if content_type.match?(MULTIPART_CONTENT_TYPE)
-        RequestBodyParsers::MultipartBodyParser.new(encoding: encoding || {})
+        RequestBodyParsers['multipart/form-data'].new(encoding: encoding || {})
       else
         RequestBodyParsers[content_type]
       end
