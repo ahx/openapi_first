@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add OpenAPI 3.2 support. OAS 3.2 uses the same JSON Schema dialect as 3.1 (no breaking changes), so the 3.1 codepath handles it correctly. Fixes #469.
+
 ## 3.4.3
 
 Fixed: Loading a document no longer raises `NoMethodError: undefined method 'schema' for nil` when a Media Type Object has no `schema` (e.g. it only declares an `example`). `schema` is optional in a Media Type Object; such media types now impose no body-schema constraint.
