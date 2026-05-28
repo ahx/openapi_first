@@ -29,9 +29,8 @@ RSpec.describe OpenapiFirst::RequestBodyParsers do
 
     context 'with an encoding map' do
       subject(:parser) do
-        OpenapiFirst::RequestBodyParsers::MultipartBodyParser.new(
-          encoding: { 'data' => { 'contentType' => 'application/json' } }
-        )
+        options = { encoding: { 'data' => { 'contentType' => 'application/json' } } }
+        described_class['multipart/form-data', options]
       end
 
       it 'parses fields whose encoding contentType is JSON' do

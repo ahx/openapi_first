@@ -14,9 +14,12 @@ module OpenapiFirst
         parsers[pattern] = parser
       end
 
-      def [](content_type)
+      def [](content_type, options = {})
         key = parsers.keys.find { content_type.match?(_1) }
-        parsers.fetch(key) { DEFAULT }
+        parser = parsers.fetch(key) { DEFAULT }
+        return parser if parser.respond_to?(:call)
+
+        parser.new(options)
       end
     end
 
@@ -44,12 +47,8 @@ module OpenapiFirst
     # `contentType: application/json` (or any */json), the field's raw value
     # is JSON-parsed before schema validation.
     class MultipartBodyParser
-      def initialize(encoding: {})
-        @encoding = encoding || {}
-      end
-
-      def self.call(request)
-        new.call(request)
+      def initialize(options)
+        @encoding = options[:encoding] || {}
       end
 
       def call(request)
@@ -89,7 +88,7 @@ module OpenapiFirst
       end
     end
 
-    register('multipart/form-data', MultipartBodyParser)
+    register(%r{\Amultipart/form-data\b}i, MultipartBodyParser)
 
     register('application/x-www-form-urlencoded', lambda(&:POST))
   end
