@@ -54,9 +54,6 @@ module OpenapiFirst
       @operation['operationId']
     end
 
-    MULTIPART_CONTENT_TYPE = %r{\Amultipart/form-data\b}i
-    private_constant :MULTIPART_CONTENT_TYPE
-
     private
 
     def parse_request(request, route_params:)
@@ -82,11 +79,7 @@ module OpenapiFirst
     end
 
     def build_body_parser(content_type, encoding)
-      if content_type.match?(MULTIPART_CONTENT_TYPE)
-        RequestBodyParsers['multipart/form-data'].new(encoding: encoding || {})
-      else
-        RequestBodyParsers[content_type]
-      end
+      RequestBodyParsers[content_type, { encoding: encoding || {} }]
     end
   end
 end
