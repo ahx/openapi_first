@@ -17,9 +17,9 @@ module OpenapiFirst
       def [](content_type, options = {})
         key = parsers.keys.find { content_type.match?(_1) }
         parser = parsers.fetch(key) { DEFAULT }
-        return parser if parser.respond_to?(:call)
+        return parser.new(options) if parser.is_a?(Class)
 
-        parser.new(options)
+        parser
       end
     end
 
