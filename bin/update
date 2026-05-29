@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-`bundle update`
+`bundle update --all`
 Dir.glob('Gemfile*')
    .reject { _1.end_with?('.lock') }
    .each do |filename|
-  puts `BUNDLE_GEMFILE=#{filename} bundle update`
+  puts `BUNDLE_GEMFILE=#{filename} bundle update --all`
 end
-puts `cd benchmarks && bundle update && cd ..`
+puts `cd benchmarks && bundle update --all && cd ..`
