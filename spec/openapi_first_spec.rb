@@ -81,6 +81,11 @@ RSpec.describe OpenapiFirst do
       expect(definition.paths).to include('/roles')
     end
 
+    it 'works with a media type that has no schema' do
+      definition = OpenapiFirst.load('./spec/data/media-type-without-schema.yaml')
+      expect(definition.paths).to include('/thing')
+    end
+
     it 'works with YAML' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml')
       expect(definition.paths).to include('/pets')

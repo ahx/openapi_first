@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+Fixed: Loading a document no longer raises `NoMethodError: undefined method 'schema' for nil` when a Media Type Object has no `schema` (e.g. it only declares an `example`). `schema` is optional in a Media Type Object; such media types now impose no body-schema constraint.
+
 ## 3.4.2
 
 Fixed: Parsing of JSON-formatted query params [issue #476](https://github.com/ahx/openapi_first/issues/476) (thanks @Drowze)

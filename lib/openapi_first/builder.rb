@@ -140,7 +140,7 @@ module OpenapiFirst
       end
       required_body = operation_object['requestBody']&.resolved&.fetch('required', false) == true
       content_objects.map do |content_type, content_object|
-        content_schema = content_object['schema'].schema(
+        content_schema = content_object['schema']&.schema(
           configuration: schemer_configuration,
           after_property_validation: config.after_request_body_property_validation
         )
@@ -171,7 +171,7 @@ module OpenapiFirst
       responses.flat_map do |status, response_object|
         headers = build_response_headers(response_object['headers'])
         response_object['content']&.map do |content_type, content_object|
-          content_schema = content_object['schema'].schema(
+          content_schema = content_object['schema']&.schema(
             configuration: schemer_configuration,
             after_property_validation: config.after_response_body_property_validation
           )
