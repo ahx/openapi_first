@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- Add OpenAPI 3.2 support. OAS 3.2 uses the same JSON Schema dialect as 3.1 (no breaking changes), so the 3.1 codepath handles it correctly. Fixes #469.
+- Add OpenAPI 3.2.0 support. Fixes [#469](https://github.com/ahx/openapi_first/issues/469).
+  - Version acceptance: `3.2.x` documents routed through the existing 3.1 codepath (same JSON Schema dialect).
+  - `additionalOperations`: non-standard HTTP methods (e.g. `COPY`, `LINK`) defined under `additionalOperations` in Path Item objects are now discovered and routed correctly.
+  - Note: OAS 3.2.0 multipart streaming fields (`itemSchema`, `prefixEncoding`, `itemEncoding`) and `discriminator.defaultMapping` are not in the published 3.2.0 spec — they appear in the release notes roadmap but were not included in the final specification at `spec.openapis.org/oas/v3.2.0.html`.
 
 ## 3.4.3
 
