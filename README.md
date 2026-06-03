@@ -416,7 +416,53 @@ Using rack middlewares is supported in probably all Ruby web frameworks.
 
 The contract testing feature is designed to be used via rack-test, which should be compatible all Ruby web frameworks as well.
 
-That aside, closer integration with specific frameworks like Sinatra, Hanami, Roda or others would be great. If you have ideas, pain points or PRs, please don't hesitate to [share](https://github.com/ahx/openapi_first/discussions).
+That aside, closer integration with specific frameworks like Hanami, Roda or others would be great. If you have ideas, pain points or PRs, please don't hesitate to [share](https://github.com/ahx/openapi_first/discussions).
+
+### Sinatra
+
+> [!NOTE]
+> Experimental.
+
+`OpenapiFirst::Sinatra` is a Sinatra extension to define routes by referencing operations in your OpenAPI description. The URL and HTTP method for each route are read from the OAD by `operationId`, so they are never repeated in your code – the API description stays the single source of truth for your routes.
+
+```ruby
+require 'sinatra/base'
+require 'openapi_first/sinatra'
+
+class PetsApi < Sinatra::Base
+  register OpenapiFirst::Sinatra
+  openapi 'openapi.yaml'
+
+  operation :index_pets do |params|
+    json index_pets(params[:filter])
+  end
+
+  operation :create_pet do
+    json create_pet(parsed_body[:data])
+  end
+end
+```
+
+In a **classic** (top-level) app the extension registers itself, so requiring the file is enough:
+
+```ruby
+require 'sinatra'
+require 'openapi_first/sinatra'
+
+openapi 'openapi.yaml'
+
+operation :create_pet do
+  json create_pet(parsed_body)
+end
+```
+
+Each `operation` route validates its request against the description before the block runs, so contract violations return `400`/`415` and the block is not reached. Validation reuses Sinatra's own routing (the operation's path and method are known when the route is defined), so openapi_first does not run its own router – there is no request-validation middleware.
+
+Because routing is left to Sinatra, requests to paths without an `operation` block fall through to Sinatra's normal handling (a `404` by default), and you can add plain Sinatra routes (health checks, assets, …) alongside `operation` blocks. Likewise, an undocumented method on a documented path returns Sinatra's `404`.
+
+Use a String for operationIds that are not valid Ruby symbols, e.g. `operation 'pets.list'`.
+
+See [`sinatra.rb`](lib/openapi_first/sinatra.rb) for a more details.
 
 ## Alternatives
 

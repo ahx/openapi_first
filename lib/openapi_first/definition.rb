@@ -93,12 +93,18 @@ module OpenapiFirst
     # Validates the request against the API description.
     # @param [Rack::Request] request The Rack request object.
     # @param [Boolean] raise_error Whether to raise an error if validation fails.
+    # @param [String,nil] path_template The OpenAPI path template (e.g. "/pets/{petId}") of the
+    #   already-matched route. Pass this when your own router has matched the route, to skip
+    #   openapi_first's path matching. Used by framework integrations like Sinatra.
+    # @param [Hash,nil] path_params The path parameters extracted by your own router
+    #   (e.g. { "petId" => "42" }), keyed by parameter name. Pass this together with +path_template+
+    #   to skip openapi_first's path-parameter extraction; otherwise they are extracted from the path.
     # @yield [ValidatedRequest] Optional block called after successful validation.
     #   The block runs inside the same catch(FAILURE) as the after_request_validation hooks,
     #   so it may call OpenapiFirst::Failure.fail! to short-circuit and produce an error.
     # @return [ValidatedRequest] The validated request object.
-    def validate_request(request, raise_error: false, &after_block)
-      route = @router.match(request.request_method, resolve_path(request), content_type: request.content_type)
+    def validate_request(request, raise_error: false, path_template: nil, path_params: nil, &after_block)
+      route = match_route(request, path_template, params: path_params)
       validated = if route.error
                     ValidatedRequest.new(request, error: route.error)
                   else
@@ -135,6 +141,14 @@ module OpenapiFirst
     end
 
     private
+
+    def match_route(request, path_template, params:)
+      request_method = request.request_method
+      content_type = request.content_type
+      return @router.match_route(request_method, path_template, params:, content_type:) if path_template
+
+      @router.match(request_method, resolve_path(request), content_type:)
+    end
 
     def call_before_request_validation_hooks(request, request_definition)
       return if @config.before_request_validation.none?

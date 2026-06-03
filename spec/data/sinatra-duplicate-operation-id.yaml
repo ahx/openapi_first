@@ -1,0 +1,17 @@
+openapi: "3.0.0"
+info:
+  title: Duplicate operationId on different routes
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      operationId: listThings
+      responses:
+        "200":
+          description: ok
+  /things:
+    get:
+      operationId: listThings
+      responses:
+        "200":
+          description: ok
