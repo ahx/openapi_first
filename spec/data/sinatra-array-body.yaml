@@ -1,0 +1,22 @@
+openapi: "3.0.0"
+info:
+  title: Top-level array request body
+  version: 1.0.0
+paths:
+  /bulk-pets:
+    post:
+      operationId: bulkCreatePets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+      responses:
+        "200":
+          description: ok

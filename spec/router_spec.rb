@@ -217,6 +217,37 @@ RSpec.describe OpenapiFirst::Router do
     end
   end
 
+  describe '#match_route' do
+    let(:requests) do
+      [
+        double(path: '/{id}', request_method: 'get'),
+        double(path: '/a', request_method: 'get')
+      ]
+    end
+
+    subject(:router) do
+      described_class.new.tap do |router|
+        requests.each do |request|
+          router.add_request(request, request_method: request.request_method, path: request.path)
+        end
+      end
+    end
+
+    it 'uses caller-provided params instead of extracting them from the path' do
+      match = router.match_route('GET', '/{id}', params: { 'id' => '42' })
+      expect(match.request_definition).to be(requests[0])
+      expect(match.params).to eq('id' => '42')
+    end
+
+    it 'returns a not_found error for an unknown template' do
+      expect(router.match_route('GET', '/unknown', params: {}).error).to have_attributes(type: :not_found)
+    end
+
+    it 'returns a method_not_allowed error for an undefined method on a known template' do
+      expect(router.match_route('DELETE', '/{id}', params: {}).error).to have_attributes(type: :method_not_allowed)
+    end
+  end
+
   describe '#routes' do
     subject(:router) do
       described_class.new.tap do |router|

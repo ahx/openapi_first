@@ -63,6 +63,22 @@ module OpenapiFirst
         return NOT_FOUND.with(error: Failure.new(:not_found, message:))
       end
 
+      match_path_item(path_item, params, request_method, content_type:)
+    end
+
+    def match_route(request_method, template, params:, content_type: nil)
+      path_item = @static[template] || @dynamic[template]
+      unless path_item
+        message = "Request path #{template} is not defined in API description."
+        return NOT_FOUND.with(error: Failure.new(:not_found, message:))
+      end
+
+      match_path_item(path_item, params, request_method, content_type:)
+    end
+
+    private
+
+    def match_path_item(path_item, params, request_method, content_type:)
       contents = path_item[request_method]&.requests
       return NOT_FOUND.with(error: Failure.new(:method_not_allowed)) unless contents
 
@@ -75,8 +91,6 @@ module OpenapiFirst
       responses = path_item[request_method]&.responses
       RequestMatch.new(request_definition:, params:, error: nil, responses:)
     end
-
-    private
 
     def route_at(path, request_method)
       request_method = request_method.upcase
