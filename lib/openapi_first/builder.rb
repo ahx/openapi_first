@@ -24,37 +24,27 @@ module OpenapiFirst
     end
 
     def initialize(contents, filepath:, config:)
-      meta_schema = detect_meta_schema(contents, filepath)
-      @schemer_configuration = build_schemer_config(filepath:, meta_schema:)
       @config = config
+      backend_class = OpenapiFirst.schema_backend
+      version = detect_openapi_version(contents, filepath)
+      unless backend_class.supported_openapi_versions.include?(version)
+        raise Error, "The #{backend_class} schema backend does not support OpenAPI #{version}. " \
+                     "Supported versions: #{backend_class.supported_openapi_versions.join(', ')}."
+      end
       @file_loader = FileLoader.new
-      ref_resolver = RefResolver.new(file_loader:)
+      @backend = backend_class.new(document: contents, filepath:, file_loader: @file_loader)
+      ref_resolver = RefResolver.new(file_loader: @file_loader)
       @contents = ref_resolver.for(contents, filepath:)
     end
 
     attr_reader :config
-    private attr_reader :schemer_configuration, :file_loader
+    private attr_reader :backend, :file_loader
 
-    def build_schemer_config(filepath:, meta_schema:)
-      result = JSONSchemer.configuration.clone
-      dir = (filepath && File.absolute_path(File.dirname(filepath))) || Dir.pwd
-      result.base_uri = URI::File.build({ path: "#{dir}/" })
-      result.ref_resolver = JSONSchemer::CachedResolver.new do |uri|
-        file_loader.load(uri.path)
-      end
-      result.meta_schema = meta_schema
-      result.insert_property_defaults = true
-      result
-    end
-
-    def detect_meta_schema(document, filepath)
-      # Copied from JSONSchemer 🙇🏻‍♂️
+    def detect_openapi_version(document, filepath)
       version = document['openapi']
       case version
-      when /\A3\.1\.\d+\z/
-        document.fetch('jsonSchemaDialect') { JSONSchemer::OpenAPI31::BASE_URI.to_s }
-      when /\A3\.0\.\d+\z/
-        JSONSchemer::OpenAPI30::BASE_URI.to_s
+      when /\A3\.1\.\d+\z/ then '3.1'
+      when /\A3\.0\.\d+\z/ then '3.0'
       else
         raise Error, "Unsupported OpenAPI version #{version.inspect} #{filepath}"
       end
@@ -121,13 +111,13 @@ module OpenapiFirst
 
       required = []
       schemas = parameters.each_with_object({}) do |parameter, result|
-        schema = parameter['schema'].schema(configuration: schemer_configuration)
+        schema = parameter['schema'].schema(backend:)
         name = parameter['name']&.value
         required << name if parameter['required']&.value
         result[name] = schema if schema
       end
 
-      Schema::Hash.new(schemas, required:, configuration: schemer_configuration,
+      Schema::Hash.new(schemas, required:, backend:,
                                 after_property_validation: config.after_request_parameter_property_validation)
     end
 
@@ -141,7 +131,7 @@ module OpenapiFirst
       required_body = operation_object['requestBody']&.resolved&.fetch('required', false) == true
       content_objects.map do |content_type, content_object|
         content_schema = content_object['schema']&.schema(
-          configuration: schemer_configuration,
+          backend:,
           after_property_validation: config.after_request_body_property_validation
         )
         encoding = content_object['encoding']&.resolved
@@ -172,7 +162,7 @@ module OpenapiFirst
         headers = build_response_headers(response_object['headers'])
         response_object['content']&.map do |content_type, content_object|
           content_schema = content_object['schema']&.schema(
-            configuration: schemer_configuration,
+            backend:,
             after_property_validation: config.after_response_body_property_validation
           )
           Response.new(status:,
@@ -198,7 +188,7 @@ module OpenapiFirst
 
         header = Header.new(
           name:,
-          schema: header['schema'].schema(configuration: schemer_configuration),
+          schema: header['schema'].schema(backend:),
           required?: header['required']&.value == true,
           node: header
         )

@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 RSpec.describe OpenapiFirst::Schema::Hash do
-  it 'validates all schemas' do
-    a_schema = JSONSchemer.schema({ 'type' => 'integer' })
-    b_schema = JSONSchemer.schema({ 'type' => 'string' })
+  let(:backend) do
+    OpenapiFirst::Schema::JsonSchemerBackend.new(document: {}, filepath: nil, file_loader: OpenapiFirst::FileLoader.new)
+  end
 
-    schema_hash = described_class.new({ 'a' => a_schema, 'b' => b_schema })
+  it 'validates all schemas' do
+    a_schema = backend.build_inline({ 'type' => 'integer' })
+    b_schema = backend.build_inline({ 'type' => 'string' })
+
+    schema_hash = described_class.new({ 'a' => a_schema, 'b' => b_schema }, backend:)
     errors = schema_hash.validate('a' => 'a', 'b' => 1).errors
 
     expect(errors.size).to eq(2)

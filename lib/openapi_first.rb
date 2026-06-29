@@ -34,6 +34,10 @@ module OpenapiFirst
     yield configuration if block_given?
   end
 
+  # The global schema validation backend class.
+  # @return [Class]
+  def self.schema_backend = configuration.schema_backend
+
   ERROR_RESPONSES = {} # rubocop:disable Style/MutableConstant
   private_constant :ERROR_RESPONSES
 

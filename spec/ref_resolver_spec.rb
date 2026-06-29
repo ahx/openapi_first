@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative '../lib/openapi_first/ref_resolver'
+require_relative '../lib/openapi_first/file_loader'
+require_relative '../lib/openapi_first/schema/json_schemer_backend'
 
 RSpec.describe OpenapiFirst::RefResolver do
   let(:contents) do
@@ -70,18 +72,20 @@ RSpec.describe OpenapiFirst::RefResolver do
   end
 
   describe '#schema' do
-    let(:ref_resolver) do
-      ->(uri) { OpenapiFirst::FileLoader.load(uri.path) }
+    let(:file_loader) { OpenapiFirst::FileLoader.new }
+
+    def backend_for(document = {}, filepath: nil)
+      OpenapiFirst::Schema::JsonSchemerBackend.new(document:, filepath:, file_loader:)
     end
 
     it 'returns a schema' do
       node = resolver.load('./spec/data/components/schemas/dog.yaml')
-      schema = node.schema(ref_resolver:)
+      schema = node.schema(backend: backend_for)
       expect(schema.valid?({ bark: 'woff' })).to eq(true)
       expect(schema.valid?({ bark: 2 })).to eq(false)
     end
 
-    it 'accepts options' do
+    it 'inserts property defaults' do
       node = resolver.for({ 'properties' => {
                             'color' => {
                               'type' => 'string',
@@ -89,21 +93,25 @@ RSpec.describe OpenapiFirst::RefResolver do
                             }
                           } })
       data = {}
-      schema = node.schema(insert_property_defaults: true)
+      schema = node.schema(backend: backend_for)
       expect(schema.valid?(data)).to eq(true)
       expect(data['color']).to eq('black')
     end
 
     it 'uses the right context' do
-      node = resolver.load('./spec/data/petstore.yaml')
-      schema = node.dig('paths', '/pets/{petId}', 'get', 'responses', '200', 'content', 'application/json', 'schema').schema(ref_resolver:)
+      filepath = './spec/data/petstore.yaml'
+      node = resolver.load(filepath)
+      schema = node.dig('paths', '/pets/{petId}', 'get', 'responses', '200', 'content', 'application/json',
+                        'schema').schema(backend: backend_for)
       expect(schema.valid?([{ id: 2, name: 'Spet' }])).to eq(true)
       expect(schema.valid?([{ id: 'two', name: 'Spet' }])).to eq(false)
     end
 
     it 'works with relative paths in the schema' do
-      node = resolver.load('./spec/data/splitted-train-travel-api/openapi.yaml')
-      schema = node.dig('paths', '/bookings', 'get', 'responses', '200', 'content', 'application/json', 'schema').schema(ref_resolver:)
+      filepath = './spec/data/splitted-train-travel-api/openapi.yaml'
+      node = resolver.load(filepath)
+      schema = node.dig('paths', '/bookings', 'get', 'responses', '200', 'content', 'application/json',
+                        'schema').schema(backend: backend_for)
       expect(schema.valid?({ data: [{ has_bicycle: true }] })).to eq(true)
       expect(schema.valid?({ data: [{ has_bicycle: 'red' }] })).to eq(false)
     end

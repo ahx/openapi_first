@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'schema/json_schemer_backend'
+
 module OpenapiFirst
   # Global configuration. Currently only used for the request validation middleware.
   class Configuration
@@ -18,6 +20,7 @@ module OpenapiFirst
       @response_validation_raise_error = true
       @hooks = HOOKS.to_h { [_1, Set.new] }
       @path = nil
+      @schema_backend = Schema::JsonSchemerBackend
     end
 
     def register(path_or_definition, as: :default)
@@ -26,6 +29,11 @@ module OpenapiFirst
 
     attr_reader :hooks, :request_validation_error_response
     attr_accessor :path
+
+    # The schema validation backend class used to build and run schema validators.
+    # This is global: it applies to all Definitions regardless of where it is configured.
+    # @return [Class] Defaults to {OpenapiFirst::Schema::JsonSchemerBackend}.
+    attr_accessor :schema_backend
 
     # @deprecated
     attr_reader :request_validation_raise_error

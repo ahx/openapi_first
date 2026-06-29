@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'json_schemer'
+require 'hana'
 
 module OpenapiFirst
   # This is here to give traverse an OAD while keeping $refs intact
@@ -142,34 +142,11 @@ module OpenapiFirst
         end
       end
 
-      # You have to pass configuration or ref_resolver
-      def schema(options)
-        base_uri = URI::File.build({ path: "#{dir}/" })
-        Schema.new(value:, context:, base_uri:, options:)
-      end
-    end
-
-    # @visibility private
-    # Defers initialization JSONSchemer::Schema, because that takes time.
-    class Schema
-      extend Forwardable
-
-      def initialize(value:, context:, base_uri:, options:)
-        @value = value
-        @context = context
-        @base_uri = base_uri
-        @options = options
-      end
-
-      attr_reader :value, :context, :base_uri, :options
-
-      def_delegators :schema, :validate, :valid?
-
-      def schema
-        @schema ||= begin
-          root_schema = JSONSchemer::Schema.new(context, base_uri:, **options)
-          JSONSchemer::Schema.new(value, nil, root_schema, base_uri:, **options)
-        end
+      # Build a schema validator for this node using the given schema backend.
+      # @param backend [#build_node] The schema validation backend.
+      # @param after_property_validation [Enumerable<#call>, nil]
+      def schema(backend:, after_property_validation: nil)
+        backend.build_node(self, after_property_validation:)
       end
     end
 

@@ -8,13 +8,14 @@ module OpenapiFirst
     class Hash
       # @param schemas Hash of schemas
       # @param required Array of required keys
-      def initialize(schemas, required: nil, **options)
+      # @param backend The schema validation backend used to build the root validator.
+      # @param after_property_validation Hooks fired after validating each top-level property.
+      def initialize(schemas, backend:, required: nil, after_property_validation: nil)
         @schemas = schemas
-        @options = options
-        @after_property_validation = options.delete(:after_property_validation)
+        @after_property_validation = after_property_validation
         schema = { 'type' => 'object' }
         schema['required'] = required if required
-        @root_schema = JSONSchemer.schema(schema, **options)
+        @root_schema = backend.build_inline(schema)
       end
 
       def validate(root_value)
