@@ -11,6 +11,8 @@ group :test, :development do
   gem 'actionpack'
   gem 'benchmark'
   gem 'bundler'
+  # Optional: powers the opt-in `OpenapiFirst.plugin :jsonschema_rs` backend. Not a runtime dependency.
+  gem 'jsonschema_rs', require: false
   gem 'minitest'
   gem 'rack-test'
   gem 'rails'

@@ -37,8 +37,9 @@ end
 - [Contract testing](#contract-testing)
   - [Test assertions](#test-assertions)
 - [Manual use](#manual-use)
-- [Framework integration](#framework-integration)
 - [Hooks](#hooks)
+- [Schema validation backends](#schema-validation-backends)
+- [Framework integration](#framework-integration)
 - [Alternatives](#alternatives)
 - [Frequently Asked Questions](#frequently-asked-questions)
 - [Development](#development)
@@ -409,6 +410,32 @@ OpenapiFirst.configure do |config|
   end
 end
 ```
+
+## Schema validation backends
+
+By default openapi_first validates schemas using [json_schemer](https://github.com/davishmcclurg/json_schemer), which supports both OpenAPI 3.0 and 3.1.
+
+If your API descriptions are OpenAPI **3.1** you can opt into a significantly faster backend powered by [jsonschema_rs](https://rubygems.org/gems/jsonschema_rs) (a Ruby binding to the Rust `jsonschema` crate). The speedup scales with how much validation a request involves – it is dramatic for large request/response bodies.
+
+Add the gem to your `Gemfile`:
+
+```ruby
+gem 'jsonschema_rs'
+```
+
+`jsonschema_rs` ships precompiled native gems for the common platforms (e.g. `arm64-darwin`, `x86_64-linux`), so no Rust toolchain is needed there. On a platform without a precompiled gem, installation falls back to compiling the Rust extension, which requires a Rust toolchain.
+
+Then enable the backend globally:
+
+```ruby
+OpenapiFirst.plugin :jsonschema_rs
+# or
+OpenapiFirst.configure do |config|
+  config.plugin :jsonschema_rs
+end
+```
+
+The backend is **global**: it applies to all loaded API descriptions. Because of that it cannot be enabled per definition (`OpenapiFirst.load(…) { |c| c.plugin :jsonschema_rs }` raises). It also only supports OpenAPI 3.1 – loading a 3.0 document while it is enabled raises an error, because OpenAPI 3.0 is not standard JSON Schema (e.g. `nullable`).
 
 ## Framework integration
 

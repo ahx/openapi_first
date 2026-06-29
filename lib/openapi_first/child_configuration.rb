@@ -14,6 +14,14 @@ module OpenapiFirst
 
     private attr_reader :parent
 
+    # The schema backend is global, so it cannot be set per definition (it would silently affect everything).
+    def schema_backend=(_value)
+      raise ArgumentError,
+            'The schema backend is global and cannot be set per definition. ' \
+            'Configure it via `OpenapiFirst.plugin :jsonschema_rs` or ' \
+            '`OpenapiFirst.configure { |config| config.schema_backend = ... }`.'
+    end
+
     HOOKS.each do |hook|
       define_method(hook) do |&block|
         return hooks[hook].chain(parent.hooks[hook]) if block.nil?
