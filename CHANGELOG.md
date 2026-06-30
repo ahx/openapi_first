@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add OpenAPI 3.2.0 support. Fixes [#469](https://github.com/ahx/openapi_first/issues/469).
+  - Version acceptance: `3.2.x` documents routed through the existing 3.1 codepath (same JSON Schema dialect).
+  - `additionalOperations`: non-standard HTTP methods (e.g. `COPY`, `LINK`) defined under `additionalOperations` in Path Item objects are now discovered and routed correctly.
+  - Note: OAS 3.2.0 multipart streaming fields (`itemSchema`, `prefixEncoding`, `itemEncoding`) and `discriminator.defaultMapping` are not in the published 3.2.0 spec — they appear in the release notes roadmap but were not included in the final specification at `spec.openapis.org/oas/v3.2.0.html`.
+
 ## 3.4.3
 
 Fixed: Loading a document no longer raises `NoMethodError: undefined method 'schema' for nil` when a Media Type Object has no `schema` (e.g. it only declares an `example`). `schema` is optional in a Media Type Object; such media types now impose no body-schema constraint.

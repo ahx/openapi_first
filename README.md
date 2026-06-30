@@ -1,6 +1,6 @@
 # openapi_first
 
-openapi_first is a Ruby gem for request / response validation and contract-testing against an [OpenAPI](https://www.openapis.org/) 3.0 or 3.1 Openapi API description (OAD). It makes an APIFirst workflow easy and reliable.
+openapi_first is a Ruby gem for request / response validation and contract-testing against an [OpenAPI](https://www.openapis.org/) 3.0, 3.1, or 3.2 OpenAPI API description (OAD). It makes an APIFirst workflow easy and reliable.
 
 ## Usage
 

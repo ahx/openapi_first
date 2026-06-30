@@ -28,6 +28,71 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe 'OpenAPI 3.2 support' do
+    it 'parses a 3.2.0 document without error' do
+      definition = OpenapiFirst.parse({
+                                        'openapi' => '3.2.0',
+                                        'info' => { 'title' => 'Test API', 'version' => '1.0' },
+                                        'paths' => {
+                                          '/widgets' => {
+                                            'get' => {
+                                              'operationId' => 'listWidgets',
+                                              'responses' => {
+                                                '200' => { 'description' => 'OK' }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      })
+      expect(definition.title).to eq('Test API')
+      expect(definition.paths).to eq(['/widgets'])
+    end
+  end
+
+  describe 'OAS 3.2 additionalOperations' do
+    let(:definition) do
+      OpenapiFirst.parse({
+                           'openapi' => '3.2.0',
+                           'info' => { 'title' => 'Test', 'version' => '1.0' },
+                           'paths' => {
+                             '/files/{id}' => {
+                               'get' => {
+                                 'operationId' => 'getFile',
+                                 'responses' => { '200' => { 'description' => 'OK' } }
+                               },
+                               'additionalOperations' => {
+                                 'COPY' => {
+                                   'operationId' => 'copyFile',
+                                   'responses' => { '200' => { 'description' => 'Copied' } }
+                                 }
+                               }
+                             }
+                           }
+                         })
+    end
+
+    it 'routes requests using non-standard HTTP methods from additionalOperations' do
+      request = build_request('/files/123', method: 'COPY')
+      validated = definition.validate_request(request)
+      expect(validated.error).to be_nil
+      expect(validated.operation_id).to eq('copyFile')
+    end
+
+    it 'does not break standard method routing alongside additionalOperations' do
+      request = build_request('/files/123', method: 'GET')
+      validated = definition.validate_request(request)
+      expect(validated.error).to be_nil
+      expect(validated.operation_id).to eq('getFile')
+    end
+
+    it 'returns method_not_allowed for undefined additional methods' do
+      request = build_request('/files/123', method: 'LINK')
+      validated = definition.validate_request(request)
+      expect(validated.error).not_to be_nil
+      expect(validated.error.type).to eq(:method_not_allowed)
+    end
+  end
+
   describe '#title' do
     it 'returns the title from info.title' do
       definition = OpenapiFirst.parse({
