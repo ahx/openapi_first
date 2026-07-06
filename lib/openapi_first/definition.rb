@@ -71,6 +71,25 @@ module OpenapiFirst
       "#<#{self.class.name} @key='#{key}'>"
     end
 
+    # Resolves the path for the named operation, filling in any `{param}` placeholders.
+    # @param operation_id [String, Symbol] An operationId present in this API description.
+    # @param params [Hash] Path-parameter values keyed by name (String or Symbol).
+    # @return [String] The resolved path (e.g. "/pets/42").
+    # @raise [ArgumentError] if the operationId is not found or a required path parameter is missing.
+    def path_for(params = {}, operation_id:)
+      request_def = routes.lazy.flat_map(&:requests).find { |r| r.operation_id == operation_id.to_s }
+      raise ArgumentError, "Operation #{operation_id.inspect} is not defined in #{key}." unless request_def
+
+      request_def.path.gsub(/\{([^}]+)\}/) do
+        name = Regexp.last_match(1)
+        params.fetch(name.to_sym) do
+          params.fetch(name) do
+            raise ArgumentError, "Missing path parameter #{name.inspect} for operation #{operation_id.inspect}."
+          end
+        end
+      end
+    end
+
     # Validates the request against the API description.
     # @param [Rack::Request] request The Rack request object.
     # @param [Boolean] raise_error Whether to raise an error if validation fails.
