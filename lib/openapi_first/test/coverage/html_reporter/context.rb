@@ -12,12 +12,13 @@ module OpenapiFirst
             'API Coverage did not detect any API requests for the registered ' \
             'API descriptions. Make sure to observe your application using OpenapiFirst::Test.'
 
-          attr_reader :coverage, :plans, :verbose
+          attr_reader :coverage, :plans, :verbose, :generated_at
 
-          def initialize(coverage_result, verbose)
+          def initialize(coverage_result, verbose, generated_at: Time.now)
             @coverage = coverage_result.coverage
             @plans = coverage_result.plans
             @verbose = verbose
+            @generated_at = generated_at.strftime('%Y-%m-%d %H:%M:%S %z')
           end
 
           # Helper for ERB rendering only — exposes this context's binding so the
@@ -26,14 +27,8 @@ module OpenapiFirst
             binding
           end
 
-          def expand_plan?(plan)
-            verbose || plan.done?
-          end
-
           def visible_routes(plan)
-            return plan.routes if expand_plan?(plan)
-
-            plan.routes.reject(&:finished?)
+            plan.routes
           end
 
           def any_request_made?(route)
@@ -51,17 +46,14 @@ module OpenapiFirst
             route.responses.count { |r| !r.finished? }
           end
 
-          def request_items(route, plan_verbose:)
+          def request_items(route)
             return [] unless any_request_made?(route) && route.requests.any?(&:content_type)
 
-            plan_verbose ? route.requests : route.requests.reject(&:finished?)
+            route.requests
           end
 
-          def response_items(route, plan_verbose:)
-            return [] unless plan_verbose || any_request_made?(route)
-            return route.responses if plan_verbose || route.responses.any? { |r| !r.finished? }
-
-            []
+          def response_items(route)
+            route.responses
           end
 
           def h(text)

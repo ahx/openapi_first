@@ -224,6 +224,28 @@ RSpec.describe OpenapiFirst::Test do
           described_class.handle_exit
         end.not_to raise_error
       end
+
+      context 'when coverage exceeds minimum_coverage by at least 1%' do
+        before do
+          configuration.minimum_coverage = 99
+        end
+
+        it 'warns to increase minimum_coverage' do
+          expect(described_class.logger).to receive(:warn).with(/increase minimum_coverage to 100/)
+          described_class.handle_exit
+        end
+      end
+
+      context 'when coverage exceeds minimum_coverage by less than 1%' do
+        before do
+          configuration.minimum_coverage = 99.5
+        end
+
+        it 'does not warn' do
+          expect(described_class.logger).not_to receive(:warn)
+          described_class.handle_exit
+        end
+      end
     end
 
     context 'with report_coverage = true' do

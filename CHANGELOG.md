@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Changed: Don't hide covered endpoints in HTML coverage reporter
+- Added: Filter un/covered endpoints in HTML coverage reporter
+
 ## 3.4.3
 
 Fixed: Loading a document no longer raises `NoMethodError: undefined method 'schema' for nil` when a Media Type Object has no `schema` (e.g. it only declares an `example`). `schema` is optional in a Media Type Object; such media types now impose no body-schema constraint.

@@ -6,20 +6,30 @@
   <style><%= File.read(File.join(__dir__, 'html_reporter.css')) %></style>
 </head>
 <body>
-  <h1>API Coverage <span class="pct"><%= coverage.round(1) %>%</span></h1>
+  <header class="page-header">
+    <h1 class="page-title">API Coverage: <%= coverage.round(1) %>%</h1>
+    <div>
+        <span class="generated-at">Generated at: <%= h generated_at %></span>
+        <div class="filters">
+            <label class="filter"><input type="checkbox" id="filter-covered" checked> Covered operations</label>
+            <label class="filter"><input type="checkbox" id="filter-uncovered" checked> Uncovered operations</label>
+        </div>
+    </div>
+  </header>
   <% if plans.empty? -%>
   <p class="warning"><%= NO_REQUESTS_WARNING %></p>
   <% else -%>
   <% plans.each do |plan| -%>
   <details class="plan"<%= ' open' unless plan.done? %>>
     <summary>
-      <%= h plan.title || plan.api_identifier %>
-      <span class="pct"><%= plan.api_identifier %> · <%= plan.coverage.round(1) %>%</span>
+      <h2><%= h plan.title || plan.api_identifier %> <span class="api-identifier"><%= h plan.api_identifier %></span></h2>
+      <span class="pct"><%= plan.coverage.round(1) %>%</span>
     </summary>
     <div class="plan-content">
-    <% plan_verbose = expand_plan?(plan) -%>
     <% visible_routes(plan).each do |route| -%>
-    <details class="route"<%= ' open' unless route.finished? %>>
+    <% requests = request_items(route) -%>
+    <% responses = response_items(route) -%>
+    <details class="route <%= route.finished? ? 'is-covered' : 'is-uncovered' %>"<%= ' open' if any_request_made?(route) && !route.finished? %>>
       <summary>
         <span class="method"><%= h route.request_method.upcase %></span>
         <span class="path"><%= h route.path %></span>
@@ -36,7 +46,6 @@
         <% end -%>
       </summary>
       <div class="route-content">
-        <% requests = request_items(route, plan_verbose: plan_verbose) -%>
         <% unless requests.empty? -%>
         <ul class="tasks">
           <% requests.each do |request| -%>
@@ -55,7 +64,6 @@
           <% end -%>
         </ul>
         <% end -%>
-        <% responses = response_items(route, plan_verbose: plan_verbose) -%>
         <% unless responses.empty? -%>
         <ul class="tasks responses">
           <% responses.each do |response| -%>
