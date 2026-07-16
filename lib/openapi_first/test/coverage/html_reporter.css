@@ -1,41 +1,142 @@
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --font-size-base: 1rem;
+  --font-size-xs: calc(var(--font-size-base) * 0.75);
+  --font-size-sm: calc(var(--font-size-base) * 0.875);
+  --font-size-h1: calc(var(--font-size-base) * 1.6);
+
+  --bg-primary: #0f1117;
+  --bg-secondary: #161b27;
+
+  --border-default: #1e293b;
+  --border-active: #334155;
+  --border-warning: #3b3010;
+
+  --tree-indent: 1.25rem;
+  --tree-row-center: 0.9rem;
+
+  --text-heading: #f8fafc;
+  --text-primary: #e2e8f0;
+  --text-muted: #94a3b8;
+
+  --color-success: #4ade80;
+  --color-error: #f87171;
+  --color-info: #7dd3fc;
+  --color-warning: #fbbf24;
+}
 
 body {
-  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
-  background: #0f1117;
-  color: #e2e8f0;
+  font-family:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   margin: 0;
-  padding: 2rem;
+  padding: 1rem 2rem;
   line-height: 1.6;
 }
 
+.page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block-end: 0.875rem;
+}
+
+.generated-at {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  margin: 0;
+}
+
 h1 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-block: 0 1rem;
-  color: #f8fafc;
+  font-size: var(--font-size-h1);
+  color: var(--text-heading);
 
   & .pct {
-    font-size: 0.95rem;
-    font-weight: 400;
-    color: #94a3b8;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
     margin-inline-start: 0.5rem;
   }
 }
 
+h2 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-heading);
+}
+
+.api-identifier {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+.filters {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  margin-block-end: 0.5rem;
+  font-size: var(--font-size-sm);
+}
+
+.filters .filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  user-select: none;
+
+  & input {
+    cursor: pointer;
+  }
+}
+
+/* CSS-only route filtering driven by the toolbar checkboxes. */
+body:has(#filter-covered:not(:checked)) details.route.is-covered {
+  display: none;
+}
+body:has(#filter-uncovered:not(:checked)) details.route.is-uncovered {
+  display: none;
+}
+
+/* Hide a plan once none of its routes remain visible. */
+body:has(#filter-covered:not(:checked))
+  details.plan:not(:has(details.route.is-uncovered)) {
+  display: none;
+}
+body:has(#filter-uncovered:not(:checked))
+  details.plan:not(:has(details.route.is-covered)) {
+  display: none;
+}
+body:has(#filter-covered:not(:checked)):has(#filter-uncovered:not(:checked))
+  details.plan {
+  display: none;
+}
+
 details.plan {
-  border: 1px solid #1e293b;
+  border: 1px solid var(--border-default);
   padding: 1.25rem 1.5rem;
   margin-block-end: 1.5rem;
-  background: #161b27;
-
-  &[open] { border-color: #334155; }
+  background: var(--bg-secondary);
 }
 
 details.plan > summary {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #cbd5e1;
+  font-size: var(--font-size-base);
+  color: var(--text-heading);
   cursor: pointer;
   list-style: none;
   display: flex;
@@ -44,41 +145,50 @@ details.plan > summary {
   user-select: none;
 
   & .pct {
-    font-size: 0.8rem;
-    font-weight: 400;
-    color: #64748b;
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
     text-transform: none;
     letter-spacing: 0;
   }
 
   &::before {
-    content: '▶';
-    font-size: 0.6rem;
-    color: #475569;
+    content: "▶";
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
     transition: transform 0.15s ease;
     align-self: center;
   }
 
-  details[open] > &::before { transform: rotate(90deg); }
+  details[open] > &::before {
+    transform: rotate(90deg);
+  }
 }
 
 .plan-content {
-  margin-block-start: 1rem;
+  margin-block-start: 0.75rem;
+  margin-inline-start: 0.25rem;
+  padding-inline-start: var(--tree-indent);
+  border-inline-start: 2px solid var(--border-default);
 }
 
 details.route {
-  border-inline-start: 2px solid #1e293b;
-  padding-inline-start: 1rem;
-  margin-block: 0.75rem;
+  margin-block: 0;
+  position: relative;
 
-  &[open] { border-color: #334155; }
+  /* horizontal connector reaching left to the plan spine */
+  &::before {
+    content: "";
+    position: absolute;
+    left: calc(-1 * var(--tree-indent));
+    top: var(--tree-row-center);
+    width: calc(var(--tree-indent) - 0.25rem);
+    border-top: 2px solid var(--border-default);
+  }
 }
 
 details.route > summary {
-  font-weight: 600;
-  color: #94a3b8;
-  font-size: 0.85rem;
-  text-transform: uppercase;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
   letter-spacing: 0.04em;
   cursor: pointer;
   list-style: none;
@@ -89,27 +199,27 @@ details.route > summary {
   user-select: none;
 
   &::before {
-    content: '▶';
-    font-size: 0.6rem;
-    color: #475569;
+    content: "▶";
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
     transition: transform 0.15s ease;
   }
 
-  details[open] > &::before { transform: rotate(90deg); }
+  details[open] > &::before {
+    transform: rotate(90deg);
+  }
 }
 
 .operation-label {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: #64748b;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
   text-transform: none;
   letter-spacing: 0;
 }
 
 .request-status,
 .response-summary {
-  font-size: 0.8rem;
-  font-weight: 400;
+  font-size: var(--font-size-xs);
   text-transform: none;
   letter-spacing: 0;
 }
@@ -121,59 +231,61 @@ details.route > summary {
 ul.tasks {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding-inline-start: var(--tree-indent);
+  padding-block: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-}
-
-ul.responses {
-  padding-inline-start: 1.5rem;
+  border-inline-start: 2px solid var(--border-default);
 }
 
 li {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   padding: 0.2rem 0.4rem;
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
+  position: relative;
+
+  /* horizontal connector reaching left to the task spine */
+  &::before {
+    content: "";
+    position: absolute;
+    left: calc(-1 * var(--tree-indent));
+    top: var(--tree-row-center);
+    width: calc(var(--tree-indent) - 0.25rem);
+    border-top: 2px solid var(--border-default);
+  }
 }
 
-.covered { color: #4ade80; }
-
-.uncovered {
-  background: #1f1315;
-  font-weight: 500;
+.covered {
+  color: var(--color-success);
 }
 
 .status {
-  color: #e2e8f0;
-  font-weight: 600;
+  color: var(--text-primary);
   min-width: 3ch;
 }
 
 .content-type {
-  color: #64748b;
-  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
 }
 
 .problem {
-  color: #f87171;
-  font-size: 0.8rem;
+  color: var(--color-error);
+  font-size: var(--font-size-xs);
 }
 
 .method {
-  color: #7dd3fc;
-  font-weight: 700;
+  color: var(--color-info);
 }
 
 .path {
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 .warning {
-  color: #fbbf24;
-  background: #1c1a10;
-  border: 1px solid #3b3010;
+  color: var(--color-warning);
+  border: 1px solid var(--border-warning);
   padding: 0.75rem 1rem;
 }
