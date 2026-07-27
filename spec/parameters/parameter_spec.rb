@@ -128,6 +128,46 @@ RSpec.describe OpenapiFirst::Parameters::Parameter do
     end
   end
 
+  describe '#required?' do
+    it 'returns true if required is true' do
+      parameter = build_parameter({ 'in' => 'query', 'required' => true })
+      expect(parameter.required?).to be true
+    end
+
+    it 'returns false if required is false' do
+      parameter = build_parameter({ 'in' => 'query', 'required' => false })
+      expect(parameter.required?).to be false
+    end
+
+    it 'returns false if required is not specified' do
+      %w[query header cookie].each do |location|
+        expect(build_parameter({ 'in' => location }).required?).to be false
+      end
+    end
+
+    it 'returns true for path parameters' do
+      parameter = build_parameter({ 'in' => 'path' })
+      expect(parameter.required?).to be true
+    end
+  end
+
+  describe '#deprecated?' do
+    it 'returns true if deprecated is true' do
+      parameter = build_parameter({ 'in' => 'query', 'deprecated' => true })
+      expect(parameter.deprecated?).to be true
+    end
+
+    it 'returns false if deprecated is false' do
+      parameter = build_parameter({ 'in' => 'query', 'deprecated' => false })
+      expect(parameter.deprecated?).to be false
+    end
+
+    it 'returns false if deprecated is not specified' do
+      parameter = build_parameter({ 'in' => 'query' })
+      expect(parameter.deprecated?).to be false
+    end
+  end
+
   describe '#media_type' do
     it 'returns the media type' do
       parameter = build_parameter(

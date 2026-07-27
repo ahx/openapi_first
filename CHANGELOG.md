@@ -8,7 +8,8 @@
   - An `after_request_body_property_validation` hook sees an empty String instead of the file.
   - Fields that were not sent as a file, and fields with a JSON `contentType` in the `encoding` map, are read and validated as before.
 - Changed: The `openapi_parameters` gem was merged into openapi_first and is not a dependency anymore. Parameter parsing now lives in `OpenapiFirst::Parameters`. If you registered a parser for parameters that use a `content` field, use `OpenapiFirst::Parameters::ContentParsers.register` instead of `OpenapiParameters::ContentParsers.register`.
-- Removed: `OpenapiFirst::Request#parameters` and `OpenapiFirst::Request#query_schema`, which were internal scaffolding. `#query_schema` always returned `nil`.
+- Added: `OpenapiFirst::Request#parameters` returns the parameters that are defined for a request as `OpenapiFirst::Parameters::Parameter` objects, which expose `name`, `location`, `schema`, `required?`, `deprecated?`, `style`, `explode?` and `media_type`. It used to return an internal object with a different interface.
+- Removed: `OpenapiFirst::Request#query_schema`, which was internal scaffolding and always returned `nil`.
 - Changed: `OpenapiFirst::Header` (returned by `Response#headers`) exposes `resolved_schema` instead of `node`.
 - Fixed: The JSON schema of a parameter that uses a `content` field with a `$ref`'d schema is resolved now.
 - Fixed: Loading a document no longer raises `NoMethodError` when a parameter has neither `schema` nor `content`.

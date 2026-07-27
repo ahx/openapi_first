@@ -357,6 +357,18 @@ validated_request.operation['operationId'] => "getStuff"
 validated_request.request_definition.path # => "/pets/{petId}"
 validated_request.request_definition.operation_id # => "showPetById"
 
+# Inspect the parameters that are defined for this request, in the order path, query, header, cookie.
+# Parameters that openapi_first ignores (Content-Type, Accept, Authorization) are not included.
+parameter = validated_request.request_definition.parameters.first
+parameter.name # => "petId"
+parameter.location # => "path" ("path", "query", "header" or "cookie")
+parameter.schema # => { "type" => "integer" } (the JSON Schema, with $refs resolved)
+parameter.required? # => true
+parameter.deprecated? # => false
+parameter.style # => "simple"
+parameter.explode? # => false
+parameter.media_type # => "application/json" if the parameter uses `content`, otherwise nil
+
 # Or you can raise an exception if validation fails:
 definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFirst::RequestInvalidError or OpenapiFirst::NotFoundError if request is invalid
 ```
