@@ -46,6 +46,8 @@ module OpenapiFirst
       end
 
       register(%r{\A[\w.+-]+/(?:[\w.-]+\+)?json\z}i, lambda do |value|
+        throw :skip, value unless value.is_a?(String)
+
         JSON.parse(value)
       rescue JSON::ParserError
         throw :skip, value

@@ -265,6 +265,60 @@ RSpec.describe OpenapiFirst::Definition do
       end
     end
 
+    context 'with repeated values for a parameter that cannot be repeated' do
+      let(:definition) do
+        OpenapiFirst.parse({
+                             'openapi' => '3.1.0',
+                             'paths' => {
+                               '/search' => {
+                                 'get' => {
+                                   'parameters' => [
+                                     { 'name' => 'filter', 'in' => 'query', 'schema' => { 'type' => 'object' } },
+                                     { 'name' => 'sort', 'in' => 'query', 'explode' => false,
+                                       'schema' => { 'type' => 'object' } },
+                                     { 'name' => 'json', 'in' => 'query',
+                                       'content' => { 'application/json' => { 'schema' => { 'type' => 'object' } } } }
+                                   ]
+                                 }
+                               }
+                             }
+                           })
+      end
+
+      it 'returns an invalid request' do
+        %w[filter sort json].each do |name|
+          validated = definition.validate_request(build_request("/search?#{name}=a&#{name}=b"))
+          expect(validated).not_to be_valid, "expected #{name} to be invalid"
+          expect(validated.error.type).to eq(:invalid_query)
+        end
+      end
+    end
+
+    context 'with a path parameter value that has an invalid encoding' do
+      let(:definition) do
+        OpenapiFirst.parse({
+                             'openapi' => '3.1.0',
+                             'paths' => {
+                               '/things/{color}' => {
+                                 'get' => {
+                                   'parameters' => [
+                                     { 'name' => 'color', 'in' => 'path', 'style' => 'matrix', 'required' => true,
+                                       'schema' => { 'type' => 'array', 'items' => { 'type' => 'string' } } }
+                                   ]
+                                 }
+                               }
+                             }
+                           })
+      end
+
+      it 'returns an invalid request' do
+        env = Rack::MockRequest.env_for('/').merge('PATH_INFO' => '/things/;color=%E0%A4%A')
+        validated = definition.validate_request(Rack::Request.new(env))
+        expect(validated).not_to be_valid
+        expect(validated.error.type).to eq(:invalid_path)
+      end
+    end
+
     context 'with a parameter without schema' do
       let(:definition) do
         OpenapiFirst.parse({

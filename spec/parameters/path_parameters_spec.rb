@@ -124,6 +124,29 @@ RSpec.describe OpenapiFirst::Parameters::Parser do
         }
         expect(unpack(parameter, { 'color' => '' })).to eq('color' => [])
       end
+
+      it 'returns an empty array if a matrix style value does not contain the parameter name' do
+        parameter = {
+          'in' => 'path', 'name' => 'color', 'explode' => false, 'style' => 'matrix',
+          'schema' => { 'type' => 'array' }
+        }
+        expect(unpack(parameter, { 'color' => 'blue' })).to eq('color' => [])
+      end
+
+      it 'returns the values if a matrix style value contains the parameter name multiple times' do
+        parameter = {
+          'in' => 'path', 'name' => 'color', 'explode' => false, 'style' => 'matrix',
+          'schema' => { 'type' => 'array' }
+        }
+        expect(unpack(parameter, { 'color' => ';color=a;color=b' })).to eq('color' => %w[a b])
+      end
+
+      it 'returns the value as is if a matrix style value has an invalid encoding' do
+        parameter = {
+          'in' => 'path', 'name' => 'color', 'style' => 'matrix', 'schema' => { 'type' => 'array' }
+        }
+        expect(unpack(parameter, { 'color' => ';color=%E0%A4%A' })).to eq('color' => ';color=%E0%A4%A')
+      end
     end
 
     describe 'Object explode true' do
@@ -161,6 +184,14 @@ RSpec.describe OpenapiFirst::Parameters::Parser do
         expect(unpack(parameter, { 'color' => 'R=100,G200,B=150' })).to eq(
           'color' => { 'B' => '150', 'G200' => nil, 'R' => '100' }
         )
+      end
+
+      it 'returns the value as is if the value has an invalid encoding' do
+        parameter = {
+          'in' => 'path', 'name' => 'color', 'explode' => true, 'style' => 'simple',
+          'schema' => { 'type' => 'object' }
+        }
+        expect(unpack(parameter, { 'color' => 'R=%E0%A4%A' })).to eq('color' => 'R=%E0%A4%A')
       end
     end
 
