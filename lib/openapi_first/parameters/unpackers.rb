@@ -43,12 +43,17 @@ module OpenapiFirst
           return value if value.is_a?(::Array)
           return value if value.empty?
 
-          result = Rack::Utils.parse_query(value, ';')[name]
-          explode ? result : result.split(',')
+          result = Unpackers.parse_query(value, ';')[name]
+          return result if explode
+          return result unless result.is_a?(::String)
+
+          result.split(',')
         end
       end
 
       ExplodeFormObject = lambda do |value|
+        throw :skip, value unless value.is_a?(::String)
+
         entries = value.split(OBJECT_EXPLODE_SPLITTER)
         throw :skip, value if entries.length.odd?
 
@@ -57,6 +62,8 @@ module OpenapiFirst
 
       DelimitedObject = Data.define(:delimiter) do
         def call(value)
+          throw :skip, value unless value.is_a?(::String)
+
           entries = value.split(delimiter)
           throw :skip, value if entries.length.odd?
 
@@ -64,7 +71,7 @@ module OpenapiFirst
         end
       end
 
-      ExplodePathObject = ->(value) { Rack::Utils.parse_query(value, ',') }
+      ExplodePathObject = ->(value) { Unpackers.parse_query(value, ',') }
 
       NonExplodePathObject = Data.define(:array_unpacker) do
         def call(value)
@@ -76,6 +83,13 @@ module OpenapiFirst
       end
 
       class << self
+        # Values that are not encoded as described are left to schema validation
+        def parse_query(value, delimiter)
+          Rack::Utils.parse_query(value, delimiter)
+        rescue ArgumentError
+          throw :skip, value
+        end
+
         def find(parameter)
           return find_media_type(parameter) if parameter.media_type
           return find_array(parameter) if parameter.array?

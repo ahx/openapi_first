@@ -13,6 +13,9 @@
 - Changed: `OpenapiFirst::Header` (returned by `Response#headers`) exposes `resolved_schema` instead of `node`.
 - Fixed: The JSON schema of a parameter that uses a `content` field with a `$ref`'d schema is resolved now.
 - Fixed: Loading a document no longer raises `NoMethodError` when a parameter has neither `schema` nor `content`.
+- Fixed: Repeated values for a query parameter that describes an object or uses `content` (`?filter=a&filter=b`) raised a `NoMethodError` or `TypeError`. The values are validated against the schema now, which returns an `:invalid_query` failure.
+- Fixed: A parameter with `style: matrix` raised a `NoMethodError` if its value did not contain the parameter name, or contained it more than once. Such values are parsed like their `explode` counterpart now.
+- Fixed: A parameter with `style: matrix`, or a path parameter that describes an object, raised an `ArgumentError` if its value had an invalid `%`-encoding. Such values are validated against the schema now.
 - Changed: Don't hide covered endpoints in HTML coverage reporter
 - Added: Filter un/covered endpoints in HTML coverage reporter
 - Changed: Reduced memory retained by a loaded `Definition`. Response headers with a schema no longer keep the whole raw document node alive, and a couple of build-time-only hashes were replaced with more compact structures.

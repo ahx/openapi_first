@@ -824,3 +824,36 @@
   query_string: color=blue&color=black
   unpacked_value:
     color: [blue, black]
+
+- description: Returns the raw values if an object parameter has repeated values
+  parameter:
+    in: query
+    name: filter
+    schema:
+      type: object
+  query_string: filter=a&filter=b
+  unpacked_value:
+    filter: [a, b]
+
+- description: Returns the raw values if a non-exploded object parameter has repeated values
+  parameter:
+    in: query
+    name: filter
+    explode: false
+    schema:
+      type: object
+  query_string: filter=a&filter=b
+  unpacked_value:
+    filter: [a, b]
+
+- description: Returns the raw values if a content parameter has repeated values
+  parameter:
+    in: query
+    name: filter
+    content:
+      application/json:
+        schema:
+          type: object
+  query_string: filter=a&filter=b
+  unpacked_value:
+    filter: [a, b]
