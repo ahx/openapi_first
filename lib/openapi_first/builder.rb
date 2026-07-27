@@ -95,23 +95,22 @@ module OpenapiFirst
     end
 
     def parse_parameters(parameters)
-      grouped_parameters = group_parameters(parameters)
+      grouped = group_parameters(parameters)
+      path = build_parameters(grouped[:path])
+      query = build_parameters(grouped[:query])
+      header = build_parameters(grouped[:header])
+      cookie = build_parameters(grouped[:cookie])
       ParsedParameters.new(
-        query_parser: Parameters::QueryParser.new(build_parameters(grouped_parameters[:query])),
-        path_parser: build_parser(grouped_parameters[:path]),
-        cookie_parser: build_parser(grouped_parameters[:cookie]),
-        header_parser: build_parser(grouped_parameters[:header]),
-        query_schema: build_parameter_schema(grouped_parameters[:query]),
-        path_schema: build_parameter_schema(grouped_parameters[:path]),
-        cookie_schema: build_parameter_schema(grouped_parameters[:cookie]),
-        header_schema: build_parameter_schema(grouped_parameters[:header])
+        all: [*path, *query, *header, *cookie].freeze,
+        path_parser: grouped[:path] && Parameters::Parser.new(path),
+        query_parser: Parameters::QueryParser.new(query),
+        header_parser: grouped[:header] && Parameters::Parser.new(header),
+        cookie_parser: grouped[:cookie] && Parameters::Parser.new(cookie),
+        path_schema: build_parameter_schema(grouped[:path]),
+        query_schema: build_parameter_schema(grouped[:query]),
+        header_schema: build_parameter_schema(grouped[:header]),
+        cookie_schema: build_parameter_schema(grouped[:cookie])
       )
-    end
-
-    def build_parser(parameters)
-      return unless parameters
-
-      Parameters::Parser.new(build_parameters(parameters))
     end
 
     def build_parameters(parameters)
@@ -225,7 +224,7 @@ module OpenapiFirst
       result
     end
 
-    ParsedParameters = Data.define(:path_parser, :query_parser, :header_parser, :cookie_parser,
+    ParsedParameters = Data.define(:all, :path_parser, :query_parser, :header_parser, :cookie_parser,
                                    :path_schema, :query_schema, :header_schema, :cookie_schema)
     private_constant :ParsedParameters
   end

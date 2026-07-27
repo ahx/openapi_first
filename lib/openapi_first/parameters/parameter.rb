@@ -6,7 +6,6 @@ require_relative 'unpackers'
 module OpenapiFirst
   module Parameters
     # A parameter of a request, or a header of a response.
-    # @visibility private
     class Parameter
       DEFAULT_STYLE = {
         'query' => 'form',
@@ -26,6 +25,8 @@ module OpenapiFirst
         @style = definition['style'] || DEFAULT_STYLE.fetch(@location)
         @explode = definition.fetch('explode') { @style == 'form' }
         @deep_object = @style == 'deepObject'
+        @required = @location == 'path' || definition['required'] == true
+        @deprecated = definition['deprecated'] == true
         @converter = Converter[schema]
         @unpacker = Unpackers.find(self)
       end
@@ -41,6 +42,10 @@ module OpenapiFirst
       def convert(value) = @converter.call(value)
 
       def explode? = @explode
+
+      def required? = @required
+
+      def deprecated? = @deprecated
 
       def deep_object? = @deep_object
 

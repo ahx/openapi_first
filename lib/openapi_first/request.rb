@@ -12,7 +12,7 @@ module OpenapiFirst
   # An 3.x Operation object can accept multiple requests, because it can handle multiple content-types.
   # This class represents one of those requests.
   class Request
-    def initialize(path:, request_method:, operation_object:, # rubocop:disable Metrics/ParameterLists
+    def initialize(path:, request_method:, operation_object:, # rubocop:disable Metrics/MethodLength,Metrics/ParameterLists
                    parameters:, content_type:, content_schema:, required_body:, key:, encoding: nil)
       @path = path
       @request_method = request_method
@@ -21,6 +21,7 @@ module OpenapiFirst
       @operation = operation_object
       @allow_empty_content = content_type.nil? || required_body == false
       @key = key
+      @parameters = parameters.all
       @query_parser = parameters.query_parser
       @path_parser = parameters.path_parser
       @header_parser = parameters.header_parser
@@ -36,7 +37,7 @@ module OpenapiFirst
       )
     end
 
-    attr_reader :content_type, :content_schema, :operation, :request_method, :path, :key
+    attr_reader :content_type, :content_schema, :operation, :request_method, :path, :key, :parameters
     private attr_reader :query_parser
 
     def allow_empty_content?
