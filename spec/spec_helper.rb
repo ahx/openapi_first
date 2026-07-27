@@ -8,6 +8,7 @@ require 'openapi_first'
 require 'json'
 require 'simplecov'
 require 'rack/test'
+require_relative 'support/parameter_helpers'
 
 SimpleCov.start do
   enable_coverage :branch
@@ -26,6 +27,8 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.include ParameterHelpers
 
   config.after(:each) do
     OpenapiFirst::Test.definitions.clear

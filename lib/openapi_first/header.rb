@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  Header = Data.define(:name, :required?, :schema, :node) do
-    def resolved_schema
-      node['schema']&.resolved
-    end
-  end
+  Header = Data.define(:name, :required?, :schema, :resolved_schema)
 end

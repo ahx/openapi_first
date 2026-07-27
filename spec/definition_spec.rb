@@ -220,6 +220,74 @@ RSpec.describe OpenapiFirst::Definition do
       end
     end
 
+    context 'with a parameter that uses content with a $ref schema' do
+      let(:definition) do
+        OpenapiFirst.parse({
+                             'openapi' => '3.1.0',
+                             'paths' => {
+                               '/search' => {
+                                 'get' => {
+                                   'parameters' => [
+                                     {
+                                       'name' => 'filter',
+                                       'in' => 'query',
+                                       'content' => {
+                                         'application/json' => {
+                                           'schema' => { '$ref' => '#/components/schemas/Filter' }
+                                         }
+                                       }
+                                     }
+                                   ]
+                                 }
+                               }
+                             },
+                             'components' => {
+                               'schemas' => {
+                                 'Filter' => {
+                                   'type' => 'object',
+                                   'properties' => { 'tag' => { 'type' => 'string' } }
+                                 }
+                               }
+                             }
+                           })
+      end
+
+      it 'parses the parameter as described in the referenced schema' do
+        validated = definition.validate_request(build_request('/search?filter={"tag":"dogs"}'))
+        expect(validated).to be_valid
+        expect(validated.parsed_query).to eq('filter' => { 'tag' => 'dogs' })
+      end
+
+      it 'validates the parameter against the referenced schema' do
+        validated = definition.validate_request(build_request('/search?filter={"tag":42}'))
+        expect(validated).not_to be_valid
+        expect(validated.error.type).to eq(:invalid_query)
+      end
+    end
+
+    context 'with a parameter without schema' do
+      let(:definition) do
+        OpenapiFirst.parse({
+                             'openapi' => '3.1.0',
+                             'paths' => {
+                               '/search' => {
+                                 'get' => {
+                                   'parameters' => [
+                                     { 'name' => 'term', 'in' => 'query', 'required' => true }
+                                   ]
+                                 }
+                               }
+                             }
+                           })
+      end
+
+      it 'returns the value as is' do
+        validated = definition.validate_request(build_request('/search?term=42'))
+        expect(validated).to be_valid
+        expect(validated.parsed_query).to eq('term' => '42')
+      end
+    end
+
     context 'with a matching path but unknown request method' do
       let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
       let(:rack_request) { build_request('/pets', method: 'PATCH') }

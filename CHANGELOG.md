@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Changed: The `openapi_parameters` gem was merged into openapi_first and is not a dependency anymore. Parameter parsing now lives in `OpenapiFirst::Parameters`. If you registered a parser for parameters that use a `content` field, use `OpenapiFirst::Parameters::ContentParsers.register` instead of `OpenapiParameters::ContentParsers.register`.
+- Removed: `OpenapiFirst::Request#parameters` and `OpenapiFirst::Request#query_schema`, which were internal scaffolding. `#query_schema` always returned `nil`.
+- Changed: `OpenapiFirst::Header` (returned by `Response#headers`) exposes `resolved_schema` instead of `node`.
+- Fixed: The JSON schema of a parameter that uses a `content` field with a `$ref`'d schema is resolved now.
+- Fixed: Loading a document no longer raises `NoMethodError` when a parameter has neither `schema` nor `content`.
 - Changed: Don't hide covered endpoints in HTML coverage reporter
 - Added: Filter un/covered endpoints in HTML coverage reporter
 

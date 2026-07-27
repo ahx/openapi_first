@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'openapi_parameters'
+require_relative 'parameters'
 require_relative 'parsed_request'
 require_relative 'request_validator'
 require_relative 'validated_request'
@@ -12,7 +12,7 @@ module OpenapiFirst
   # An 3.x Operation object can accept multiple requests, because it can handle multiple content-types.
   # This class represents one of those requests.
   class Request
-    def initialize(path:, request_method:, operation_object:, # rubocop:disable Metrics/MethodLength,Metrics/ParameterLists
+    def initialize(path:, request_method:, operation_object:, # rubocop:disable Metrics/ParameterLists
                    parameters:, content_type:, content_schema:, required_body:, key:, encoding: nil)
       @path = path
       @request_method = request_method
@@ -21,10 +21,10 @@ module OpenapiFirst
       @operation = operation_object
       @allow_empty_content = content_type.nil? || required_body == false
       @key = key
-      @query_parser = parameters.query&.then { |params| OpenapiParameters::Query.new(params) }
-      @path_parser = parameters.path&.then { |params| OpenapiParameters::Path.new(params) }
-      @headers_parser = parameters.header&.then { |params| OpenapiParameters::Header.new(params) }
-      @cookies_parser = parameters.cookie&.then { |params| OpenapiParameters::Cookie.new(params) }
+      @query_parser = parameters.query_parser
+      @path_parser = parameters.path_parser
+      @header_parser = parameters.header_parser
+      @cookie_parser = parameters.cookie_parser
       @body_parsers = build_body_parser(content_type, encoding) if content_type
       @validator = RequestValidator.new(
         content_schema:,
@@ -34,10 +34,9 @@ module OpenapiFirst
         header_schema: parameters.header_schema,
         cookie_schema: parameters.cookie_schema
       )
-      @parameters = parameters
     end
 
-    attr_reader :content_type, :content_schema, :operation, :request_method, :path, :key, :query_schema, :parameters
+    attr_reader :content_type, :content_schema, :operation, :request_method, :path, :key
     private attr_reader :query_parser
 
     def allow_empty_content?
@@ -66,15 +65,15 @@ module OpenapiFirst
       [ParsedRequest.new(
         path: @path_parser&.unpack(route_params),
         query:,
-        headers: @headers_parser&.unpack_env(request.env),
-        cookies: @cookies_parser&.unpack(request.env[Rack::HTTP_COOKIE]),
+        headers: @header_parser&.unpack(Parameters::HeadersHash.new(request.env)),
+        cookies: @cookie_parser&.unpack(Rack::Utils.parse_cookies_header(request.env[Rack::HTTP_COOKIE])),
         body:
       ), nil]
     end
 
     def parse_query(query_string)
       [@query_parser&.unpack(query_string), nil]
-    rescue OpenapiParameters::InvalidParameterError
+    rescue Rack::Utils::InvalidParameterError
       [nil, Failure.new(:invalid_query, message: 'Invalid query parameter.')]
     end
 
