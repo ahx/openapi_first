@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+- Added: Sinatra integration (OpenapiFirst::Sinatra)
+  A Sinatra extension to define routes by referencing OpenAPI operations:
+
+  ```ruby
+      require 'openapi_first/sinatra'
+
+      class PetsApi < Sinatra::Base
+        register OpenapiFirst::Sinatra
+        openapi 'openapi.yaml'
+
+        operation :index_pets do |params|
+          json index_pets(params[:filter])
+        end
+
+        operation :create_pet do
+          pet = create_pet(parsed_body)
+          headers['Location'] = operation_url(:show_pet, petId: pet.id)
+          status :created
+          json pet
+        end
+
+        operation :show_pet do |params|
+          json show_pet(params[:petId])
+        end
+      end
+  ```
+
+  The HTTP method and path for each route come from the operationId.
+  Request validation is called automatically for these operations.
 - Changed: Don't hide covered endpoints in HTML coverage reporter
 - Added: Filter un/covered endpoints in HTML coverage reporter
 

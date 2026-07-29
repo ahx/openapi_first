@@ -1,0 +1,17 @@
+openapi: "3.0.0"
+info:
+  title: Hyphenated path parameter
+  version: 1.0.0
+paths:
+  /things/{thing-id}:
+    get:
+      operationId: showThing
+      parameters:
+        - name: thing-id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ok
