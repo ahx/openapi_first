@@ -18,6 +18,11 @@ module OpenapiFirst
           html = TEMPLATE.result(Context.new(coverage_result, @verbose).get_binding)
           FileUtils.mkdir_p(File.dirname(@output))
           File.write(@output, html)
+          coverage_result.plans.each do |plan|
+            next if plan.coverage >= 100
+
+            @logger.info "API validation coverage for #{plan.api_identifier}: #{plan.coverage.round(4)}%"
+          end
           @logger.info "API coverage report written to #{@output}"
         end
 

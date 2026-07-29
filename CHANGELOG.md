@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added Sinatra integration (OpenapiFirst::Sinatra)
+- Added: Sinatra integration (OpenapiFirst::Sinatra)
   A Sinatra extension to define routes by referencing OpenAPI operations:
 
   ```ruby
@@ -31,6 +31,8 @@
 
   The HTTP method and path for each route come from the operationId.
   Request validation is called automatically for these operations.
+- Changed: Don't hide covered endpoints in HTML coverage reporter
+- Added: Filter un/covered endpoints in HTML coverage reporter
 
 ## 3.4.3
 

@@ -83,11 +83,17 @@ module OpenapiFirst
       return unless configuration.report_coverage == true
 
       coverage = Coverage.result.coverage
-      return if coverage >= configuration.minimum_coverage
+      minimum_coverage = configuration.minimum_coverage
 
-      puts "API Coverage fails with exit 2, because not all described requests and responses have been tested (#{coverage.round(4)}% covered)." # rubocop:disable Layout/LineLength
+      if coverage < minimum_coverage
+        logger.error "API Coverage fails with exit 2, because not all described requests and responses have been tested (#{coverage.round(4)}% covered)." # rubocop:disable Layout/LineLength
 
-      exit 2
+        exit 2
+      end
+
+      return unless coverage - minimum_coverage >= 1.0
+
+      logger.warn "API Coverage (#{coverage.round(4)}%) is higher than the configured minimum_coverage (#{minimum_coverage}%). You should probably increase minimum_coverage to #{coverage.round(4)}." # rubocop:disable Layout/LineLength
     end
 
     # Print the coverage report
