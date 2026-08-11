@@ -4,6 +4,7 @@
 
 - Changed: Don't hide covered endpoints in HTML coverage reporter
 - Added: Filter un/covered endpoints in HTML coverage reporter
+- Changed: Reduced memory retained by a loaded `Definition`. Response headers with a schema no longer keep the whole raw document node alive, and a couple of build-time-only hashes were replaced with more compact structures.
 
 ## 3.4.3
 

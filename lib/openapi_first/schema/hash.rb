@@ -10,7 +10,6 @@ module OpenapiFirst
       # @param required Array of required keys
       def initialize(schemas, required: nil, **options)
         @schemas = schemas
-        @options = options
         @after_property_validation = options.delete(:after_property_validation)
         schema = { 'type' => 'object' }
         schema['required'] = required if required

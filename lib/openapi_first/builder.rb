@@ -193,16 +193,16 @@ module OpenapiFirst
 
       result = []
       headers_object.each do |name, header|
-        next if header['schema'].nil?
+        schema_node = header['schema']
+        next if schema_node.nil?
         next if IGNORED_HEADER_PARAMETERS.include?(name)
 
-        header = Header.new(
+        result << Header.new(
           name:,
-          schema: header['schema'].schema(configuration: schemer_configuration),
+          schema: schema_node.schema(configuration: schemer_configuration),
           required?: header['required']&.value == true,
-          node: header
+          resolved_schema: schema_node.resolved
         )
-        result << header
       end
       result
     end

@@ -18,6 +18,10 @@ module OpenapiFirst
     # Returned by {#routes} to introspect all routes
     Route = Data.define(:path, :request_method, :requests, :responses)
 
+    # Holds the requests/responses defined for one path + request method
+    RouteEntry = Data.define(:requests, :responses)
+    private_constant :RouteEntry
+
     NOT_FOUND = RequestMatch.new(request_definition: nil, params: nil, responses: nil, error: Failure.new(:not_found))
     private_constant :NOT_FOUND
 
@@ -32,8 +36,8 @@ module OpenapiFirst
         request_methods.filter_map do |request_method, content|
           next if request_method == :template
 
-          Route.new(path:, request_method:, requests: content[:requests].each_value.lazy.uniq,
-                    responses: content[:responses].each_value.lazy.flat_map(&:values))
+          Route.new(path:, request_method:, requests: content.requests.each_value.lazy.uniq,
+                    responses: content.responses.each_value.lazy.flat_map(&:values))
         end
       end
     end
@@ -41,14 +45,14 @@ module OpenapiFirst
     # Add a request definition
     def add_request(request, request_method:, path:, content_type: nil, allow_empty_content: false)
       route = route_at(path, request_method)
-      requests = route[:requests]
+      requests = route.requests
       requests[content_type] = request
       requests[nil] = request if allow_empty_content
     end
 
     # Add a response definition
     def add_response(response, request_method:, path:, status:, response_content_type: nil)
-      (route_at(path, request_method)[:responses][status] ||= {})[response_content_type] = response
+      (route_at(path, request_method).responses[status] ||= {})[response_content_type] = response
     end
 
     # Return all request objects that match the given path and request method
@@ -59,7 +63,7 @@ module OpenapiFirst
         return NOT_FOUND.with(error: Failure.new(:not_found, message:))
       end
 
-      contents = path_item.dig(request_method, :requests)
+      contents = path_item[request_method]&.requests
       return NOT_FOUND.with(error: Failure.new(:method_not_allowed)) unless contents
 
       request_definition = FindContent.call(contents, content_type)
@@ -68,7 +72,7 @@ module OpenapiFirst
         return NOT_FOUND.with(error: Failure.new(:unsupported_media_type, message:))
       end
 
-      responses = path_item.dig(request_method, :responses)
+      responses = path_item[request_method]&.responses
       RequestMatch.new(request_definition:, params:, error: nil, responses:)
     end
 
@@ -81,10 +85,7 @@ module OpenapiFirst
                   else
                     @static[path] ||= {}
                   end
-      path_item[request_method] ||= {
-        requests: {},
-        responses: {}
-      }
+      path_item[request_method] ||= RouteEntry.new(requests: {}, responses: {})
     end
 
     def content_type_err(content_type)
