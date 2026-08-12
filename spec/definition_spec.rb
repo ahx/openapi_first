@@ -28,6 +28,27 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe 'OpenAPI 3.2 support' do
+    it 'parses a 3.2.0 document without error' do
+      definition = OpenapiFirst.parse({
+                                        'openapi' => '3.2.0',
+                                        'info' => { 'title' => 'Test API', 'version' => '1.0' },
+                                        'paths' => {
+                                          '/widgets' => {
+                                            'get' => {
+                                              'operationId' => 'listWidgets',
+                                              'responses' => {
+                                                '200' => { 'description' => 'OK' }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      })
+      expect(definition.title).to eq('Test API')
+      expect(definition.paths).to eq(['/widgets'])
+    end
+  end
+
   describe '#title' do
     it 'returns the title from info.title' do
       definition = OpenapiFirst.parse({

@@ -51,7 +51,7 @@ module OpenapiFirst
       # Copied from JSONSchemer 🙇🏻‍♂️
       version = document['openapi']
       case version
-      when /\A3\.1\.\d+\z/
+      when /\A3\.[12]\.\d+\z/
         document.fetch('jsonSchemaDialect') { JSONSchemer::OpenAPI31::BASE_URI.to_s }
       when /\A3\.0\.\d+\z/
         JSONSchemer::OpenAPI30::BASE_URI.to_s
