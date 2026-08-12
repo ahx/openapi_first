@@ -84,12 +84,12 @@ module OpenapiFirst
     # @return [OpenapiFirst::Definition]
     # @raise [OpenapiFirst::Error] if {#openapi} has already been called for this app.
     def openapi(spec)
-      raise ::OpenapiFirst::Error, '`openapi` can only be called once per app.' if openapi_definition
+      raise OpenapiFirst::Error, '`openapi` can only be called once per app.' if openapi_definition
 
-      definition = ::OpenapiFirst.load(spec)
+      definition = OpenapiFirst.load(spec)
       set :openapi_definition, definition
       set :openapi_operations_index, build_operation_index(definition)
-      set :openapi_error_response, ::OpenapiFirst.configuration.request_validation_error_response
+      set :openapi_error_response, OpenapiFirst.configuration.request_validation_error_response
       definition
     end
 
@@ -110,7 +110,7 @@ module OpenapiFirst
     # @raise [ArgumentError] if the operationId is not defined in the API description.
     def operation(operation_id, &block)
       unless openapi_operations_index
-        raise ::OpenapiFirst::Error, 'Call `openapi` with your API description before defining operations.'
+        raise OpenapiFirst::Error, 'Call `openapi` with your API description before defining operations.'
       end
 
       request_method, path = openapi_operations_index.fetch(operation_id.to_s) do
@@ -137,7 +137,7 @@ module OpenapiFirst
       proc do |*captures|
         path_params = param_names.zip(captures).to_h
         validated = settings.openapi_definition.validate_request(request, path_template:, path_params:)
-        env[::OpenapiFirst::REQUEST] = validated
+        env[OpenapiFirst::REQUEST] = validated
         if (failure = validated.error) && (error_response = settings.openapi_error_response)
           halt(*error_response.new(failure:).render)
         end
@@ -159,7 +159,7 @@ module OpenapiFirst
           entry = [route.request_method, route.path]
           existing = index[operation_id]
           if existing && existing != entry
-            raise ::OpenapiFirst::Error,
+            raise OpenapiFirst::Error,
                   "operationId #{operation_id.inspect} is used for #{existing.join(' ')} and " \
                   "#{entry.join(' ')} in #{definition.key}. operationIds must be unique."
           end
@@ -206,7 +206,7 @@ module OpenapiFirst
 
       # @return [OpenapiFirst::ValidatedRequest] The validated request for the current request.
       def openapi_request
-        env[::OpenapiFirst::REQUEST]
+        env[OpenapiFirst::REQUEST]
       end
     end
   end
