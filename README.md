@@ -183,9 +183,11 @@ This means the _content_ of these fields is not validated, so `minLength`, `maxL
 
 ### Response validation
 
-You should use [Contract Testing](#contract-testing) instead of running the response validation middleware.
+> [!WARNING]
+> You should use [Contract Testing](#contract-testing) instead of this middleware.
 
 This middleware raises an error by default if the response is not valid.
+
 This can be useful in a test or staging environment, especially if you are adopting OpenAPI for an existing implementation.
 
 ```ruby
