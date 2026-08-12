@@ -3,6 +3,10 @@
 ## Unreleased
 
 - Added: OpenAPI 3.2 documents are accepted, but not fully supported yet. They are handled using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored. Loading such a document prints a warning. Operations defined under `additionalOperations` are routed. See #469.
+- **Breaking**: Uploaded files are no longer read during request validation. Before, the whole content of every `multipart/form-data` part that was sent as a file was read into memory, which allowed a single large upload to any documented multipart route to exhaust the memory of the server process. Such a field is now passed through as Rack parsed it (`{ filename:, type:, name:, tempfile:, head: }`), which is the same shape that Sinatra and Hanami hand to your application. Use `parsed_body['file'][:tempfile]` to read or stream the file.
+  - The content of these fields is not validated anymore, so `minLength`, `maxLength` or `pattern` on a field that was sent as a file are ignored.
+  - An `after_request_body_property_validation` hook sees an empty String instead of the file.
+  - Fields that were not sent as a file, and fields with a JSON `contentType` in the `encoding` map, are read and validated as before.
 - Changed: Don't hide covered endpoints in HTML coverage reporter
 - Added: Filter un/covered endpoints in HTML coverage reporter
 - Changed: Reduced memory retained by a loaded `Definition`. Response headers with a schema no longer keep the whole raw document node alive, and a couple of build-time-only hashes were replaced with more compact structures.

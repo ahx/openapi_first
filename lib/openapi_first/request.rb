@@ -28,6 +28,7 @@ module OpenapiFirst
       @body_parsers = build_body_parser(content_type, encoding) if content_type
       @validator = RequestValidator.new(
         content_schema:,
+        content_type:,
         required_request_body: required_body == true,
         path_schema: parameters.path_schema,
         query_schema: parameters.query_schema,

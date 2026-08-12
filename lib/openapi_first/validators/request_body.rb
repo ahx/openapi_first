@@ -1,20 +1,29 @@
 # frozen_string_literal: true
 
+require_relative 'multipart_request_body'
+require_relative 'required_request_body'
+
 module OpenapiFirst
   module Validators
     class RequestBody
-      def initialize(content_schema:, required_request_body:)
+      MULTIPART = %r{\Amultipart/}i
+      private_constant :MULTIPART
+
+      def self.for(content_schema:, required_request_body:, content_type:)
+        validators = []
+        validators << RequiredRequestBody.new if required_request_body
+        klass = MULTIPART.match?(content_type.to_s) ? MultipartRequestBody : self
+        validators << klass.new(content_schema:)
+        validators
+      end
+
+      def initialize(content_schema:)
         @schema = content_schema
-        @required = required_request_body
       end
 
       def call(parsed_request)
         body = parsed_request.body
-        if body.nil?
-          return Failure.new(:invalid_body, message: 'Request body must not be empty') if @required
-
-          return
-        end
+        return if body.nil?
 
         validation = Schema::ValidationResult.new(
           @schema.validate(body, access_mode: 'write')
