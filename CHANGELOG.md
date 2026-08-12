@@ -8,8 +8,14 @@
   - An `after_request_body_property_validation` hook sees an empty String instead of the file.
   - Fields that were not sent as a file, and fields with a JSON `contentType` in the `encoding` map, are read and validated as before.
 - The `openapi_parameters` gem was merged into openapi_first and is not a dependency anymore. Parameter parsing now lives in `OpenapiFirst::Parameters`. If you registered a parser for parameters that use a `content` field, use `OpenapiFirst::Parameters::ContentParsers.register` instead of `OpenapiParameters::ContentParsers.register`.
-- Removed: `OpenapiFirst::Request#query_schema`, which was internal scaffolding and always returned `nil`.
-- Changed: `OpenapiFirst::Header` (returned by `Response#headers`) exposes `resolved_schema` instead of `node`.
+- Changed: `OpenapiFirst::Header` (returned by `Response#headers`) exposes `resolved_schema` instead of `node`
+
+#### Removed deprecations
+- Removed: `OpenapiFirst::Configuration#request_validation_raise_error` and `#response_validation_raise_error` (both reader and writer), deprecated since 3.0.0. Pass `raise_error:` to middlewares instead.
+- Removed: `OpenapiFirst::Test::Configuration#coverage_formatter`, `#coverage_formatter=`, `#coverage_formatter_options` and `#coverage_formatter_options=`, deprecated since 3.4.0. Use `#coverage_reporter` / `#coverage_reporter_options` instead.
+- Removed: `OpenapiFirst::Test::Coverage::TerminalFormatter`, deprecated since 3.4.0. Use `OpenapiFirst::Test::Coverage::TerminalReporter` instead.
+- Removed: The `formatter:` keyword of `OpenapiFirst::Test.report_coverage`, deprecated since 3.4.0. Use `reporter:` instead.
+- Removed: `OpenapiFirst::Test::Coverage::TerminalReporter#format`, deprecated since 3.4.0. Use `#report` instead.
 
 ### Features 
 - Added: OpenAPI 3.2 documents are accepted, but not fully supported yet. They are handled using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored. Loading such a document prints a warning. Operations defined under `additionalOperations` are routed. See #469.

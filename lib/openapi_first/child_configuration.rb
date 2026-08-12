@@ -7,8 +7,6 @@ module OpenapiFirst
       super()
       @parent = parent
       @request_validation_error_response = parent.request_validation_error_response
-      @request_validation_raise_error = parent.request_validation_raise_error
-      @response_validation_raise_error = parent.response_validation_raise_error
       @path = parent.path
     end
 

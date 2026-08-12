@@ -98,13 +98,8 @@ module OpenapiFirst
 
     # Print the coverage report
     # @param reporter A reporter class to render the report.
-    # @param formatter @deprecated Alias for `reporter:`.
     # @return [IO] An output where to puts the report.
-    def self.report_coverage(reporter: Coverage::TerminalReporter, formatter: nil, **)
-      if formatter
-        warn 'DEPRECATION WARNING: Test.report_coverage(formatter:) is deprecated, use reporter: instead.'
-        reporter = formatter
-      end
+    def self.report_coverage(reporter: Coverage::TerminalReporter, **)
       reporter.new(**).report(Coverage.result)
     end
 

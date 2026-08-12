@@ -11,11 +11,6 @@ module OpenapiFirst
           @logger = logger
         end
 
-        def format(coverage_result)
-          logger.warn 'DEPRECATION WARNING: TerminalReporter#format is deprecated, use #report instead.'
-          report(coverage_result)
-        end
-
         def report(coverage_result)
           coverage = coverage_result.coverage
           if coverage.zero?

@@ -13,31 +13,6 @@ RSpec.describe OpenapiFirst::Test::Configuration do
     it 'defaults to HtmlReporter' do
       expect(configuration.coverage_reporter).to eq(OpenapiFirst::Test::Coverage::HtmlReporter)
     end
-
-    it 'exposes a deprecated TerminalFormatter alias on the Coverage module' do
-      expect(OpenapiFirst::Test::Coverage::TerminalFormatter).to eq(OpenapiFirst::Test::Coverage::TerminalReporter)
-    end
-
-    it 'aliases the deprecated coverage_formatter accessor (warning emitted once)' do
-      expect { configuration.coverage_formatter = :something }.to output(/DEPRECATION/).to_stderr
-      expect(configuration.coverage_reporter).to eq(:something)
-      # Subsequent calls do not re-warn
-      expect { configuration.coverage_formatter }.not_to output.to_stderr
-    end
-
-    it 'aliases the deprecated coverage_formatter_options accessor' do
-      expect { configuration.coverage_formatter_options = { verbose: true } }.to output(/DEPRECATION/).to_stderr
-      expect(configuration.coverage_reporter_options).to eq(verbose: true)
-    end
-
-    it 'reads through coverage_formatter_options' do
-      configuration.coverage_reporter_options = { verbose: true }
-      # First access on a fresh instance warns and returns the value
-      out = nil
-      allow(configuration).to receive(:warn) { |msg| out = msg }
-      expect(configuration.coverage_formatter_options).to eq(verbose: true)
-      expect(out).to match(/DEPRECATION/)
-    end
   end
 
   describe 'ignored_unknown_status' do

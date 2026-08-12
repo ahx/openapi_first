@@ -15,9 +15,6 @@ module OpenapiFirst
       autoload :TerminalReporter, 'openapi_first/test/coverage/terminal_reporter'
       autoload :HtmlReporter, 'openapi_first/test/coverage/html_reporter'
 
-      # @deprecated Use {TerminalReporter} instead.
-      TerminalFormatter = TerminalReporter
-
       Result = Data.define(:plans, :coverage)
 
       class << self
