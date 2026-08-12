@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added: OpenAPI 3.2 documents are accepted, but not fully supported yet. They are handled using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored. Loading such a document prints a warning. Operations defined under `additionalOperations` are routed. See #469.
 - Changed: Don't hide covered endpoints in HTML coverage reporter
 - Added: Filter un/covered endpoints in HTML coverage reporter
 - Changed: Reduced memory retained by a loaded `Definition`. Response headers with a schema no longer keep the whole raw document node alive, and a couple of build-time-only hashes were replaced with more compact structures.

@@ -52,7 +52,11 @@ module OpenapiFirst
       version = document['openapi']
       case version
       when /\A3\.1\.\d+\z/
-        document.fetch('jsonSchemaDialect') { JSONSchemer::OpenAPI31::BASE_URI.to_s }
+        openapi31_meta_schema(document)
+      when /\A3\.2\.\d+\z/
+        warn "OpenAPI 3.2 is not fully supported. #{filepath || 'This API description'} is handled " \
+             'using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored.'
+        openapi31_meta_schema(document)
       when /\A3\.0\.\d+\z/
         JSONSchemer::OpenAPI30::BASE_URI.to_s
       else
@@ -60,37 +64,55 @@ module OpenapiFirst
       end
     end
 
-    def router # rubocop:disable Metrics/MethodLength
+    def openapi31_meta_schema(document)
+      document.fetch('jsonSchemaDialect') { JSONSchemer::OpenAPI31::BASE_URI.to_s }
+    end
+
+    def router
       router = OpenapiFirst::Router.new
       @contents.fetch('paths').each do |path, path_item_object|
         path_parameters = path_item_object['parameters'] || []
         path_item_object.resolved.keys.intersection(REQUEST_METHODS).map do |request_method|
           operation_object = path_item_object[request_method]
-          operation_parameters = operation_object['parameters'] || []
-          parameters = parse_parameters(operation_parameters.chain(path_parameters))
+          register_operation(router, path:, request_method:, operation_object:, path_parameters:)
+        end
 
-          build_requests(path:, request_method:, operation_object:,
-                         parameters:).each do |request|
-            router.add_request(
-              request,
-              request_method:,
-              path:,
-              content_type: request.content_type,
-              allow_empty_content: request.allow_empty_content?
-            )
-            build_responses(request:, responses: operation_object['responses']).each do |response|
-              router.add_response(
-                response,
-                request_method:,
-                path:,
-                status: response.status,
-                response_content_type: response.content_type
-              )
-            end
-          end
+        path_item_object['additionalOperations']&.each do |request_method, operation_object|
+          register_operation(router, path:, request_method: request_method.downcase,
+                                     operation_object:, path_parameters:)
         end
       end
       router
+    end
+
+    def register_operation(router, path:, request_method:, operation_object:, path_parameters:)
+      operation_parameters = operation_object['parameters'] || []
+      parameters = parse_parameters(operation_parameters.chain(path_parameters))
+
+      build_requests(path:, request_method:, operation_object:,
+                     parameters:).each do |request|
+        router.add_request(
+          request,
+          request_method:,
+          path:,
+          content_type: request.content_type,
+          allow_empty_content: request.allow_empty_content?
+        )
+        register_responses(router, request:, path:, request_method:,
+                                   responses: operation_object['responses'])
+      end
+    end
+
+    def register_responses(router, request:, path:, request_method:, responses:)
+      build_responses(request:, responses:).each do |response|
+        router.add_response(
+          response,
+          request_method:,
+          path:,
+          status: response.status,
+          response_content_type: response.content_type
+        )
+      end
     end
 
     def parse_parameters(parameters)
