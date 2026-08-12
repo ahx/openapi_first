@@ -18,6 +18,7 @@ group :test, :development do
   gem 'rspec'
   gem 'rubocop'
   gem 'rubocop-performance'
+  gem 'rubydex', require: false
   gem 'simplecov'
   gem 'sinatra'
 end

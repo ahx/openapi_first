@@ -13,7 +13,7 @@ RSpec.describe 'Example App' do
   end
 
   def app
-    App
+    RackHandler
   end
 
   it 'is API conform' do

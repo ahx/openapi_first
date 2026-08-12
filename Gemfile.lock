@@ -227,7 +227,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.7)
-    rubocop (1.88.2)
+    rubocop (1.89.0)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -246,6 +246,8 @@ GEM
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.47.1, < 2.0)
     ruby-progressbar (1.13.0)
+    rubydex (0.3.0-arm64-darwin)
+    rubydex (0.3.0-x86_64-linux)
     securerandom (0.4.1)
     simplecov (1.0.3)
     simpleidn (0.2.3)
@@ -291,6 +293,7 @@ DEPENDENCIES
   rspec
   rubocop
   rubocop-performance
+  rubydex
   simplecov
   sinatra
 

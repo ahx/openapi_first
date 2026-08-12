@@ -4,7 +4,7 @@ require 'rack'
 
 # This example is a bit contrived, but it shows what you could do with the middlewares
 
-App = Rack::Builder.new do
+RackHandler = Rack::Builder.new do
   spec = OpenapiFirst.load(File.expand_path('./openapi.yaml', __dir__))
   use(OpenapiFirst::Middlewares::RequestValidation, spec:)
 

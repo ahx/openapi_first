@@ -58,7 +58,7 @@ module OpenapiFirst
               'Please register your API description via ' \
               "`OpenapiFirst.register('myopenapi.yaml)` or " \
               'in a block passed to `OpenapiFirst::Test.setup` like this: ' \
-              "`OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }` " \
+              "`OpenapiFirst::Test.setup { |test| test.register('myopenapi.yaml') }` "
 
       end
 
