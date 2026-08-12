@@ -5,6 +5,14 @@ RSpec.describe OpenapiFirst::Definition do
     Rack::Request.new(Rack::MockRequest.env_for(path, method:))
   end
 
+  def parse_quietly(document)
+    original_stderr = $stderr
+    $stderr = StringIO.new
+    OpenapiFirst.parse(document)
+  ensure
+    $stderr = original_stderr
+  end
+
   describe '#config' do
     it 'returns a frozen configuration' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml')
@@ -29,46 +37,65 @@ RSpec.describe OpenapiFirst::Definition do
   end
 
   describe 'OpenAPI 3.2 support' do
+    let(:document) do
+      {
+        'openapi' => '3.2.0',
+        'info' => { 'title' => 'Test API', 'version' => '1.0' },
+        'paths' => {
+          '/widgets' => {
+            'get' => {
+              'operationId' => 'listWidgets',
+              'responses' => {
+                '200' => { 'description' => 'OK' }
+              }
+            }
+          }
+        }
+      }
+    end
+
     it 'parses a 3.2.0 document without error' do
-      definition = OpenapiFirst.parse({
-                                        'openapi' => '3.2.0',
-                                        'info' => { 'title' => 'Test API', 'version' => '1.0' },
-                                        'paths' => {
-                                          '/widgets' => {
-                                            'get' => {
-                                              'operationId' => 'listWidgets',
-                                              'responses' => {
-                                                '200' => { 'description' => 'OK' }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      })
+      definition = parse_quietly(document)
       expect(definition.title).to eq('Test API')
       expect(definition.paths).to eq(['/widgets'])
+    end
+
+    it 'warns that OpenAPI 3.2 is not fully supported' do
+      expect { OpenapiFirst.parse(document) }
+        .to output(/OpenAPI 3.2 is not fully supported\. This API description is handled using the OpenAPI 3.1 rules/)
+        .to_stderr
+    end
+
+    it 'names the file it was loaded from in the warning' do
+      expect { OpenapiFirst.load('./spec/data/openapi-3.2.yaml') }
+        .to output(%r{OpenAPI 3.2 is not fully supported\. \./spec/data/openapi-3\.2\.yaml is handled}).to_stderr
+    end
+
+    it 'does not warn for 3.1 documents' do
+      expect { OpenapiFirst.parse(document.merge('openapi' => '3.1.0')) }.not_to output.to_stderr
     end
   end
 
   describe 'OAS 3.2 additionalOperations' do
     let(:definition) do
-      OpenapiFirst.parse({
-                           'openapi' => '3.2.0',
-                           'info' => { 'title' => 'Test', 'version' => '1.0' },
-                           'paths' => {
-                             '/files/{id}' => {
-                               'get' => {
-                                 'operationId' => 'getFile',
-                                 'responses' => { '200' => { 'description' => 'OK' } }
-                               },
-                               'additionalOperations' => {
-                                 'COPY' => {
-                                   'operationId' => 'copyFile',
-                                   'responses' => { '200' => { 'description' => 'Copied' } }
-                                 }
-                               }
-                             }
-                           }
-                         })
+      parse_quietly({
+                      'openapi' => '3.2.0',
+                      'info' => { 'title' => 'Test', 'version' => '1.0' },
+                      'paths' => {
+                        '/files/{id}' => {
+                          'get' => {
+                            'operationId' => 'getFile',
+                            'responses' => { '200' => { 'description' => 'OK' } }
+                          },
+                          'additionalOperations' => {
+                            'COPY' => {
+                              'operationId' => 'copyFile',
+                              'responses' => { '200' => { 'description' => 'Copied' } }
+                            }
+                          }
+                        }
+                      }
+                    })
     end
 
     it 'routes requests using non-standard HTTP methods from additionalOperations' do

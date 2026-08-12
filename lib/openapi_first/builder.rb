@@ -51,13 +51,21 @@ module OpenapiFirst
       # Copied from JSONSchemer 🙇🏻‍♂️
       version = document['openapi']
       case version
-      when /\A3\.[12]\.\d+\z/
-        document.fetch('jsonSchemaDialect') { JSONSchemer::OpenAPI31::BASE_URI.to_s }
+      when /\A3\.1\.\d+\z/
+        openapi31_meta_schema(document)
+      when /\A3\.2\.\d+\z/
+        warn "OpenAPI 3.2 is not fully supported. #{filepath || 'This API description'} is handled " \
+             'using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored.'
+        openapi31_meta_schema(document)
       when /\A3\.0\.\d+\z/
         JSONSchemer::OpenAPI30::BASE_URI.to_s
       else
         raise Error, "Unsupported OpenAPI version #{version.inspect} #{filepath}"
       end
+    end
+
+    def openapi31_meta_schema(document)
+      document.fetch('jsonSchemaDialect') { JSONSchemer::OpenAPI31::BASE_URI.to_s }
     end
 
     def router
