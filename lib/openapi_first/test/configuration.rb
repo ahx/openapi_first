@@ -38,30 +38,6 @@ module OpenapiFirst
                     :ignore_unknown_requests, :ignore_unknown_response_status, :minimum_coverage, :logger
       attr_reader :report_coverage, :ignored_unknown_status
 
-      # @deprecated Use {#coverage_reporter} instead.
-      def coverage_formatter
-        warn_coverage_formatter_deprecation
-        coverage_reporter
-      end
-
-      # @deprecated Use {#coverage_reporter=} instead.
-      def coverage_formatter=(value)
-        warn_coverage_formatter_deprecation
-        self.coverage_reporter = value
-      end
-
-      # @deprecated Use {#coverage_reporter_options} instead.
-      def coverage_formatter_options
-        warn_coverage_formatter_deprecation
-        coverage_reporter_options
-      end
-
-      # @deprecated Use {#coverage_reporter_options=} instead.
-      def coverage_formatter_options=(value)
-        warn_coverage_formatter_deprecation
-        self.coverage_reporter_options = value
-      end
-
       # Set ignored unknown status codes.
       # @param [Array<Integer>] status Status codes that are okay not to cover in an OAD
       def ignored_unknown_status=(status)
@@ -129,16 +105,6 @@ module OpenapiFirst
         return false if ignore_unknown_response_status? && validated_response.error.type == :response_status_not_found
 
         true
-      end
-
-      private
-
-      def warn_coverage_formatter_deprecation
-        return if @coverage_formatter_warned
-
-        warn 'DEPRECATION WARNING: Test::Configuration#coverage_formatter(_options) is deprecated, ' \
-             'use #coverage_reporter(_options) instead.'
-        @coverage_formatter_warned = true
       end
     end
   end

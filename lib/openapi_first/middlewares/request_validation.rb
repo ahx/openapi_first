@@ -36,7 +36,7 @@ module OpenapiFirst
           options = spec
           spec = options[:spec]
         end
-        @raise = options.fetch(:raise_error, OpenapiFirst.configuration.request_validation_raise_error)
+        @raise = options.fetch(:raise_error, false)
         @error_response_class = error_response_option(options[:error_response])
 
         spec ||= :default

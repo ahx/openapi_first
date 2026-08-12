@@ -20,7 +20,7 @@ module OpenapiFirst
           options = spec
           spec = options[:spec]
         end
-        @raise = options.fetch(:raise_error, OpenapiFirst.configuration.response_validation_raise_error)
+        @raise = options.fetch(:raise_error, true)
 
         spec ||= :default
         spec = OpenapiFirst[spec] if spec.is_a?(Symbol)
