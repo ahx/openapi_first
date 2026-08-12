@@ -440,9 +440,6 @@ That aside, closer integration with specific frameworks like Hanami, Roda or oth
 
 ### Sinatra
 
-> [!NOTE]
-> Experimental.
-
 `OpenapiFirst::Sinatra` is a Sinatra extension to define routes by referencing operations in your OpenAPI description. The URL and HTTP method for each route are read from the OAD by `operationId`, so they are never repeated in your code – the API description stays the single source of truth for your routes.
 
 ```ruby
