@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0.beta1
+
 ### Breaking changes
 - Uploaded files are no longer read during request validation. Before, the whole content of every `multipart/form-data` part that was sent as a file was read into memory, which allowed a single large upload to any documented multipart route to exhaust the memory of the server process. Such a field is now passed through as Rack parsed it (`{ filename:, type:, name:, tempfile:, head: }`), which is the same shape that Sinatra and Hanami hand to your application. Use `parsed_body['file'][:tempfile]` to read or stream the file.
   - The content of these fields is not validated anymore, so `minLength`, `maxLength` or `pattern` on a field that was sent as a file are ignored.
