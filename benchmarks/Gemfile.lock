@@ -5,7 +5,6 @@ PATH
       drb (~> 2.0)
       hana (~> 1.3)
       json_schemer (>= 2.1, < 3.0)
-      openapi_parameters (>= 0.12.0, < 2.0)
       rack (>= 2.2, < 4.0)
 
 GEM
@@ -33,8 +32,6 @@ GEM
     memory_profiler (1.1.0)
     mustermann (3.1.1)
     nio4r (2.7.5)
-    openapi_parameters (0.12.0)
-      rack (>= 2.2)
     openapi_parser (2.3.1)
     optparse (0.8.1)
     profile-viewer (0.0.7)
@@ -76,7 +73,6 @@ DEPENDENCIES
   benchmark-memory
   committee
   openapi_first!
-  openapi_parameters
   profile-viewer
   puma
   sinatra

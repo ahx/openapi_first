@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'parameters'
 require_relative 'response_body_parsers'
 
 module OpenapiFirst
@@ -18,7 +19,7 @@ module OpenapiFirst
 
       [ParsedResponse.new(
         body:,
-        headers: @headers_parser&.call(rack_response.headers) || {}
+        headers: @headers_parser&.unpack(rack_response.headers) || {}
       ), nil]
     end
 
@@ -39,15 +40,14 @@ module OpenapiFirst
     def build_headers_parser(headers)
       return unless headers&.any?
 
-      headers_as_parameters = headers.map do |header|
-        {
-          'name' => header.name,
-          'explode' => false,
-          'in' => 'header',
-          'schema' => header.resolved_schema
-        }
-      end
-      OpenapiParameters::Header.new(headers_as_parameters).method(:unpack)
+      Parameters::Parser.new(
+        headers.map do |header|
+          Parameters::Parameter.new(
+            { 'name' => header.name, 'in' => 'header' },
+            schema: header.resolved_schema
+          )
+        end
+      )
     end
   end
 end

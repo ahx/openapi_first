@@ -7,6 +7,15 @@
   - The content of these fields is not validated anymore, so `minLength`, `maxLength` or `pattern` on a field that was sent as a file are ignored.
   - An `after_request_body_property_validation` hook sees an empty String instead of the file.
   - Fields that were not sent as a file, and fields with a JSON `contentType` in the `encoding` map, are read and validated as before.
+- Changed: The `openapi_parameters` gem was merged into openapi_first and is not a dependency anymore. Parameter parsing now lives in `OpenapiFirst::Parameters`. If you registered a parser for parameters that use a `content` field, use `OpenapiFirst::Parameters::ContentParsers.register` instead of `OpenapiParameters::ContentParsers.register`.
+- Added: `OpenapiFirst::Request#parameters` returns the parameters that are defined for a request as `OpenapiFirst::Parameters::Parameter` objects, which expose `name`, `location`, `schema`, `required?`, `deprecated?`, `style`, `explode?` and `media_type`. It used to return an internal object with a different interface.
+- Removed: `OpenapiFirst::Request#query_schema`, which was internal scaffolding and always returned `nil`.
+- Changed: `OpenapiFirst::Header` (returned by `Response#headers`) exposes `resolved_schema` instead of `node`.
+- Fixed: The JSON schema of a parameter that uses a `content` field with a `$ref`'d schema is resolved now.
+- Fixed: Loading a document no longer raises `NoMethodError` when a parameter has neither `schema` nor `content`.
+- Fixed: Repeated values for a query parameter that describes an object or uses `content` (`?filter=a&filter=b`) raised a `NoMethodError` or `TypeError`. The values are validated against the schema now, which returns an `:invalid_query` failure.
+- Fixed: A parameter with `style: matrix` raised a `NoMethodError` if its value did not contain the parameter name, or contained it more than once. Such values are parsed like their `explode` counterpart now.
+- Fixed: A parameter with `style: matrix`, or a path parameter that describes an object, raised an `ArgumentError` if its value had an invalid `%`-encoding. Such values are validated against the schema now.
 - Changed: Don't hide covered endpoints in HTML coverage reporter
 - Added: Filter un/covered endpoints in HTML coverage reporter
 - Changed: Reduced memory retained by a loaded `Definition`. Response headers with a schema no longer keep the whole raw document node alive, and a couple of build-time-only hashes were replaced with more compact structures.

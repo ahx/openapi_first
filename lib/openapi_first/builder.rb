@@ -5,6 +5,7 @@ require 'json_schemer'
 require_relative 'failure'
 require_relative 'router'
 require_relative 'header'
+require_relative 'parameters'
 require_relative 'request'
 require_relative 'response'
 require_relative 'schema/hash'
@@ -116,26 +117,34 @@ module OpenapiFirst
     end
 
     def parse_parameters(parameters)
-      grouped_parameters = group_parameters(parameters)
+      grouped = group_parameters(parameters)
+      path = build_parameters(grouped[:path])
+      query = build_parameters(grouped[:query])
+      header = build_parameters(grouped[:header])
+      cookie = build_parameters(grouped[:cookie])
       ParsedParameters.new(
-        query: resolve_parameters(grouped_parameters[:query]),
-        path: resolve_parameters(grouped_parameters[:path]),
-        cookie: resolve_parameters(grouped_parameters[:cookie]),
-        header: resolve_parameters(grouped_parameters[:header]),
-        query_schema: build_parameter_schema(grouped_parameters[:query]),
-        path_schema: build_parameter_schema(grouped_parameters[:path]),
-        cookie_schema: build_parameter_schema(grouped_parameters[:cookie]),
-        header_schema: build_parameter_schema(grouped_parameters[:header])
+        all: [*path, *query, *header, *cookie].freeze,
+        path_parser: grouped[:path] && Parameters::Parser.new(path),
+        query_parser: Parameters::QueryParser.new(query),
+        header_parser: grouped[:header] && Parameters::Parser.new(header),
+        cookie_parser: grouped[:cookie] && Parameters::Parser.new(cookie),
+        path_schema: build_parameter_schema(grouped[:path]),
+        query_schema: build_parameter_schema(grouped[:query]),
+        header_schema: build_parameter_schema(grouped[:header]),
+        cookie_schema: build_parameter_schema(grouped[:cookie])
       )
     end
 
-    def resolve_parameters(parameters)
-      parameters&.map do |parameter|
-        result = parameter.resolved
-        _media_type, media_type_object = parameter['content']&.first
-        result['schema'] = (media_type_object || parameter)['schema'].resolved
-        result
-      end.to_a
+    def build_parameters(parameters)
+      parameters.to_a.map do |parameter|
+        Parameters::Parameter.new(parameter.resolved, schema: parameter_schema_node(parameter)&.resolved)
+      end
+    end
+
+    # The schema of a parameter is either defined directly or inside a content media type object
+    def parameter_schema_node(parameter)
+      _media_type, media_type_object = parameter['content']&.first
+      (media_type_object || parameter)['schema']
     end
 
     def build_parameter_schema(parameters)
@@ -143,7 +152,7 @@ module OpenapiFirst
 
       required = []
       schemas = parameters.each_with_object({}) do |parameter, result|
-        schema = parameter['schema'].schema(configuration: schemer_configuration)
+        schema = parameter_schema_node(parameter)&.schema(configuration: schemer_configuration)
         name = parameter['name']&.value
         required << name if parameter['required']&.value
         result[name] = schema if schema
@@ -238,8 +247,8 @@ module OpenapiFirst
       result
     end
 
-    ParsedParameters = Data.define(:path, :query, :header, :cookie, :path_schema, :query_schema, :header_schema,
-                                   :cookie_schema)
+    ParsedParameters = Data.define(:all, :path_parser, :query_parser, :header_parser, :cookie_parser,
+                                   :path_schema, :query_schema, :header_schema, :cookie_schema)
     private_constant :ParsedParameters
   end
 end
