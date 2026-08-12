@@ -2,24 +2,20 @@
 
 ## Unreleased
 
-- Added: OpenAPI 3.2 documents are accepted, but not fully supported yet. They are handled using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored. Loading such a document prints a warning. Operations defined under `additionalOperations` are routed. See #469.
-- **Breaking**: Uploaded files are no longer read during request validation. Before, the whole content of every `multipart/form-data` part that was sent as a file was read into memory, which allowed a single large upload to any documented multipart route to exhaust the memory of the server process. Such a field is now passed through as Rack parsed it (`{ filename:, type:, name:, tempfile:, head: }`), which is the same shape that Sinatra and Hanami hand to your application. Use `parsed_body['file'][:tempfile]` to read or stream the file.
+### Breaking changes
+- Uploaded files are no longer read during request validation. Before, the whole content of every `multipart/form-data` part that was sent as a file was read into memory, which allowed a single large upload to any documented multipart route to exhaust the memory of the server process. Such a field is now passed through as Rack parsed it (`{ filename:, type:, name:, tempfile:, head: }`), which is the same shape that Sinatra and Hanami hand to your application. Use `parsed_body['file'][:tempfile]` to read or stream the file.
   - The content of these fields is not validated anymore, so `minLength`, `maxLength` or `pattern` on a field that was sent as a file are ignored.
   - An `after_request_body_property_validation` hook sees an empty String instead of the file.
   - Fields that were not sent as a file, and fields with a JSON `contentType` in the `encoding` map, are read and validated as before.
-- Changed: The `openapi_parameters` gem was merged into openapi_first and is not a dependency anymore. Parameter parsing now lives in `OpenapiFirst::Parameters`. If you registered a parser for parameters that use a `content` field, use `OpenapiFirst::Parameters::ContentParsers.register` instead of `OpenapiParameters::ContentParsers.register`.
-- Added: `OpenapiFirst::Request#parameters` returns the parameters that are defined for a request as `OpenapiFirst::Parameters::Parameter` objects, which expose `name`, `location`, `schema`, `required?`, `deprecated?`, `style`, `explode?` and `media_type`. It used to return an internal object with a different interface.
+- The `openapi_parameters` gem was merged into openapi_first and is not a dependency anymore. Parameter parsing now lives in `OpenapiFirst::Parameters`. If you registered a parser for parameters that use a `content` field, use `OpenapiFirst::Parameters::ContentParsers.register` instead of `OpenapiParameters::ContentParsers.register`.
 - Removed: `OpenapiFirst::Request#query_schema`, which was internal scaffolding and always returned `nil`.
 - Changed: `OpenapiFirst::Header` (returned by `Response#headers`) exposes `resolved_schema` instead of `node`.
-- Fixed: The JSON schema of a parameter that uses a `content` field with a `$ref`'d schema is resolved now.
-- Fixed: Loading a document no longer raises `NoMethodError` when a parameter has neither `schema` nor `content`.
-- Fixed: Repeated values for a query parameter that describes an object or uses `content` (`?filter=a&filter=b`) raised a `NoMethodError` or `TypeError`. The values are validated against the schema now, which returns an `:invalid_query` failure.
-- Fixed: A parameter with `style: matrix` raised a `NoMethodError` if its value did not contain the parameter name, or contained it more than once. Such values are parsed like their `explode` counterpart now.
-- Fixed: A parameter with `style: matrix`, or a path parameter that describes an object, raised an `ArgumentError` if its value had an invalid `%`-encoding. Such values are validated against the schema now.
-- Changed: Don't hide covered endpoints in HTML coverage reporter
-- Added: Filter un/covered endpoints in HTML coverage reporter
-- Changed: Reduced memory retained by a loaded `Definition`. Response headers with a schema no longer keep the whole raw document node alive, and a couple of build-time-only hashes were replaced with more compact structures.
-- Added: Sinatra integration (OpenapiFirst::Sinatra)
+
+### Features 
+- Added: OpenAPI 3.2 documents are accepted, but not fully supported yet. They are handled using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored. Loading such a document prints a warning. Operations defined under `additionalOperations` are routed. See #469.
+- Added: `OpenapiFirst::Request#parameters` returns the parameters that are defined for a request as `OpenapiFirst::Parameters::Parameter` objects, which expose `name`, `location`, `schema`, `required?`, `deprecated?`, `style`, `explode?` and `media_type`. It used to return an internal object with a different interface.
+- Show all covered endpoints in HTML coverage reporter and filter un/covered endpoints
+- Sinatra integration (OpenapiFirst::Sinatra)
   A Sinatra extension to define routes by referencing OpenAPI operations:
 
   ```ruby
@@ -48,6 +44,15 @@
 
   The HTTP method and path for each route come from the operationId.
   Request validation is called automatically for these operations.
+
+### Fixes
+- Fixed: The JSON schema of a parameter that uses a `content` field with a `$ref`'d schema is resolved now.
+- Fixed: Loading a document no longer raises `NoMethodError` when a parameter has neither `schema` nor `content`.
+- Fixed: Repeated values for a query parameter that describes an object or uses `content` (`?filter=a&filter=b`) raised a `NoMethodError` or `TypeError`. The values are validated against the schema now, which returns an `:invalid_query` failure.
+- Fixed: A parameter with `style: matrix` raised a `NoMethodError` if its value did not contain the parameter name, or contained it more than once. Such values are parsed like their `explode` counterpart now.
+- Fixed: A parameter with `style: matrix`, or a path parameter that describes an object, raised an `ArgumentError` if its value had an invalid `%`-encoding. Such values are validated against the schema now.
+- Fixed: Reduced memory retained by a loaded `Definition`. Response headers with a schema no longer keep the whole raw document node alive, and a couple of build-time-only hashes were replaced with more compact structures.
+
 
 ## 3.4.3
 
