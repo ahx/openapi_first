@@ -555,6 +555,32 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe '#path_for' do
+    let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
+
+    it 'returns the path for an operation without path parameters' do
+      expect(definition.path_for(operation_id: :listPets)).to eq('/pets')
+    end
+
+    it 'fills in path parameters with symbol keys' do
+      expect(definition.path_for({ petId: 42 }, operation_id: :showPetById)).to eq('/pets/42')
+    end
+
+    it 'fills in path parameters with string keys' do
+      expect(definition.path_for({ 'petId' => '42' }, operation_id: :showPetById)).to eq('/pets/42')
+    end
+
+    it 'raises ArgumentError for an unknown operationId' do
+      expect { definition.path_for(operation_id: :unknownOperation) }
+        .to raise_error(ArgumentError, /unknownOperation/)
+    end
+
+    it 'raises ArgumentError when a required path parameter is missing' do
+      expect { definition.path_for(operation_id: :showPetById) }
+        .to raise_error(ArgumentError, /petId/)
+    end
+  end
+
   describe '#filepath' do
     let(:definition) { OpenapiFirst.load('./spec/data/petstore.yaml') }
 
