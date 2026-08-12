@@ -39,10 +39,6 @@ module OpenapiFirst
       Failure.new(:invalid_body, message: 'Failed to parse request body as JSON')
     end)
 
-    # Parses multipart/form-data requests and currently puts the contents of a file upload at the parsed hash values.
-    # NOTE: This behavior will probably change in the next major version.
-    #       The uploaded file should not be read during request validation.
-    #
     # Honors the OpenAPI `encoding` map: when a top-level field has
     # `contentType: application/json` (or any */json), the field's raw value
     # is JSON-parsed before schema validation.
@@ -65,9 +61,11 @@ module OpenapiFirst
       private
 
       def decode_field(name, value)
-        raw = unpack_value(value)
         content_type = @encoding.dig(name, 'contentType')
-        return raw unless content_type && raw.is_a?(String) && json?(content_type)
+        return unpack_value(value) unless content_type && json?(content_type)
+
+        raw = read_raw(value)
+        return unpack_value(value) if raw.nil?
 
         JSON.parse(raw)
       rescue JSON::ParserError => e
@@ -79,10 +77,16 @@ module OpenapiFirst
         content_type.match?(%r{[/+]json\b}i)
       end
 
+      def read_raw(value)
+        return value if value.is_a?(String)
+
+        value[:tempfile]&.read if value.is_a?(Hash) && value.key?(:tempfile)
+      end
+
       def unpack_value(value)
         return value.map { unpack_value(_1) } if value.is_a?(Array)
         return value unless value.is_a?(Hash)
-        return value[:tempfile]&.read if value.key?(:tempfile)
+        return value if value.key?(:tempfile)
 
         value.transform_values { unpack_value(_1) }
       end

@@ -166,7 +166,24 @@ use OpenapiFirst::Middlewares::RequestValidation, 'openapi.yaml', error_response
 You can build your own custom error response with `error_response: MyCustomClass` that implements `OpenapiFirst::ErrorResponse`.
 You can define custom error responses globally by including / implementing `OpenapiFirst::ErrorResponse` and register it via `OpenapiFirst.register_error_response(my_name, MyCustomErrorResponse)` and set `error_response: my_name`.
 
+#### Multipart file uploads
+
+Uploaded files are not read during request validation. A `multipart/form-data` field that was sent as a file is passed through as Rack parsed it – the same shape that Sinatra and Hanami hand to your application:
+
+```ruby
+file = validated_request.parsed_body['file']
+file[:filename] # => "cat.jpg"
+file[:type]     # => "image/jpeg"
+file[:tempfile] # => #<Tempfile …> Read or stream this in your application.
+```
+
+The tempfile is only usable while the request is being handled, because Rack removes it afterwards.
+
+This means the _content_ of these fields is not validated, so `minLength`, `maxLength` or `pattern` on a field that was sent as a file are ignored. Fields that were not sent as a file are read and validated as usual, and a field with `contentType: application/json` in the `encoding` map is still parsed as JSON.
+
 ### Response validation
+
+You should use [Contract Testing](#contract-testing) instead of running the response validation middleware.
 
 This middleware raises an error by default if the response is not valid.
 This can be useful in a test or staging environment, especially if you are adopting OpenAPI for an existing implementation.

@@ -60,8 +60,18 @@ RSpec.describe 'Request body validation' do
       post '/multipart-with-file', 'file' => uploaded_file
       expect(last_response.status).to eq(200)
 
-      uploaded_file = last_request.env[OpenapiFirst::REQUEST].parsed_body['file']
-      expect(uploaded_file).to eq File.read(fixture_path('foo.txt'))
+      part = last_request.env[OpenapiFirst::REQUEST].parsed_body['file']
+      expect(part[:filename]).to eq('foo.txt')
+      expect(part[:tempfile].read).to eq File.read(fixture_path('foo.txt'))
+    end
+
+    it 'does not read the uploaded file during request validation' do
+      uploaded_file = Rack::Test::UploadedFile.new(fixture_path('foo.txt'))
+
+      expect_any_instance_of(Tempfile).not_to receive(:read)
+      post '/multipart-with-file', 'file' => uploaded_file
+
+      expect(last_response.status).to eq(200), last_response.body
     end
 
     it 'succeeds with nested multipart form data file binary upload' do
@@ -70,8 +80,8 @@ RSpec.describe 'Request body validation' do
       post '/nested-multipart-with-file', 'user' => { 'avatar' => uploaded_file }
       expect(last_response.status).to eq(200), last_response.body
 
-      uploaded_file = last_request.env[OpenapiFirst::REQUEST].parsed_body.dig('user', 'avatar')
-      expect(uploaded_file).to eq File.read(fixture_path('foo.txt'))
+      part = last_request.env[OpenapiFirst::REQUEST].parsed_body.dig('user', 'avatar')
+      expect(part[:tempfile].read).to eq File.read(fixture_path('foo.txt'))
     end
 
     it 'succeeds list of binary fields in multipart/form-data' do
@@ -80,8 +90,31 @@ RSpec.describe 'Request body validation' do
       post '/users-with-avatars', 'data' => [{ 'avatar' => uploaded_file, 'name' => 'Quentin' }]
       expect(last_response.status).to eq(200), last_response.body
 
-      names = last_request.env[OpenapiFirst::REQUEST].parsed_body.fetch('data').map { _1['name'] }
-      expect(names).to eq(['Quentin'])
+      data = last_request.env[OpenapiFirst::REQUEST].parsed_body.fetch('data')
+      expect(data.map { _1['name'] }).to eq(['Quentin'])
+      expect(data.first['avatar'][:tempfile].read).to eq File.read(fixture_path('foo.txt'))
+    end
+
+    it 'fails when a required file part is missing' do
+      data_part = Rack::Test::UploadedFile.new(
+        StringIO.new(JSON.generate(name: 'Quentin', description: 'Cat')),
+        'application/json', original_filename: 'data.json'
+      )
+
+      post '/multipart-with-encoding', 'data' => data_part
+
+      expect(last_response.status).to eq(400), last_response.body
+    end
+
+    it 'still validates non-file fields next to a file upload' do
+      uploaded_file = Rack::Test::UploadedFile.new(fixture_path('foo.txt'))
+
+      post '/multipart-with-file', 'file' => uploaded_file, 'petId' => 'not-a-number'
+
+      expect(last_response.status).to eq(400), last_response.body
+
+      part = last_request.env[OpenapiFirst::REQUEST].parsed_body['file']
+      expect(part[:tempfile].read).to eq File.read(fixture_path('foo.txt'))
     end
 
     context 'when raise_error is true and a multipart JSON-encoded part is malformed' do
@@ -113,7 +146,37 @@ RSpec.describe 'Request body validation' do
       expect(last_response.status).to eq(200), last_response.body
       parsed = last_request.env[OpenapiFirst::REQUEST].parsed_body
       expect(parsed['data']).to eq('name' => 'Quentin', 'description' => 'Cat')
-      expect(parsed['file']).to eq(File.read(fixture_path('foo.txt')))
+      expect(parsed['file'][:tempfile].read).to eq(File.read(fixture_path('foo.txt')))
+    end
+
+    context 'with an after_request_body_property_validation hook' do
+      let(:seen) { [] }
+
+      let(:app) do
+        properties = seen
+        definition = OpenapiFirst.load('./spec/data/request-body-validation.yaml') do |config|
+          config.after_request_body_property_validation do |data, property, _property_schema|
+            properties << [property, data[property]]
+          end
+        end
+        Rack::Builder.new do
+          use(OpenapiFirst::Middlewares::RequestValidation, spec: definition)
+          run lambda { |_env|
+            Rack::Response.new('hello', 200).finish
+          }
+        end
+      end
+
+      it 'restores a nested file upload after validation and shows the hook a placeholder' do
+        uploaded_file = Rack::Test::UploadedFile.new(fixture_path('foo.txt'))
+
+        post '/nested-multipart-with-file', 'user' => { 'avatar' => uploaded_file }
+        expect(last_response.status).to eq(200), last_response.body
+
+        part = last_request.env[OpenapiFirst::REQUEST].parsed_body.dig('user', 'avatar')
+        expect(part[:tempfile].read).to eq File.read(fixture_path('foo.txt'))
+        expect(seen).to include(['avatar', ''])
+      end
     end
 
     it 'succeeds without optional file upload' do
@@ -336,6 +399,8 @@ RSpec.describe 'Request body validation' do
       post path
 
       expect(last_response.status).to be 400
+      error = last_request.env[OpenapiFirst::REQUEST].error
+      expect(error.message).to eq 'Request body must not be empty'
     end
 
     it 'returns 415 if request content-type does not match' do

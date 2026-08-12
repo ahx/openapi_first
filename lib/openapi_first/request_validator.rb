@@ -9,6 +9,7 @@ module OpenapiFirst
   class RequestValidator
     def initialize(
       content_schema:,
+      content_type:,
       required_request_body:,
       path_schema:,
       query_schema:,
@@ -16,7 +17,9 @@ module OpenapiFirst
       cookie_schema:
     )
       @validators = []
-      @validators << Validators::RequestBody.new(content_schema:, required_request_body:) if content_schema
+      if content_schema
+        @validators.concat Validators::RequestBody.for(content_schema:, required_request_body:, content_type:)
+      end
       @validators.concat Validators::RequestParameters.for(
         path_schema:,
         query_schema:,

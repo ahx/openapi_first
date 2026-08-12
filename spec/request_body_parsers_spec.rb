@@ -24,7 +24,16 @@ RSpec.describe OpenapiFirst::RequestBodyParsers do
       post '/', 'file' => uploaded_file
 
       body = parser.call(last_request)
-      expect(body['file']).to eq(File.read('./spec/data/foo.txt'))
+      expect(body['file'][:filename]).to eq('foo.txt')
+      expect(body['file'][:tempfile].read).to eq(File.read('./spec/data/foo.txt'))
+    end
+
+    it 'does not read uploaded files' do
+      uploaded_file = Rack::Test::UploadedFile.new('./spec/data/foo.txt')
+      post '/', 'file' => uploaded_file
+
+      expect_any_instance_of(Tempfile).not_to receive(:read)
+      parser.call(last_request)
     end
 
     context 'with an encoding map' do
