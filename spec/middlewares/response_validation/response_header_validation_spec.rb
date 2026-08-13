@@ -52,6 +52,18 @@ RSpec.describe 'Response Header validation' do
     end.to raise_error OpenapiFirst::ResponseInvalidError
   end
 
+  it 'succeeds with a ref nested inside a header schema' do
+    post '/echo', JSON.generate({ 'X-Counts' => '1,2', 'Location' => '/echos/42' })
+    expect(last_response.status).to eq 201
+  end
+
+  it 'fails with a ref nested inside a header schema' do
+    expect do
+      post '/echo', JSON.generate({ 'X-Counts' => '1,two', 'Location' => '/echos/42' })
+    end.to raise_error OpenapiFirst::ResponseInvalidError,
+                       'Response header is invalid: value at `/X-Counts` is not an integer'
+  end
+
   it 'fails with a missing header' do
     expect do
       post '/echo', JSON.generate({ 'X-Id' => '42' })

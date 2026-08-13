@@ -137,7 +137,7 @@ module OpenapiFirst
 
     def build_parameters(parameters)
       parameters.to_a.map do |parameter|
-        Parameters::Parameter.new(parameter.resolved, schema: parameter_schema_node(parameter)&.resolved)
+        Parameters::Parameter.new(parameter.resolved, schema: parameter_schema_node(parameter)&.dereferenced)
       end
     end
 
@@ -232,7 +232,7 @@ module OpenapiFirst
           name:,
           schema: schema_node.schema(configuration: schemer_configuration),
           required?: header['required']&.value == true,
-          resolved_schema: schema_node.resolved
+          resolved_schema: schema_node.dereferenced
         )
       end
       result

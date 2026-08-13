@@ -99,6 +99,10 @@ module OpenapiFirst
                   "file #{File.absolute_path(filepath).inspect}: #{e.message}"
         raise OpenapiFirst::FileNotFoundError, message
       end
+
+      private
+
+      def mark(visited) = (visited || []) + [value.object_id]
     end
 
     # @visibility private
@@ -106,6 +110,8 @@ module OpenapiFirst
       include Resolvable
 
       def resolved = value
+
+      def dereferenced(_visited = nil) = value
     end
 
     # @visibility private
@@ -122,6 +128,19 @@ module OpenapiFirst
         return resolve_ref(value['$ref']).value if value.key?('$ref')
 
         value
+      end
+
+      # Returns a plain Hash with all nested $refs resolved.
+      # A node that is reached again on its own path, as in a recursive schema,
+      # is returned unresolved to stop the recursion.
+      # @param visited [Array<Integer>, nil] Object ids of the nodes on the current path.
+      def dereferenced(visited = nil)
+        return value if visited&.include?(value.object_id)
+
+        visited = mark(visited)
+        return resolve_ref(value['$ref'])&.dereferenced(visited) if value.key?('$ref')
+
+        value.each_key.to_h { |key| [key, self[key]&.dereferenced(visited)] }
       end
 
       def [](key)
@@ -200,6 +219,15 @@ module OpenapiFirst
             item
           end
         end
+      end
+
+      # Returns a plain Array with all nested $refs resolved.
+      # @param visited [Array<Integer>, nil] Object ids of the nodes on the current path.
+      def dereferenced(visited = nil)
+        return value if visited&.include?(value.object_id)
+
+        visited = mark(visited)
+        value.each_index.map { self[_1]&.dereferenced(visited) }
       end
     end
   end

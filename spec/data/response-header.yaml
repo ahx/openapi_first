@@ -32,3 +32,12 @@ paths:
                 type: integer
             X-Authors:
               $ref: './components/headers/x-authors.yaml'
+            X-Counts:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/count'
+components:
+  schemas:
+    count:
+      type: integer
