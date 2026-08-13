@@ -231,6 +231,71 @@ RSpec.describe OpenapiFirst::RefResolver do
     end
   end
 
+  describe '#dereferenced' do
+    it 'resolves nested refs' do
+      doc = resolver.for(contents)
+      expect(doc.dereferenced).to eq(
+        'definitions' => {
+          'Thing' => { 'type' => 'object' },
+          'A' => { 'name' => 'A' }
+        },
+        'hash' => { 'type' => 'object' },
+        'array' => [{ 'name' => 'A' }, { 'name' => 'B' }]
+      )
+    end
+
+    it 'resolves refs nested in a schema' do
+      contents = {
+        'type' => 'object',
+        'properties' => {
+          'ids' => { '$ref' => '#/$defs/ids' }
+        },
+        '$defs' => {
+          'ids' => { 'type' => 'array', 'default' => nil, 'items' => { '$ref' => '#/$defs/id' } },
+          'id' => { 'type' => %w[integer null], 'enum' => [1, nil] }
+        }
+      }
+      doc = resolver.for(contents)
+      expect(doc.dig('properties', 'ids').dereferenced).to eq(
+        'type' => 'array',
+        'default' => nil,
+        'items' => { 'type' => %w[integer null], 'enum' => [1, nil] }
+      )
+    end
+
+    it 'resolves refs across files' do
+      doc = resolver.load('./spec/data/query-parameter-validation.yaml')
+      node = doc.dig('paths', '/search', 'get', 'parameters', 1, 'schema')
+      expect(node.dereferenced).to eq(
+        'type' => 'object',
+        'required' => ['name'],
+        'properties' => {
+          'name' => { 'type' => 'string', 'minLength' => 2 },
+          'other' => { 'type' => 'object' },
+          'id' => { 'type' => 'integer' }
+        }
+      )
+    end
+
+    it 'keeps the ref of a recursive schema' do
+      doc = resolver.load('./spec/data/self-referencing.yaml')
+      node = doc.dig('paths', '/', 'get', 'responses', '200', 'content', 'application/json', 'schema')
+      expect(node.dereferenced).to eq(
+        'type' => 'object',
+        'properties' => {
+          'foo' => { 'type' => 'string' },
+          'bar' => {
+            'type' => 'object',
+            'properties' => {
+              'foo' => { 'type' => 'string' },
+              'bar' => { '$ref' => '#/components/schemas/MySelfRef' }
+            }
+          }
+        }
+      )
+    end
+  end
+
   describe '#each' do
     it 'works across files' do
       filepath = './spec/data/splitted-train-travel-api/openapi.yaml'

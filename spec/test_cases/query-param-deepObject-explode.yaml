@@ -1,0 +1,26 @@
+- description: deepObject query param with array value
+  oad:
+    openapi: 3.1.1
+    paths:
+      /:
+        get:
+          operationId: 'foo'
+          parameters:
+            - name: filter
+              in: query
+              style: deepObject
+              explode: true
+              schema:
+                type: object
+                properties:
+                  ids:
+                    $ref: '../data/components/schemas/integers.yaml'
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: 'get'
+    uri: '/?filter[ids]=1&filter[ids]=2'
+  invalid_request:
+    method: 'get'
+    uri: '/?filter[ids]=1'

@@ -52,6 +52,7 @@
   Request validation is called automatically for these operations.
 
 ### Fixes
+- Fixed: `$ref`s nested inside the schema of a parameter or a response header are resolved now, so these values are unpacked and converted as described. Before, only a `$ref` at the top level of the schema was resolved. See #450.
 - Fixed: The JSON schema of a parameter that uses a `content` field with a `$ref`'d schema is resolved now.
 - Fixed: Loading a document no longer raises `NoMethodError` when a parameter has neither `schema` nor `content`.
 - Fixed: Repeated values for a query parameter that describes an object or uses `content` (`?filter=a&filter=b`) raised a `NoMethodError` or `TypeError`. The values are validated against the schema now, which returns an `:invalid_query` failure.

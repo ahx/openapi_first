@@ -1,0 +1,87 @@
+- description: Query parameter with a $ref'd items schema
+  oad:
+    openapi: 3.1.1
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: ids
+              in: query
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/id'
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        id:
+          type: integer
+  valid_request:
+    method: get
+    uri: '/?ids=1&ids=2'
+  invalid_request:
+    method: get
+    uri: '/?ids=one'
+
+- description: deepObject query parameter with a $ref inside allOf
+  oad:
+    openapi: 3.1.1
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: filter
+              in: query
+              style: deepObject
+              explode: true
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/counter'
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        counter:
+          type: object
+          required: [count]
+          properties:
+            count:
+              type: integer
+  valid_request:
+    method: get
+    uri: '/?filter[count]=5'
+  invalid_request:
+    method: get
+    uri: '/?filter[count]=five'
+
+- description: Path parameter with a $ref'd property schema
+  oad:
+    openapi: 3.1.1
+    paths:
+      "/things/{filter}":
+        get:
+          parameters:
+            - name: filter
+              in: path
+              required: true
+              schema:
+                type: object
+                properties:
+                  id:
+                    $ref: '#/components/schemas/id'
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        id:
+          type: integer
+  valid_request:
+    method: get
+    uri: '/things/id,42'
+  invalid_request:
+    method: get
+    uri: '/things/id,fortytwo'
