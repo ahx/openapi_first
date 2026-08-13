@@ -52,6 +52,7 @@
   Request validation is called automatically for these operations.
 
 ### Fixes
+- Fixed: Validating against a schema from a referenced file raised `ArgumentError` in OpenAPI 3.0 documents when a top-level key of that file collides with a JSON Schema keyword, such as `$ref: 'parameters.yaml#/id'`. The containing file is no longer parsed as a schema itself, so such keys work like any other now. See #348.
 - Fixed: `$ref`s nested inside the schema of a parameter or a response header are resolved now, so these values are unpacked and converted as described. Before, only a `$ref` at the top level of the schema was resolved. See #450.
 - Fixed: The JSON schema of a parameter that uses a `content` field with a `$ref`'d schema is resolved now.
 - Fixed: Loading a document no longer raises `NoMethodError` when a parameter has neither `schema` nor `content`.

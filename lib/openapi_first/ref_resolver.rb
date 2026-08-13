@@ -176,6 +176,14 @@ module OpenapiFirst
     class Schema
       extend Forwardable
 
+      # The root context is a document, not a schema. Parsing it with only the core vocabulary
+      # keeps document keys that collide with dialect keywords (like "id" in OpenAPI 3.0)
+      # from being parsed as such and keeps them navigable for $ref pointers.
+      DOCUMENT_META_SCHEMA = JSONSchemer::Schema.new(
+        {},
+        vocabulary: { 'https://json-schema.org/draft/2020-12/vocab/core' => true }
+      )
+
       def initialize(value:, context:, base_uri:, options:)
         @value = value
         @context = context
@@ -189,8 +197,22 @@ module OpenapiFirst
 
       def schema
         @schema ||= begin
-          root_schema = JSONSchemer::Schema.new(context, base_uri:, **options)
+          root_schema = JSONSchemer::Schema.new(context, base_uri:, **options, meta_schema: DOCUMENT_META_SCHEMA)
+          apply_dialect(root_schema)
           JSONSchemer::Schema.new(value, nil, root_schema, base_uri:, **options)
+        end
+      end
+
+      private
+
+      # Set the dialect meta schema on the root like JSONSchemer::Schema#parse would,
+      # so that schemas resolved via $ref pointers into the document inherit it.
+      def apply_dialect(root_schema)
+        dialect = options[:meta_schema] || options.fetch(:configuration, JSONSchemer.configuration).meta_schema
+        if dialect.is_a?(String)
+          JSONSchemer::Schema::SCHEMA_KEYWORD_CLASS.new(dialect, root_schema, '$schema')
+        else
+          root_schema.meta_schema = dialect
         end
       end
     end
