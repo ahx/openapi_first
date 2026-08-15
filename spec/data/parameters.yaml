@@ -1,4 +1,4 @@
-openapi: "3.0.2"
+openapi: "3.0.3"
 info:
   version: 1.0.0
   title: Search example
@@ -92,11 +92,7 @@ paths:
         required: true
         schema:
           type: integer
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
+      - $ref: components/parameters.yaml#/id
     get:
       responses:
         "200":
