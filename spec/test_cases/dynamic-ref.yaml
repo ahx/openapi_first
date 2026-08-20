@@ -1,0 +1,49 @@
+- description: Modeling generics with $dynamicRef and $dynamicAnchor as in https://json-schema.org/blog/posts/dynamicref-and-generics
+  oad:
+    openapi: 3.1.0
+    paths:
+      "/strings":
+        post:
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ListOfString'
+          responses:
+            '200':
+              description: ok
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/ListOfString'
+    components:
+      schemas:
+        ListOfT:
+          $id: 'https://json-schema.blog/list-of-t'
+          $defs:
+            content:
+              $dynamicAnchor: T
+              not: true
+          type: array
+          items:
+            $dynamicRef: '#T'
+        ListOfString:
+          $defs:
+            string-items:
+              $dynamicAnchor: T
+              type: string
+          $ref: '#/components/schemas/ListOfT'
+  valid_response:
+    content_type: application/json
+    body: ["hello", "world"]
+  invalid_response:
+    content_type: application/json
+    body: [1, 2, 3]
+  valid_request:
+    method: post
+    uri: "/strings"
+    body: ["hello", "world"]
+  invalid_request:
+    method: post
+    uri: "/strings"
+    body: [1, 2, 3]
