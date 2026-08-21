@@ -40,9 +40,13 @@ module OpenapiFirst
 
     def convert(value) = @converter.call(value)
 
-    # Unpacks and converts a raw value. Values that cannot be unpacked are converted as they are.
+    # Unpacks and converts a raw value.
+    # For a query parameter, a value that cannot be unpacked is still converted.
+    # For any other location, such a value is returned as it is, unconverted.
     def unpack_and_convert(value)
-      convert(catch(:skip) { unpack(value) })
+      return convert(catch(:skip) { unpack(value) }) if location == 'query'
+
+      catch(:skip) { convert(unpack(value)) }
     end
 
     def explode? = @explode

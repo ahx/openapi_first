@@ -2,7 +2,7 @@
 
 require 'yaml'
 
-RSpec.describe OpenapiFirst::ParametersParser::Query do
+RSpec.describe OpenapiFirst::QueryStringParser do
   def parser_for(definitions)
     definitions = [definitions] unless definitions.is_a?(Array)
     described_class.new(build_parameters(definitions))

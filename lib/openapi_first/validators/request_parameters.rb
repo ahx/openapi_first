@@ -2,8 +2,9 @@
 
 module OpenapiFirst
   module Validators
+    # @visibility private
     module RequestParameters
-      RequestHeaders = Data.define(:schema) do
+      Headers = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.headers)
           Failure.new(:invalid_header, errors: validation.errors) if validation.error?
@@ -24,7 +25,7 @@ module OpenapiFirst
         end
       end
 
-      RequestCookies = Data.define(:schema) do
+      Cookies = Data.define(:schema) do
         def call(parsed_request)
           validation = schema.validate(parsed_request.cookies)
           Failure.new(:invalid_cookie, errors: validation.errors) if validation.error?
@@ -34,8 +35,8 @@ module OpenapiFirst
       VALIDATORS = {
         path_schema: Path,
         query_schema: Query,
-        header_schema: RequestHeaders,
-        cookie_schema: RequestCookies
+        header_schema: Headers,
+        cookie_schema: Cookies
       }.freeze
 
       def self.for(args)

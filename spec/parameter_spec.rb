@@ -213,12 +213,20 @@ RSpec.describe OpenapiFirst::Parameter do
       expect(parameter.unpack_and_convert('1,2')).to eq([1, 2])
     end
 
-    it 'converts the value as is if it cannot be unpacked' do
+    it 'returns the value as is without converting it if it cannot be unpacked' do
       parameter = build_parameter(
-        { 'in' => 'query', 'name' => 'filter',
-          'content' => { 'application/json' => { 'schema' => { 'type' => 'object' } } } }
+        { 'in' => 'header', 'name' => 'X-Count',
+          'content' => { 'application/json' => { 'schema' => { 'type' => 'integer' } } } }
       )
-      expect(parameter.unpack_and_convert('{')).to eq('{')
+      expect(parameter.unpack_and_convert('007')).to eq('007')
+    end
+
+    it 'converts the value even if it cannot be unpacked if the parameter is a query parameter' do
+      parameter = build_parameter(
+        { 'in' => 'query', 'name' => 'n',
+          'content' => { 'application/json' => { 'schema' => { 'type' => 'integer' } } } }
+      )
+      expect(parameter.unpack_and_convert('007')).to eq(7)
     end
   end
 end

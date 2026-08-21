@@ -62,7 +62,7 @@ RSpec.describe OpenapiFirst::ResponseValidator do
       end
       let(:headers) do
         [
-          instance_double(OpenapiFirst::Header,
+          instance_double(OpenapiFirst::ResponseHeader,
                           name: 'x-id',
                           schema: JSONSchemer.schema({ type: 'integer' }),
                           required?: false)

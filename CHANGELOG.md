@@ -8,7 +8,7 @@
   - An `after_request_body_property_validation` hook sees an empty String instead of the file.
   - Fields that were not sent as a file, and fields with a JSON `contentType` in the `encoding` map, are read and validated as before.
 - The `openapi_parameters` gem was merged into openapi_first and is not a dependency anymore. Parameter parsing now lives in openapi_first itself. If you registered a parser for parameters that use a `content` field, use `OpenapiFirst::ParameterContentParsers.register` instead of `OpenapiParameters::ContentParsers.register`.
-- Changed: `OpenapiFirst::Header` (returned by `Response#headers`) exposes `parameter`, an `OpenapiFirst::Parameter`, instead of `node`
+- Changed: `OpenapiFirst::ResponseHeader` (returned by `Response#headers`, renamed from `OpenapiFirst::Header`) exposes `parameter`, an `OpenapiFirst::Parameter`, instead of `node`
 
 #### Removed deprecations
 - Removed: `OpenapiFirst::Configuration#request_validation_raise_error` and `#response_validation_raise_error` (both reader and writer), deprecated since 3.0.0. Pass `raise_error:` to middlewares instead.
@@ -59,6 +59,7 @@
 - Fixed: Repeated values for a query parameter that describes an object or uses `content` (`?filter=a&filter=b`) raised a `NoMethodError` or `TypeError`. The values are validated against the schema now, which returns an `:invalid_query` failure.
 - Fixed: A parameter with `style: matrix` raised a `NoMethodError` if its value did not contain the parameter name, or contained it more than once. Such values are parsed like their `explode` counterpart now.
 - Fixed: A parameter with `style: matrix`, or a path parameter that describes an object, raised an `ArgumentError` if its value had an invalid `%`-encoding. Such values are validated against the schema now.
+- Fixed: A path, header or cookie parameter that uses a `content` field with a value that could not be parsed as that media type (e.g. `007` as `application/json`) was converted using the parameter's schema type anyway, which could make an invalid value pass schema validation (e.g. as the integer `7`). Such values are left as they are now, so schema validation rejects them as before.
 - Fixed: Reduced memory retained by a loaded `Definition`. Response headers with a schema no longer keep the whole raw document node alive, and a couple of build-time-only hashes were replaced with more compact structures.
 
 

@@ -4,10 +4,10 @@ require 'json_schemer'
 
 require_relative 'failure'
 require_relative 'router'
-require_relative 'header'
+require_relative 'response_header'
 require_relative 'parameter'
 require_relative 'parameters_parser'
-require_relative 'parameters_parser/query'
+require_relative 'query_string_parser'
 require_relative 'request'
 require_relative 'response'
 require_relative 'schema/hash'
@@ -127,7 +127,7 @@ module OpenapiFirst
       ParsedParameters.new(
         all: [*path, *query, *header, *cookie].freeze,
         path_parser: grouped[:path] && ParametersParser.new(path),
-        query_parser: ParametersParser::Query.new(query),
+        query_parser: QueryStringParser.new(query),
         header_parser: grouped[:header] && ParametersParser.new(header),
         cookie_parser: grouped[:cookie] && ParametersParser.new(cookie),
         path_schema: build_parameter_schema(grouped[:path]),
@@ -231,7 +231,7 @@ module OpenapiFirst
         next if IGNORED_HEADER_PARAMETERS.include?(name)
 
         required = header['required']&.value == true
-        result << Header.new(
+        result << ResponseHeader.new(
           name:,
           schema: schema_node.schema(configuration: schemer_configuration),
           required?: required,

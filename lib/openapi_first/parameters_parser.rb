@@ -11,12 +11,12 @@ module OpenapiFirst
 
     attr_reader :parameters
 
-    # @param values [Hash] The raw values, keyed by parameter name.
-    def unpack(values)
+    # @param parameters_hash [Hash] The raw values, keyed by parameter name.
+    def unpack(parameters_hash)
       parameters.each_with_object({}) do |parameter, result|
-        next unless values.key?(parameter.name)
+        next unless parameters_hash.key?(parameter.name)
 
-        result[parameter.name] = parameter.unpack_and_convert(values[parameter.name])
+        result[parameter.name] = parameter.unpack_and_convert(parameters_hash[parameter.name])
       end
     end
   end
