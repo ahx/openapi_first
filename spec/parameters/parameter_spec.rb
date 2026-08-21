@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Parameters::Parameter do
+RSpec.describe OpenapiFirst::Parameter do
   describe '#name' do
     it 'returns the name' do
       parameter = build_parameter({ 'in' => 'query', 'name' => 'id' })
@@ -202,6 +202,23 @@ RSpec.describe OpenapiFirst::Parameters::Parameter do
           'content' => { 'application/xml' => { 'schema' => { 'type' => 'object' } } } }
       )
       expect(parameter.unpack('<a>1</a>')).to eq('<a>1</a>')
+    end
+  end
+
+  describe '#unpack_and_convert' do
+    it 'unpacks and converts the value' do
+      parameter = build_parameter(
+        { 'in' => 'query', 'name' => 'ids', 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } } }
+      )
+      expect(parameter.unpack_and_convert('1,2')).to eq([1, 2])
+    end
+
+    it 'converts the value as is if it cannot be unpacked' do
+      parameter = build_parameter(
+        { 'in' => 'query', 'name' => 'filter',
+          'content' => { 'application/json' => { 'schema' => { 'type' => 'object' } } } }
+      )
+      expect(parameter.unpack_and_convert('{')).to eq('{')
     end
   end
 end

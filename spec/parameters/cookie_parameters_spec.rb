@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Parameters::Parser do
+RSpec.describe OpenapiFirst::ParametersParser do
   def unpack(definitions, cookie_string)
     definitions = [definitions] unless definitions.is_a?(Array)
     described_class.new(build_parameters(definitions)).unpack(Rack::Utils.parse_cookies_header(cookie_string))

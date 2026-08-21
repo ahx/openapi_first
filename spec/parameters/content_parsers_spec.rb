@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Parameters::ContentParsers do
+RSpec.describe OpenapiFirst::ParameterContentParsers do
   around do |example|
     original = described_class.parsers.dup
     example.run
@@ -63,6 +63,6 @@ RSpec.describe OpenapiFirst::Parameters::ContentParsers do
   end
 
   def unpack(parameter, values)
-    OpenapiFirst::Parameters::Parser.new([parameter]).unpack(values)
+    OpenapiFirst::ParametersParser.new([parameter]).unpack(values)
   end
 end

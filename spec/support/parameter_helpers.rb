@@ -3,7 +3,7 @@
 module ParameterHelpers
   def build_parameter(definition)
     _media_type, media_type_object = definition['content']&.first
-    OpenapiFirst::Parameters::Parameter.new(definition, schema: (media_type_object || definition)['schema'])
+    OpenapiFirst::Parameter.new(definition, schema: (media_type_object || definition)['schema'])
   end
 
   def build_parameters(definitions)

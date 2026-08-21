@@ -1,25 +1,25 @@
 # frozen_string_literal: true
 
 require 'rack'
-require_relative 'object_converter'
+require_relative '../parameters_parser'
 
 module OpenapiFirst
-  module Parameters
+  class ParametersParser
     # Unpacks query parameters from a query string.
     # @visibility private
-    class QueryParser
+    class Query
       DEEP_PROP = '\[([\w-]+)\]$'
       private_constant :DEEP_PROP
 
       # @param parameters [Array<Parameter>]
       def initialize(parameters)
         @parameters = parameters
+        @deep_object_parameters, flat_parameters = parameters.partition(&:deep_object?)
+        @flat_parser = ParametersParser.new(flat_parameters)
         @deep_object_properties = {}
         @deep_object_regex = {}
-        parameters.each do |parameter|
-          next unless parameter.deep_object?
-
-          @deep_object_properties[parameter.name] = ObjectConverter.get_properties(parameter.schema)
+        @deep_object_parameters.each do |parameter|
+          @deep_object_properties[parameter.name] = parameter.object_properties
           @deep_object_regex[parameter.name] = /^#{Regexp.escape(parameter.name)}#{DEEP_PROP}/
         end
       end
@@ -28,21 +28,17 @@ module OpenapiFirst
 
       def unpack(query_string)
         parsed_query = parse_query(query_string)
-        parameters.each_with_object({}) do |parameter, result|
-          if parameter.deep_object?
-            if parsed_query.key?(parameter.name)
-              value = parsed_query[parameter.name]
-            else
-              value = parse_deep_object(parameter, parsed_query)
-              next if value.empty?
-            end
+        result = @flat_parser.unpack(parsed_query)
+        @deep_object_parameters.each do |parameter|
+          name = parameter.name
+          if parsed_query.key?(name)
+            result[name] = parameter.convert(parsed_query[name])
           else
-            next unless parsed_query.key?(parameter.name)
-
-            value = catch(:skip) { parameter.unpack(parsed_query[parameter.name]) }
+            value = parse_deep_object(parameter, parsed_query)
+            result[name] = parameter.convert(value) unless value.empty?
           end
-          result[parameter.name] = parameter.convert(value)
         end
+        result
       end
 
       # Returns query parameters that are not defined in the API description
@@ -52,7 +48,7 @@ module OpenapiFirst
 
         unknown = parsed_query.each_with_object({}) do |(key, value), result|
           next if known_parameter_names.include?(key)
-          next if parameters.any? { _1.deep_object? && key.start_with?("#{_1.name}[") }
+          next if @deep_object_parameters.any? { key.start_with?("#{_1.name}[") }
 
           result[key] = value
         end

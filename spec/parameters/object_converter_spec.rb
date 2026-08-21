@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Parameters::ObjectConverter do
+RSpec.describe OpenapiFirst::Parameter::Converter::ObjectConverter do
   describe '.get_properties' do
     it 'returns properties for a simple object' do
       schema = {

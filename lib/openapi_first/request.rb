@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'parameters'
+require_relative 'request_headers'
 require_relative 'parsed_request'
 require_relative 'request_validator'
 require_relative 'validated_request'
@@ -67,7 +67,7 @@ module OpenapiFirst
       [ParsedRequest.new(
         path: @path_parser&.unpack(route_params),
         query:,
-        headers: @header_parser&.unpack(Parameters::HeadersHash.new(request.env)),
+        headers: @header_parser&.unpack(RequestHeaders.new(request.env)),
         cookies: @cookie_parser&.unpack(Rack::Utils.parse_cookies_header(request.env[Rack::HTTP_COOKIE])),
         body:
       ), nil]

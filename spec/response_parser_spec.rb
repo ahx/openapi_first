@@ -102,12 +102,14 @@ RSpec.describe OpenapiFirst::ResponseParser do
                         name: 'Location',
                         required?: true,
                         schema: JSONSchemer::Schema.new(location_schema),
-                        resolved_schema: location_schema),
+                        parameter: build_parameter({ 'name' => 'Location', 'in' => 'header',
+                                                     'schema' => location_schema })),
         instance_double(OpenapiFirst::Header,
                         name: 'X-Id',
                         required?: false,
                         schema: JSONSchemer::Schema.new(x_id_schema),
-                        resolved_schema: x_id_schema)
+                        parameter: build_parameter({ 'name' => 'X-Id', 'in' => 'header',
+                                                     'schema' => x_id_schema }))
       ]
     end
 

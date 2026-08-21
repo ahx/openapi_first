@@ -5,7 +5,9 @@ require 'json_schemer'
 require_relative 'failure'
 require_relative 'router'
 require_relative 'header'
-require_relative 'parameters'
+require_relative 'parameter'
+require_relative 'parameters_parser'
+require_relative 'parameters_parser/query'
 require_relative 'request'
 require_relative 'response'
 require_relative 'schema/hash'
@@ -124,10 +126,10 @@ module OpenapiFirst
       cookie = build_parameters(grouped[:cookie])
       ParsedParameters.new(
         all: [*path, *query, *header, *cookie].freeze,
-        path_parser: grouped[:path] && Parameters::Parser.new(path),
-        query_parser: Parameters::QueryParser.new(query),
-        header_parser: grouped[:header] && Parameters::Parser.new(header),
-        cookie_parser: grouped[:cookie] && Parameters::Parser.new(cookie),
+        path_parser: grouped[:path] && ParametersParser.new(path),
+        query_parser: ParametersParser::Query.new(query),
+        header_parser: grouped[:header] && ParametersParser.new(header),
+        cookie_parser: grouped[:cookie] && ParametersParser.new(cookie),
         path_schema: build_parameter_schema(grouped[:path]),
         query_schema: build_parameter_schema(grouped[:query]),
         header_schema: build_parameter_schema(grouped[:header]),
@@ -137,7 +139,7 @@ module OpenapiFirst
 
     def build_parameters(parameters)
       parameters.to_a.map do |parameter|
-        Parameters::Parameter.new(parameter.resolved, schema: parameter_schema_node(parameter)&.dereferenced)
+        Parameter.new(parameter.resolved, schema: parameter_schema_node(parameter)&.dereferenced)
       end
     end
 
@@ -228,11 +230,13 @@ module OpenapiFirst
         next if schema_node.nil?
         next if IGNORED_HEADER_PARAMETERS.include?(name)
 
+        required = header['required']&.value == true
         result << Header.new(
           name:,
           schema: schema_node.schema(configuration: schemer_configuration),
-          required?: header['required']&.value == true,
-          resolved_schema: schema_node.dereferenced
+          required?: required,
+          parameter: Parameter.new({ 'name' => name, 'in' => 'header', 'required' => required },
+                                   schema: schema_node.dereferenced)
         )
       end
       result

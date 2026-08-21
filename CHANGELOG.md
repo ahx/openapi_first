@@ -7,8 +7,8 @@
   - The content of these fields is not validated anymore, so `minLength`, `maxLength` or `pattern` on a field that was sent as a file are ignored.
   - An `after_request_body_property_validation` hook sees an empty String instead of the file.
   - Fields that were not sent as a file, and fields with a JSON `contentType` in the `encoding` map, are read and validated as before.
-- The `openapi_parameters` gem was merged into openapi_first and is not a dependency anymore. Parameter parsing now lives in `OpenapiFirst::Parameters`. If you registered a parser for parameters that use a `content` field, use `OpenapiFirst::Parameters::ContentParsers.register` instead of `OpenapiParameters::ContentParsers.register`.
-- Changed: `OpenapiFirst::Header` (returned by `Response#headers`) exposes `resolved_schema` instead of `node`
+- The `openapi_parameters` gem was merged into openapi_first and is not a dependency anymore. Parameter parsing now lives in openapi_first itself. If you registered a parser for parameters that use a `content` field, use `OpenapiFirst::ParameterContentParsers.register` instead of `OpenapiParameters::ContentParsers.register`.
+- Changed: `OpenapiFirst::Header` (returned by `Response#headers`) exposes `parameter`, an `OpenapiFirst::Parameter`, instead of `node`
 
 #### Removed deprecations
 - Removed: `OpenapiFirst::Configuration#request_validation_raise_error` and `#response_validation_raise_error` (both reader and writer), deprecated since 3.0.0. Pass `raise_error:` to middlewares instead.
@@ -19,7 +19,7 @@
 
 ### Features 
 - Added: OpenAPI 3.2 documents are accepted, but not fully supported yet. They are handled using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored. Loading such a document prints a warning. Operations defined under `additionalOperations` are routed. See #469.
-- Added: `OpenapiFirst::Request#parameters` returns the parameters that are defined for a request as `OpenapiFirst::Parameters::Parameter` objects, which expose `name`, `location`, `schema`, `required?`, `deprecated?`, `style`, `explode?` and `media_type`. It used to return an internal object with a different interface.
+- Added: `OpenapiFirst::Request#parameters` returns the parameters that are defined for a request as `OpenapiFirst::Parameter` objects, which expose `name`, `location`, `schema`, `required?`, `deprecated?`, `style`, `explode?` and `media_type`. It used to return an internal object with a different interface.
 - Show all covered endpoints in HTML coverage reporter and filter un/covered endpoints
 - Sinatra integration (OpenapiFirst::Sinatra)
   A Sinatra extension to define routes by referencing OpenAPI operations:

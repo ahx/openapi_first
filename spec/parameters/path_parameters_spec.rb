@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Parameters::Parser do
+RSpec.describe OpenapiFirst::ParametersParser do
   def unpack(definitions, path_params)
     definitions = [definitions] unless definitions.is_a?(Array)
     described_class.new(build_parameters(definitions)).unpack(path_params)

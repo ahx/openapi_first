@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'parameters'
+require_relative 'parameters_parser'
 require_relative 'response_body_parsers'
 
 module OpenapiFirst
@@ -40,14 +40,7 @@ module OpenapiFirst
     def build_headers_parser(headers)
       return unless headers&.any?
 
-      Parameters::Parser.new(
-        headers.map do |header|
-          Parameters::Parameter.new(
-            { 'name' => header.name, 'in' => 'header' },
-            schema: header.resolved_schema
-          )
-        end
-      )
+      ParametersParser.new(headers.map(&:parameter))
     end
   end
 end

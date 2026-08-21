@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'rack'
-require_relative 'content_parsers'
+require_relative '../parameter_content_parsers'
 
 module OpenapiFirst
-  module Parameters
+  class Parameter
     # Resolves the unpacker of a parameter once, at Parameter construction time.
     # Each unpacker is a callable that takes a raw string (or already-parsed
     # value) and returns the unpacked Ruby value, throwing :skip on unrecoverable
@@ -101,7 +101,7 @@ module OpenapiFirst
         private
 
         def find_media_type(parameter)
-          ContentParsers[parameter.media_type] || PassThrough
+          ParameterContentParsers[parameter.media_type] || PassThrough
         end
 
         def find_array(parameter)

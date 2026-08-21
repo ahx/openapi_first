@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'array_converter'
-require_relative 'object_converter'
+require_relative 'converter/array_converter'
+require_relative 'converter/object_converter'
 
 module OpenapiFirst
-  module Parameters
+  class Parameter
     # Converts a parameter value (string) to the type specified in the JSON Schema.
     # @visibility private
     module Converter

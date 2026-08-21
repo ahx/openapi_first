@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Parameters::Converter do
+RSpec.describe OpenapiFirst::Parameter::Converter do
   def convert(value, schema)
     described_class.convert(value, schema)
   end

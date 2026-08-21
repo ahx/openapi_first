@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Parameters::Parser do
+RSpec.describe OpenapiFirst::ParametersParser do
   def unpack(definitions, headers)
     definitions = [definitions] unless definitions.is_a?(Array)
     described_class.new(build_parameters(definitions)).unpack(headers)
@@ -17,10 +17,10 @@ RSpec.describe OpenapiFirst::Parameters::Parser do
       expect(unpack(parameter, { 'X-Some' => 'abc', 'X-Unknown' => 'xyz' })).to eq('X-Some' => 'abc')
     end
 
-    describe 'with a HeadersHash' do
+    describe 'with RequestHeaders' do
       it 'finds headers in a Rack env' do
         parameter = { 'in' => 'header', 'name' => 'X-Some' }
-        headers = OpenapiFirst::Parameters::HeadersHash.new({ 'HTTP_X_SOME' => 'abc' })
+        headers = OpenapiFirst::RequestHeaders.new({ 'HTTP_X_SOME' => 'abc' })
         expect(unpack(parameter, headers)).to eq('X-Some' => 'abc')
       end
 
@@ -30,7 +30,7 @@ RSpec.describe OpenapiFirst::Parameters::Parser do
           { 'in' => 'header', 'name' => 'Content-Type' }
         ]
         env = { 'CONTENT_LENGTH' => '12', 'CONTENT_TYPE' => 'application/json' }
-        headers = OpenapiFirst::Parameters::HeadersHash.new(env)
+        headers = OpenapiFirst::RequestHeaders.new(env)
         expect(unpack(parameters, headers)).to eq('Content-Length' => 12, 'Content-Type' => 'application/json')
       end
     end
