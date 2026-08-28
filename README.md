@@ -49,7 +49,7 @@ end
 
 ## Configuration
 
-You should register OADs globally so you don't have to load the file multiple times or to refernce them by Symbol (like :v1 in this example).
+You should register OADs globally so you don't have to load the file multiple times.
 ```ruby
 OpenapiFirst.configure do |config|
   config.register('openapi/openapi.yaml') # :default
@@ -57,7 +57,7 @@ OpenapiFirst.configure do |config|
 end
 ```
 
-You can configure default options globally:
+You can configure defaults globally:
 
 ```ruby
 OpenapiFirst.configure do |config|
@@ -119,7 +119,7 @@ content-type: "application/problem+json"
 openapi_first offers a [JSON:API](https://jsonapi.org/) error response by passing `error_response: :jsonapi`:
 
 ```ruby
-use OpenapiFirst::Middlewares::RequestValidation, 'openapi.yaml', error_response: :jsonapi
+use OpenapiFirst::Middlewares::RequestValidation, error_response: :jsonapi
 ```
 
 <details>
@@ -221,15 +221,7 @@ Here is how to set it up:
     ```
 
     There are other ways to monitor your app, see `OpenapiFirst::Test.observe` (rails) or `OpenapiFirst::Test.app`.
-3. Run your tests. The Coverage feature will tell you about missing or invalid requests/responses:
-      ```
-      ✓ GET /stations
-        ✓ 200(application/json)
-        ❌ 200(application/xml) – No responses tracked!
-        ❌ 400(application/problem+json) – No responses tracked!
-      ```
-
-      Now add tests for all those "❌" to make them "✓" and you're green!
+3. Run your tests. The Coverage feature will produce a HTML report at `coverage/openapi_coverage.html` with missing or invalid requests/responses.
 
 > [!NOTE]
 > Check out [faraday-openapi](https://codeberg.org/ahx/faraday-openapi) to have your API _client_ validate request/responses against an OAD, which is useful to validate HTTP mocks during testing.
@@ -251,7 +243,6 @@ OpenapiFirst::Test.setup do |test|
   end
 end
 ```
-
 
 OpenapiFirst::Test raises an error when a response status is not defined except for 404 and 500. You can change this:
 
@@ -484,7 +475,6 @@ See [`sinatra.rb`](lib/openapi_first/sinatra.rb) for a more details.
 ## Alternatives
 
 This gem was inspired by [committee](https://github.com/interagent/committee) (Ruby) and [Connexion](https://github.com/spec-first/connexion) (Python).
-Here is a [feature comparison between openapi_first and committee](https://gist.github.com/ahx/1538c31f0652f459861713b5259e366a).
 
 ## Frequently Asked Questions
 

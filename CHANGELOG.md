@@ -2,13 +2,15 @@
 
 ## Unreleased
 
-### Breaking changes
+No stricter / less strict request validation. Mostly internal stuff. Plus a Sinatra integration.
+
+#### Breaking changes
 - Uploaded files are no longer read during request validation. Before, the whole content of every `multipart/form-data` part that was sent as a file was read into memory, which allowed a single large upload to any documented multipart route to exhaust the memory of the server process. Such a field is now passed through as Rack parsed it (`{ filename:, type:, name:, tempfile:, head: }`), which is the same shape that Sinatra and Hanami hand to your application. Use `parsed_body['file'][:tempfile]` to read or stream the file.
   - The content of these fields is not validated anymore, so `minLength`, `maxLength` or `pattern` on a field that was sent as a file are ignored.
   - An `after_request_body_property_validation` hook sees an empty String instead of the file.
   - Fields that were not sent as a file, and fields with a JSON `contentType` in the `encoding` map, are read and validated as before.
 - The `openapi_parameters` gem was merged into openapi_first and is not a dependency anymore. Parameter parsing now lives in openapi_first itself. If you registered a parser for parameters that use a `content` field, use `OpenapiFirst::ParameterContentParsers.register` instead of `OpenapiParameters::ContentParsers.register`.
-- Changed: `OpenapiFirst::ResponseHeader` (returned by `Response#headers`, renamed from `OpenapiFirst::Header`) exposes `parameter`, an `OpenapiFirst::Parameter`, instead of `node`
+- Changed: `OpenapiFirst::ResponseHeader` (returned by `Response#headers`, renamed from `OpenapiFirst::Header`) exposes `parameter`, an `OpenapiFirst::Parameter`, instead of `node`.
 
 #### Removed deprecations
 - Removed: `OpenapiFirst::Configuration#request_validation_raise_error` and `#response_validation_raise_error` (both reader and writer), deprecated since 3.0.0. Pass `raise_error:` to middlewares instead.
@@ -17,11 +19,11 @@
 - Removed: The `formatter:` keyword of `OpenapiFirst::Test.report_coverage`, deprecated since 3.4.0. Use `reporter:` instead.
 - Removed: `OpenapiFirst::Test::Coverage::TerminalReporter#format`, deprecated since 3.4.0. Use `#report` instead.
 
-### Features 
+#### Added
 - Added: OpenAPI 3.2 documents are accepted, but not fully supported yet. They are handled using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored. Loading such a document prints a warning. Operations defined under `additionalOperations` are routed. See #469.
 - Added: `OpenapiFirst::Request#parameters` returns the parameters that are defined for a request as `OpenapiFirst::Parameter` objects, which expose `name`, `location`, `schema`, `required?`, `deprecated?`, `style`, `explode?` and `media_type`. It used to return an internal object with a different interface.
-- Show all covered endpoints in HTML coverage reporter and filter un/covered endpoints
-- Sinatra integration (OpenapiFirst::Sinatra)
+- Added: Show all covered endpoints in HTML coverage reporter and filter covered/uncovered endpoints
+- Added: Sinatra integration (OpenapiFirst::Sinatra)
   A Sinatra extension to define routes by referencing OpenAPI operations:
 
   ```ruby
@@ -51,7 +53,7 @@
   The HTTP method and path for each route come from the operationId.
   Request validation is called automatically for these operations.
 
-### Fixes
+#### Fixed
 - Fixed: Validating against a schema from a referenced file raised `ArgumentError` in OpenAPI 3.0 documents when a top-level key of that file collides with a JSON Schema keyword, such as `$ref: 'parameters.yaml#/id'`. The containing file is no longer parsed as a schema itself, so such keys work like any other now. See #348.
 - Fixed: `$ref`s nested inside the schema of a parameter or a response header are resolved now, so these values are unpacked and converted as described. Before, only a `$ref` at the top level of the schema was resolved. See #450.
 - Fixed: The JSON schema of a parameter that uses a `content` field with a `$ref`'d schema is resolved now.
