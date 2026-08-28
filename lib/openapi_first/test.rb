@@ -5,7 +5,64 @@ require_relative 'test/configuration'
 require_relative 'registry'
 
 module OpenapiFirst
-  # Test integration
+  # Test integration for contract testing. Use this to validate requests/responses against a
+  # registered OAD while your test suite runs, and tracks which parts of the API
+  # description have been exercised.
+  #
+  # @example Basic setup (e.g. in spec_helper.rb)
+  #   require 'openapi_first'
+  #   OpenapiFirst::Test.setup
+  #
+  # {.setup} prepares coverage tracking and OAD registration. To actually validate the
+  # requests/responses that happen during your tests, you also have to observe your
+  # application, i.e. wrap it with silent request/response validation. There are three ways
+  # to do this:
+  #
+  # 1. Include {Methods}, which adds an `app` method wrapping your rack app for rack-test.
+  #    This is the easiest option if you don't already define `app` yourself:
+  #      RSpec.configure do |config|
+  #        config.include OpenapiFirst::Test::Methods[MyApp], type: :request
+  #      end
+  # 2. Call {.observe} to inject validation directly into an app class or instance
+  #    , if you can't rely on rack-test's `app` method:
+  #      OpenapiFirst::Test.observe(Rails.application)
+  # 3. Call {.app} to wrap an app instance yourself, e.g. if you already define your own
+  #    `app` method and only want to wrap what it returns:
+  #      def app
+  #        OpenapiFirst::Test.app(MyApp.new)
+  #      end
+  #
+  # @example Configure via the block passed to .setup
+  #   OpenapiFirst::Test.setup do |test|
+  #     test.register('openapi/openapi.yaml')
+  #
+  #     # Ignore certain request/response errors instead of raising them
+  #     test.ignore_request_error do |validated_request|
+  #       validated_request.path.start_with?('/legacy') && validated_request.unknown?
+  #     end
+  #     test.ignore_response_error do |validated_response, rack_request|
+  #       validated_response.error.type == :response_status_not_found
+  #     end
+  #
+  #     # Response status codes that are okay to leave uncovered (default: 401, 404, 500)
+  #     test.ignored_unknown_status << 403
+  #     test.ignore_unknown_response_status = true # or: ignore all unknown status codes
+  #
+  #     # Don't raise when a request doesn't match the API description at all
+  #     test.ignore_unknown_requests = true
+  #
+  #     # Exclude parts of the API description from coverage tracking
+  #     test.skip_response_coverage { |response_definition| response_definition.status == '5XX' }
+  #     test.skip_coverage { |path, request_method| path == '/internal' && request_method == 'GET' }
+  #
+  #     # Require minimm of 95% coverage of the API description (default: 100)
+  #     test.minimum_coverage = 95
+  #
+  #     # Report coverage always (default), only warn, or not at all: true / :warn / false
+  #     test.report_coverage = :warn
+  #   end
+  #
+  # See {OpenapiFirst::Test::Configuration} for the full list of options.
   module Test # rubocop:disable Metrics/ModuleLength
     autoload :Coverage, 'openapi_first/test/coverage'
     autoload :Methods, 'openapi_first/test/methods'
