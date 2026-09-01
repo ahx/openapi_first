@@ -29,6 +29,31 @@ RSpec.describe 'Cookie Parameter validation' do
       expect(last_response.status).to eq 400
     end
 
+    it 'returns 400 if cookie has invalid encoding' do
+      set_cookie 'knusper=%C3'
+      get '/'
+
+      expect(last_response.status).to eq 400
+      expect(JSON.parse(last_response.body)['title']).to eq 'Bad Request Cookie'
+    end
+
+    it 'returns 400 if string cookie has invalid encoding' do
+      set_cookie 'knusper=42'
+      set_cookie 'nickname=%C3'
+      get '/'
+
+      expect(last_response.status).to eq 400
+      expect(JSON.parse(last_response.body)['title']).to eq 'Bad Request Cookie'
+    end
+
+    it 'ignores invalid encoding in undefined cookies' do
+      set_cookie 'other=%C3'
+      set_cookie 'knusper=42'
+      get '/'
+
+      expect(last_response.status).to eq 200
+    end
+
     it 'adds the converted cookie to env ' do
       set_cookie 'knusper=42'
       get '/'

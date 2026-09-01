@@ -3,7 +3,7 @@
 RSpec.describe OpenapiFirst::ParametersParser do
   def unpack(definitions, path_params)
     definitions = [definitions] unless definitions.is_a?(Array)
-    described_class.new(build_parameters(definitions)).unpack(path_params)
+    described_class.new(build_parameters(definitions), check_encoding: false).unpack(path_params)
   end
 
   describe 'path parameters' do

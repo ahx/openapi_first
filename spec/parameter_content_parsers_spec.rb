@@ -63,6 +63,6 @@ RSpec.describe OpenapiFirst::ParameterContentParsers do
   end
 
   def unpack(parameter, values)
-    OpenapiFirst::ParametersParser.new([parameter]).unpack(values)
+    OpenapiFirst::ParametersParser.new([parameter], check_encoding: false).unpack(values)
   end
 end

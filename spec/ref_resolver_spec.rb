@@ -300,7 +300,8 @@ RSpec.describe OpenapiFirst::RefResolver do
         'properties' => {
           'name' => { 'type' => 'string', 'minLength' => 2 },
           'other' => { 'type' => 'object' },
-          'id' => { 'type' => 'integer' }
+          'id' => { 'type' => 'integer' },
+          'search' => { 'type' => 'string' }
         }
       )
     end

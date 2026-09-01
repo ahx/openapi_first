@@ -61,6 +61,9 @@ module OpenapiFirst
       query, query_error = parse_query(request.env[Rack::QUERY_STRING])
       return [nil, query_error] if query_error
 
+      cookies = parse_cookies(request.env[Rack::HTTP_COOKIE])
+      return [nil, cookies] if cookies.is_a?(Failure)
+
       body = @body_parsers&.call(request)
       return [nil, body] if body.is_a?(Failure)
 
@@ -68,7 +71,7 @@ module OpenapiFirst
         path: @path_parser&.unpack(route_params),
         query:,
         headers: @header_parser&.unpack(RequestHeaders.new(request.env)),
-        cookies: @cookie_parser&.unpack(Rack::Utils.parse_cookies_header(request.env[Rack::HTTP_COOKIE])),
+        cookies:,
         body:
       ), nil]
     end
@@ -77,6 +80,12 @@ module OpenapiFirst
       [@query_parser&.unpack(query_string), nil]
     rescue Rack::Utils::InvalidParameterError
       [nil, Failure.new(:invalid_query, message: 'Invalid query parameter.')]
+    end
+
+    def parse_cookies(cookie_header)
+      @cookie_parser&.unpack(Rack::Utils.parse_cookies_header(cookie_header))
+    rescue Rack::Utils::InvalidParameterError
+      Failure.new(:invalid_cookie, message: 'Invalid cookie value.')
     end
 
     def build_body_parser(content_type, encoding)

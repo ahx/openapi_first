@@ -13,3 +13,5 @@ schema:
       type: object
     id:
       type: integer
+    search:
+      type: string
