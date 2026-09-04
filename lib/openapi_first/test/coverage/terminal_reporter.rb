@@ -5,6 +5,8 @@ module OpenapiFirst
     module Coverage
       # Reports coverage to a logger using ANSI-coloured lines.
       class TerminalReporter
+        include SkippedSummary
+
         def initialize(verbose: false, focused: true, logger: Test.logger)
           @verbose = verbose
           @focused = focused && !verbose
@@ -18,13 +20,14 @@ module OpenapiFirst
                         'Make sure to observe your application using OpenapiFirst::Test.'
           end
           coverage_result.plans.each { |plan| format_plan(plan) } if coverage.positive?
+          log_skipped_summary(coverage_result)
         end
 
         private attr_reader :out, :verbose, :focused, :logger
 
         private
 
-        def format_plan(plan) # rubocop:disable Metrics/PerceivedComplexity
+        def format_plan(plan)
           logger.info "API validation coverage for #{plan.api_identifier}: #{plan.coverage}%"
           return if plan.done? && !verbose
 
@@ -32,9 +35,7 @@ module OpenapiFirst
           focused_route = requested_routes_count <= 1 && focused
 
           plan.routes.each do |route|
-            next if route.finished? && !verbose
-
-            next if route.requests.none?(&:requested?) && focused_route
+            next unless report_route?(route, focused_route)
 
             format_requests(route.requests)
 
@@ -42,9 +43,19 @@ module OpenapiFirst
           end
         end
 
+        def report_route?(route, focused_route)
+          return verbose if route.skipped?
+          return false if route.finished? && !verbose
+          return false if focused_route && route.requests.none?(&:requested?)
+
+          true
+        end
+
         def format_requests(requests)
           requests.each do |request|
-            if request.finished?
+            if request.skipped?
+              log_skipped "⚠ #{request_label(request)} – Skipped!" if verbose
+            elsif request.finished?
               log_success "✓ #{request_label(request)}"
             else
               log_error "❌ #{request_label(request)} – #{explain_unfinished_request(request)}"
@@ -54,7 +65,9 @@ module OpenapiFirst
 
         def format_responses(responses)
           responses.each do |response|
-            if response.finished?
+            if response.skipped?
+              log_skipped "  #{response_label(response)} – Skipped!" if verbose
+            elsif response.finished?
               log_success "  ✓  #{response_label(response)}" if verbose
             else
               log_error "  ❌ #{response_label(response)} – #{explain_unfinished_response(response)}"
@@ -91,6 +104,10 @@ module OpenapiFirst
 
         def log_success(msg)
           logger.info "\e[32m#{msg}\e[0m"
+        end
+
+        def log_skipped(msg)
+          logger.info "\e[33m#{msg}\e[0m"
         end
 
         def log_error(msg)

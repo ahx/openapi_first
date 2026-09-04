@@ -11,8 +11,9 @@ module OpenapiFirst
 
         def_delegators :@response, :status, :content_type, :key
 
-        def initialize(response_definition)
+        def initialize(response_definition, skipped: false)
           @response = response_definition
+          @skipped = skipped
           @responded = false
           @last_error_message = nil
         end
@@ -23,6 +24,10 @@ module OpenapiFirst
           @responded = true
           @valid ||= true if validated_response.valid?
           @last_error_message = validated_response.error.exception_message unless validated_response.valid?
+        end
+
+        def skipped?
+          @skipped == true
         end
 
         def responded?

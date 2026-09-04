@@ -168,6 +168,54 @@ RSpec.describe OpenapiFirst::Test::Coverage::Plan do
     expect(plan.tasks.count(&:finished?)).to eq(0)
   end
 
+  describe 'skipped requests and responses' do
+    it 'keeps skipped responses in the routes and counts them' do
+      plan = described_class.for(oad, skip_response: ->(res) { res.status == '200' })
+      route = plan.routes.first
+
+      expect(route).not_to be_skipped
+      expect(route.responses.map(&:status)).to eq(%w[200 4XX])
+      expect(route.skipped_responses.map(&:status)).to eq(['200'])
+      expect(route.tracked_responses.map(&:status)).to eq(['4XX'])
+      expect(plan.skipped_requests_count).to eq(0)
+      expect(plan.skipped_responses_count).to eq(1)
+    end
+
+    it 'keeps a skipped route with all its requests and responses' do
+      plan = described_class.for(oad, skip_route: ->(_path, _request_method) { true })
+      route = plan.routes.first
+
+      expect(route).to be_skipped
+      expect(route.requests.map(&:skipped?)).to eq([true])
+      expect(route.responses.map(&:skipped?)).to eq([true, true])
+      expect(route.tracked_requests).to be_empty
+      expect(route.tracked_responses).to be_empty
+      expect(plan.skipped_requests_count).to eq(1)
+      expect(plan.skipped_responses_count).to eq(2)
+    end
+
+    it 'excludes skipped tasks from coverage' do
+      plan = described_class.for(oad, skip_route: ->(_path, _request_method) { true })
+
+      expect(plan.tasks).to be_empty
+      expect(plan).to be_done
+    end
+
+    it 'does not track a skipped request' do
+      plan = described_class.for(oad, skip_route: ->(_path, _request_method) { true })
+
+      plan.track_request(valid_request)
+
+      expect(plan.routes.first.requests.first).not_to be_requested
+    end
+
+    it 'is not finished when the route is skipped' do
+      plan = described_class.for(oad, skip_route: ->(_path, _request_method) { true })
+
+      expect(plan.routes.first).not_to be_finished
+    end
+  end
+
   context 'with skip_response option' do
     let(:plan) do
       skip_response = ->(response) { response.status == '4XX' }

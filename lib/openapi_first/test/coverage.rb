@@ -4,6 +4,7 @@ require_relative 'coverage/plan'
 require_relative 'coverage/tracker'
 require_relative 'coverage/covered_request'
 require_relative 'coverage/covered_response'
+require_relative 'coverage/skipped_summary'
 require 'drb'
 
 module OpenapiFirst
@@ -15,7 +16,15 @@ module OpenapiFirst
       autoload :TerminalReporter, 'openapi_first/test/coverage/terminal_reporter'
       autoload :HtmlReporter, 'openapi_first/test/coverage/html_reporter'
 
-      Result = Data.define(:plans, :coverage)
+      Result = Data.define(:plans, :coverage) do
+        def skipped_requests_count
+          plans.sum(&:skipped_requests_count)
+        end
+
+        def skipped_responses_count
+          plans.sum(&:skipped_responses_count)
+        end
+      end
 
       class << self
         def start(skip_response: nil, skip_route: nil)

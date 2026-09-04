@@ -20,6 +20,11 @@ RSpec.describe OpenapiFirst::Test::Coverage::HtmlReporter do
               }
             }
           }
+        },
+        '/internal' => {
+          'get' => {
+            'responses' => { '200' => { 'description' => 'ok' } }
+          }
         }
       }
     }
@@ -113,6 +118,69 @@ RSpec.describe OpenapiFirst::Test::Coverage::HtmlReporter do
       expect(html).to include('response-summary problem')
       expect(html).to include('⚠️')
       expect(html).to include('1 response(s) not covered')
+    end
+  end
+
+  context 'with skipped requests and responses' do
+    let(:plan) do
+      OpenapiFirst::Test::Coverage::Plan.for(
+        oad,
+        skip_response: ->(res) { res.status == '400' },
+        skip_route: ->(path, _method) { path == '/internal' }
+      )
+    end
+
+    it 'renders a toggle for skipped requests' do
+      html, = run_reporter(build_result(plan))
+      expect(html).to include('id="filter-skipped-requests"')
+      expect(html).to include('Skipped requests')
+    end
+
+    it 'shows the number of skipped requests and responses' do
+      html, = run_reporter(build_result(plan))
+      expect(html).to include('1 request(s) and 2 response(s) skipped')
+    end
+
+    it 'marks a skipped route as skipped instead of uncovered' do
+      html, = run_reporter(build_result(plan))
+      expect(html).to include('class="route is-skipped"')
+      expect(html).to include('/internal')
+      expect(html).to include('request-status skipped')
+    end
+
+    it 'lists the skipped request of a skipped route' do
+      html, = run_reporter(build_result(plan))
+      expect(html).to include('Skipped, not covered by any test')
+    end
+
+    it 'lists a skipped response of a route that is not skipped' do
+      html, = run_reporter(build_result(plan))
+      expect(html).to include('class="skipped"')
+      expect(html).to include('application/problem+json')
+    end
+
+    it 'does not count skipped responses as uncovered' do
+      plan.track_request(valid_request)
+      plan.track_response(valid_200_response)
+      html, = run_reporter(build_result(plan))
+      expect(html).to include('class="route is-covered"')
+      expect(html).not_to include('response(s) not covered')
+      expect(html).to include('1 response(s) skipped')
+    end
+
+    it 'warns that a request was skipped entirely' do
+      _, logger = run_reporter(build_result(plan))
+      expect(logger).to have_received(:info).with('API coverage skipped 1 request(s) and 2 response(s).')
+      expect(logger).to have_received(:warn).with(include('skipped entirely'))
+    end
+  end
+
+  context 'without any skipped requests or responses' do
+    it 'does not mention skipped requests or responses' do
+      html, logger = run_reporter(build_result(plan))
+      expect(html).not_to include('class="skipped-summary"')
+      expect(logger).not_to have_received(:info).with(include('skipped'))
+      expect(logger).not_to have_received(:warn).with(include('skipped'))
     end
   end
 

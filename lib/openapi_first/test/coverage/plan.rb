@@ -14,14 +14,13 @@ module OpenapiFirst
 
         def self.for(oad, skip_response: nil, skip_route: nil)
           plan = new(definition_key: oad.key, filepath: oad.filepath, title: oad.title)
-          routes = oad.routes
-          routes = routes.reject { |route| skip_route[route.path, route.request_method] } if skip_route
-          routes.each do |route|
-            responses = skip_response ? route.responses.reject(&skip_response) : route.responses
+          oad.routes.each do |route|
             plan.add_route request_method: route.request_method,
                            path: route.path,
                            requests: route.requests,
-                           responses:
+                           responses: route.responses,
+                           skipped: skip_route ? skip_route[route.path, route.request_method] : false,
+                           skip_response:
           end
           plan
         end
@@ -63,14 +62,35 @@ module OpenapiFirst
           index.values
         end
 
-        def add_route(request_method:, path:, requests:, responses:)
-          request_tasks = requests.to_a.map do |request|
-            index[request.key] = RequestTask.new(request)
-          end
+        def skipped_requests
+          routes.flat_map(&:skipped_requests)
+        end
+
+        def skipped_responses
+          routes.flat_map(&:skipped_responses)
+        end
+
+        def skipped_requests_count
+          skipped_requests.count
+        end
+
+        def skipped_responses_count
+          skipped_responses.count
+        end
+
+        def add_route(request_method:, path:, requests:, responses:, skipped: false, skip_response: nil)
+          request_tasks = requests.to_a.map { |request| add_task RequestTask.new(request, skipped:) }
           response_tasks = responses.to_a.map do |response|
-            index[response.key] = ResponseTask.new(response)
+            add_task ResponseTask.new(response, skipped: skipped || (skip_response ? skip_response[response] : false))
           end
           @routes << RouteTask.new(path:, request_method:, requests: request_tasks, responses: response_tasks)
+        end
+
+        private
+
+        def add_task(task)
+          index[task.key] = task unless task.skipped?
+          task
         end
       end
     end
