@@ -28,6 +28,7 @@
   --color-error: #f87171;
   --color-info: #7dd3fc;
   --color-warning: #fbbf24;
+  --color-skipped: #fb923c;
 }
 
 body {
@@ -112,17 +113,36 @@ body:has(#filter-covered:not(:checked)) details.route.is-covered {
 body:has(#filter-uncovered:not(:checked)) details.route.is-uncovered {
   display: none;
 }
+body:has(#filter-skipped-requests:not(:checked)) details.route.is-skipped {
+  display: none;
+}
 
 /* Hide a plan once none of its routes remain visible. */
 body:has(#filter-covered:not(:checked))
-  details.plan:not(:has(details.route.is-uncovered)) {
-  display: none;
-}
+  details.plan:not(:has(details.route.is-uncovered)):not(
+    :has(details.route.is-skipped)
+  ),
 body:has(#filter-uncovered:not(:checked))
-  details.plan:not(:has(details.route.is-covered)) {
-  display: none;
-}
+  details.plan:not(:has(details.route.is-covered)):not(
+    :has(details.route.is-skipped)
+  ),
+body:has(#filter-skipped-requests:not(:checked))
+  details.plan:not(:has(details.route.is-covered)):not(
+    :has(details.route.is-uncovered)
+  ),
 body:has(#filter-covered:not(:checked)):has(#filter-uncovered:not(:checked))
+  details.plan:not(:has(details.route.is-skipped)),
+body:has(#filter-covered:not(:checked)):has(
+    #filter-skipped-requests:not(:checked)
+  )
+  details.plan:not(:has(details.route.is-uncovered)),
+body:has(#filter-uncovered:not(:checked)):has(
+    #filter-skipped-requests:not(:checked)
+  )
+  details.plan:not(:has(details.route.is-covered)),
+body:has(#filter-covered:not(:checked)):has(
+    #filter-uncovered:not(:checked)
+  ):has(#filter-skipped-requests:not(:checked))
   details.plan {
   display: none;
 }
@@ -259,6 +279,21 @@ li {
 
 .covered {
   color: var(--color-success);
+}
+
+.skipped {
+  color: var(--color-skipped);
+}
+
+.skipped-note,
+.skipped-summary {
+  color: var(--color-skipped);
+  font-size: var(--font-size-xs);
+}
+
+.skipped-summary {
+  margin-inline-start: 0.75rem;
+  white-space: nowrap;
 }
 
 .status {

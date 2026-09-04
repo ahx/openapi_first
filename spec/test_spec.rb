@@ -143,7 +143,8 @@ RSpec.describe OpenapiFirst::Test do
         test.skip_coverage { |path, request_method| path == '/pets' && request_method == 'POST' }
       end
       route_tasks = described_class::Coverage.result.plans.first.routes
-      expect(route_tasks.map { |route| [route.path, route.request_method] }).to eq([['/pets', 'GET'], ['/pets/{petId}', 'GET']])
+      expect(route_tasks.select(&:skipped?).map { |route| [route.path, route.request_method] }).to eq([['/pets', 'POST']])
+      expect(route_tasks.reject(&:skipped?).map { |route| [route.path, route.request_method] }).to eq([['/pets', 'GET'], ['/pets/{petId}', 'GET']])
     end
 
     it 'can skip_coverage for paths' do
@@ -152,7 +153,19 @@ RSpec.describe OpenapiFirst::Test do
         test.skip_coverage { |path| path == '/pets' }
       end
       route_tasks = described_class::Coverage.result.plans.first.routes
-      expect(route_tasks.map { |route| [route.path, route.request_method] }).to eq([['/pets/{petId}', 'GET']])
+      expect(route_tasks.select(&:skipped?).map { |route| [route.path, route.request_method] }).to eq([['/pets', 'GET'], ['/pets', 'POST']])
+      expect(route_tasks.reject(&:skipped?).map { |route| [route.path, route.request_method] }).to eq([['/pets/{petId}', 'GET']])
+    end
+
+    it 'reports the number of skipped requests and responses' do
+      described_class.setup do |test|
+        test.register('./spec/data/petstore.yaml')
+        test.skip_coverage { |path, request_method| path == '/pets' && request_method == 'POST' }
+        test.skip_response_coverage { |response| response.status == 'default' }
+      end
+      result = described_class::Coverage.result
+      expect(result.skipped_requests_count).to eq(1)
+      expect(result.skipped_responses_count).to eq(3)
     end
 
     it 'is okay if no block is given if an OAD is registered ' do

@@ -20,6 +20,7 @@ No stricter / less strict request validation. Mostly internal stuff. Plus a Sina
 - Removed: `OpenapiFirst::Test::Coverage::TerminalReporter#format`, deprecated since 3.4.0. Use `#report` instead.
 
 #### Added
+- API coverage now reports skipped requests and responses.
 - Added: OpenAPI 3.2 documents are accepted, but not fully supported yet. They are handled using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored. Loading such a document prints a warning. Operations defined under `additionalOperations` are routed. See #469.
 - Added: `OpenapiFirst::Request#parameters` returns the parameters that are defined for a request as `OpenapiFirst::Parameter` objects, which expose `name`, `location`, `schema`, `required?`, `deprecated?`, `style`, `explode?` and `media_type`. It used to return an internal object with a different interface.
 - Added: Show all covered endpoints in HTML coverage reporter and filter covered/uncovered endpoints

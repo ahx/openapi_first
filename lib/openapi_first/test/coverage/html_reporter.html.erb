@@ -10,9 +10,13 @@
     <h1 class="page-title">API Coverage: <%= coverage.round(1) %>%</h1>
     <div>
         <span class="generated-at">Generated at: <%= h generated_at %></span>
+        <% if any_skipped? -%>
+        <span class="skipped-summary"><%= skipped_requests_count %> request(s) and <%= skipped_responses_count %> response(s) skipped</span>
+        <% end -%>
         <div class="filters">
             <label class="filter"><input type="checkbox" id="filter-covered" checked> Covered operations</label>
             <label class="filter"><input type="checkbox" id="filter-uncovered" checked> Uncovered operations</label>
+            <label class="filter"><input type="checkbox" id="filter-skipped-requests" checked> Skipped requests</label>
         </div>
     </div>
   </header>
@@ -29,17 +33,22 @@
     <% visible_routes(plan).each do |route| -%>
     <% requests = request_items(route) -%>
     <% responses = response_items(route) -%>
-    <details class="route <%= route.finished? ? 'is-covered' : 'is-uncovered' %>"<%= ' open' if any_request_made?(route) && !route.finished? %>>
+    <details class="route <%= route_class(route) %>"<%= ' open' if any_request_made?(route) && !route.finished? %>>
       <summary>
         <span class="method"><%= h route.request_method.upcase %></span>
         <span class="path"><%= h route.path %></span>
         <% status = route_status(route) -%>
-        <% if status == :request_problem -%>
-        <span class="request-status problem">❌ <span class="problem"><%= h explain_unfinished_request(route.requests.first) %></span></span>
+        <% if status == :skipped -%>
+        <span class="request-status skipped">Skipped</span>
+        <% elsif status == :request_problem -%>
+        <span class="request-status problem">❌ <span class="problem"><%= h explain_unfinished_request(route.tracked_requests.first) %></span></span>
         <% elsif status == :responses_problem -%>
         <span class="response-summary problem">⚠️ <%= uncovered_responses_count(route) %> response(s) not covered</span>
         <% else -%>
         <span class="request-status covered">✅</span>
+        <% end -%>
+        <% if route.skipped_responses.any? && status != :skipped -%>
+        <span class="response-summary skipped"><%= route.skipped_responses.count %> response(s) skipped</span>
         <% end -%>
         <% if (label = route.summary) -%>
         <span class="operation-label"><%= h label %></span>
@@ -49,7 +58,12 @@
         <% unless requests.empty? -%>
         <ul class="tasks">
           <% requests.each do |request| -%>
-          <% if request.finished? -%>
+          <% if request.skipped? -%>
+          <li class="skipped">
+            <% if request.content_type -%><span class="content-type"><%= h request.content_type %></span><% end -%>
+            <span class="skipped-note">Skipped, not covered by any test</span>
+          </li>
+          <% elsif request.finished? -%>
           <li class="covered">
             <span>✅</span>
             <% if request.content_type -%><span class="content-type"><%= h request.content_type %></span><% end -%>
@@ -67,7 +81,13 @@
         <% unless responses.empty? -%>
         <ul class="tasks responses">
           <% responses.each do |response| -%>
-          <% if response.finished? -%>
+          <% if response.skipped? -%>
+          <li class="skipped">
+            <span class="status"><%= h response.status %></span>
+            <% if response.content_type -%><span class="content-type"><%= h response.content_type %></span><% end -%>
+            <span class="skipped-note">Skipped</span>
+          </li>
+          <% elsif response.finished? -%>
           <li class="covered">
             <span>✅</span>
             <span class="status"><%= h response.status %></span>

@@ -9,10 +9,11 @@ module OpenapiFirst
       class RequestTask
         extend Forwardable
 
-        def_delegators :@request, :path, :request_method, :content_type
+        def_delegators :@request, :key, :path, :request_method, :content_type
 
-        def initialize(request_definition)
+        def initialize(request_definition, skipped: false)
           @request = request_definition
+          @skipped = skipped
           @requested = false
           @last_error_message = nil
         end
@@ -23,6 +24,10 @@ module OpenapiFirst
           @requested = true
           @valid ||= true if validated_request.valid?
           @last_error_message = validated_request.error.exception_message unless validated_request.valid?
+        end
+
+        def skipped?
+          @skipped == true
         end
 
         def requested?
