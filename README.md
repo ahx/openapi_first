@@ -197,7 +197,7 @@ use OpenapiFirst::Middlewares::ResponseValidation if ENV['RACK_ENV'] == 'test'
 use OpenapiFirst::Middlewares::ResponseValidation, raise_error: false
 ```
 
-If you are adopting OpenAPI you can use these options together with [hooks](#hooks) to get notified about requests/responses that do match your API description.
+If you are adopting OpenAPI you can use these options together with [hooks](#hooks) to get notified about requests/responses that do not match your API description.
 
 ## Contract Testing
 
@@ -239,7 +239,7 @@ OpenapiFirst::Test.setup do |test|
   
   test.ignore_response_error do |validated_response, rack_request|
     # Ignore invalid response bodies on certain paths
-    validated_request.path.start_with?('/api/legacy/stuff') && validated_request.error.type ==  :invalid_body      
+    rack_request.path.start_with?('/api/legacy/stuff') && validated_response.error.type ==  :invalid_body      
   end
 end
 ```
@@ -275,7 +275,7 @@ Skip coverage for a request and all responses alltogether of a route with `skip_
 ```ruby
 OpenapiFirst::Test.setup do |test|
   test.skip_coverage do |path, request_method|
-    path == '/bookings/{bookingId}' && requests_method == 'DELETE'
+    path == '/bookings/{bookingId}' && request_method == 'DELETE'
   end
 end
 ```
@@ -371,7 +371,7 @@ definition.validate_request(rack_request, raise_error: true) # Raises OpenapiFir
 ```ruby
 validated_response = definition.validate_response(rack_request, rack_response)
 
-# Inspect the response and access parsed parameters and
+# Inspect the response and access parsed parameters
 validated_response.valid?
 validated_response.invalid?
 validated_response.error # => Failure object or nil
@@ -380,7 +380,7 @@ validated_response.parsed_body
 validated_response.parsed_headers
 
 # Or you can raise an exception if validation fails:
-definition.validate_response(rack_request,rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
+definition.validate_response(rack_request, rack_response, raise_error: true) # Raises OpenapiFirst::ResponseInvalidError or OpenapiFirst::ResponseNotFoundError
 ```
 
 ## Hooks
@@ -494,7 +494,7 @@ Here your OpenAPI schema defines endpoints starting with `/resource` but your ac
 
 ```ruby
 oad = OpenapiFirst.load('openapi.yaml') do |config|
-  config.path = ->(req) { request.path.delete_prefix('/api') }
+  config.path = ->(req) { req.path.delete_prefix('/api') }
 end
 use OpenapiFirst::Middlewares::RequestValidation, oad
 ```

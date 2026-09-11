@@ -3,7 +3,7 @@
 module OpenapiFirst
   # A failure object returned when validation or parsing of a request or response has failed.
   # This returned in ValidatedRequest#error and ValidatedResponse#error.
-  class Failure < Data.define(:type, :message, :errors) # rubocop:disable Style/DataInheritance
+  class Failure < Data.define(:type, :message, :errors)
     TYPES = {
       not_found: [NotFoundError, 'Not found.'],
       method_not_allowed: [RequestInvalidError, 'Request method is not defined.'],
