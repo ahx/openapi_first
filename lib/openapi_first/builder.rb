@@ -10,6 +10,7 @@ require_relative 'parameters_parser'
 require_relative 'query_string_parser'
 require_relative 'request'
 require_relative 'response'
+require_relative 'schema/content'
 require_relative 'schema/hash'
 require_relative 'ref_resolver'
 
@@ -68,7 +69,10 @@ module OpenapiFirst
     end
 
     def openapi31_meta_schema(document)
-      document.fetch('jsonSchemaDialect') { JSONSchemer::OpenAPI31::BASE_URI.to_s }
+      dialect = document.fetch('jsonSchemaDialect') { JSONSchemer::OpenAPI31::BASE_URI.to_s }
+      return dialect unless dialect == JSONSchemer::OpenAPI31::BASE_URI.to_s
+
+      Schema::Content.openapi31_dialect
     end
 
     def router

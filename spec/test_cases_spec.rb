@@ -17,7 +17,7 @@ RSpec.describe 'request/response validation examples' do
 
   Dir.glob(File.join(__dir__, '/test_cases/*.yaml')).each do |filepath|
     describe filepath do
-      YAML.load_file(filepath).each do |example|
+      YAML.load_file(filepath, aliases: true).each do |example|
         context example['description'] do
           let(:oad) { example['oad'] }
           let(:definition) { OpenapiFirst.parse(oad, filepath:) }

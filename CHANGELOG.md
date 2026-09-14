@@ -23,6 +23,7 @@ No stricter / less strict request validation. Mostly internal stuff. Plus a Sina
 - API coverage now reports skipped requests and responses.
 - Added: OpenAPI 3.2 documents are accepted, but not fully supported yet. They are handled using the OpenAPI 3.1 rules, so features introduced in 3.2 may be ignored. Loading such a document prints a warning. Operations defined under `additionalOperations` are routed. See #469.
 - Added: `OpenapiFirst::Request#parameters` returns the parameters that are defined for a request as `OpenapiFirst::Parameter` objects, which expose `name`, `location`, `schema`, `required?`, `deprecated?`, `style`, `explode?` and `media_type`. It used to return an internal object with a different interface.
+- Added: Support for `contentSchema` in OpenAPI 3.1 documents. A string with a `contentMediaType` (and optionally a `contentEncoding`) is decoded and parsed, and the embedded document is validated against `contentSchema`.
 - Added: Show all covered endpoints in HTML coverage reporter and filter covered/uncovered endpoints
 - Added: Sinatra integration (OpenapiFirst::Sinatra)
   A Sinatra extension to define routes by referencing OpenAPI operations:
@@ -55,6 +56,7 @@ No stricter / less strict request validation. Mostly internal stuff. Plus a Sina
   Request validation is called automatically for these operations.
 
 #### Fixed
+- Fixed: Loading an OpenAPI 3.1 document raised `JSONSchemer::UnknownContentMediaType` or `JSONSchemer::UnknownContentEncoding` when a schema used a `contentMediaType` or `contentEncoding` that openapi_first cannot decode, like the `contentMediaType: image/png` that OpenAPI 3.1 uses to describe binary payloads. These are treated as annotations now, so such a document loads and everything else in it is validated.
 - Fixed: Validating against a schema from a referenced file raised `ArgumentError` in OpenAPI 3.0 documents when a top-level key of that file collides with a JSON Schema keyword, such as `$ref: 'parameters.yaml#/id'`. The containing file is no longer parsed as a schema itself, so such keys work like any other now. See #348.
 - Fixed: `$ref`s nested inside the schema of a parameter or a response header are resolved now, so these values are unpacked and converted as described. Before, only a `$ref` at the top level of the schema was resolved. See #450.
 - Fixed: The JSON schema of a parameter that uses a `content` field with a `$ref`'d schema is resolved now.

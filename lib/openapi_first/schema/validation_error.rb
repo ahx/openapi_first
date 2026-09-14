@@ -10,11 +10,8 @@ module OpenapiFirst
         location = data_pointer.empty? ? 'root' : "`#{data_pointer}`"
 
         case type
-        when 'required'
+        when 'required', 'dependentRequired'
           keys = details.fetch('missing_keys', []).join(', ')
-          "object at #{location} is missing required properties: #{keys}"
-        when 'dependentRequired'
-          keys = details.fetch('missing_keys').join(', ')
           "object at #{location} is missing required properties: #{keys}"
         when 'string', 'boolean', 'number'
           "value at #{location} is not a #{type}"
@@ -36,8 +33,23 @@ module OpenapiFirst
           "number at #{location} is greater than: #{schema['maximum']}"
         when 'readOnly'
           "value at #{location} is `readOnly`"
+        when 'contentEncoding', 'contentMediaType', 'contentSchema'
+          content_message(location)
         else
           "value at #{location} is invalid (#{type.inspect})"
+        end
+      end
+
+      private
+
+      def content_message(location)
+        case type
+        when 'contentEncoding'
+          "string at #{location} is not #{schema.fetch('contentEncoding')} encoded"
+        when 'contentMediaType'
+          "string at #{location} is not valid #{schema.fetch('contentMediaType')}"
+        else
+          "string at #{location} does not match `contentSchema`: #{details.fetch('errors').join('. ')}"
         end
       end
     end

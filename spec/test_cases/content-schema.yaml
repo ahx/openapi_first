@@ -1,0 +1,301 @@
+- description: a payload matching contentSchema passes validation
+  oad: &json-payload
+    openapi: 3.1.0
+    info:
+      title: contentSchema
+      version: 1.0.0
+    paths:
+      /:
+        post:
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  required: [payload]
+                  properties:
+                    payload:
+                      type: string
+                      contentMediaType: application/json
+                      contentSchema:
+                        type: object
+                        required: [a]
+                        properties:
+                          a:
+                            type: integer
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "{\"a\": 1}" }
+- description: a payload violating contentSchema fails validation
+  oad: *json-payload
+  invalid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "{\"a\": \"not-an-integer\"}" }
+- description: the content keywords are not applied to a payload that is not a string
+  oad:
+    openapi: 3.1.0
+    info:
+      title: contentSchema on an untyped property
+      version: 1.0.0
+    paths:
+      /:
+        post:
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  required: [payload]
+                  properties:
+                    payload:
+                      contentEncoding: base64
+                      contentMediaType: application/json
+                      contentSchema:
+                        type: object
+                        required: [a]
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": { "b": 2 } }
+- description: a payload that cannot be parsed as the contentMediaType fails validation
+  oad: *json-payload
+  invalid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "this is not JSON" }
+- description: a payload that cannot be parsed passes validation without contentSchema
+  oad:
+    openapi: 3.1.0
+    info:
+      title: contentMediaType without contentSchema
+      version: 1.0.0
+    paths:
+      /:
+        post:
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  required: [payload]
+                  properties:
+                    payload:
+                      type: string
+                      contentMediaType: application/json
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "this is not JSON" }
+- description: contentSchema is ignored without contentMediaType
+  oad:
+    openapi: 3.1.0
+    info:
+      title: contentSchema without contentMediaType
+      version: 1.0.0
+    paths:
+      /:
+        post:
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  required: [payload]
+                  properties:
+                    payload:
+                      type: string
+                      contentSchema:
+                        type: object
+                        required: [a]
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "anything goes" }
+- description: base64 encoded content is decoded before contentSchema is applied
+  oad: &base64-payload
+    openapi: 3.1.0
+    info:
+      title: contentEncoding
+      version: 1.0.0
+    paths:
+      /:
+        post:
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  required: [payload]
+                  properties:
+                    payload:
+                      type: string
+                      contentEncoding: base64
+                      contentMediaType: application/json
+                      contentSchema:
+                        type: object
+                        required: [a]
+                        properties:
+                          a:
+                            type: integer
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "eyJhIjogMX0=" }
+- description: a payload violating contentSchema inside base64 fails validation
+  oad: *base64-payload
+  invalid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "eyJhIjogImIifQ==" }
+- description: a payload that is not base64 encoded fails validation
+  oad: *base64-payload
+  invalid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "!!! not base64 !!!" }
+- description: a payload that is not base64 encoded passes validation without contentSchema
+  oad:
+    openapi: 3.1.0
+    info:
+      title: contentEncoding without contentSchema
+      version: 1.0.0
+    paths:
+      /:
+        post:
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  required: [payload]
+                  properties:
+                    payload:
+                      type: string
+                      contentEncoding: base64
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "!!! not base64 !!!" }
+- description: an unknown contentMediaType is ignored
+  oad:
+    openapi: 3.1.0
+    info:
+      title: binary content
+      version: 1.0.0
+    paths:
+      /:
+        post:
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  required: [payload]
+                  properties:
+                    payload:
+                      contentMediaType: image/png
+                      contentSchema:
+                        type: object
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "not a PNG, but nothing can check that" }
+- description: an unknown contentEncoding is ignored
+  oad:
+    openapi: 3.1.0
+    info:
+      title: base64url content
+      version: 1.0.0
+    paths:
+      /:
+        post:
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  required: [payload]
+                  properties:
+                    payload:
+                      type: string
+                      contentEncoding: base64url
+                      contentMediaType: application/json
+                      contentSchema:
+                        type: object
+                        required: [a]
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: post
+    uri: '/'
+    content_type: application/json
+    body: { "payload": "eyJhIjogMX0" }
+- description: contentSchema is applied to responses as well
+  oad:
+    openapi: 3.1.0
+    info:
+      title: contentSchema in responses
+      version: 1.0.0
+    paths:
+      /:
+        get:
+          responses:
+            '200':
+              description: ok
+              content:
+                application/json:
+                  schema:
+                    required: [payload]
+                    properties:
+                      payload:
+                        type: string
+                        contentMediaType: application/json
+                        contentSchema:
+                          type: object
+                          required: [a]
+                          properties:
+                            a:
+                              type: integer
+  valid_response:
+    status: 200
+    content_type: application/json
+    body: { "payload": "{\"a\": 1}" }
+  invalid_response:
+    status: 200
+    content_type: application/json
+    body: { "payload": "{\"a\": \"not-an-integer\"}" }

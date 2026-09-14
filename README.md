@@ -478,6 +478,37 @@ This gem was inspired by [committee](https://github.com/interagent/committee) (R
 
 ## Frequently Asked Questions
 
+### Is `contentSchema` validated?
+
+Yes. In an OpenAPI 3.1 document you can describe a string that carries an embedded document:
+
+```yaml
+type: object
+properties:
+  payload:
+    type: string
+    contentMediaType: application/json
+    contentSchema:
+      type: object
+      required: [event]
+      properties:
+        event:
+          type: string
+```
+
+openapi_first parses the string as the `contentMediaType` (decoding it first if there is a `contentEncoding`) and validates the result against the `contentSchema`:
+
+```json
+{ "payload": "{\"event\": 42}" }
+// => string at `/payload` does not match `contentSchema`: value at `/event` is not a string
+```
+
+A string that cannot be decoded or parsed is invalid as well, but only when there is a `contentSchema` next to it. Without one, the content keywords describe the string without constraining it.
+
+JSON Schema leaves this to the implementation: the content keywords are annotations, and validating the embedded document is an opt-in that openapi_first takes, because a `contentSchema` in an API description is meant to describe what clients may send.
+
+`application/json` and `base64` are the media type and encoding that openapi_first can decode. Any other value, like the `contentMediaType: image/png` that OpenAPI 3.1 uses to describe binary payloads, is kept as documentation and the string is not validated against a `contentSchema`.
+
 ### How can I adapt request paths that don't match my schema?
 
 Let's say you have `openapi.yaml` like this:
