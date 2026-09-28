@@ -4,6 +4,7 @@ require_relative 'openapi_first/json'
 require_relative 'openapi_first/file_loader'
 require_relative 'openapi_first/errors'
 require_relative 'openapi_first/registry'
+require_relative 'openapi_first/utils'
 require_relative 'openapi_first/configuration'
 require_relative 'openapi_first/child_configuration'
 require_relative 'openapi_first/definition'
@@ -82,7 +83,7 @@ module OpenapiFirst
   # @return [Definition]
   # TODO: This needs to work with unresolved contents as well
   def self.parse(contents, only: nil, filepath: nil, path_prefix: nil, &)
-    contents = ::JSON.parse(::JSON.generate(contents)) # Deeply stringify keys, because of YAML. See https://github.com/ahx/openapi_first/issues/367
+    contents = Utils.deep_stringify_keys(contents) # Deeply stringify keys, because of YAML. See https://github.com/ahx/openapi_first/issues/367
     contents['paths'].filter!(&->(key, _) { only.call(key) }) if only
     Definition.new(contents, filepath, path_prefix, &)
   end

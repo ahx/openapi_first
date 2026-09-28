@@ -184,6 +184,17 @@ module OpenapiFirst
         vocabulary: { 'https://json-schema.org/draft/2020-12/vocab/core' => true }
       )
 
+      # This class is here to monkey-patch JSONSchemer::Schema when we are passing
+      # an instance to sub-schemas. It skips stringifying all keys of the passed object to
+      # allocate fewer objects. We don't have to stringify the keys, because they are already stringified upstream.
+      # @visibility private
+      class DocumentRootSchema < JSONSchemer::Schema
+        private
+
+        def deep_stringify_keys(value) = value
+      end
+      private_constant :DocumentRootSchema
+
       def initialize(value:, context:, base_uri:, options:)
         @value = value
         @context = context
@@ -197,7 +208,7 @@ module OpenapiFirst
 
       def schema
         @schema ||= begin
-          root_schema = JSONSchemer::Schema.new(context, base_uri:, **options, meta_schema: DOCUMENT_META_SCHEMA)
+          root_schema = DocumentRootSchema.new(context, base_uri:, **options, meta_schema: DOCUMENT_META_SCHEMA)
           apply_dialect(root_schema)
           JSONSchemer::Schema.new(value, nil, root_schema, base_uri:, **options)
         end
