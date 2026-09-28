@@ -26,6 +26,25 @@ RSpec.describe OpenapiFirst::FileLoader do
       expect(contents['openapi']).to eq('3.0.0')
     end
 
+    it 'loads YAML keys as strings' do
+      Tempfile.create(['codes', '.yaml']) do |file|
+        file.write("200:\n  description: ok\n")
+        file.flush
+
+        expect(described_class.load(file.path)).to eq({ '200' => { 'description' => 'ok' } })
+      end
+    end
+
+    it 'names the file when YAML contains a value that cannot be represented' do
+      Tempfile.create(['limits', '.yaml']) do |file|
+        file.write("maximum: .inf\n")
+        file.flush
+
+        expect { described_class.load(file.path) }
+          .to raise_error(OpenapiFirst::Error, /\ACould not load "#{Regexp.escape(file.path)}": Infinity/)
+      end
+    end
+
     it 'loads .json' do
       contents = described_class.load('./spec/data/petstore.json')
       expect(contents['openapi']).to eq('3.0.0')

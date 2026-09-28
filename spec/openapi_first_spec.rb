@@ -40,6 +40,44 @@ RSpec.describe OpenapiFirst do
       definition = OpenapiFirst.parse(YAML.safe_load_file('./spec/data/petstore.yaml'))
       expect(definition.paths).to include('/pets')
     end
+
+    it 'resolves $refs through keys that are not strings' do
+      pet = { 'type' => 'object', 'properties' => { 'name' => { 'type' => 'string' } } }
+      definition = OpenapiFirst.parse({
+                                        'openapi' => '3.1.0',
+                                        'paths' => {
+                                          '/pets' => {
+                                            'get' => {
+                                              'responses' => {
+                                                200 => { 'description' => 'ok',
+                                                         'content' => { 'application/json' => { 'schema' => pet } } }
+                                              }
+                                            },
+                                            'post' => {
+                                              'requestBody' => {
+                                                'content' => {
+                                                  'application/json' => {
+                                                    'schema' => {
+                                                      'type' => 'object',
+                                                      'properties' => {
+                                                        'pet' => {
+                                                          '$ref' => '#/paths/~1pets/get/responses/200/content/application~1json/schema'
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              'responses' => { 201 => { 'description' => 'created' } }
+                                            }
+                                          }
+                                        }
+                                      })
+      request = Rack::Request.new(Rack::MockRequest.env_for('/pets', method: 'POST', input: '{"pet": {"name": 1}}',
+                                                                     'CONTENT_TYPE' => 'application/json'))
+
+      expect(definition.validate_request(request, raise_error: false).error.type).to eq(:invalid_body)
+    end
   end
 
   describe '.configure' do

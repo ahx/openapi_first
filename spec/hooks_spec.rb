@@ -379,4 +379,49 @@ RSpec.describe 'Hooks' do
                            ])
     end
   end
+
+  describe 'body property hooks with a schema referenced by request and response' do
+    let(:spec) do
+      {
+        'openapi' => '3.1.0',
+        'paths' => {
+          '/pets' => {
+            'post' => {
+              'requestBody' => {
+                'content' => { 'application/json' => { 'schema' => { '$ref' => '#/components/schemas/Pet' } } }
+              },
+              'responses' => {
+                '200' => {
+                  'description' => 'ok',
+                  'content' => { 'application/json' => { 'schema' => { '$ref' => '#/components/schemas/Pet' } } }
+                }
+              }
+            }
+          }
+        },
+        'components' => {
+          'schemas' => {
+            'Pet' => { 'type' => 'object', 'properties' => { 'name' => { 'type' => 'string' } } }
+          }
+        }
+      }
+    end
+
+    it 'calls only the hook of the validated body' do
+      request_calls = []
+      response_calls = []
+      definition = OpenapiFirst.parse(spec) do |config|
+        config.after_request_body_property_validation { |data, property| request_calls << [data, property] }
+        config.after_response_body_property_validation { |data, property| response_calls << [data, property] }
+      end
+      request = build_request('/pets', method: 'POST', body: '{"name": "Quentin"}')
+      response = Rack::Response.new('{"name": "Rex"}', 200, { 'Content-Type' => 'application/json' })
+
+      definition.validate_request(request)
+      definition.validate_response(request, response)
+
+      expect(request_calls).to eq([[{ 'name' => 'Quentin' }, 'name']])
+      expect(response_calls).to eq([[{ 'name' => 'Rex' }, 'name']])
+    end
+  end
 end

@@ -107,6 +107,34 @@ RSpec.describe OpenapiFirst::RefResolver do
       expect(schema.valid?({ data: [{ has_bicycle: true }] })).to eq(true)
       expect(schema.valid?({ data: [{ has_bicycle: 'red' }] })).to eq(false)
     end
+
+    it 'resolves refs the same way regardless of which schemas were validated before' do
+      contents = { 'components' => { 'schemas' => {
+        'Named' => { '$defs' => { 'name' => { '$anchor' => 'name', 'type' => 'string' } } },
+        'Pet' => { 'properties' => { 'name' => { '$ref' => '#name' } } }
+      } } }
+      validate_pet = lambda do |after:|
+        doc = described_class.new(file_loader: OpenapiFirst::FileLoader.new).for(contents)
+        schema = ->(name) { doc.dig('components', 'schemas', name).schema(configuration: JSONSchemer.configuration) }
+        after.each { schema.call(_1).valid?('Rex') }
+        schema.call('Pet').valid?({ 'name' => 'Rex' })
+      rescue JSONSchemer::UnknownRef => e
+        e.class
+      end
+
+      expect(validate_pet.call(after: ['Named'])).to eq(validate_pet.call(after: []))
+    end
+
+    it 'resolves refs through keys that YAML loads as integers' do
+      Tempfile.create(['codes', '.yaml']) do |file|
+        file.write("properties:\n  n:\n    $ref: '#/codes/200'\ncodes:\n  200:\n    type: integer\n")
+        file.flush
+        schema = resolver.load(file.path).schema(configuration: JSONSchemer.configuration)
+
+        expect(schema.valid?({ 'n' => 1 })).to eq(true)
+        expect(schema.valid?({ 'n' => 'x' })).to eq(false)
+      end
+    end
   end
 
   describe '#[]' do

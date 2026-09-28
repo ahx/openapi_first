@@ -26,12 +26,20 @@ module OpenapiFirst
           if extname == '.json'
             ::JSON.parse(body)
           elsif ['.yaml', '.yml'].include?(extname)
-            YAML.unsafe_load(body)
+            load_yaml(body, file_path)
           else
             body
           end
         end
       end
+    end
+
+    private
+
+    def load_yaml(body, file_path)
+      Utils.deep_stringify_keys(YAML.unsafe_load(body))
+    rescue ::JSON::GeneratorError => e
+      raise Error, "Could not load #{file_path.inspect}: #{e.message}"
     end
   end
 end
