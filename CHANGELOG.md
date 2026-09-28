@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Fix: Reduced memory usage with large API descriptions. Schemas no longer each deep-copy (stringify keys) the whole OAD build a root schema. This is a json_schemer specific optimization.
+## 4.0.1
+
+- Fix: Reduced memory usage with large API descriptions. Schemas no longer each deep-copy (stringify keys) the whole OAD to build a root schema. This is a json_schemer specific optimization.
 
 ## 4.0.0
 
