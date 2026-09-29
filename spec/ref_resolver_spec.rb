@@ -125,6 +125,45 @@ RSpec.describe OpenapiFirst::RefResolver do
       expect(validate_pet.call(after: ['Named'])).to eq(validate_pet.call(after: []))
     end
 
+    it 'resolves refs through keys with a plus sign' do
+      Tempfile.create(['plus', '.yaml']) do |file|
+        file.write(<<~YAML)
+          properties:
+            error:
+              $ref: '#/content/application~1vnd.api+json/schema'
+          content:
+            application/vnd.api+json:
+              schema:
+                type: integer
+        YAML
+        file.flush
+        schema = resolver.load(file.path).schema(configuration: JSONSchemer.configuration)
+
+        expect(schema.valid?({ 'error' => 1 })).to eq(true)
+        expect(schema.valid?({ 'error' => 'x' })).to eq(false)
+      end
+    end
+
+    it 'resolves refs to other files through keys with a plus sign' do
+      Dir.mktmpdir do |dir|
+        File.write(File.join(dir, 'errors.yaml'), <<~YAML)
+          content:
+            application/vnd.api+json:
+              schema:
+                type: integer
+        YAML
+        File.write(File.join(dir, 'openapi.yaml'), <<~YAML)
+          properties:
+            error:
+              $ref: './errors.yaml#/content/application~1vnd.api+json/schema'
+        YAML
+        schema = resolver.load(File.join(dir, 'openapi.yaml')).schema(ref_resolver:)
+
+        expect(schema.valid?({ 'error' => 1 })).to eq(true)
+        expect(schema.valid?({ 'error' => 'x' })).to eq(false)
+      end
+    end
+
     it 'resolves refs through keys that YAML loads as integers' do
       Tempfile.create(['codes', '.yaml']) do |file|
         file.write("properties:\n  n:\n    $ref: '#/codes/200'\ncodes:\n  200:\n    type: integer\n")

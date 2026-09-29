@@ -189,6 +189,14 @@ module OpenapiFirst
       # allocate fewer objects. We don't have to stringify the keys, because they are already stringified upstream.
       # @visibility private
       class DocumentRootSchema < JSONSchemer::Schema
+        def resolve_ref(uri)
+          return super unless uri.fragment&.include?('+')
+
+          uri = uri.dup
+          uri.fragment = uri.fragment.gsub('+', '%2B')
+          super
+        end
+
         private
 
         def deep_stringify_keys(value) = value

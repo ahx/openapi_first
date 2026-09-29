@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: `$ref` pointers through keys with a plus sign (like `#/content/application~1vnd.api+json/schema`) no longer raise `JSONSchemer::InvalidRefPointer`.
+
 ## 4.1.0
 
 - Query and cookie parameter values with invalid encoding (like `?search=%C3`) produce a 400 response now. Before such a value passed validation or raised an `ArgumentError`. This applies to documented and undocumented query parameter, but only to documented cookie parameters.
