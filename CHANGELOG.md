@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 4.1.0
+
+- Query and cookie parameter values with invalid encoding (like `?search=%C3`) produce a 400 response now. Before such a value passed validation or raised an `ArgumentError`. This applies to documented and undocumented query parameter, but only to documented cookie parameters.
+- A query string with more parameters than Rack accepts (4096 by default) produces a 400 response now instead of raising `Rack::QueryParser::QueryLimitError`. See the [rack documentation](https://rack.github.io/rack/main/index.html#configuration) about how to configure this.
+
 ## 4.0.1
 
 - Fix: Reduced memory usage with large API descriptions. Schemas no longer each deep-copy (stringify keys) the whole OAD to build a root schema. This is a json_schemer specific optimization.

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rack'
+require 'rack/query_parser'
 require_relative 'parameters_parser'
 
 module OpenapiFirst
@@ -10,11 +11,15 @@ module OpenapiFirst
     DEEP_PROP = '\[([\w-]+)\]$'
     private_constant :DEEP_PROP
 
+    # Rack < 3.1 does not know about Rack::BadRequest
+    BAD_REQUEST = defined?(Rack::BadRequest) ? Rack::BadRequest : Rack::QueryParser::QueryLimitError
+    private_constant :BAD_REQUEST
+
     # @param parameters [Array<Parameter>]
     def initialize(parameters)
       @parameters = parameters
       @deep_object_parameters, flat_parameters = parameters.partition(&:deep_object?)
-      @flat_parser = ParametersParser.new(flat_parameters)
+      @flat_parser = ParametersParser.new(flat_parameters, check_encoding: false)
       @deep_object_properties = {}
       @deep_object_regex = {}
       @deep_object_parameters.each do |parameter|
@@ -54,16 +59,23 @@ module OpenapiFirst
       return if unknown.empty?
 
       unknown
+    rescue Rack::Utils::InvalidParameterError
+      nil
     end
 
     private
 
     def parse_query(query_string)
       Rack::Utils.parse_query(query_string) do |string|
-        Rack::Utils.unescape(string)
+        unescaped = Rack::Utils.unescape(string)
+        next unescaped if unescaped.valid_encoding?
+
+        raise Rack::Utils::InvalidParameterError, "invalid encoding (#{string})"
       rescue ArgumentError => e
         raise Rack::Utils::InvalidParameterError, e.message
       end
+    rescue BAD_REQUEST => e
+      raise Rack::Utils::InvalidParameterError, e.message
     end
 
     def parse_deep_object(parameter, parsed_query)

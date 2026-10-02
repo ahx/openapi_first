@@ -3,7 +3,7 @@
 RSpec.describe OpenapiFirst::ParametersParser do
   def unpack(definitions, headers)
     definitions = [definitions] unless definitions.is_a?(Array)
-    described_class.new(build_parameters(definitions)).unpack(headers)
+    described_class.new(build_parameters(definitions), check_encoding: false).unpack(headers)
   end
 
   describe 'header parameters' do

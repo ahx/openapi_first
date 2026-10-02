@@ -126,10 +126,10 @@ module OpenapiFirst
       cookie = build_parameters(grouped[:cookie])
       ParsedParameters.new(
         all: [*path, *query, *header, *cookie].freeze,
-        path_parser: grouped[:path] && ParametersParser.new(path),
+        path_parser: grouped[:path] && ParametersParser.new(path, check_encoding: false),
         query_parser: QueryStringParser.new(query),
-        header_parser: grouped[:header] && ParametersParser.new(header),
-        cookie_parser: grouped[:cookie] && ParametersParser.new(cookie),
+        header_parser: grouped[:header] && ParametersParser.new(header, check_encoding: false),
+        cookie_parser: grouped[:cookie] && ParametersParser.new(cookie, check_encoding: true),
         path_schema: build_parameter_schema(grouped[:path]),
         query_schema: build_parameter_schema(grouped[:query]),
         header_schema: build_parameter_schema(grouped[:header]),

@@ -75,6 +75,13 @@ paths:
           schema:
             type: string
             format: time
+        - name: tags
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
         - name: include
           in: query
           description: Relations you want to include

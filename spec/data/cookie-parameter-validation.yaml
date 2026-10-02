@@ -11,6 +11,10 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - name: nickname
+        in: cookie
+        schema:
+          type: string
     get:
       responses:
         '200':

@@ -61,8 +61,57 @@ RSpec.describe 'Query Parameter validation' do
       expect(response_body[:title]).to eq 'Bad Query Parameter'
     end
 
-    it 'returns 400 if nested[parameter] has invalid encoding' do
+    it 'returns 400 if deepObject parameter has invalid encoding' do
       get '/search?filter=%E0%A4%A'
+
+      expect(last_response.status).to eq 400
+      expect(response_body[:title]).to eq 'Bad Query Parameter'
+    end
+
+    it 'fails when deepObject nested filter[search] value has invalid encoding' do
+      get '/search?term=valid&filter[name]=valid&filter[search]=%C3'
+
+      expect(last_response.status).to eq 400
+      expect(response_body[:title]).to eq 'Bad Query Parameter'
+    end
+
+    it 'returns 400 if plain string query parameter has invalid encoding' do
+      get '/search?term=%C3'
+
+      expect(last_response.status).to eq 400
+      expect(response_body[:title]).to eq 'Bad Query Parameter'
+    end
+
+    it 'returns 400 if array query parameter has invalid encoding' do
+      get '/search?term=valid&tags=%C3,a'
+
+      expect(last_response.status).to eq 400
+      expect(response_body[:title]).to eq 'Bad Query Parameter'
+    end
+
+    it 'returns 400 if deepObject property name has invalid encoding' do
+      get '/search?term=valid&filter[%C3]=x'
+
+      expect(last_response.status).to eq 400
+      expect(response_body[:title]).to eq 'Bad Query Parameter'
+    end
+
+    it 'returns 400 if the query has more parameters than Rack accepts' do
+      get "/search?term=valid&#{Array.new(4097) { "x#{_1}=1" }.join('&')}"
+
+      expect(last_response.status).to eq 400
+      expect(response_body[:title]).to eq 'Bad Query Parameter'
+    end
+
+    it 'returns 400 if undefined query parameter has invalid encoding' do
+      get '/search?term=valid&unknown=%C3'
+
+      expect(last_response.status).to eq 400
+      expect(response_body[:title]).to eq 'Bad Query Parameter'
+    end
+
+    it 'returns 400 if undefined query parameter name has invalid encoding' do
+      get '/search?term=valid&%C3=x'
 
       expect(last_response.status).to eq 400
       expect(response_body[:title]).to eq 'Bad Query Parameter'

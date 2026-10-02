@@ -36,6 +36,24 @@ RSpec.describe 'Response Header validation' do
     end.to raise_error OpenapiFirst::ResponseInvalidError, 'Response header is invalid: value at `/X-Id` is not an integer'
   end
 
+  context 'with a header value that is not valid UTF-8' do
+    let(:app) do
+      Rack::Builder.app do
+        use OpenapiFirst::Middlewares::ResponseValidation, spec: './spec/data/response-header.yaml'
+        run(lambda do |_env|
+          headers = { 'Location' => '/echos/42', 'X-Id' => (+"\xC3").force_encoding(Encoding::UTF_8) }
+          Rack::Response.new('', 201, headers).finish
+        end)
+      end
+    end
+
+    it 'validates the value against its schema' do
+      expect do
+        post '/echo', '{}'
+      end.to raise_error OpenapiFirst::ResponseInvalidError, 'Response header is invalid: value at `/X-Id` is not an integer'
+    end
+  end
+
   it 'ignores "Content-Type" header' do
     post '/echo', JSON.generate({ 'Location' => '/echos/42', 'Content-Type' => 'unknown' })
     expect(last_response.status).to eq 201

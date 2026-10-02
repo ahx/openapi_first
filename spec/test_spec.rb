@@ -759,6 +759,12 @@ RSpec.describe OpenapiFirst::Test do
                          'Unknown query parameters "foo", "bar" for /stuff?color=red&foo=1&bar=2'
     end
 
+    it 'does not raise an error if the query string cannot be decoded' do
+      expect do
+        app.call(Rack::MockRequest.env_for('/stuff?color=red&unknown=%C3'))
+      end.not_to raise_error
+    end
+
     it 'raises another error if request is unknown' do
       expect do
         app.call(Rack::MockRequest.env_for('/unknown?unknown=12'))

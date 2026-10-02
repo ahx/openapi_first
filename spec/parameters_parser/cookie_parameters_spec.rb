@@ -3,10 +3,26 @@
 RSpec.describe OpenapiFirst::ParametersParser do
   def unpack(definitions, cookie_string)
     definitions = [definitions] unless definitions.is_a?(Array)
-    described_class.new(build_parameters(definitions)).unpack(Rack::Utils.parse_cookies_header(cookie_string))
+    described_class.new(build_parameters(definitions), check_encoding: true)
+                   .unpack(Rack::Utils.parse_cookies_header(cookie_string))
   end
 
   describe 'cookie parameters' do
+    it 'raises an exception if a defined cookie has invalid encoding' do
+      parameter = { 'in' => 'cookie', 'name' => 'Some' }
+      expect { unpack(parameter, 'Some=%C3;') }.to raise_error(Rack::Utils::InvalidParameterError)
+    end
+
+    it 'returns nil for a cookie without a value' do
+      parameter = { 'in' => 'cookie', 'name' => 'Some' }
+      expect(unpack(parameter, 'Some')).to eq('Some' => nil)
+    end
+
+    it 'ignores invalid encoding in undefined cookies' do
+      parameter = { 'in' => 'cookie', 'name' => 'Some' }
+      expect(unpack(parameter, 'Other=%C3; Some=abc;')).to eq('Some' => 'abc')
+    end
+
     it 'returns the converted value' do
       parameter = { 'in' => 'cookie', 'name' => 'Some', 'schema' => { 'type' => 'integer' } }
       expect(unpack(parameter, 'Some=12;')).to eq('Some' => 12)

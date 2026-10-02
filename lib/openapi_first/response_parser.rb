@@ -40,7 +40,7 @@ module OpenapiFirst
     def build_headers_parser(headers)
       return unless headers&.any?
 
-      ParametersParser.new(headers.map(&:parameter))
+      ParametersParser.new(headers.map(&:parameter), check_encoding: false)
     end
   end
 end
