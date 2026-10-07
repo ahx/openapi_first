@@ -27,9 +27,9 @@ module OpenapiFirst
     end
 
     def initialize(contents, filepath:, config:)
+      @config = config
       meta_schema = detect_meta_schema(contents, filepath)
       @schemer_configuration = build_schemer_config(filepath:, meta_schema:)
-      @config = config
       @file_loader = FileLoader.new
       ref_resolver = RefResolver.new(file_loader:)
       @contents = ref_resolver.for(contents, filepath:)
@@ -47,6 +47,7 @@ module OpenapiFirst
       end
       result.meta_schema = meta_schema
       result.insert_property_defaults = true
+      result.regexp_resolver = config.regexp_resolver if config.regexp_resolver
       result
     end
 

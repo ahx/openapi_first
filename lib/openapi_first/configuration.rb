@@ -16,13 +16,14 @@ module OpenapiFirst
       @request_validation_error_response = OpenapiFirst.find_error_response(:default)
       @hooks = HOOKS.to_h { [_1, Set.new] }
       @path = nil
+      @regexp_resolver = nil
     end
 
     def register(path_or_definition, as: :default)
       OpenapiFirst.register(path_or_definition, as:)
     end
 
-    attr_reader :hooks, :request_validation_error_response
+    attr_reader :hooks, :request_validation_error_response, :regexp_resolver
     attr_accessor :path
 
     # Return a child configuration that still receives updates of global hooks.
@@ -47,6 +48,10 @@ module OpenapiFirst
     def plugin(name, **)
       require_relative 'plugins'
       Plugins.load(name).configure(self, **)
+    end
+
+    def regexp_resolver=(resolver)
+      @regexp_resolver = resolver.is_a?(Symbol) ? resolver.to_s : resolver
     end
 
     def request_validation_error_response=(mod)

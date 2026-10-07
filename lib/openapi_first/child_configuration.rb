@@ -8,6 +8,7 @@ module OpenapiFirst
       @parent = parent
       @request_validation_error_response = parent.request_validation_error_response
       @path = parent.path
+      @regexp_resolver = parent.regexp_resolver
     end
 
     private attr_reader :parent

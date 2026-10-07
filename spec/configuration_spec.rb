@@ -39,6 +39,44 @@ RSpec.describe OpenapiFirst::Configuration do
     end
   end
 
+  describe '#regexp_resolver=' do
+    let(:document) do
+      {
+        'openapi' => '3.1.0',
+        'info' => { 'title' => 'Ids', 'version' => '1' },
+        'paths' => {
+          '/ids' => {
+            'get' => {
+              'parameters' => [
+                { 'name' => 'ids', 'in' => 'query', 'schema' => { 'type' => 'string', 'pattern' => '^\d+(,\d+)*$' } }
+              ],
+              'responses' => { '200' => { 'description' => 'OK' } }
+            }
+          }
+        }
+      }
+    end
+
+    def valid?(definition, query)
+      request = Rack::Request.new(Rack::MockRequest.env_for("/ids?#{query}"))
+      definition.validate_request(request).valid?
+    end
+
+    it 'anchors ^ and $ to lines by default' do
+      definition = OpenapiFirst.parse(document)
+
+      expect(valid?(definition, 'ids=1,2')).to be(true)
+      expect(valid?(definition, 'ids=1%0Aa')).to be(true)
+    end
+
+    it 'anchors ^ and $ to the whole value with ecma' do
+      definition = OpenapiFirst.parse(document) { |config| config.regexp_resolver = :ecma }
+
+      expect(valid?(definition, 'ids=1,2')).to be(true)
+      expect(valid?(definition, 'ids=1%0Aa')).to be(false)
+    end
+  end
+
   describe '#child' do
     it 'clones actions' do
       config = OpenapiFirst::Configuration.new
