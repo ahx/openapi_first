@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Fix: Passing a block to `config.register` not works when called inside `OpenapiFirst.configure` block. Before the block was ignored.
+- Faster routing for OADs with many dynamic paths. The router now looks up path templates in a prefix tree of path segments instead of trying each template one by one.
+- Changed: If more than one path template matches a request path, the router now compares the templates segment by segment from left to right. For example `/users/{id}/{action}` wins over `/{tenant}/settings/profile` for `/users/settings/profile`. Before, the template with more literal characters overall won.
 
 ## 4.2.1
 

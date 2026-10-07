@@ -215,6 +215,162 @@ RSpec.describe OpenapiFirst::Router do
         expect(match.params).to eq({ 'ke-bab' => '1' })
       end
     end
+
+    context 'with multiple path params' do
+      let(:requests) do
+        [
+          double(path: '/orgs/{org}/repos/{repo}/issues/{number}', request_method: 'get'),
+          double(path: '/orgs/{org}/repos/{repo}', request_method: 'get')
+        ]
+      end
+
+      it 'parses all path parameters' do
+        match = router.match('GET', '/orgs/ivx/repos/api/issues/42')
+        expect(match.request_definition).to be(requests[0])
+        expect(match.params).to eq({ 'org' => 'ivx', 'repo' => 'api', 'number' => '42' })
+      end
+
+      it 'does not match a path with an empty segment' do
+        match = router.match('GET', '/orgs//repos/api')
+        expect(match.error.type).to eq(:not_found)
+      end
+    end
+
+    context 'with a variable inside of a segment and a variable for the whole segment' do
+      let(:requests) do
+        [
+          double(path: '/files/{id}', request_method: 'get'),
+          double(path: '/files/{name}.{ext}', request_method: 'get')
+        ]
+      end
+
+      it 'prefers the variable inside of a segment' do
+        match = router.match('GET', '/files/report.pdf')
+        expect(match.request_definition).to be(requests[1])
+        expect(match.params).to eq({ 'name' => 'report', 'ext' => 'pdf' })
+      end
+
+      it 'matches the variable for the whole segment' do
+        match = router.match('GET', '/files/report')
+        expect(match.request_definition).to be(requests[0])
+        expect(match.params).to eq({ 'id' => 'report' })
+      end
+    end
+
+    context 'with multiple variables inside of segments' do
+      let(:requests) do
+        [
+          double(path: '/files/{name}.{ext}', request_method: 'get'),
+          double(path: '/files/{name}.json', request_method: 'get'),
+          double(path: '/stuff/{a}..{b}', request_method: 'get')
+        ]
+      end
+
+      it 'prefers the segment with more literal characters' do
+        match = router.match('GET', '/files/report.json')
+        expect(match.request_definition).to be(requests[1])
+        expect(match.params).to eq({ 'name' => 'report' })
+      end
+
+      it 'parses all variables of a segment' do
+        match = router.match('GET', '/stuff/some..other')
+        expect(match.request_definition).to be(requests[2])
+        expect(match.params).to eq({ 'a' => 'some', 'b' => 'other' })
+      end
+
+      it 'does not match a segment without its literal characters' do
+        match = router.match('GET', '/stuff/some.other')
+        expect(match.error.type).to eq(:not_found)
+      end
+
+      it 'does not match an empty variable inside of a segment' do
+        match = router.match('GET', '/files/.json')
+        expect(match.error.type).to eq(:not_found)
+      end
+    end
+
+    context 'with a variable inside of a later segment' do
+      let(:requests) do
+        [
+          double(path: '/{dir}/index.html', request_method: 'get'),
+          double(path: '/files/{name}.{ext}', request_method: 'get'),
+          double(path: '/files/{id}/{action}', request_method: 'get'),
+          double(path: '/files/{id}/{name}.json', request_method: 'get')
+        ]
+      end
+
+      it 'prefers literal segments from left to right' do
+        match = router.match('GET', '/files/index.html')
+        expect(match.request_definition).to be(requests[1])
+        expect(match.params).to eq({ 'name' => 'index', 'ext' => 'html' })
+      end
+
+      it 'prefers the variable inside of a segment over a variable for the whole segment' do
+        match = router.match('GET', '/files/1/profile.json')
+        expect(match.request_definition).to be(requests[3])
+        expect(match.params).to eq({ 'id' => '1', 'name' => 'profile' })
+      end
+
+      it 'backtracks to a variable for the whole segment' do
+        match = router.match('GET', '/files/1/profile')
+        expect(match.request_definition).to be(requests[2])
+        expect(match.params).to eq({ 'id' => '1', 'action' => 'profile' })
+      end
+
+      it 'backtracks out of a variable inside of a segment' do
+        match = router.match('GET', '/files/1.json/profile')
+        expect(match.request_definition).to be(requests[2])
+        expect(match.params).to eq({ 'id' => '1.json', 'action' => 'profile' })
+      end
+    end
+
+    context 'with multiple matching templates' do
+      let(:requests) do
+        [
+          double(path: '/{tenant}/settings/profile', request_method: 'get'),
+          double(path: '/users/{id}/{action}', request_method: 'get')
+        ]
+      end
+
+      it 'prefers literal segments from left to right' do
+        match = router.match('GET', '/users/settings/profile')
+        expect(match.request_definition).to be(requests[1])
+        expect(match.params).to eq({ 'id' => 'settings', 'action' => 'profile' })
+      end
+    end
+
+    context 'with templates that only differ in variable names' do
+      let(:requests) do
+        [
+          double(path: '/items/{id}', request_method: 'get'),
+          double(path: '/items/{itemId}', request_method: 'get')
+        ]
+      end
+
+      it 'matches the template that was added first' do
+        match = router.match('GET', '/items/1')
+        expect(match.request_definition).to be(requests[0])
+        expect(match.params).to eq({ 'id' => '1' })
+      end
+    end
+
+    context 'with a literal segment that starts with a colon' do
+      let(:requests) do
+        [
+          double(path: '/jobs/{id}/:cancel', request_method: 'post')
+        ]
+      end
+
+      it 'matches the literal segment' do
+        match = router.match('POST', '/jobs/1/:cancel')
+        expect(match.params).to eq({ 'id' => '1' })
+      end
+
+      it 'does not treat the literal segment as a variable' do
+        match = router.match('POST', '/jobs/1/abort')
+        expect(match.error.type).to eq(:not_found)
+      end
+    end
   end
 
   describe '#match_route' do

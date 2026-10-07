@@ -23,7 +23,6 @@ module OpenapiFirst
           "#{name}.register(#{path_or_definition.inspect}, as: :my_other_api)"
         )
       end
-
       definition = OpenapiFirst.load(path_or_definition, &)
       definitions[as] = definition
       definition

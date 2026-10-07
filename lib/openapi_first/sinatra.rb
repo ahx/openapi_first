@@ -62,9 +62,6 @@ module OpenapiFirst
   # encoded characters, ...) - a request Sinatra matches is not re-checked against openapi_first's own
   # path matching. Avoid path shapes where the two routers disagree.
   module Sinatra
-    PATH_PARAMETER = /\{[^}]+\}/
-    private_constant :PATH_PARAMETER
-
     # The configuration lives in Sinatra settings (rather than plain instance variables) so a
     # subclass of a configured app inherits the loaded description and its operation index.
     def self.registered(app)
@@ -133,7 +130,7 @@ module OpenapiFirst
     end
 
     def operation_handler(path_template, block)
-      param_names = path_template.scan(PATH_PARAMETER).map! { |placeholder| placeholder[1..-2] }
+      param_names = PathTemplate.variable_names(path_template)
       proc do |*captures|
         path_params = param_names.zip(captures).to_h
         validated = settings.openapi_definition.validate_request(request, path_template:, path_params:)
@@ -147,7 +144,7 @@ module OpenapiFirst
     end
 
     def sinatra_pattern(path)
-      path.gsub(PATH_PARAMETER) { |placeholder| ":#{placeholder[1..-2].gsub(/[^A-Za-z0-9_]/, '_')}" }
+      PathTemplate.expand(path) { |name| ":#{name.gsub(/[^A-Za-z0-9_]/, '_')}" }
     end
 
     def build_operation_index(definition)
