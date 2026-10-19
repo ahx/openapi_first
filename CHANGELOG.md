@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 4.2.1
+
+- Fix deprecation warnings when using multi_json >= 1.21. openapi_first now uses `MultiJSON.parse`/`MultiJSON.generate` if available ([#508](https://github.com/ahx/openapi_first/issues/508)).
+
 ## 4.2.0
 
 - Added `config.regexp_resolver` configuration option, `'ruby'` (default) or `'ecma'` (also as Symbol). The value is passed to json_schemer's `regexp_resolver` configuration. In OpenAPI, the pattern keyword specifies a regular expression that must conform to the ECMA-262 standard. So using `'ecma'` is recommended.

@@ -6,11 +6,11 @@ RSpec.describe OpenapiFirst::FileLoader do
       require 'multi_json'
       # :nocov:
       before do
-        MultiJson.load_options = { symbolize_keys: true }
+        MultiJSON.parse_options = { symbolize_names: true }
       end
 
       after do
-        MultiJson.load_options = { symbolize_keys: false }
+        MultiJSON.parse_options = { symbolize_names: false }
       end
       # :nocov:
     rescue LoadError # rubocop:disable Lint/SuppressedException
