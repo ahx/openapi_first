@@ -6,7 +6,7 @@ module OpenapiFirst
     ValidationError = Data.define(:value, :data_pointer, :schema_pointer, :type, :details, :schema) do
       # This returns an error message for this specific error.
       # This it copied from json_schemer here to be easier to customize when passing custom data_pointers.
-      def message
+      def message # rubocop:disable Metrics/CyclomaticComplexity
         location = data_pointer.empty? ? 'root' : "`#{data_pointer}`"
 
         case type
@@ -14,8 +14,8 @@ module OpenapiFirst
           keys = details.fetch('missing_keys', []).join(', ')
           "object at #{location} is missing required properties: #{keys}"
         when 'dependentRequired'
-          keys = details.fetch('missing_keys').join(', ')
-          "object at #{location} is missing required properties: #{keys}"
+          keys = details&.fetch('missing_keys')
+          "object at #{location} is missing required properties#{keys && " #{keys.join(', ')}"}"
         when 'string', 'boolean', 'number'
           "value at #{location} is not a #{type}"
         when 'array', 'object', 'integer'
