@@ -25,8 +25,8 @@ module OpenapiFirst
       # Register OADs, but don't load them just yet
       # @param [OpenapiFirst::OAD] oad The OAD to register
       # @param [Symbol] as The name to register the OAD under
-      def register(oad, as: :default)
-        Test.register(oad, as:)
+      def register(oad, as: :default, &)
+        Test.register(oad, as:, &)
       end
 
       # Observe a rack app

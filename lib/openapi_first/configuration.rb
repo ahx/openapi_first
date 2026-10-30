@@ -19,8 +19,8 @@ module OpenapiFirst
       @regexp_resolver = nil
     end
 
-    def register(path_or_definition, as: :default)
-      OpenapiFirst.register(path_or_definition, as:)
+    def register(path_or_definition, as: :default, &)
+      OpenapiFirst.register(path_or_definition, as:, &)
     end
 
     attr_reader :hooks, :request_validation_error_response, :regexp_resolver

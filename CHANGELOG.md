@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: Passing a block to `config.register` not works when called inside `OpenapiFirst.configure` block. Before the block was ignored.
+
 ## 4.2.1
 
 - Fix deprecation warnings when using multi_json >= 1.21. openapi_first now uses `MultiJSON.parse`/`MultiJSON.generate` if available ([#508](https://github.com/ahx/openapi_first/issues/508)).

@@ -9,6 +9,17 @@ RSpec.describe OpenapiFirst::Test::Configuration do
     end.to raise_error(ArgumentError)
   end
 
+  describe '#register' do
+    it 'configures the registered OAD with the given block' do
+      path = ->(request) { request.path.chomp('/') }
+
+      definition = configuration.register('./spec/data/petstore.yaml') { |config| config.path = path }
+
+      expect(definition.config.path).to be(path)
+      expect(OpenapiFirst::Test[:default]).to be(definition)
+    end
+  end
+
   describe 'coverage_reporter' do
     it 'defaults to HtmlReporter' do
       expect(configuration.coverage_reporter).to eq(OpenapiFirst::Test::Coverage::HtmlReporter)

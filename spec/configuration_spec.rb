@@ -77,6 +77,25 @@ RSpec.describe OpenapiFirst::Configuration do
     end
   end
 
+  describe '#register' do
+    let(:spec_path) { './spec/data/petstore.yaml' }
+
+    it 'registers the OAD' do
+      OpenapiFirst::Configuration.new.register(spec_path, as: :pets)
+
+      expect(OpenapiFirst[:pets].filepath).to eq(spec_path)
+    end
+
+    it 'configures the registered OAD with the given block' do
+      path = ->(request) { request.path.chomp('/') }
+
+      definition = OpenapiFirst::Configuration.new.register(spec_path) { |config| config.path = path }
+
+      expect(definition.config.path).to be(path)
+      expect(OpenapiFirst[:default]).to be(definition)
+    end
+  end
+
   describe '#child' do
     it 'clones actions' do
       config = OpenapiFirst::Configuration.new
