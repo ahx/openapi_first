@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'rack/utils'
 require_relative '../path_template'
 require_relative 'segment_pattern'
 
@@ -23,7 +24,10 @@ module OpenapiFirst
       def match(path)
         values = []
         value, names = find(path.split('/', -1), 0, values)
-        [value, names.zip(values).to_h] if value
+        return unless value
+
+        values.map! { decode(_1) } if path.include?('%')
+        [value, names.zip(values).to_h]
       end
 
       def find(segments, index, values)
@@ -46,6 +50,11 @@ module OpenapiFirst
       end
 
       private
+
+      def decode(value)
+        decoded = Rack::Utils.unescape_path(value).force_encoding(Encoding::UTF_8)
+        decoded.valid_encoding? ? decoded : value
+      end
 
       def find_partial(segments, index, values)
         @partial.each_value do |pattern, node|

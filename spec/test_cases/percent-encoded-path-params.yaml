@@ -1,0 +1,138 @@
+- description: percent-encoded space in path param
+  oad:
+    openapi: 3.1.1
+    paths:
+      /files/{name}:
+        get:
+          parameters:
+            - name: name
+              in: path
+              required: true
+              schema:
+                enum: ['my file']
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: get
+    uri: '/files/my%20file'
+    parsed_path_parameters:
+      name: my file
+  invalid_request:
+    method: get
+    uri: '/files/my%2520file'
+- description: percent-encoded reserved characters in path param
+  oad:
+    openapi: 3.1.1
+    paths:
+      /files/{name}:
+        get:
+          parameters:
+            - name: name
+              in: path
+              required: true
+              schema:
+                enum: ['C++']
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: get
+    uri: '/files/C%2B%2B'
+    parsed_path_parameters:
+      name: C++
+  invalid_request:
+    method: get
+    uri: '/files/C%252B%252B'
+- description: percent-encoded slash in path param
+  oad:
+    openapi: 3.1.1
+    paths:
+      /files/{name}:
+        get:
+          parameters:
+            - name: name
+              in: path
+              required: true
+              schema:
+                enum: ['docs/intro']
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: get
+    uri: '/files/docs%2Fintro'
+    parsed_path_parameters:
+      name: docs/intro
+  invalid_request:
+    method: get
+    uri: '/files/docs/intro'
+- description: percent-encoded variable inside of a path segment
+  oad:
+    openapi: 3.1.1
+    paths:
+      /reports/{name}.pdf:
+        get:
+          parameters:
+            - name: name
+              in: path
+              required: true
+              schema:
+                enum: ['q1 sales']
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: get
+    uri: '/reports/q1%20sales.pdf'
+    parsed_path_parameters:
+      name: q1 sales
+  invalid_request:
+    method: get
+    uri: '/reports/q1+sales.pdf'
+- description: plus sign in path param is not a space
+  oad:
+    openapi: 3.1.1
+    paths:
+      /files/{name}:
+        get:
+          parameters:
+            - name: name
+              in: path
+              required: true
+              schema:
+                enum: ['a+b']
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: get
+    uri: '/files/a+b'
+    parsed_path_parameters:
+      name: a+b
+  invalid_request:
+    method: get
+    uri: '/files/a%20b'
+- description: non-ASCII characters in path param
+  oad:
+    openapi: 3.1.1
+    paths:
+      /files/{name}:
+        get:
+          parameters:
+            - name: name
+              in: path
+              required: true
+              schema:
+                enum: ['bär']
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: get
+    uri: '/files/b%C3%A4r'
+    parsed_path_parameters:
+      name: bär
+  invalid_request:
+    method: get
+    uri: '/files/b%E4r'
