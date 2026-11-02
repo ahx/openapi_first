@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'path_template'
 require_relative 'builder'
 require 'forwardable'
 
@@ -80,8 +81,7 @@ module OpenapiFirst
       request_def = routes.lazy.flat_map(&:requests).find { |r| r.operation_id == operation_id.to_s }
       raise ArgumentError, "Operation #{operation_id.inspect} is not defined in #{key}." unless request_def
 
-      request_def.path.gsub(/\{([^}]+)\}/) do
-        name = Regexp.last_match(1)
+      PathTemplate.expand(request_def.path) do |name|
         params.fetch(name.to_sym) do
           params.fetch(name) do
             raise ArgumentError, "Missing path parameter #{name.inspect} for operation #{operation_id.inspect}."

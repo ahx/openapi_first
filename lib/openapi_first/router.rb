@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'router/path_template'
+require_relative 'path_template'
+require_relative 'router/path_trie'
 require_relative 'router/find_content'
 require_relative 'router/find_response'
 
@@ -27,15 +28,14 @@ module OpenapiFirst
 
     def initialize
       @static = {}
-      @dynamic = {} # TODO: use a trie or similar
+      @dynamic = {}
+      @trie = PathTrie.new
     end
 
     # Returns an enumerator of all routes
     def routes
       @static.chain(@dynamic).lazy.flat_map do |path, request_methods|
-        request_methods.filter_map do |request_method, content|
-          next if request_method == :template
-
+        request_methods.map do |request_method, content|
           Route.new(path:, request_method:, requests: content.requests.each_value.lazy.uniq,
                     responses: content.responses.each_value.lazy.flat_map(&:values))
         end
@@ -95,7 +95,7 @@ module OpenapiFirst
     def route_at(path, request_method)
       request_method = request_method.upcase
       path_item = if PathTemplate.template?(path)
-                    @dynamic[path] ||= { template: PathTemplate.new(path) }
+                    @dynamic[path] ||= {}.tap { @trie.add(path, _1) }
                   else
                     @static[path] ||= {}
                   end
@@ -112,15 +112,7 @@ module OpenapiFirst
       found = @static[request_path]
       return [found, {}] if found
 
-      @dynamic.each_value.reduce(nil) do |best, path_item|
-        params = path_item[:template].match(request_path)
-        next best unless params
-
-        candidate = [path_item, params]
-        next candidate unless best
-
-        params.values.sum(&:length) < best[1].values.sum(&:length) ? candidate : best
-      end
+      @trie.match(request_path)
     end
   end
 end
