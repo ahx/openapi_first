@@ -20,6 +20,48 @@ RSpec.describe OpenapiFirst::Definition do
     end
   end
 
+  describe '#configure' do
+    let(:called) { [] }
+
+    let(:definition) do
+      hooks_called = called
+      OpenapiFirst.load('./spec/data/petstore.yaml', path_prefix: '/api') do |config|
+        config.after_request_validation { hooks_called << :original }
+      end
+    end
+
+    let(:new_definition) do
+      hooks_called = called
+      definition.configure do |config|
+        config.after_request_validation { hooks_called << :new }
+      end
+    end
+
+    it 'returns a new Definition of the same document' do
+      expect(new_definition).not_to be(definition)
+      expect(new_definition.filepath).to eq(definition.filepath)
+      expect(new_definition.path_prefix).to eq('/api')
+      expect(new_definition.paths).to eq(definition.paths)
+    end
+
+    it 'freezes the new configuration' do
+      expect(new_definition.config).to be_frozen
+    end
+
+    it 'calls the hooks of the block and of the original Definition' do
+      new_definition.validate_request(build_request('/api/pets'))
+
+      expect(called).to eq(%i[new original])
+    end
+
+    it 'does not change the original Definition' do
+      new_definition
+      definition.validate_request(build_request('/api/pets'))
+
+      expect(called).to eq(%i[original])
+    end
+  end
+
   describe '#inspect' do
     it 'returns a frozen configuration' do
       definition = OpenapiFirst.load('./spec/data/petstore.yaml')

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added: You can pass a block to `OpenapiFirst::Middlewares::RequestValidation` to configure hooks and other options specifically for that middleware. With a registered name or a Definition it creates a copy of that OAD, so the registered OAD stays unchanged.
+- Fix: `OpenapiFirst.load` now accepts and applies a configuration block.
+
 ## 4.3.0
 
 - Fix: Passing a block to `config.register` not works when called inside `OpenapiFirst.configure` block. Before the block was ignored.

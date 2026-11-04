@@ -62,15 +62,20 @@ module OpenapiFirst
     configuration.plugin(name, **)
   end
 
-  # Load and dereference an OpenAPI spec file or return the Definition if it's already loaded
-  # @param filepath_or_definition [String, Definition] The path to the file or a Definition object
+  # Load and dereference an OpenAPI spec file or return the Definition if it's already loaded.
+  # If a block is given together with a Definition or Symbol,
+  # this returns a new Definition with the configuration block applied.
+  # @param filepath_or_definition [String, Symbol, Definition] The path to the file, a registered name or a Definition
   # @param only [Proc, nil] An optional proc to filter paths. It is called with the path string and should return
   # true/false
   # @param path_prefix [String, nil] An optional path prefix, that is not documented, that all requests begin with.
+  # @yieldparam config [Configuration] Configuration of the returned Definition.
   # @return [Definition]
   def self.load(filepath_or_definition, only: nil, path_prefix: nil, &)
-    return filepath_or_definition if filepath_or_definition.is_a?(Definition)
-    return self[filepath_or_definition] if filepath_or_definition.is_a?(Symbol)
+    if filepath_or_definition.is_a?(Definition) || filepath_or_definition.is_a?(Symbol)
+      definition = self[filepath_or_definition]
+      return block_given? ? definition.configure(&) : definition
+    end
 
     filepath = filepath_or_definition
     raise FileNotFoundError, "File not found: #{filepath}" unless File.exist?(filepath)
