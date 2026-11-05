@@ -184,6 +184,151 @@ RSpec.describe OpenapiFirst::Middlewares::RequestValidation do
     end
   end
 
+  context 'with a configuration block' do
+    let(:called) { [] }
+
+    context 'with a path' do
+      let(:app) do
+        hooks_called = called
+        Rack::Builder.app do
+          use(OpenapiFirst::Middlewares::RequestValidation, './spec/data/petstore.yaml') do |config|
+            config.after_request_validation { |validated| hooks_called << validated.operation_id }
+          end
+          run ->(_) { Rack::Response.new.finish }
+        end
+      end
+
+      it 'calls the hooks' do
+        get '/pets'
+
+        expect(called).to eq(%w[listPets])
+      end
+    end
+
+    context 'with the registered :default OAD' do
+      let(:app) do
+        OpenapiFirst.register('./spec/data/petstore.yaml')
+        hooks_called = called
+        Rack::Builder.app do
+          use(OpenapiFirst::Middlewares::RequestValidation) do |config|
+            config.after_request_validation { |validated| hooks_called << validated.operation_id }
+          end
+          run ->(_) { Rack::Response.new.finish }
+        end
+      end
+
+      it 'calls the hooks' do
+        get '/pets'
+
+        expect(called).to eq(%w[listPets])
+      end
+
+      it 'does not change the registered OAD' do
+        app
+        OpenapiFirst[:default].validate_request(Rack::Request.new(Rack::MockRequest.env_for('/pets')))
+
+        expect(called).to be_empty
+      end
+    end
+
+    context 'with a Definition and a global hook' do
+      after { OpenapiFirst.instance_variable_set(:@configuration, nil) }
+
+      let(:app) do
+        hooks_called = called
+        OpenapiFirst.configure do |config|
+          config.after_request_validation { hooks_called << :global }
+        end
+        oad = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+          config.after_request_validation { hooks_called << :definition }
+        end
+        Rack::Builder.app do
+          use(OpenapiFirst::Middlewares::RequestValidation, oad) do |config|
+            config.after_request_validation { hooks_called << :middleware }
+          end
+          run ->(_) { Rack::Response.new.finish }
+        end
+      end
+
+      it 'calls the hooks of the middleware, the Definition and the global configuration' do
+        get '/pets'
+
+        expect(called).to eq(%i[middleware definition global])
+      end
+    end
+
+    context 'with a hook that fails the request' do
+      let(:app) do
+        Rack::Builder.app do
+          use(OpenapiFirst::Middlewares::RequestValidation, './spec/data/petstore.yaml') do |config|
+            config.after_request_validation { OpenapiFirst::Failure.fail!(:invalid_query, message: 'nope') }
+          end
+          run ->(_) { Rack::Response.new.finish }
+        end
+      end
+
+      it 'returns an error response' do
+        get '/pets'
+
+        expect(last_response.status).to eq 400
+      end
+    end
+
+    context 'with request_validation_error_response' do
+      let(:app) do
+        Rack::Builder.app do
+          use(OpenapiFirst::Middlewares::RequestValidation, './spec/data/petstore.yaml') do |config|
+            config.request_validation_error_response = :jsonapi
+          end
+          run ->(_) { Rack::Response.new.finish }
+        end
+      end
+
+      it 'uses the configured error response' do
+        get '/pets?limit=three'
+
+        expect(last_response.status).to eq 400
+        expect(last_response.content_type).to eq 'application/vnd.api+json'
+      end
+    end
+
+    context 'with request_validation_error_response and the error_response option' do
+      let(:app) do
+        Rack::Builder.app do
+          use(OpenapiFirst::Middlewares::RequestValidation, './spec/data/petstore.yaml',
+              error_response: :default) do |config|
+            config.request_validation_error_response = :jsonapi
+          end
+          run ->(_) { Rack::Response.new.finish }
+        end
+      end
+
+      it 'uses the error_response option' do
+        get '/pets?limit=three'
+
+        expect(last_response.content_type).to eq 'application/problem+json'
+      end
+    end
+  end
+
+  context 'with request_validation_error_response configured on the Definition' do
+    let(:app) do
+      oad = OpenapiFirst.load('./spec/data/petstore.yaml') do |config|
+        config.request_validation_error_response = :jsonapi
+      end
+      Rack::Builder.app do
+        use OpenapiFirst::Middlewares::RequestValidation, oad
+        run ->(_) { Rack::Response.new.finish }
+      end
+    end
+
+    it 'uses the configured error response' do
+      get '/pets?limit=three'
+
+      expect(last_response.content_type).to eq 'application/vnd.api+json'
+    end
+  end
+
   context 'with discriminator' do
     let(:app) do
       Rack::Builder.app do

@@ -141,6 +141,49 @@ RSpec.describe OpenapiFirst do
       expect(returned_definition).to be(original_definition)
     end
 
+    context 'with a Definition and a block' do
+      def validate_get(definition, path)
+        definition.validate_request(Rack::Request.new(Rack::MockRequest.env_for(path)))
+      end
+
+      let(:called) { [] }
+
+      let(:original_definition) do
+        OpenapiFirst.load('./spec/data/petstore.yaml', path_prefix: '/api') do |config|
+          config.after_request_validation { called << :original }
+        end
+      end
+
+      let(:definition) do
+        OpenapiFirst.load(original_definition) do |config|
+          config.after_request_validation { called << :new }
+        end
+      end
+
+      it 'returns a new Definition of the same document' do
+        expect(definition).not_to be(original_definition)
+        expect(definition.filepath).to eq(original_definition.filepath)
+        expect(definition.paths).to eq(original_definition.paths)
+        expect(definition.config).to be_frozen
+      end
+
+      it 'keeps the path_prefix' do
+        expect(validate_get(definition, '/api/pets')).to be_valid
+      end
+
+      it 'calls the hooks of the given Definition and of the block' do
+        validate_get(definition, '/api/pets')
+
+        expect(called).to eq(%i[new original])
+      end
+
+      it 'does not change the given Definition' do
+        validate_get(original_definition, '/api/pets')
+
+        expect(called).to eq(%i[original])
+      end
+    end
+
     require 'benchmark'
     it 'works with a large document' do
       time = Benchmark.realtime do
@@ -160,6 +203,18 @@ RSpec.describe OpenapiFirst do
         OpenapiFirst.register(spec_path)
         oad = OpenapiFirst.load(:default)
         expect(oad.key).to eq(spec_path)
+      end
+
+      it 'returns a new Definition of the registered OAD if a block is given' do
+        registered = OpenapiFirst.register(spec_path)
+        path = lambda(&:path)
+
+        oad = OpenapiFirst.load(:default) { |config| config.path = path }
+
+        expect(oad).not_to be(registered)
+        expect(oad.key).to eq(spec_path)
+        expect(oad.config.path).to be(path)
+        expect(registered.config.path).to be_nil
       end
     end
 

@@ -84,6 +84,19 @@ The request validation middleware returns a 4xx if the request is invalid or not
 use OpenapiFirst::Middlewares::RequestValidation
 ```
 
+You can pass a block to configure [hooks](#hooks) and other options for this middleware only:
+
+```ruby
+use OpenapiFirst::Middlewares::RequestValidation, :v1 do |config|
+  config.request_validation_error_response = :jsonapi
+  config.after_request_validation do |validated_request|
+    warn validated_request.error.message if validated_request.invalid?
+  end
+end
+```
+
+If you pass a registered name or a Definition together with a block, the middleware uses a copy of that OAD that keeps its configuration and adds yours. The registered OAD stays unchanged.
+
 #### Error responses
 
 openapi_first produces a useful machine readable error response that can be customized.

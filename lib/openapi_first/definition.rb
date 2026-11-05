@@ -24,15 +24,24 @@ module OpenapiFirst
     # @param contents [Hash] The OpenAPI document.
     # @param filepath [String] The file path of the OpenAPI document.
     # @param path_prefix [String,nil] An optional path prefix, that is not documented, that all requests begin with.
-    def initialize(contents, filepath = nil, path_prefix = nil)
+    # @param config [Configuration] The configuration to use. Gets yielded and frozen.
+    def initialize(contents, filepath = nil, path_prefix = nil, config: OpenapiFirst.configuration.child)
       @filepath = filepath
       @path_prefix = path_prefix
-      @config = OpenapiFirst.configuration.child
+      @config = config
       yield @config if block_given?
       @config.freeze
       @router = Builder.build_router(contents, filepath:, config:)
       @resolved = contents
       @paths = @router.routes.map(&:path).to_a.uniq # TODO: Refactor
+    end
+
+    # Returns a new Definition of the same document whose configuration is a child of this one's.
+    # @visibility private
+    # @yield [Configuration]
+    # @return [Definition]
+    def configure(&)
+      Definition.new(@resolved, filepath, path_prefix, config: @config.child, &)
     end
 
     # Gives access to the raw resolved Hash. Like `mydefinition['components'].dig('schemas', 'Stations')`

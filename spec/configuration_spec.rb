@@ -125,5 +125,27 @@ RSpec.describe OpenapiFirst::Configuration do
       expect(parent.after_request_validation.size).to eq(2)
       expect(child.after_request_validation.size).to eq(2)
     end
+
+    it 'includes hooks of all ancestors' do
+      grandparent = OpenapiFirst::Configuration.new
+      parent = grandparent.child
+      child = parent.child
+      grandparent.after_request_validation { :grandparent }
+      parent.after_request_validation { :parent }
+      child.after_request_validation { :child }
+
+      expect(child.after_request_validation.map(&:call)).to eq(%i[child parent grandparent])
+    end
+
+    it 'inherits the request_validation_error_response from the parent until it is set' do
+      parent = OpenapiFirst::Configuration.new
+      child = parent.child
+
+      parent.request_validation_error_response = :jsonapi
+      expect(child.request_validation_error_response).to be(OpenapiFirst::ErrorResponses::Jsonapi)
+
+      child.request_validation_error_response = :default
+      expect(child.request_validation_error_response).to be(OpenapiFirst::ErrorResponses::Default)
+    end
   end
 end
