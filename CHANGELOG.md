@@ -4,6 +4,7 @@
 
 - Added: You can pass a block to `OpenapiFirst::Middlewares::RequestValidation` to configure hooks and other options specifically for that middleware. With a registered name or a Definition it creates a copy of that OAD, so the registered OAD stays unchanged.
 - Fix: `OpenapiFirst.load` now accepts and applies a configuration block.
+- Changed: Percent-encoded path parameters are now decoded. For example `/files/my%20file` yields `my file` for `/files/{name}`. A `+` stays a `+`. Values with a malformed encoding or that do not decode to valid UTF-8 are kept as they are. If your application decodes path parameters itself, remove that, or values get decoded twice. Known limitation: An encoded delimiter inside an array or object path parameter is decoded before the value is split, so `/files/a%2Cb,c` yields `["a", "b", "c"]`.
 
 ## 4.3.0
 

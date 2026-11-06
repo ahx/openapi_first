@@ -371,6 +371,45 @@ RSpec.describe OpenapiFirst::Router do
         expect(match.error.type).to eq(:not_found)
       end
     end
+
+    context 'with percent-encoded path params' do
+      let(:requests) do
+        [
+          double(path: '/files/{name}', request_method: 'get')
+        ]
+      end
+
+      it 'decodes the params' do
+        match = router.match('GET', '/files/my%20file')
+        expect(match.params).to eq({ 'name' => 'my file' })
+      end
+
+      it 'decodes an encoded slash within its segment' do
+        match = router.match('GET', '/files/docs%2Fintro')
+        expect(match.params).to eq({ 'name' => 'docs/intro' })
+      end
+
+      it 'keeps malformed percent-encodings as they are' do
+        match = router.match('GET', '/files/100%zz')
+        expect(match.params).to eq({ 'name' => '100%zz' })
+      end
+
+      it 'keeps percent-encodings that do not decode to valid UTF-8 as they are' do
+        match = router.match('GET', '/files/%FF')
+        expect(match.params).to eq({ 'name' => '%FF' })
+      end
+
+      it 'keeps percent-encodings that do not decode to valid UTF-8 as they are in a binary path' do
+        match = router.match('GET', '/files/%FF'.b)
+        expect(match.params).to eq({ 'name' => '%FF' })
+      end
+
+      it 'decodes to UTF-8 from a binary path' do
+        name = router.match('GET', '/files/%C3%A4'.b).params['name']
+        expect(name).to eq('ä')
+        expect(name.encoding).to eq(Encoding::UTF_8)
+      end
+    end
   end
 
   describe '#match_route' do

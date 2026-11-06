@@ -50,6 +50,13 @@ RSpec.describe OpenapiFirst::Sinatra do
     expect(JSON.parse(last_response.body)).to eq('petId' => '42')
   end
 
+  it 'percent-decodes path parameters once' do
+    get '/pets/my%2520pet'
+
+    expect(last_response.status).to eq(200)
+    expect(JSON.parse(last_response.body)).to eq('petId' => 'my%20pet')
+  end
+
   it 'routes a POST operation to its block' do
     post '/pets'
 

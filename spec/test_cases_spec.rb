@@ -95,6 +95,15 @@ RSpec.describe 'request/response validation examples' do
                 expect(validated.error).to be_nil
                 expect(validated).to be_valid
               end
+
+              example['valid_request'].select { |key, _| key.start_with?('parsed_') }.each do |method, expected|
+                it "returns #{method}" do
+                  send_request(example['valid_request'])
+
+                  validated = definition.validate_request(last_request)
+                  expect(validated.public_send(method)).to eq(expected)
+                end
+              end
             end
           end
 
