@@ -55,11 +55,13 @@ RSpec.describe OpenapiFirst::Test::Coverage::HtmlReporter do
   end
 
   def run_reporter(result, **opts)
-    output_path = Tempfile.new(['api_coverage', '.html']).path
+    file = Tempfile.new(['api_coverage', '.html'])
     logger = instance_double(Logger, info: nil, warn: nil)
-    reporter = described_class.new(output: output_path, logger:, **opts)
+    reporter = described_class.new(output: file.path, logger:, **opts)
     reporter.report(result)
-    [File.read(output_path), logger]
+    [File.read(file.path), logger]
+  ensure
+    file&.close!
   end
 
   context 'with uncovered requests and responses' do
