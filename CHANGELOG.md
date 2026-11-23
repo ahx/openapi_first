@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Changed: Renamed internal `OpenapiFirst::Request` to `OpenapiFirst::RequestDefinition` and `OpenapiFirst::Response` to `OpenapiFirst::ResponseDefinition`. These are the objects returned by `ValidatedRequest#request_definition` and `ValidatedResponse#response_definition`. The old constants still work, but are deprecated and will be removed in the next major version.
+
 ## 4.4.0
 
 - Changed: Percent-encoded path parameters are now decoded. For example `/files/my%20file` yields `my file` for `/files/{name}`. A `+` stays a `+`. Values with a malformed encoding or that do not decode to valid UTF-8 are kept as they are. If your application decodes path parameters itself, remove that, or values get decoded twice. Known limitation: An encoded delimiter inside an array or object path parameter is decoded before the value is split, so `/files/a%2Cb,c` yields `["a", "b", "c"]`.

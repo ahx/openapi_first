@@ -194,7 +194,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
         Rack::Request.new(Rack::MockRequest.env_for('/')),
         parsed_request:,
         error: nil,
-        request_definition: instance_double(OpenapiFirst::Request, operation_id: 'createPets')
+        request_definition: instance_double(OpenapiFirst::RequestDefinition, operation_id: 'createPets')
       )
       expect(request.operation_id).to eq('createPets')
     end
@@ -220,7 +220,7 @@ RSpec.describe OpenapiFirst::ValidatedRequest do
         Rack::Request.new(Rack::MockRequest.env_for('/')),
         parsed_request:,
         error: nil,
-        request_definition: instance_double(OpenapiFirst::Request, operation:)
+        request_definition: instance_double(OpenapiFirst::RequestDefinition, operation:)
       )
       expect(request.operation).to be(operation)
     end

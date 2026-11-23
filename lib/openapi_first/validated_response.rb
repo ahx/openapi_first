@@ -20,7 +20,7 @@ module OpenapiFirst
     attr_reader :error
 
     # The response definition if this response is defined in the API description
-    # @return [Response, nil]
+    # @return [ResponseDefinition, nil]
     attr_reader :response_definition
 
     # The parsed headers

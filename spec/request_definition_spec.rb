@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe OpenapiFirst::Request do
+RSpec.describe OpenapiFirst::RequestDefinition do
   describe '#parameters' do
     let(:definition) do
       OpenapiFirst.parse({

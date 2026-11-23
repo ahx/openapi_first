@@ -8,7 +8,7 @@ module OpenapiFirst
   # Represents a response definition in the OpenAPI document.
   # This is not a direct reflecton of the OpenAPI 3.X response definition, but a combination of
   # status, content type and content schema.
-  class Response
+  class ResponseDefinition
     def initialize(status:, headers:, content_type:, content_schema:, key:)
       @status = status
       @content_type = content_type
@@ -30,4 +30,7 @@ module OpenapiFirst
       ValidatedResponse.new(response, parsed_values:, error:, response_definition: self)
     end
   end
+
+  Response = ResponseDefinition
+  deprecate_constant :Response
 end

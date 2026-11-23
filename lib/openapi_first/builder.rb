@@ -8,8 +8,8 @@ require_relative 'response_header'
 require_relative 'parameter'
 require_relative 'parameters_parser'
 require_relative 'query_string_parser'
-require_relative 'request'
-require_relative 'response'
+require_relative 'request_definition'
+require_relative 'response_definition'
 require_relative 'schema/hash'
 require_relative 'ref_resolver'
 
@@ -179,24 +179,24 @@ module OpenapiFirst
           after_property_validation: config.after_request_body_property_validation
         )
         encoding = content_object['encoding']&.resolved
-        Request.new(path:, request_method:, parameters:,
-                    operation_object: operation_object.resolved,
-                    content_type:,
-                    content_schema:,
-                    encoding:,
-                    required_body:,
-                    key: [path, request_method, content_type].join(':'))
+        RequestDefinition.new(path:, request_method:, parameters:,
+                              operation_object: operation_object.resolved,
+                              content_type:,
+                              content_schema:,
+                              encoding:,
+                              required_body:,
+                              key: [path, request_method, content_type].join(':'))
       end
     end
 
     def request_without_body(path:, request_method:, parameters:, operation_object:)
-      Request.new(path:, request_method:, parameters:,
-                  operation_object: operation_object.resolved,
-                  content_type: nil,
-                  content_schema: nil,
-                  encoding: nil,
-                  required_body: false,
-                  key: [path, request_method, nil].join(':'))
+      RequestDefinition.new(path:, request_method:, parameters:,
+                            operation_object: operation_object.resolved,
+                            content_type: nil,
+                            content_schema: nil,
+                            encoding: nil,
+                            required_body: false,
+                            key: [path, request_method, nil].join(':'))
     end
 
     def build_responses(responses:, request:)
@@ -209,13 +209,13 @@ module OpenapiFirst
             configuration: schemer_configuration,
             after_property_validation: config.after_response_body_property_validation
           )
-          Response.new(status:,
-                       headers:,
-                       content_type:,
-                       content_schema:,
-                       key: [request.key, status, content_type].join(':'))
-        end || Response.new(status:, headers:, content_type: nil,
-                            content_schema: nil, key: [request.key, status, nil].join(':'))
+          ResponseDefinition.new(status:,
+                                 headers:,
+                                 content_type:,
+                                 content_schema:,
+                                 key: [request.key, status, content_type].join(':'))
+        end || ResponseDefinition.new(status:, headers:, content_type: nil,
+                                      content_schema: nil, key: [request.key, status, nil].join(':'))
       end
     end
 

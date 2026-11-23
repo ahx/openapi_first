@@ -11,7 +11,7 @@ module OpenapiFirst
   # Note that this is not the same as an OpenAPI 3.x Operation.
   # An 3.x Operation object can accept multiple requests, because it can handle multiple content-types.
   # This class represents one of those requests.
-  class Request
+  class RequestDefinition
     def initialize(path:, request_method:, operation_object:, # rubocop:disable Metrics/MethodLength,Metrics/ParameterLists
                    parameters:, content_type:, content_schema:, required_body:, key:, encoding: nil)
       @path = path
@@ -92,4 +92,7 @@ module OpenapiFirst
       RequestBodyParsers[content_type, { encoding: encoding || {} }]
     end
   end
+
+  Request = RequestDefinition
+  deprecate_constant :Request
 end

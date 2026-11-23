@@ -21,7 +21,7 @@ module OpenapiFirst
     attr_reader :error
 
     # The request definition if this request is defined in the API description
-    # @return [Request, nil]
+    # @return [RequestDefinition, nil]
     attr_reader :request_definition
 
     # @!method operation_id
