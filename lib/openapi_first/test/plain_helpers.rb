@@ -5,6 +5,9 @@ module OpenapiFirst
     # Assertion methods to use when no known test framework was found
     # These methods just raise an exception if an error was found
     module PlainHelpers
+      # Validates the last request and response of rack-test against the API description.
+      # @param status [Integer, nil] The expected response status
+      # @param api [Symbol, Definition] The registered API description
       def assert_api_conform(status: nil, api: openapi_first_default_api)
         api = OpenapiFirst::Test[api]
         # :nocov:

@@ -5,6 +5,9 @@ module OpenapiFirst
     # Assertion methods for Minitest
     module MinitestHelpers
       # :nocov:
+      # Asserts that the last request and response of rack-test conform to the API description.
+      # @param status [Integer, nil] The expected response status
+      # @param api [Symbol, Definition] The registered API description
       def assert_api_conform(status: nil, api: openapi_first_default_api)
         api = OpenapiFirst::Test[api]
         request = respond_to?(:last_request) ? last_request : @request

@@ -7,11 +7,24 @@ module OpenapiFirst
   module Test
     # Methods to use in integration tests
     module Methods
+      # @api private
       def self.included(base)
         base.include(DefaultApiMethod)
         base.include(AssertionMethod)
       end
 
+      # Returns a module to include into a test class. It adds `assert_api_conform` and, if you
+      # pass an app, an `app` method for rack-test that validates silently and tracks coverage.
+      # @example
+      #   RSpec.configure do |config|
+      #     config.include OpenapiFirst::Test::Methods[MyApp, api: :v1], type: :request
+      #   end
+      # @param application_under_test [#call, nil] The Rack app to define `app` for
+      # @param api [Symbol, nil] The registered API description to use. Defaults to the `:api` metadata
+      #   of the RSpec example group, else :default.
+      # @param validate_request_before_handling [Boolean] Validate the request before the app handles it
+      #   instead of after
+      # @return [Module]
       def self.[](application_under_test = nil, api: nil, validate_request_before_handling: false)
         mod = Module.new do
           def self.included(base)
@@ -53,7 +66,7 @@ module OpenapiFirst
         end
       end
 
-      # @visibility private
+      # @api private
       module AssertionMethod
         def self.included(base)
           if Test.minitest?(base)

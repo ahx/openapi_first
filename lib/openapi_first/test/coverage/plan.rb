@@ -9,6 +9,7 @@ module OpenapiFirst
     module Coverage
       # This stores the coverage data for one API description
       # A plan can be #done? and has several #tasks which can be #finished?
+      # @api private
       class Plan
         class UnknownRequestError < StandardError; end
 

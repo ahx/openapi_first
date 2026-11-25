@@ -37,7 +37,7 @@ module OpenapiFirst
     end
 
     # Returns a new Definition of the same document whose configuration is a child of this one's.
-    # @visibility private
+    # @api private
     # @yield [Configuration]
     # @return [Definition]
     def configure(&)
@@ -131,7 +131,8 @@ module OpenapiFirst
     # @param request [Rack::Request] The Rack request object.
     # @param response [Rack::Response] The Rack response object.
     # @param raise_error [Boolean] Whether to raise an error if validation fails.
-    # @return [ValidatedResponse] The validated response object.
+    # @return [ValidatedResponse, nil] The validated response object, or nil if the request does not match
+    #   any operation in the API description. Responses to unknown requests are not validated.
     def validate_response(request, response, raise_error: false)
       route = @router.match(request.request_method, resolve_path(request), content_type: request.content_type)
       return if route.error # Skip response validation for unknown requests

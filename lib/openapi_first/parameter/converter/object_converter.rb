@@ -4,7 +4,7 @@ module OpenapiFirst
   class Parameter
     module Converter
       # Converts the properties of an object parameter value
-      # @visibility private
+      # @api private
       ObjectConverter = Data.define(:schema) do
         def self.get_properties(schema) # rubocop:disable Metrics
           return nil if schema.nil? || schema.empty?

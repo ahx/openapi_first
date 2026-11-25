@@ -4,6 +4,7 @@ require_relative '../schema/validation_result'
 
 module OpenapiFirst
   module Validators
+    # @api private
     class MultipartRequestBody
       FILE_UPLOAD_PLACEHOLDER = String.new('', encoding: Encoding::BINARY).freeze
 

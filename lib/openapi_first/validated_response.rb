@@ -23,13 +23,15 @@ module OpenapiFirst
     # @return [ResponseDefinition, nil]
     attr_reader :response_definition
 
-    # The parsed headers
+    # The parsed headers. This only returns the headers that are defined in the OpenAPI spec.
+    # Returns nil if the response is not defined or could not be parsed.
     # @return [Hash<String,anything>, nil]
     def parsed_headers
       @parsed_values&.headers
     end
 
-    # The parsed body
+    # The parsed body.
+    # Returns nil if the response is not defined or could not be parsed.
     # @return [Hash<String,anything>, nil]
     def parsed_body
       @parsed_values&.body

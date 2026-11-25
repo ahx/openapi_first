@@ -16,6 +16,9 @@ module OpenapiFirst
     #   OpenapiFirst.plugin :x_public, field: 'x-visible'
     #   OpenapiFirst.plugin :x_public, if: ->(req) { req.host == 'api.example.com' }
     module XPublic
+      # @param config [Configuration]
+      # @param field [String] The OpenAPI extension field to check
+      # @return [void]
       def self.configure(config, field: 'x-public', **opts)
         condition = opts[:if]
         config.before_request_validation do |request, request_definition|

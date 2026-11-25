@@ -70,39 +70,58 @@ module OpenapiFirst
     autoload :App, 'openapi_first/test/app'
     extend Registry
 
+    # Raised when the coverage of the API description is too low
     class CoverageError < Error; end
+    # Raised in tests when a request has a query parameter that the API description does not declare
     class UnknownQueryParameterError < Error; end
 
-    # Inject request/response validation in a rack app class
+    # Injects silent request/response validation into a Rack app class or instance, so that its
+    # requests and responses are validated and tracked for coverage during tests.
+    # @example
+    #   OpenapiFirst::Test.observe(Rails.application)
+    # @param app [#call, Class] A Rack app instance or a class with a `call` instance method
+    # @param api [Symbol, Definition] The name of a registered API description, or a Definition
+    # @return [void]
     def self.observe(app, api: :default)
       Observe.observe(app, api:)
     end
 
+    # @api private
     def self.minitest?(base)
       base.include?(::Minitest::Assertions)
     rescue NameError
       false
     end
 
+    # The API descriptions registered via {.register}, or the ones registered via
+    # {OpenapiFirst.register} if none were registered here.
+    # @return [Hash<Symbol, Definition>]
     def self.definitions
       super.empty? ? OpenapiFirst.definitions : super
     end
 
+    # @return [::Logger]
     def self.logger
       configuration.logger
     end
 
+    # @return [Test::Configuration]
     def self.configuration
       @configuration ||= Configuration.new
     end
 
+    # @param oad [Definition]
+    # @return [Boolean] true if oad is one of the {.definitions}
     def self.registered?(oad)
       key = oad.key
       definitions.any? { |(_name, registered)| registered.key == key }
     end
 
     # Sets up OpenAPI test coverage and OAD registration.
+    # Reports coverage when the test process exits, and exits with status 2 if the coverage is below
+    # {Configuration#minimum_coverage}.
     # @yield [OpenapiFirst::Test::Configuration] configuration A configuration to setup test integration
+    # @return [void]
     def self.setup
       install
       yield configuration if block_given?
@@ -130,6 +149,7 @@ module OpenapiFirst
       end
     end
 
+    # @api private
     def self.handle_exit
       return unless configuration.report_coverage
 
@@ -163,11 +183,17 @@ module OpenapiFirst
     # Returns the Rack app wrapped with silent request, response validation
     # You can use this if you want to track coverage via Test::Coverage, but don't want to use
     # the middlewares or manual request, response validation.
+    # @param app [#call] The Rack app
+    # @param spec [Definition, nil] The API description. Overrides api.
+    # @param api [Symbol] The name of a registered API description
+    # @param validate_request_before_handling [Boolean] Validate the request before the app handles it instead of after
+    # @return [#call] The wrapped Rack app
     def self.app(app, spec: nil, api: :default, validate_request_before_handling: false)
       spec ||= self[api]
       App.new(app, api: spec, validate_request_before_handling:)
     end
 
+    # @api private
     def self.install
       return if @installed
 
@@ -194,6 +220,7 @@ module OpenapiFirst
       @installed = true
     end
 
+    # @api private
     def self.uninstall
       configuration = OpenapiFirst.configuration
       configuration.after_request_validation.delete(@after_request_validation)

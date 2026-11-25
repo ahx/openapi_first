@@ -6,7 +6,7 @@ require_relative 'segment_pattern'
 
 module OpenapiFirst
   class Router
-    # @visibility private
+    # @api private
     class PathTrie
       def initialize
         @static = {}

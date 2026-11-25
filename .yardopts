@@ -1,0 +1,7 @@
+--markup markdown
+--hide-api private
+lib/**/*.rb
+-
+README.md
+CHANGELOG.md
+LICENSE.txt

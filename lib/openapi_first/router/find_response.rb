@@ -4,7 +4,7 @@ require_relative 'find_content'
 
 module OpenapiFirst
   class Router
-    # @visibility private
+    # @api private
     module FindResponse
       Match = Data.define(:response, :error)
 

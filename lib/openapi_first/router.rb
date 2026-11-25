@@ -7,6 +7,7 @@ require_relative 'router/find_response'
 
 module OpenapiFirst
   # Router can map requests / responses to their API definition
+  # @api private
   class Router
     # Returned by {#match}
     RequestMatch = Data.define(:request_definition, :params, :error, :responses) do

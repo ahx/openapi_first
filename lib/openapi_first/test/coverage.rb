@@ -16,6 +16,9 @@ module OpenapiFirst
       autoload :TerminalReporter, 'openapi_first/test/coverage/terminal_reporter'
       autoload :HtmlReporter, 'openapi_first/test/coverage/html_reporter'
 
+      # The result of a coverage run, which is passed to the coverage reporter
+      # @!attribute [r] coverage
+      #   @return [Float] The coverage in percent
       Result = Data.define(:plans, :coverage) do
         def skipped_requests_count
           plans.sum(&:skipped_requests_count)
@@ -27,6 +30,7 @@ module OpenapiFirst
       end
 
       class << self
+        # @api private
         def start(skip_response: nil, skip_route: nil)
           return if @drb_uri
 
@@ -48,6 +52,7 @@ module OpenapiFirst
           @drb_uri = nil
         end
 
+        # @api private
         def track_request(request, oad)
           return unless request.known?
 
@@ -68,6 +73,7 @@ module OpenapiFirst
           )
         end
 
+        # @api private
         def track_response(response, _request, oad)
           return unless response.known?
 
@@ -88,6 +94,7 @@ module OpenapiFirst
           )
         end
 
+        # @return [Result] The coverage of all registered API descriptions
         def result
           Result.new(plans:, coverage:)
         end

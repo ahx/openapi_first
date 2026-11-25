@@ -13,6 +13,8 @@ module OpenapiFirst
           @logger = logger
         end
 
+        # Prints the report to the logger
+        # @param coverage_result [Coverage::Result]
         def report(coverage_result)
           coverage = coverage_result.coverage
           if coverage.zero?

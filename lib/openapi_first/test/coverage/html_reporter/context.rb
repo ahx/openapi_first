@@ -7,6 +7,7 @@ module OpenapiFirst
     module Coverage
       class HtmlReporter
         # Provides the binding and helper methods for the ERB template.
+        # @api private
         class Context
           NO_REQUESTS_WARNING =
             'API Coverage did not detect any API requests for the registered ' \

@@ -2,7 +2,7 @@
 
 module OpenapiFirst
   module Validators
-    # @visibility private
+    # @api private
     module RequestParameters
       Headers = Data.define(:schema) do
         def call(parsed_request)

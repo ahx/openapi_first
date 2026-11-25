@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module OpenapiFirst
-  # @visibility private
+  # @api private
   module Utils
     module_function
 

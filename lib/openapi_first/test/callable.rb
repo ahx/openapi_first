@@ -4,6 +4,7 @@ module OpenapiFirst
   module Test
     # Return a Module with a call method that wrapps silent request/response validation to monitor a Rack app
     # This is used by Openapi::Test.observe
+    # @api private
     module Callable
       # Returns a Module with a `call(env)` method that wraps super inside silent request/response validation
       # You can use `Application.prepend(OpenapiFirst::Test::Callable[oad])` to monitor your app during testing.

@@ -5,6 +5,7 @@ require_relative 'validation_error'
 module OpenapiFirst
   module Schema
     # A hash of Schemas
+    # @api private
     class Hash
       # @param schemas Hash of schemas
       # @param required Array of required keys

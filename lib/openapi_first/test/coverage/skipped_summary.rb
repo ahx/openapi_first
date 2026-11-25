@@ -4,6 +4,7 @@ module OpenapiFirst
   module Test
     module Coverage
       # Shared reporting of skipped requests and responses for coverage reporters.
+      # @api private
       module SkippedSummary
         def log_skipped_summary(coverage_result)
           requests = coverage_result.skipped_requests_count

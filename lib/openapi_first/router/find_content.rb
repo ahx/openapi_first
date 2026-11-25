@@ -2,7 +2,7 @@
 
 module OpenapiFirst
   class Router
-    # @visibility private
+    # @api private
     module FindContent
       def self.call(contents, content_type)
         return contents[nil] if content_type.nil? || content_type.empty?

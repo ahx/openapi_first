@@ -2,7 +2,7 @@
 
 module OpenapiFirst
   # Path templating as described in https://spec.openapis.org/oas/v3.1.0#path-templating
-  # @visibility private
+  # @api private
   module PathTemplate
     VARIABLE = /\{(?<name>[^{}]+)\}/
     SEGMENT_VARIABLE = /\A#{VARIABLE}\z/

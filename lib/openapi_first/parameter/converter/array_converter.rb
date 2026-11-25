@@ -4,7 +4,7 @@ module OpenapiFirst
   class Parameter
     module Converter
       # Converts the items of an array parameter value
-      # @visibility private
+      # @api private
       ArrayConverter = Data.define(:schema) do
         def call(value)
           return [] if value.nil? || value.empty?

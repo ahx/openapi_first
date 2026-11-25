@@ -5,6 +5,7 @@ require_relative 'validation_error'
 module OpenapiFirst
   module Schema
     # Result of validating data against a schema. Return value of Schema#validate.
+    # @api private
     class ValidationResult
       def initialize(validation)
         @validation = validation
