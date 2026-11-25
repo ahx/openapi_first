@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-# :nocov:
+# simplecov:disable
 begin
   require 'sinatra/base'
 rescue LoadError
   raise LoadError, 'openapi_first/sinatra needs the `sinatra` gem. Add `gem "sinatra"` to your Gemfile.'
 end
-# :nocov:
+# simplecov:disable
 
 require 'did_you_mean'
 require 'openapi_first'

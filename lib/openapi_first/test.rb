@@ -142,10 +142,10 @@ module OpenapiFirst
 
       main_process = Process.pid
       @setup ||= at_exit do
-        # :nocov:
+        # simplecov:disable
         # Only handle exit once in the main process
         @exit_handler&.call if Process.pid == main_process
-        # :nocov:
+        # simplecov:disable
       end
     end
 

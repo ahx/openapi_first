@@ -10,10 +10,10 @@ module OpenapiFirst
       # @param api [Symbol, Definition] The registered API description
       def assert_api_conform(status: nil, api: openapi_first_default_api)
         api = OpenapiFirst::Test[api]
-        # :nocov:
+        # simplecov:disable
         request = respond_to?(:last_request) ? last_request : @request
         response = respond_to?(:last_response) ? last_response : @response
-        # :nocov:
+        # simplecov:disable
 
         if status && status != response.status
           raise OpenapiFirst::Error,
@@ -22,12 +22,12 @@ module OpenapiFirst
         end
 
         validated = api.validate_request(request, raise_error: false)
-        # :nocov:
+        # simplecov:disable
         raise validated.error.exception if validated.invalid?
 
         validated = api.validate_response(request, response, raise_error: false)
         raise validated.error.exception if validated.invalid?
-        # :nocov:
+        # simplecov:disable
       end
     end
   end

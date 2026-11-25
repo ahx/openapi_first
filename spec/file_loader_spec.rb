@@ -4,7 +4,7 @@ RSpec.describe OpenapiFirst::FileLoader do
   describe '.load' do
     begin
       require 'multi_json'
-      # :nocov:
+      # simplecov:disable
       before do
         MultiJSON.parse_options = { symbolize_names: true }
       end
@@ -12,7 +12,7 @@ RSpec.describe OpenapiFirst::FileLoader do
       after do
         MultiJSON.parse_options = { symbolize_names: false }
       end
-      # :nocov:
+      # simplecov:disable
     rescue LoadError # rubocop:disable Lint/SuppressedException
     end
 
