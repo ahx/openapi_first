@@ -78,11 +78,31 @@ end
 
 ### Request validation
 
-The request validation middleware returns a 4xx if the request is invalid or not defined in the API description. It adds a request object to the current Rack environment at `env[OpenapiFirst::REQUEST]` with the request parameters parsed exactly as described in your API description plus access to meta information from your API description. See _[Manual use](#manual-use)_ for more details about that object.
+The request validation middleware returns a 4xx if the request is invalid or not defined in the API description. It adds an `OpenapiFirst::ValidatedRequest` to the current Rack environment at `env[OpenapiFirst::REQUEST]` (`'openapi.request'`) with the request parameters parsed exactly as described in your API description plus access to meta information from your API description. See _[Manual use](#manual-use)_ for more details about that object.
 
 ```ruby
 use OpenapiFirst::Middlewares::RequestValidation
 ```
+
+Read the validated request in your application:
+
+```ruby
+validated_request = env[OpenapiFirst::REQUEST]
+validated_request.parsed_params # => { "petId" => 42, "limit" => 10 }
+validated_request.operation_id # => "showPetById"
+```
+
+Your application can reject a valid request by calling `OpenapiFirst::Failure.fail!`. The middleware discards the application's response, sets the failure as the `error` of `env[OpenapiFirst::REQUEST]` and renders the matching [error response](#error-responses).
+
+```ruby
+get '/pets/:id' do
+  OpenapiFirst::Failure.fail!(:not_found, message: 'Pet not found') unless Pet.exists?(params[:id])
+  # …
+end
+```
+
+The first argument is the failure type, which determines the error class and the response status:
+`:not_found`, `:method_not_allowed`, `:unsupported_media_type`, `:invalid_body`, `:invalid_query`, `:invalid_header`, `:invalid_path` or `:invalid_cookie`. You can pass `message:` to set the error message.
 
 You can pass a block to configure [hooks](#hooks) and other options for this middleware only:
 
@@ -179,6 +199,26 @@ use OpenapiFirst::Middlewares::RequestValidation, error_response: :jsonapi
 You can build your own custom error response with `error_response: MyCustomClass` that implements `OpenapiFirst::ErrorResponse`.
 You can define custom error responses globally by including / implementing `OpenapiFirst::ErrorResponse` and register it via `OpenapiFirst.register_error_response(my_name, MyCustomErrorResponse)` and set `error_response: my_name`.
 
+A custom error response implements `body` and `content_type`. It can read the `OpenapiFirst::Failure` via `failure` and can override `status`, which defaults to 404, 405, 415 or 400 depending on `failure.type`.
+
+```ruby
+class MyErrorResponse
+  include OpenapiFirst::ErrorResponse
+
+  def body
+    JSON.generate({ error: failure.message, details: failure.errors&.map(&:message) })
+  end
+
+  def content_type
+    'application/json'
+  end
+end
+
+OpenapiFirst.register_error_response(:my_errors, MyErrorResponse)
+
+use OpenapiFirst::Middlewares::RequestValidation, error_response: :my_errors
+```
+
 #### Multipart file uploads
 
 Uploaded files are not read during request validation. A `multipart/form-data` field that was sent as a file is passed through as Rack parsed it – the same shape that Sinatra and Hanami hand to your application:
@@ -196,7 +236,7 @@ This means the _content_ of these fields is not validated, so `minLength`, `maxL
 
 ### Response validation
 
-> [!WARNING]
+> [!NOTE]
 > You should use [Contract Testing](#contract-testing) instead of this middleware.
 
 This middleware raises an error by default if the response is not valid.
@@ -257,7 +297,7 @@ OpenapiFirst::Test.setup do |test|
 end
 ```
 
-OpenapiFirst::Test raises an error when a response status is not defined except for 404 and 500. You can change this:
+OpenapiFirst::Test raises an error when a response status is not defined except for 401, 404 and 500. You can change this:
 
 ```ruby
 OpenapiFirst::Test.setup do |test|
@@ -301,6 +341,21 @@ OpenapiFirst::Test.setup do |test|
 end
 ```
 
+OpenapiFirst::Test raises `OpenapiFirst::Test::UnknownQueryParameterError` when a test sends a query parameter that the API description does not declare for that operation. This makes typos in tests visible. Requests for which an `ignore_request_error` block returns true are not checked.
+
+After the test run, OpenapiFirst::Test reports API coverage and exits with status 2 if the coverage is below `minimum_coverage` (default: 100):
+
+```ruby
+OpenapiFirst::Test.setup do |test|
+  test.minimum_coverage = 95
+
+  # true (default): report and enforce minimum_coverage
+  # :warn: report, but never fail the test run
+  # false: neither report nor enforce
+  test.report_coverage = :warn
+end
+```
+
 ### Test assertions
 
 > [!WARNING]
@@ -313,7 +368,7 @@ Here is how to use it with RSpec, but MiniTest works just as good:
 ```ruby
 # spec_helper.rb
 OpenapiFirst::Test.setup do |test|
-  test.register(File.join(__dir__, '../examples/openapi.yaml'), as: :example_app)
+  test.register(File.join(__dir__, '../examples/openapi.yaml'))
 end
 ```
 
@@ -402,12 +457,16 @@ You can integrate your code at certain points during request/response validation
 
 Available hooks:
 
-- `before_request_validation`
-- `after_request_validation`
-- `after_response_validation`
-- `after_request_parameter_property_validation`
-- `after_request_body_property_validation`
-- `after_response_body_property_validation`
+| Hook | Block arguments |
+| --- | --- |
+| `before_request_validation` | `rack_request, request_definition, definition` |
+| `after_request_validation` | `validated_request, definition` |
+| `after_response_validation` | `validated_response, rack_request, definition` |
+| `after_request_parameter_property_validation` | `data, property, property_schema, parent_schema` |
+| `after_request_body_property_validation` | `data, property, property_schema, parent_schema` |
+| `after_response_body_property_validation` | `data, property, property_schema, parent_schema` |
+
+`before_request_validation` only runs for requests that match an operation in the API description. The `*_property_validation` hooks run for each property of an object schema after it was validated. `data` is the object that contains `property`, so you can change its value in place. `parent_schema` is the schema of that object, or `nil` for `after_request_parameter_property_validation`.
 
 Setup per per instance:
 
@@ -430,6 +489,16 @@ Setup globally:
 OpenapiFirst.configure do |config|
   config.after_request_parameter_property_validation do |data, property, property_schema|
     data[property] = Date.iso8601(data[property]) if property_schema['format'] == 'date'
+  end
+end
+```
+
+You can mark a request as invalid by calling `OpenapiFirst::Failure.fail!` inside a `before_request_validation` or `after_request_validation` hook. If the [request validation middleware](#request-validation) is used, it will render an error response. See [Request validation](#request-validation) for the failure types.
+
+```ruby
+OpenapiFirst.configure do |config|
+  config.before_request_validation do |rack_request, request_definition|
+    OpenapiFirst::Failure.fail!(:not_found) unless request_definition.operation['x-public']
   end
 end
 ```
