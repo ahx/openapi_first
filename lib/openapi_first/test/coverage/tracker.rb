@@ -5,6 +5,7 @@ module OpenapiFirst
     module Coverage
       # Class that allows tracking requests and response for OAD definitions.
       # For each definition it builds a plan and forwards tracking to the correct plan.
+      # @api private
       class Tracker
         attr_reader :plans_by_key
 

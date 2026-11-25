@@ -6,10 +6,11 @@ module OpenapiFirst
   module Test
     class ObserveError < Error; end
 
-    # @visibility private
+    # @api private
     module Observed; end
 
     # Inject silent request/response validation to observe rack apps during testing
+    # @api private
     module Observe
       def self.observe(app, api: :default)
         definition = OpenapiFirst::Test[api]

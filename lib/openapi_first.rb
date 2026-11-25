@@ -19,9 +19,10 @@ module OpenapiFirst
 
   autoload :Test, 'openapi_first/test'
 
-  # Key in rack to find instance of Request
+  # Key in the Rack env where the request validation middleware stores the {ValidatedRequest}
   REQUEST = 'openapi.request'
 
+  # @api private
   FAILURE = :openapi_first_validation_failure
 
   # @return [Configuration]

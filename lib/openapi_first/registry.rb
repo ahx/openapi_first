@@ -4,15 +4,13 @@ module OpenapiFirst
   class NotRegisteredError < Error; end
   class AlreadyRegisteredError < Error; end
 
-  # @visibility private
+  # @api private
   module Registry
+    # @return [Hash<Symbol, Definition>] The registered API descriptions by name
     def definitions
       @definitions ||= {}
     end
 
-    # Register an OpenAPI definition for testing
-    # @param path_or_definition [String, Definition] Path to the OpenAPI file or a Definition object
-    # @param as [Symbol] Name to register the API definition as
     def register(path_or_definition, as: :default, &)
       if definitions.key?(as) && as == :default
         raise(

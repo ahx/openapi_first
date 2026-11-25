@@ -5,7 +5,7 @@ require_relative '../path_template'
 module OpenapiFirst
   class Router
     # Matches one path segment against a segment of a path template that mixes literals and variables
-    # @visibility private
+    # @api private
     class SegmentPattern
       def initialize(segment)
         @pattern = build_pattern(segment)

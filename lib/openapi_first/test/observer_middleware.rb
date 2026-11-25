@@ -3,6 +3,7 @@
 module OpenapiFirst
   module Test
     # Middleware that observes requests and responses. This is used to trigger hooks added by OpenapiFirst::Tests.
+    # @api private
     class ObserverMiddleware
       def initialize(app, options = {})
         @app = app

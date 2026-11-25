@@ -4,6 +4,7 @@ require_relative 'multipart_request_body'
 
 module OpenapiFirst
   module Validators
+    # @api private
     class RequestBody
       MULTIPART = %r{\Amultipart/}i
       private_constant :MULTIPART

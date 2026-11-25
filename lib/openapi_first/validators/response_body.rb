@@ -4,6 +4,7 @@ require_relative '../schema/validation_result'
 
 module OpenapiFirst
   module Validators
+    # @api private
     class ResponseBody
       def initialize(schema)
         @schema = schema

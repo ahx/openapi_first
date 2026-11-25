@@ -6,7 +6,7 @@ require_relative 'parameters_parser'
 
 module OpenapiFirst
   # Unpacks query parameters from a query string.
-  # @visibility private
+  # @api private
   class QueryStringParser
     DEEP_PROP = '\[([\w-]+)\]$'
     private_constant :DEEP_PROP

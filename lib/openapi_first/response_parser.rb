@@ -4,9 +4,11 @@ require_relative 'parameters_parser'
 require_relative 'response_body_parsers'
 
 module OpenapiFirst
+  # @api private
   ParsedResponse = Data.define(:body, :headers)
 
   # Parse a response
+  # @api private
   class ResponseParser
     def initialize(headers:, content_type:)
       @headers_parser = build_headers_parser(headers)

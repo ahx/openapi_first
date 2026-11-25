@@ -6,7 +6,7 @@ require_relative 'converter/object_converter'
 module OpenapiFirst
   class Parameter
     # Converts a parameter value (string) to the type specified in the JSON Schema.
-    # @visibility private
+    # @api private
     module Converter
       PASS_THROUGH = ->(value) { value }
 

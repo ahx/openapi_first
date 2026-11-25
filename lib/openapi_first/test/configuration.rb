@@ -82,6 +82,8 @@ module OpenapiFirst
         @skip_response_coverage = block
       end
 
+      # @param block A Proc that will be called with the path template and the request method of each route.
+      #   Return true to exclude the route and its responses from coverage.
       def skip_coverage(&block)
         return @skip_coverage unless block_given?
 

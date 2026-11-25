@@ -3,6 +3,7 @@
 module OpenapiFirst
   module Test
     module Coverage
+      # @api private
       RouteTask = Data.define(:path, :request_method, :requests, :responses) do
         def skipped?
           requests.all?(&:skipped?)

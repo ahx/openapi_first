@@ -31,6 +31,8 @@ module OpenapiFirst
       # @attr_reader [Proc] app The upstream Rack application
       attr_reader :app
 
+      # @param env [Hash] The Rack env
+      # @return [Array] A Rack response
       def call(env)
         status, headers, body = @app.call(env)
         @definition.validate_response(Rack::Request.new(env), Rack::Response[status, headers, body],

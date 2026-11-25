@@ -2,6 +2,7 @@
 
 module OpenapiFirst
   # A subclass to configuration that points to its parent
+  # @api private
   class ChildConfiguration < Configuration
     def initialize(parent:)
       super()

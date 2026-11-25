@@ -4,11 +4,14 @@ require_relative 'observe'
 
 module OpenapiFirst
   module Test
+    # @api private
     REQUEST = 'openapi.test.request'
+    # @api private
     RESPONSE = 'openapi.test.response'
 
     # A wrapper of the original app
     # with silent request/response validation to track requests/responses.
+    # @api private
     class App < SimpleDelegator
       def initialize(app, api:, validate_request_before_handling:)
         super(app)

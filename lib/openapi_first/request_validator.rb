@@ -6,6 +6,7 @@ require_relative 'validators/request_body'
 
 module OpenapiFirst
   # Validates a Request against a request definition.
+  # @api private
   class RequestValidator
     def initialize(
       content_schema:,

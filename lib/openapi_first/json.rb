@@ -8,7 +8,7 @@ begin
 
   module OpenapiFirst
     # Compatibility with MultiJson
-    # @visibility private
+    # @api private
     module JSON
       if defined?(::MultiJSON)
         # multi_json >= 1.21.0

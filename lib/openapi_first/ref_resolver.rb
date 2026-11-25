@@ -4,7 +4,7 @@ require 'json_schemer'
 
 module OpenapiFirst
   # This is here to give traverse an OAD while keeping $refs intact
-  # @visibility private
+  # @api private
   class RefResolver
     def initialize(file_loader:)
       @file_loader = file_loader
@@ -41,7 +41,7 @@ module OpenapiFirst
       self.for(value, filepath: filepath, context: file_contents)
     end
 
-    # @visibility private
+    # @api private
     module Diggable
       def dig(*keys)
         keys.inject(self) do |result, key|
@@ -52,7 +52,7 @@ module OpenapiFirst
       end
     end
 
-    # @visibility private
+    # @api private
     module Resolvable
       def initialize(value, ref_resolver:, context: value, filepath: nil)
         @value = value
@@ -108,7 +108,7 @@ module OpenapiFirst
       def mark(visited) = (visited || []) + [value.object_id]
     end
 
-    # @visibility private
+    # @api private
     class Simple
       include Resolvable
 
@@ -117,7 +117,7 @@ module OpenapiFirst
       def dereferenced(_visited = nil) = value
     end
 
-    # @visibility private
+    # @api private
     class Hash
       include Resolvable
       include Diggable
@@ -171,7 +171,7 @@ module OpenapiFirst
       end
     end
 
-    # @visibility private
+    # @api private
     # Defers initialization JSONSchemer::Schema, because that takes time.
     class Schema
       extend Forwardable
@@ -187,7 +187,7 @@ module OpenapiFirst
       # This class is here to monkey-patch JSONSchemer::Schema when we are passing
       # an instance to sub-schemas. It skips stringifying all keys of the passed object to
       # allocate fewer objects. We don't have to stringify the keys, because they are already stringified upstream.
-      # @visibility private
+      # @api private
       class DocumentRootSchema < JSONSchemer::Schema
         private
 
@@ -228,7 +228,7 @@ module OpenapiFirst
       end
     end
 
-    # @visibility private
+    # @api private
     class Array
       include Enumerable
       include Resolvable

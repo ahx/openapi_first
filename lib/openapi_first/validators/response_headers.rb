@@ -2,6 +2,7 @@
 
 module OpenapiFirst
   module Validators
+    # @api private
     class ResponseHeaders
       def initialize(headers)
         @headers = headers

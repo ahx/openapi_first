@@ -32,12 +32,14 @@ module OpenapiFirst
 
     attr_reader :name, :schema, :location, :media_type, :style
 
+    # @api private
     def unpack(value)
       return value if value.nil?
 
       @unpacker.call(value)
     end
 
+    # @api private
     def convert(value) = @converter.call(value)
 
     # Unpacks and converts a raw value.
@@ -57,6 +59,7 @@ module OpenapiFirst
 
     def deep_object? = @deep_object
 
+    # @return [String, nil] The JSON Schema type of the parameter
     def type = schema && schema['type']
 
     def array? = type == 'array'

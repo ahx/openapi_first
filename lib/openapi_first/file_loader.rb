@@ -4,7 +4,7 @@ require 'json'
 require 'yaml'
 
 module OpenapiFirst
-  # @!visibility private
+  # @api private
   class FileLoader
     def self.load(file_path)
       new.load(file_path)

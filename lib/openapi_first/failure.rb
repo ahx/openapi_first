@@ -20,8 +20,18 @@ module OpenapiFirst
     }.freeze
     private_constant :TYPES
 
-    # @param type [Symbol] See Failure::TYPES.keys
-    # @param errors [Array<OpenapiFirst::Schema::ValidationError>]
+    # Marks the current request as invalid with a new Failure and stops validation.
+    # Call this only inside a `before_request_validation` or `after_request_validation` hook or in
+    # the block passed to {Definition#validate_request}. It uses `throw`, which nothing else catches.
+    # @example
+    #   config.before_request_validation do |rack_request, request_definition|
+    #     OpenapiFirst::Failure.fail!(:not_found) unless request_definition.operation['x-public']
+    #   end
+    # @param type [Symbol] One of :not_found, :method_not_allowed, :unsupported_media_type,
+    #   :invalid_body, :invalid_query, :invalid_header, :invalid_path, :invalid_cookie
+    # @param message [String, nil] The error message
+    # @param errors [Array<OpenapiFirst::Schema::ValidationError>, nil]
+    # @return [void]
     def self.fail!(type, message: nil, errors: nil)
       throw FAILURE, new(
         type,
@@ -30,8 +40,12 @@ module OpenapiFirst
       )
     end
 
-    # @param type [Symbol] See TYPES.keys
+    # @param type [Symbol] One of :not_found, :method_not_allowed, :unsupported_media_type,
+    #   :invalid_body, :invalid_query, :invalid_header, :invalid_path, :invalid_cookie,
+    #   :response_content_type_not_found, :response_status_not_found, :invalid_response_body,
+    #   :invalid_response_header
     # @param message [String] A generic error message
+    # @raise [ArgumentError] if type is unknown
     # @param errors [Array<OpenapiFirst::Schema::ValidationError>]
     def self.new(type, message: nil, errors: nil)
       unless TYPES.key?(type)
@@ -41,10 +55,11 @@ module OpenapiFirst
       super(type:, message:, errors:)
     end
 
-    # @method type [Symbol] type The type of the failure. See TYPES.keys.
-    # Example: :invalid_body
+    # @!attribute [r] type
+    #   @return [Symbol] The type of the failure, e.g. :invalid_body. See {.new} for all types.
 
-    # @method errors [Array<OpenapiFirst::Schema::ValidationError>, nil] errors Schema validation errors
+    # @!attribute [r] errors
+    #   @return [Array<OpenapiFirst::Schema::ValidationError>, nil] Schema validation errors
 
     alias original_message message
     private :original_message
@@ -53,15 +68,20 @@ module OpenapiFirst
       "#<OpenapiFirst::Failure:#{object_id} type: #{type}, message: #{message}>"
     end
 
-    # A generic error message
+    # The message passed to {.new}, or {#exception_message} if none was passed
+    # @return [String]
     def message
       original_message || exception_message
     end
 
+    # @param context [ValidatedRequest, ValidatedResponse, nil] The object that failed validation
+    # @return [RequestInvalidError, NotFoundError, ResponseInvalidError, ResponseNotFoundError]
+    #   The exception to raise for this failure type
     def exception(context = nil)
       TYPES.fetch(type).first.new(exception_message, context)
     end
 
+    # @return [String] The message of {#exception}, prefixed by the failure type, e.g. "Request body invalid: ..."
     def exception_message
       _, message_prefix = TYPES.fetch(type)
 

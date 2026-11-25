@@ -2,7 +2,7 @@
 
 module OpenapiFirst
   # A wrapper around the Rack env hash that allows accessing headers by header name
-  # @visibility private
+  # @api private
   class RequestHeaders
     # This was copied from this Rack::Request PR: https://github.com/rack/rack/pull/1881
     def initialize(env)

@@ -5,6 +5,7 @@ require_relative 'validators/response_body'
 
 module OpenapiFirst
   # Entry point for response validators
+  # @api private
   class ResponseValidator
     VALIDATORS = [
       Validators::ResponseHeaders,

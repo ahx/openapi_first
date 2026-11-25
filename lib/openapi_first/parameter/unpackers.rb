@@ -9,7 +9,7 @@ module OpenapiFirst
     # Each unpacker is a callable that takes a raw string (or already-parsed
     # value) and returns the unpacked Ruby value, throwing :skip on unrecoverable
     # parse errors.
-    # @visibility private
+    # @api private
     module Unpackers
       ARRAY_DELIMITER = {
         'label' => '.',

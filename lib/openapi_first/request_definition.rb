@@ -12,6 +12,7 @@ module OpenapiFirst
   # An 3.x Operation object can accept multiple requests, because it can handle multiple content-types.
   # This class represents one of those requests.
   class RequestDefinition
+    # @api private
     def initialize(path:, request_method:, operation_object:, # rubocop:disable Metrics/MethodLength,Metrics/ParameterLists
                    parameters:, content_type:, content_schema:, required_body:, key:, encoding: nil)
       @path = path
@@ -38,19 +39,40 @@ module OpenapiFirst
       )
     end
 
+    # @!attribute [r] content_type
+    #   @return [String, nil] The request content type, or nil if the operation defines no request body
+    # @!attribute [r] content_schema
+    #   @return [#value, nil] The schema of the request body. Its `value` is the JSON Schema Hash.
+    # @!attribute [r] operation
+    #   @return [Hash] The raw OpenAPI 3 operation object
+    # @!attribute [r] request_method
+    #   @return [String] The lowercase HTTP method, e.g. "get"
+    # @!attribute [r] path
+    #   @return [String] The OpenAPI path template, e.g. "/pets/{petId}"
+    # @!attribute [r] key
+    #   @return [String] A unique key of this request definition
+    # @!attribute [r] parameters
+    #   @return [Array<Parameter>] The parameters in the order path, query, header, cookie
     attr_reader :content_type, :content_schema, :operation, :request_method, :path, :key, :parameters
     private attr_reader :query_parser
 
+    # @return [Boolean] true if a request without a body is valid
     def allow_empty_content?
       @allow_empty_content
     end
 
+    # @api private
+    # Use {Definition#validate_request} to validate a request.
+    # @param request [Rack::Request]
+    # @param route_params [Hash<String, String>] The path parameters extracted by the router
+    # @return [ValidatedRequest]
     def validate(request, route_params:)
       parsed_request, error = parse_request(request, route_params:)
       error ||= @validator.call(parsed_request) if parsed_request
       ValidatedRequest.new(request, parsed_request:, error:, request_definition: self, query_parser:)
     end
 
+    # @return [String, nil] The OpenAPI 3 operationId
     def operation_id
       @operation['operationId']
     end
@@ -93,6 +115,7 @@ module OpenapiFirst
     end
   end
 
+  # @deprecated Use {RequestDefinition}
   Request = RequestDefinition
   deprecate_constant :Request
 end

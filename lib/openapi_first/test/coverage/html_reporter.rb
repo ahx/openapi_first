@@ -16,6 +16,8 @@ module OpenapiFirst
           @logger = logger
         end
 
+        # Writes the HTML report to the output file
+        # @param coverage_result [Coverage::Result]
         def report(coverage_result)
           html = TEMPLATE.result(Context.new(coverage_result, @verbose).get_binding)
           FileUtils.mkdir_p(File.dirname(@output))

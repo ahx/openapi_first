@@ -5,7 +5,7 @@ require 'forwardable'
 module OpenapiFirst
   module Test
     module Coverage
-      # @visibility private
+      # @api private
       class RequestTask
         extend Forwardable
 

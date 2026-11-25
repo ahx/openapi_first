@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Changed: Renamed internal `OpenapiFirst::Request` to `OpenapiFirst::RequestDefinition` and `OpenapiFirst::Response` to `OpenapiFirst::ResponseDefinition`. These are the objects returned by `ValidatedRequest#request_definition` and `ValidatedResponse#response_definition`. The old constants still work, but are deprecated and will be removed in the next major version.
+- Internal classes and methods are now marked with YARD `@api private`, and the API docs on rubydoc.info show only the public API.
 
 ## 4.4.0
 
