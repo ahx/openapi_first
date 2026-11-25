@@ -84,7 +84,7 @@ module OpenapiFirst
       def resolve_ref(pointer)
         if pointer.start_with?('#')
           value = Hana::Pointer.new(pointer[1..]).eval(context)
-          raise "Unknown reference #{pointer.inspect} in #{filepath || context}" unless value
+          raise "Unknown reference #{pointer.inspect} in #{ref_location}. Nothing exists at that pointer." unless value
 
           return ref_resolver.for(value, filepath:, context:)
         end
@@ -94,7 +94,10 @@ module OpenapiFirst
         return ref_resolver.load(full_path) unless file_pointer
 
         resolved = ref_resolver.file_at(full_path, file_pointer)
-        raise "Unknown reference #{pointer.inspect} in #{filepath || context}" unless resolved
+        unless resolved
+          raise "Unknown reference #{pointer.inspect} in #{ref_location}. " \
+                "Nothing exists at #{"##{file_pointer}".inspect} in #{full_path.inspect}."
+        end
 
         resolved
       rescue OpenapiFirst::FileNotFoundError => e
@@ -104,6 +107,8 @@ module OpenapiFirst
       end
 
       private
+
+      def ref_location = filepath ? File.absolute_path(filepath).inspect : 'the API description'
 
       def mark(visited) = (visited || []) + [value.object_id]
     end

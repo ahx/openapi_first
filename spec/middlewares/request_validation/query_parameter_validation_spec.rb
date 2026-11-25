@@ -12,10 +12,10 @@ RSpec.describe 'Query Parameter validation' do
   let(:raise_error_option) { false }
 
   let(:app) do
-    oas = spec
+    oad = spec
     raise_error = raise_error_option
     Rack::Builder.app do
-      use(OpenapiFirst::Middlewares::RequestValidation, spec: oas, raise_error:)
+      use(OpenapiFirst::Middlewares::RequestValidation, oad, raise_error:)
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }

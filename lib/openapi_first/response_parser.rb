@@ -36,7 +36,7 @@ module OpenapiFirst
       end
       rack_response.body
     rescue TypeError
-      raise Error, "Cannot not read response body. Response is not string-like, but is a #{rack_response.body.class}."
+      raise Error, "Cannot read response body. Response is not string-like, but is a #{rack_response.body.class}."
     end
 
     def build_headers_parser(headers)
