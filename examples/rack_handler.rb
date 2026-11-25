@@ -6,7 +6,7 @@ require 'rack'
 
 RackHandler = Rack::Builder.new do
   spec = OpenapiFirst.load(File.expand_path('./openapi.yaml', __dir__))
-  use(OpenapiFirst::Middlewares::RequestValidation, spec:)
+  use(OpenapiFirst::Middlewares::RequestValidation, spec)
 
   not_found = ->(_request) { [404, {}, []] }
   handlers = {

@@ -78,7 +78,11 @@ module OpenapiFirst
     end
 
     filepath = filepath_or_definition
-    raise FileNotFoundError, "File not found: #{filepath}" unless File.exist?(filepath)
+    unless File.exist?(filepath)
+      raise FileNotFoundError,
+            "File not found: #{File.expand_path(filepath).inspect}." /
+            'Pass a filepath or the Symbol name of an API description registered via OpenapiFirst.register.'
+    end
 
     contents = FileLoader.load(filepath)
     parse(contents, only:, filepath:, path_prefix:, &)

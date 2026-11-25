@@ -9,7 +9,7 @@ RSpec.describe 'Response Header validation' do
 
   let(:app) do
     Rack::Builder.app do
-      use OpenapiFirst::Middlewares::ResponseValidation, spec: './spec/data/response-header.yaml'
+      use OpenapiFirst::Middlewares::ResponseValidation, './spec/data/response-header.yaml'
       run(lambda do |env|
         res = Rack::Response.new
         res.status = 201
@@ -39,7 +39,7 @@ RSpec.describe 'Response Header validation' do
   context 'with a header value that is not valid UTF-8' do
     let(:app) do
       Rack::Builder.app do
-        use OpenapiFirst::Middlewares::ResponseValidation, spec: './spec/data/response-header.yaml'
+        use OpenapiFirst::Middlewares::ResponseValidation, './spec/data/response-header.yaml'
         run(lambda do |_env|
           headers = { 'Location' => '/echos/42', 'X-Id' => (+"\xC3").force_encoding(Encoding::UTF_8) }
           Rack::Response.new('', 201, headers).finish

@@ -10,7 +10,7 @@ RSpec.describe 'Header Parameter validation' do
   let(:app) do
     Rack::Builder.app do
       use OpenapiFirst::Middlewares::RequestValidation,
-          spec: File.expand_path('spec/data/header-parameter-validation.yaml')
+          File.expand_path('spec/data/header-parameter-validation.yaml')
       run lambda { |_env|
         Rack::Response.new('hello', 200).finish
       }
@@ -47,8 +47,7 @@ RSpec.describe 'Header Parameter validation' do
       let(:app) do
         Rack::Builder.app do
           spec_file = File.expand_path('spec/data/header-parameter-validation.yaml')
-          use OpenapiFirst::Middlewares::RequestValidation, raise_error: true,
-                                                            spec: spec_file
+          use OpenapiFirst::Middlewares::RequestValidation, spec_file, raise_error: true
           run ->(_) {}
         end
       end
