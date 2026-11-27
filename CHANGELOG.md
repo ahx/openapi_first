@@ -4,6 +4,7 @@
 
 - Changed: Renamed internal `OpenapiFirst::Request` to `OpenapiFirst::RequestDefinition` and `OpenapiFirst::Response` to `OpenapiFirst::ResponseDefinition`. These are the objects returned by `ValidatedRequest#request_definition` and `ValidatedResponse#response_definition`. The old constants still work, but are deprecated and will be removed in the next major version.
 - Internal classes and methods are now marked with YARD `@api private`, and the API docs on rubydoc.info show only the public API.
+- Fix: A parameter whose schema is a `$ref` gets the `default` of the referenced schema again, including through chains of `$ref`s and `$ref`s to other files. This was lost in 4.0.0. A `default` next to the `$ref` takes precedence in OpenAPI 3.1. OpenAPI 3.0 ignores keywords next to a `$ref`, so there a `default` next to the `$ref` is no longer applied.
 
 ## 4.4.0
 

@@ -209,7 +209,7 @@ module OpenapiFirst
 
       attr_reader :value, :context, :base_uri, :options
 
-      def_delegators :schema, :validate, :valid?
+      def_delegators :schema, :validate, :valid?, :parsed
 
       def schema
         @schema ||= begin

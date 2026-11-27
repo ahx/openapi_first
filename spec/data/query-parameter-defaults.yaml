@@ -1,0 +1,3 @@
+DefaultTrue:
+  type: boolean
+  default: true
