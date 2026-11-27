@@ -1,0 +1,141 @@
+- description: Query parameter default in a $ref'd schema
+  oad:
+    openapi: 3.1.1
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: has_default
+              in: query
+              schema:
+                $ref: '#/components/schemas/DefaultTrue'
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        DefaultTrue:
+          type: boolean
+          default: true
+  valid_request:
+    method: get
+    uri: '/'
+    parsed_query: { "has_default": true }
+
+- description: Query parameter default through a chain of $refs
+  oad:
+    openapi: 3.1.1
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: has_nested_default
+              in: query
+              schema:
+                $ref: '#/components/schemas/DefaultTrueAlias'
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        DefaultTrue:
+          type: boolean
+          default: true
+        DefaultTrueAlias:
+          $ref: '#/components/schemas/DefaultTrue'
+  valid_request:
+    method: get
+    uri: '/'
+    parsed_query: { "has_nested_default": true }
+
+- description: Query parameter default in a schema $ref'd from another file
+  oad:
+    openapi: 3.1.1
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: has_default_in_file
+              in: query
+              schema:
+                $ref: '../data/query-parameter-defaults.yaml#/DefaultTrue'
+          responses:
+            '200':
+              description: ok
+  valid_request:
+    method: get
+    uri: '/'
+    parsed_query: { "has_default_in_file": true }
+
+- description: Query parameter default next to a $ref wins over the referenced default
+  oad:
+    openapi: 3.1.1
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: has_default
+              in: query
+              schema:
+                $ref: '#/components/schemas/DefaultTrue'
+                default: false
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        DefaultTrue:
+          type: boolean
+          default: true
+  valid_request:
+    method: get
+    uri: '/'
+    parsed_query: { "has_default": false }
+
+- description: Query parameter default in a $ref'd schema in OpenAPI 3.0
+  oad:
+    openapi: 3.0.3
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: has_default
+              in: query
+              schema:
+                $ref: '#/components/schemas/DefaultTrue'
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        DefaultTrue:
+          type: boolean
+          default: true
+  valid_request:
+    method: get
+    uri: '/'
+    parsed_query: { "has_default": true }
+
+- description: Query parameter default next to a $ref is ignored in OpenAPI 3.0
+  oad:
+    openapi: 3.0.3
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: has_default
+              in: query
+              schema:
+                $ref: '#/components/schemas/Boolean'
+                default: false
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        Boolean:
+          type: boolean
+  valid_request:
+    method: get
+    uri: '/'
+    parsed_query: {}

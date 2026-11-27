@@ -20,7 +20,7 @@ module OpenapiFirst
       def validate(root_value)
         validation = @root_schema.validate(root_value)
         validations = @schemas.reduce(validation) do |enum, (key, schema)|
-          root_value[key] = schema.value['default'] if schema.value.key?('default') && !root_value.key?(key)
+          insert_default(root_value, key, schema) unless root_value.key?(key)
           next enum unless root_value.key?(key)
 
           value = root_value[key]
@@ -33,6 +33,19 @@ module OpenapiFirst
           end)
         end
         ValidationResult.new(validations)
+      end
+
+      private
+
+      def insert_default(root_value, key, schema)
+        default = default_keyword(schema.parsed)
+        root_value[key] = default.value if default
+      end
+
+      def default_keyword(parsed)
+        parsed.fetch('default') do
+          parsed.each_value.filter_map { default_keyword(_1.ref_schema.parsed) if _1.respond_to?(:ref_schema) }.first
+        end
       end
     end
   end
