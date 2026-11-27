@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: The `default` of a parameter schema that is a `$ref` is applied again. A `default` next to the `$ref` is ignored in OpenAPI 3.0 and used in 3.1, like json_schemer does for validation ([#518](https://github.com/ahx/openapi_first/issues/518)).
 - Changed: Renamed internal `OpenapiFirst::Request` to `OpenapiFirst::RequestDefinition` and `OpenapiFirst::Response` to `OpenapiFirst::ResponseDefinition`. These are the objects returned by `ValidatedRequest#request_definition` and `ValidatedResponse#response_definition`. The old constants still work, but are deprecated and will be removed in the next major version.
 - Internal classes and methods are now marked with YARD `@api private`, and the API docs on rubydoc.info show only the public API.
 

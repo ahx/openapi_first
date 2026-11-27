@@ -9,8 +9,10 @@ module OpenapiFirst
     class Hash
       # @param schemas Hash of schemas
       # @param required Array of required keys
-      def initialize(schemas, required: nil, **options)
+      # @param defaults Hash of default values
+      def initialize(schemas, required: nil, defaults: {}, **options)
         @schemas = schemas
+        @defaults = defaults
         @after_property_validation = options.delete(:after_property_validation)
         schema = { 'type' => 'object' }
         schema['required'] = required if required
@@ -20,7 +22,7 @@ module OpenapiFirst
       def validate(root_value)
         validation = @root_schema.validate(root_value)
         validations = @schemas.reduce(validation) do |enum, (key, schema)|
-          root_value[key] = schema.value['default'] if schema.value.key?('default') && !root_value.key?(key)
+          root_value[key] = @defaults[key] if @defaults.key?(key) && !root_value.key?(key)
           next enum unless root_value.key?(key)
 
           value = root_value[key]

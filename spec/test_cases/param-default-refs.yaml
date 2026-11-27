@@ -1,0 +1,125 @@
+- description: Query parameter default from a $ref'd schema in OpenAPI 3.0
+  oad:
+    openapi: 3.0.3
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: enabled
+              in: query
+              schema:
+                $ref: '#/components/schemas/enabled'
+            - name: nested
+              in: query
+              schema:
+                $ref: '#/components/schemas/enabledAlias'
+            - name: in_file
+              in: query
+              schema:
+                $ref: '../data/components/schemas/enabled.yaml'
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        enabled:
+          type: boolean
+          default: true
+        enabledAlias:
+          $ref: '#/components/schemas/enabled'
+  valid_request:
+    method: get
+    uri: '/'
+    parsed_query:
+      enabled: true
+      nested: true
+      in_file: true
+
+- description: Query parameter default next to a $ref is ignored in OpenAPI 3.0
+  oad:
+    openapi: 3.0.3
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: enabled
+              in: query
+              schema:
+                $ref: '#/components/schemas/enabled'
+                default: false
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        enabled:
+          type: boolean
+          default: true
+  valid_request:
+    method: get
+    uri: '/'
+    parsed_query:
+      enabled: true
+
+- description: Query parameter default from a $ref'd schema in OpenAPI 3.1
+  oad:
+    openapi: 3.1.1
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: enabled
+              in: query
+              schema:
+                $ref: '#/components/schemas/enabled'
+            - name: nested
+              in: query
+              schema:
+                $ref: '#/components/schemas/enabledAlias'
+            - name: in_file
+              in: query
+              schema:
+                $ref: '../data/components/schemas/enabled.yaml'
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        enabled:
+          type: boolean
+          default: true
+        enabledAlias:
+          $ref: '#/components/schemas/enabled'
+  valid_request:
+    method: get
+    uri: '/'
+    parsed_query:
+      enabled: true
+      nested: true
+      in_file: true
+
+- description: Query parameter default next to a $ref wins in OpenAPI 3.1
+  oad:
+    openapi: 3.1.1
+    paths:
+      "/":
+        get:
+          parameters:
+            - name: enabled
+              in: query
+              schema:
+                $ref: '#/components/schemas/enabled'
+                default: false
+          responses:
+            '200':
+              description: ok
+    components:
+      schemas:
+        enabled:
+          type: boolean
+          default: true
+  valid_request:
+    method: get
+    uri: '/'
+    parsed_query:
+      enabled: false

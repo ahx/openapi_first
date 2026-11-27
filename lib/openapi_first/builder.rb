@@ -32,12 +32,12 @@ module OpenapiFirst
       meta_schema = detect_meta_schema(contents, filepath)
       @schemer_configuration = build_schemer_config(filepath:, meta_schema:)
       @file_loader = FileLoader.new
-      ref_resolver = RefResolver.new(file_loader:)
+      @ref_resolver = RefResolver.new(file_loader:)
       @contents = ref_resolver.for(contents, filepath:)
     end
 
     attr_reader :config
-    private attr_reader :schemer_configuration, :file_loader
+    private attr_reader :schemer_configuration, :file_loader, :ref_resolver
 
     def build_schemer_config(filepath:, meta_schema:)
       result = JSONSchemer.configuration.clone
@@ -155,15 +155,28 @@ module OpenapiFirst
       return unless parameters
 
       required = []
+      defaults = {}
       schemas = parameters.each_with_object({}) do |parameter, result|
-        schema = parameter_schema_node(parameter)&.schema(configuration: schemer_configuration)
+        schema_node = parameter_schema_node(parameter)
+        schema = schema_node&.schema(configuration: schemer_configuration)
         name = parameter['name']&.value
         required << name if parameter['required']&.value
         result[name] = schema if schema
+        defaults.merge!(parameter_default(name, schema_node)) if schema_node
       end
 
-      Schema::Hash.new(schemas, required:, configuration: schemer_configuration,
+      Schema::Hash.new(schemas, required:, defaults:, configuration: schemer_configuration,
                                 after_property_validation: config.after_request_parameter_property_validation)
+    end
+
+    # This uses json_schemer to find the default, because OpenAPI 3.0 ignores keywords next to a $ref and 3.1 does not
+    def parameter_default(name, schema_node)
+      value = schema_node.value
+      return value.slice('default').transform_keys { name } unless value.key?('$ref')
+
+      schema = ref_resolver.for({ 'properties' => { name => value } },
+                                filepath: schema_node.filepath, context: schema_node.context)
+      {}.tap { schema.schema(configuration: schemer_configuration).validate(_1) }
     end
 
     def build_requests(path:, request_method:, operation_object:, parameters:) # rubocop:disable Metrics/MethodLength
